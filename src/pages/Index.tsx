@@ -13,6 +13,7 @@ import { Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import GameCompletionModal from "@/components/GameCompletionModal";
 import { PlayerTimer } from "@/components/PlayerTimer";
+import { AIThinkingIndicator } from "@/components/AIThinkingIndicator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -63,6 +64,8 @@ const Index = () => {
   });
   const { toast } = useToast();
   const [aiCooldownUntil, setAiCooldownUntil] = useState<number | null>(null);
+  const [aiIsThinking, setAiIsThinking] = useState(false);
+  const [aiIsSelectingQuestion, setAiIsSelectingQuestion] = useState(false);
 
   // Redirect to auth if not authenticated and trying to access admin
   useEffect(() => {
@@ -99,6 +102,8 @@ const Index = () => {
       // AI picks a question when it's their turn and no question is selected
       if (!selectedQuestion && !isQuestionModalOpen) {
         console.log('AI turn: selecting random question');
+        setAiIsSelectingQuestion(true);
+        setAiIsThinking(true);
         const timer = setTimeout(() => {
           handleAISelectQuestion();
         }, 1500);
@@ -108,6 +113,8 @@ const Index = () => {
       // AI answers the question when modal is open and question is selected
       if (selectedQuestion && isQuestionModalOpen && (!aiCooldownUntil || now >= aiCooldownUntil)) {
         console.log('AI turn: answering selected question');
+        setAiIsSelectingQuestion(false);
+        setAiIsThinking(true);
         const timer = setTimeout(() => {
           handleAITurn(selectedQuestion);
         }, 2000);
@@ -323,6 +330,7 @@ const Index = () => {
     setSelectedQuestion(question);
     setSelectedQuestionGridId(questionId);
     setIsQuestionModalOpen(true);
+    setAiIsSelectingQuestion(false); // AI finished selecting question
     
     const activePlayer = players.find(p => p.isActive);
     console.log('Question selected:', questionId, 'Active player:', activePlayer?.name);
@@ -371,11 +379,13 @@ const Index = () => {
       // Set AI cooldown for 60 seconds after answering
       const cooldownEnd = Date.now() + 60000; // 60 seconds
       setAiCooldownUntil(cooldownEnd);
+      setAiIsThinking(false); // AI finished thinking
       console.log('AI cooldown set for 60 seconds');
       
       handleAnswer(correctAnswerIndex);
     } else {
       console.log('No correct answer index found for AI');
+      setAiIsThinking(false);
     }
   };
 
@@ -681,8 +691,16 @@ const Index = () => {
         rowCount={gameConfig.rowCount}
       />
       
-      {/* Player Timer - positioned below the game board with ample space */}
+      {/* Player Timer and AI Thinking Indicator - positioned below the game board with ample space */}
       <div className="container mx-auto px-4 py-8">
+        {/* Show AI thinking indicator when computer is active and thinking */}
+        <AIThinkingIndicator
+          isActive={players.find(p => p.isActive)?.name === "Computer"}
+          isSelectingQuestion={aiIsSelectingQuestion}
+          isAnswering={aiIsThinking && !aiIsSelectingQuestion}
+        />
+        
+        {/* Show human player timer when human is active and no question selected */}
         <PlayerTimer 
           isActive={players.find(p => p.isActive)?.name !== "Computer" && !selectedQuestion && !isQuestionModalOpen}
           playerName={players.find(p => p.isActive)?.name || ""}
