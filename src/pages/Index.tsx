@@ -66,15 +66,18 @@ const Index = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleModeSelect = (mode: 'single' | 'multiplayer') => {
+  const handleModeSelect = (mode: 'single' | 'multiplayer', playerCount?: number) => {
     setGameMode(mode);
     setGameConfigured(false);
-    if (mode === 'multiplayer') {
-      setPlayers([
-        { id: "player1", name: "Player 1", score: 0, isActive: true },
-        { id: "player2", name: "Player 2", score: 0, isActive: false }
-      ]);
-    } else {
+    if (mode === 'multiplayer' && playerCount) {
+      const multiplayerPlayers = Array.from({ length: playerCount }, (_, index) => ({
+        id: `player${index + 1}`,
+        name: `Player ${index + 1}`,
+        score: 0,
+        isActive: index === 0
+      }));
+      setPlayers(multiplayerPlayers);
+    } else if (mode === 'single') {
       setPlayers([
         { id: "player1", name: "Player 1", score: 0, isActive: true },
         { id: "computer", name: "Computer", score: 0, isActive: false }

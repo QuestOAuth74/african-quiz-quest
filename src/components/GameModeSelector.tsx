@@ -1,15 +1,27 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Bot, Sparkles } from "lucide-react";
+import { Users, Bot, Sparkles, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface GameModeSelectorProps {
-  onSelectMode: (mode: 'single' | 'multiplayer') => void;
+  onSelectMode: (mode: 'single' | 'multiplayer', playerCount?: number) => void;
 }
 
 export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
+  const [showPlayerSelect, setShowPlayerSelect] = useState(false);
+  
   const handleModeSelect = (mode: 'single' | 'multiplayer') => {
-    onSelectMode(mode);
+    if (mode === 'multiplayer') {
+      setShowPlayerSelect(true);
+    } else {
+      onSelectMode(mode);
+    }
+  };
+
+  const handlePlayerCountSelect = (playerCount: number) => {
+    onSelectMode('multiplayer', playerCount);
+    setShowPlayerSelect(false);
   };
 
   return (
@@ -77,12 +89,12 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
                   <Users size={56} className="text-theme-brown" />
                 </div>
                 <CardTitle className="text-3xl font-bold text-theme-yellow">
-                  TWO PLAYER
+                  MULTIPLAYER
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center px-8 pb-8">
                 <p className="text-card-foreground mb-8 text-lg leading-relaxed">
-                  Compete head-to-head with a friend. Who knows more about the rich history of Africa?
+                  Compete with 2-4 players. Who knows more about the rich history of Africa?
                 </p>
                 <Button 
                   onClick={() => handleModeSelect('multiplayer')} 
@@ -105,6 +117,49 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
           </div>
         </div>
       </div>
+
+      {/* Player Count Selection Modal */}
+      {showPlayerSelect && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <Card className="jeopardy-card max-w-md w-full animate-scale-in">
+            <CardHeader className="text-center pb-4">
+              <div className="flex items-center justify-between mb-4">
+                <Button
+                  onClick={() => setShowPlayerSelect(false)}
+                  variant="outline"
+                  size="sm"
+                  className="jeopardy-button"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-1" />
+                  Back
+                </Button>
+                <CardTitle className="text-2xl font-bold text-theme-yellow">
+                  SELECT PLAYERS
+                </CardTitle>
+                <div className="w-16" /> {/* Spacer for balance */}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4 pb-8">
+              <p className="text-center text-card-foreground mb-6">
+                How many players will compete?
+              </p>
+              <div className="grid grid-cols-1 gap-3">
+                {[2, 3, 4].map((count) => (
+                  <Button
+                    key={count}
+                    onClick={() => handlePlayerCountSelect(count)}
+                    className="w-full jeopardy-gold font-bold text-lg py-4 hover:scale-105 transition-all duration-300"
+                    size="lg"
+                  >
+                    <Users className="w-5 h-5 mr-2" />
+                    {count} PLAYERS
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
