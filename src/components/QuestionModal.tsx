@@ -122,8 +122,8 @@ export function QuestionModal({
       </audio>
       
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] jeopardy-card border-theme-yellow/30 overflow-hidden flex flex-col">
-          <DialogHeader className="text-center pb-6 flex-shrink-0">
+        <DialogContent className="max-w-4xl max-h-[85vh] jeopardy-card border-theme-yellow/30">
+          <DialogHeader className="text-center pb-4 flex-shrink-0">
             <DialogTitle className="font-orbitron font-black text-2xl md:text-3xl text-theme-yellow">
               {question.category.toUpperCase()}
             </DialogTitle>
@@ -132,11 +132,10 @@ export function QuestionModal({
             </div>
           </DialogHeader>
           
-          <div className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="space-y-8 pr-4">
-                {/* Timer */}
-                <div className="space-y-3">
+          <ScrollArea className="flex-1 max-h-[70vh]">
+            <div className="space-y-6 pr-4">
+              {/* Timer */}
+              <div className="space-y-3">
                   <div className="w-full bg-theme-brown-dark rounded-full h-3 border border-theme-yellow/30">
                     <div 
                       className={`h-3 rounded-full transition-all duration-1000 ${
@@ -157,7 +156,7 @@ export function QuestionModal({
 
                 {/* Question */}
                 <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
-                  <CardContent className="p-6">
+                      <CardContent className="p-4">
                     {question.imageUrl && (
                       <div className="mb-6 flex justify-center">
                         <img 
@@ -176,13 +175,13 @@ export function QuestionModal({
                 {/* Answer Options */}
                 {!showAnswer && !hasAnswered && timeLeft > 0 && (
                   <div className="space-y-4 animate-fade-in">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {question.options.map((option, index) => (
                         <Button
                           key={index}
                           onClick={() => handleAnswer(index)}
                           variant="outline"
-                          className="p-6 h-auto text-left jeopardy-button font-exo text-base hover:scale-105 transition-all duration-300 border-theme-yellow/50 text-theme-yellow hover:text-theme-yellow-light"
+                          className="p-4 h-auto text-left jeopardy-button font-exo text-sm hover:scale-105 transition-all duration-300 border-theme-yellow/50 text-theme-yellow hover:text-theme-yellow-light"
                         >
                           <span className="font-orbitron font-bold mr-3 text-theme-yellow-light">
                             {String.fromCharCode(65 + index)}.
@@ -191,12 +190,11 @@ export function QuestionModal({
                         </Button>
                       ))}
                     </div>
-                    <div className="flex justify-center">
+                    <div className="flex justify-center pt-2">
                       <Button
                         onClick={handlePass}
                         variant="outline"
-                        className="px-8 py-4 jeopardy-button font-orbitron font-bold text-lg hover:scale-105 transition-all duration-300 border-orange-500/50 text-orange-400 hover:text-orange-300"
-                        size="lg"
+                        className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300 border-orange-500/50 text-orange-400 hover:text-orange-300"
                       >
                         <SkipForward className="mr-2" size={20} />
                         PASS
@@ -207,7 +205,7 @@ export function QuestionModal({
 
                 {/* Show Results and Explanation */}
                 {showAnswer && (
-                  <div className="space-y-6 animate-fade-in">
+                  <div className="space-y-4 animate-fade-in">
                     {/* Results */}
                     <Card className={`border-none ${
                       selectedAnswerIndex === question.correctAnswerIndex 
@@ -216,9 +214,9 @@ export function QuestionModal({
                           ? 'bg-orange-900/20 border-orange-500/50'
                           : 'bg-red-900/20 border-red-500/50'
                     }`}>
-                      <CardContent className="p-6">
+                      <CardContent className="p-4">
                         <div className="text-center">
-                          <div className="flex items-center justify-center gap-3 mb-4">
+                          <div className="flex items-center justify-center gap-2 mb-3">
                             {selectedAnswerIndex === question.correctAnswerIndex ? (
                               <CheckCircle className="text-green-800" size={24} />
                             ) : selectedAnswerIndex === null ? (
@@ -226,7 +224,7 @@ export function QuestionModal({
                             ) : (
                               <XCircle className="text-red-600" size={24} />
                             )}
-                            <p className={`text-lg font-orbitron font-bold uppercase tracking-wider ${
+                            <p className={`text-base font-orbitron font-bold uppercase tracking-wider ${
                               selectedAnswerIndex === question.correctAnswerIndex 
                                 ? 'text-green-800' 
                                 : selectedAnswerIndex === null 
@@ -241,7 +239,7 @@ export function QuestionModal({
                             </p>
                           </div>
                           {selectedAnswerIndex !== null && typeof selectedAnswerIndex === 'number' && (
-                            <p className={`text-base mb-3 ${
+                            <p className={`text-sm mb-2 ${
                               selectedAnswerIndex === question.correctAnswerIndex 
                                 ? 'text-green-800' 
                                 : 'text-red-100'
@@ -249,7 +247,7 @@ export function QuestionModal({
                               You selected: <strong>{question.options[selectedAnswerIndex]}</strong>
                             </p>
                           )}
-                          <p className={`text-lg font-exo font-bold ${
+                          <p className={`text-base font-exo font-bold ${
                             selectedAnswerIndex === question.correctAnswerIndex 
                               ? 'text-green-800' 
                               : 'text-white'
@@ -263,14 +261,14 @@ export function QuestionModal({
                     {/* Explanation */}
                     <Card className="jeopardy-card border-theme-brown-light/50">
                       <CardContent className="p-6">
-                        <h3 className="text-lg font-orbitron font-bold text-theme-yellow mb-4 uppercase tracking-wider">
+                        <h3 className="text-base font-orbitron font-bold text-theme-yellow mb-3 uppercase tracking-wider">
                           Explanation
                         </h3>
-                        <p className="text-base font-exo leading-relaxed text-card-foreground mb-4">
+                        <p className="text-sm font-exo leading-relaxed text-card-foreground mb-3">
                           {question.explanation}
                         </p>
-                        <div className="pt-4 border-t border-theme-yellow/30">
-                          <h4 className="text-base font-orbitron font-bold text-theme-yellow-light mb-3 uppercase tracking-wider">
+                        <div className="pt-3 border-t border-theme-yellow/30">
+                          <h4 className="text-sm font-orbitron font-bold text-theme-yellow-light mb-2 uppercase tracking-wider">
                             Historical Context
                           </h4>
                           <p className="text-sm font-exo leading-relaxed text-card-foreground/90">
@@ -281,11 +279,10 @@ export function QuestionModal({
                     </Card>
 
                     {/* Close Button */}
-                    <div className="text-center">
+                    <div className="text-center pt-2">
                       <Button 
                         onClick={handleClose}
-                        className="px-8 py-4 jeopardy-button font-orbitron font-bold text-lg hover:scale-105 transition-all duration-300"
-                        size="lg"
+                        className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300"
                       >
                         CONTINUE GAME
                       </Button>
@@ -294,7 +291,6 @@ export function QuestionModal({
                 )}
               </div>
             </ScrollArea>
-          </div>
         </DialogContent>
       </Dialog>
     </>
