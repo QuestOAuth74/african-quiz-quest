@@ -6,6 +6,7 @@ import { GameHeader } from "@/components/GameHeader";
 import { GameBoard } from "@/components/GameBoard";
 import QuestionModal from "@/components/QuestionModal";
 import UserAuth from "@/components/UserAuth";
+import { TopNavigation } from "@/components/TopNavigation";
 import { AudioControls } from "@/components/AudioControls";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
@@ -464,13 +465,16 @@ const Index = () => {
   if (!gameMode) {
     return (
       <div className="min-h-screen overflow-hidden relative">
+        {/* Top Navigation */}
+        <TopNavigation />
+        
         {/* Global Audio Controls */}
         <div className="fixed top-4 right-4 z-50">
           <AudioControls />
         </div>
 
         {/* User Authentication Section */}
-        <div className="container mx-auto px-4 pt-20 pb-8">
+        <div className="container mx-auto px-4 pt-24 pb-8">
           <div className="max-w-md mx-auto">
             <UserAuth />
           </div>
@@ -485,31 +489,41 @@ const Index = () => {
   if (!gameConfigured) {
     return (
       <div className="min-h-screen overflow-hidden relative">
+        {/* Top Navigation */}
+        <TopNavigation />
+        
         {/* Global Audio Controls */}
         <div className="fixed top-4 right-4 z-50">
           <AudioControls />
         </div>
-        <GameSetup
-          gameMode={gameMode}
-          onBack={handleBackToModeSelection}
-          onStartGame={handleGameSetup}
-        />
+        <div className="pt-16">
+          <GameSetup
+            gameMode={gameMode}
+            onBack={handleBackToModeSelection}
+            onStartGame={handleGameSetup}
+          />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen overflow-hidden relative">
+      {/* Top Navigation */}
+      <TopNavigation />
+      
       {/* Global Audio Controls */}
       <div className="fixed top-4 right-4 z-50">
         <AudioControls />
       </div>
 
-      <GameHeader 
-        players={players}
-        gameMode={gameMode}
-        onNewGame={handleNewGame}
-      />
+      <div className="pt-16">
+        <GameHeader 
+          players={players}
+          gameMode={gameMode}
+          onNewGame={handleNewGame}
+        />
+      </div>
       <GameBoard 
         categories={categories}
         onQuestionSelect={handleQuestionSelect}
