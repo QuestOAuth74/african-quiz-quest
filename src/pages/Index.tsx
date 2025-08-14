@@ -66,11 +66,14 @@ const Index = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleModeSelect = (mode: 'single' | 'multiplayer', playerCount?: number) => {
+  const [playerCount, setPlayerCount] = useState<number>(2);
+
+  const handleModeSelect = (mode: 'single' | 'multiplayer', selectedPlayerCount?: number) => {
     setGameMode(mode);
     setGameConfigured(false);
-    if (mode === 'multiplayer' && playerCount) {
-      const multiplayerPlayers = Array.from({ length: playerCount }, (_, index) => ({
+    if (mode === 'multiplayer' && selectedPlayerCount) {
+      setPlayerCount(selectedPlayerCount);
+      const multiplayerPlayers = Array.from({ length: selectedPlayerCount }, (_, index) => ({
         id: `player${index + 1}`,
         name: `Player ${index + 1}`,
         score: 0,
@@ -85,8 +88,16 @@ const Index = () => {
     }
   };
 
-  const handleGameSetup = async (selectedCategories: any[], rowCount: number, questionFilter: 'all' | 'fresh' | 'correct' | 'incorrect') => {
+  const handleGameSetup = async (selectedCategories: any[], rowCount: number, questionFilter: 'all' | 'fresh' | 'correct' | 'incorrect', playerNames?: string[]) => {
     try {
+      // Update player names if provided (for multiplayer)
+      if (playerNames && gameMode === 'multiplayer') {
+        setPlayers(prev => prev.map((player, index) => ({
+          ...player,
+          name: playerNames[index] || `Player ${index + 1}`
+        })));
+      }
+      
       // Load questions for selected categories
       await loadQuestionsForCategories(selectedCategories, rowCount, questionFilter);
     } catch (error) {
@@ -588,6 +599,7 @@ const Index = () => {
         <div className="pt-16">
           <GameSetup
             gameMode={gameMode}
+            playerCount={playerCount}
             onBack={handleBackToModeSelection}
             onStartGame={handleGameSetup}
           />

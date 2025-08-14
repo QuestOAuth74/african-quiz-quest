@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Play } from "lucide-react";
+import { ArrowLeft, Play, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Category {
@@ -18,8 +19,9 @@ type QuestionFilter = 'all' | 'fresh' | 'correct' | 'incorrect';
 
 interface GameSetupProps {
   gameMode: 'single' | 'multiplayer';
+  playerCount?: number;
   onBack: () => void;
-  onStartGame: (selectedCategories: Category[], rowCount: number, questionFilter: QuestionFilter) => void;
+  onStartGame: (selectedCategories: Category[], rowCount: number, questionFilter: QuestionFilter, playerNames?: string[]) => void;
 }
 
 interface QuestionCounts {
@@ -29,13 +31,16 @@ interface QuestionCounts {
   incorrect: number;
 }
 
-const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
+const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [rowCount, setRowCount] = useState<number>(5);
   const [questionFilter, setQuestionFilter] = useState<QuestionFilter>('all');
   const [loading, setLoading] = useState(true);
   const [questionCounts, setQuestionCounts] = useState<QuestionCounts>({ all: 0, fresh: 0, correct: 0, incorrect: 0 });
+  const [playerNames, setPlayerNames] = useState<string[]>(
+    Array.from({ length: playerCount || 2 }, (_, i) => `Player ${i + 1}`)
+  );
   const { toast } = useToast();
 
   useEffect(() => {
@@ -165,7 +170,7 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
       selectedCategories.includes(cat.id)
     );
     
-    onStartGame(selectedCategoryData, rowCount, questionFilter);
+    onStartGame(selectedCategoryData, rowCount, questionFilter, gameMode === 'multiplayer' ? playerNames : undefined);
   };
 
   if (loading) {
@@ -198,7 +203,7 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
                 Game Setup
               </h1>
               <p className="text-theme-yellow-light font-exo">
-                Configure your {gameMode === 'single' ? 'single player' : 'multiplayer'} game
+                Configure your {gameMode === 'single' ? 'single player' : `${playerCount || 2} player`} game
               </p>
             </div>
           </div>
@@ -282,7 +287,40 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
                   </p>
                 </CardContent>
               </Card>
-
+              
+              {/* Player Names for Multiplayer */}
+              {gameMode === 'multiplayer' && (
+                <Card className="jeopardy-card">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-orbitron text-accent flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      Player Names
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {playerNames.map((name, index) => (
+                      <div key={index}>
+                        <Label htmlFor={`player-${index}`} className="text-sm font-medium text-muted-foreground">
+                          Player {index + 1}
+                        </Label>
+                        <Input
+                          id={`player-${index}`}
+                          value={name}
+                          onChange={(e) => {
+                            const newNames = [...playerNames];
+                            newNames[index] = e.target.value || `Player ${index + 1}`;
+                            setPlayerNames(newNames);
+                          }}
+                          placeholder={`Player ${index + 1}`}
+                          className="jeopardy-button mt-1"
+                          maxLength={20}
+                        />
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+              
               {/* Question Filter Selection */}
               <Card className="jeopardy-card">
                 <CardHeader>
@@ -322,7 +360,7 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Mode</Label>
                     <Badge variant="secondary" className="ml-2 bg-accent text-accent-foreground">
-                      {gameMode === 'single' ? 'Single Player' : 'Multiplayer'}
+                      {gameMode === 'single' ? 'Single Player' : `${playerCount || 2} Players`}
                     </Badge>
                   </div>
                   
