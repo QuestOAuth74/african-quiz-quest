@@ -3,8 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Gem, Download, MessageSquare, MessageCircle, Trophy, Sparkles } from 'lucide-react';
+import { Gem, Download, MessageSquare, MessageCircle, Trophy, Sparkles, Crown, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 
 interface UserOrbData {
   total_orbs: number;
@@ -27,6 +28,59 @@ export const OrbProgress = ({ userId }: OrbProgressProps) => {
   useEffect(() => {
     fetchOrbData();
   }, [userId]);
+
+  // Trigger confetti when user reaches 100 orbs
+  useEffect(() => {
+    if (orbData && orbData.total_orbs >= 100 && !orbData.pdf_claimed) {
+      triggerCelebration();
+    }
+  }, [orbData]);
+
+  const triggerCelebration = () => {
+    // Multi-burst confetti celebration
+    const colors = ['#f59e0b', '#8b5cf6', '#06b6d4', '#10b981', '#f97316'];
+    
+    // First burst
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: colors
+    });
+
+    // Second burst from left
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors
+      });
+    }, 250);
+
+    // Third burst from right
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors
+      });
+    }, 400);
+
+    // Final shower
+    setTimeout(() => {
+      confetti({
+        particleCount: 150,
+        spread: 120,
+        startVelocity: 45,
+        origin: { y: 0.4 },
+        colors: colors
+      });
+    }, 600);
+  };
 
   const fetchOrbData = async () => {
     try {
@@ -162,22 +216,66 @@ export const OrbProgress = ({ userId }: OrbProgressProps) => {
         {/* Progress toward PDF */}
         <div className="space-y-3">
           {orbData.pdf_claimed ? (
-            <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg text-center">
-              <Sparkles className="h-6 w-6 text-green-500 mx-auto mb-2" />
-              <div className="text-sm font-semibold text-green-600">PDF Reward Claimed!</div>
-              <div className="text-xs text-muted-foreground">
+            <div className="p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl text-center space-y-3">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Crown className="h-8 w-8 text-yellow-500 animate-pulse" />
+                <Sparkles className="h-6 w-6 text-green-500" />
+                <Crown className="h-8 w-8 text-yellow-500 animate-pulse" />
+              </div>
+              <div className="text-lg font-bold text-green-600 mb-2">🎉 PDF Reward Claimed! 🎉</div>
+              <div className="text-sm text-muted-foreground">
                 Claimed on {new Date(orbData.pdf_claimed_at!).toLocaleDateString()}
+              </div>
+              <div className="text-xs text-green-600 bg-green-50 p-2 rounded-lg border border-green-200">
+                You will be contacted by The Admin within 72 hours with your free PDF copy!
               </div>
             </div>
           ) : orbData.total_orbs >= 100 ? (
-            <Button 
-              onClick={handleClaimPDF}
-              disabled={claiming}
-              className="w-full bg-gradient-to-r from-amber-500 to-purple-500 text-white hover:from-amber-600 hover:to-purple-600 shadow-lg"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              {claiming ? 'Claiming...' : 'Claim PDF Reward!'}
-            </Button>
+            <div className="space-y-4">
+              {/* Congratulatory Message */}
+              <div className="p-6 bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-pink-500/15 border-2 border-gradient-to-r border-amber-500/30 rounded-xl text-center space-y-4 animate-scale-in">
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <Star className="h-8 w-8 text-yellow-500 animate-spin" style={{ animationDuration: '3s' }} />
+                  <Crown className="h-10 w-10 text-yellow-500 animate-pulse" />
+                  <Star className="h-8 w-8 text-yellow-500 animate-spin" style={{ animationDuration: '3s', animationDirection: 'reverse' }} />
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black bg-gradient-to-r from-amber-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    🎊 CONGRATULATIONS! 🎊
+                  </h3>
+                  <p className="text-lg font-bold text-foreground">
+                    You've achieved 100 Orbs!
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    What an incredible accomplishment! Your dedication to learning history is truly inspiring.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-r from-amber-500/10 to-purple-500/10 p-4 rounded-lg border border-amber-500/20">
+                  <div className="text-sm font-semibold text-foreground mb-2">
+                    🎁 Your Exclusive Reward Awaits!
+                  </div>
+                  <div className="text-sm text-muted-foreground mb-3">
+                    "Black Africa: An Illustrated History" - Free PDF Edition
+                  </div>
+                  <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded border border-amber-200">
+                    <strong>📧 What happens next:</strong><br />
+                    The Admin will personally contact you within 72 hours to deliver your free electronic PDF copy directly to your email!
+                  </div>
+                </div>
+              </div>
+
+              {/* Claim Button */}
+              <Button 
+                onClick={handleClaimPDF}
+                disabled={claiming}
+                className="w-full h-14 bg-gradient-to-r from-amber-500 via-purple-500 to-pink-500 text-white hover:from-amber-600 hover:via-purple-600 hover:to-pink-600 shadow-xl text-lg font-bold animate-pulse"
+              >
+                <Download className="h-5 w-5 mr-3" />
+                {claiming ? 'Processing Your Reward...' : 'Claim Your PDF Reward!'}
+              </Button>
+            </div>
           ) : (
             <div className="p-4 bg-background/30 border border-border/30 rounded-lg text-center">
               <div className="text-sm font-medium text-muted-foreground mb-1">
