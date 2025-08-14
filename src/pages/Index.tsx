@@ -412,6 +412,14 @@ const Index = () => {
     })));
   };
 
+  const handleSkipTurn = () => {
+    console.log('Skip turn requested, switching to next player');
+    setPlayers(prev => prev.map(player => ({
+      ...player,
+      isActive: !player.isActive
+    })));
+  };
+
   const handleAnswer = async (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
     let isCorrect = false;
     let pointChange = 0;
@@ -701,7 +709,26 @@ const Index = () => {
           gameMode={gameMode}
           onNewGame={handleNewGame}
         />
+        
+        {/* Thinking Bar - positioned between header and board */}
+        <div className="container mx-auto px-4 py-4">
+          {/* Show AI thinking indicator when computer is active and thinking */}
+          <AIThinkingIndicator
+            isActive={players.find(p => p.isActive)?.name === "Computer"}
+            isSelectingQuestion={aiIsSelectingQuestion}
+            isAnswering={aiIsThinking && !aiIsSelectingQuestion}
+          />
+          
+          {/* Show human player timer when human is active and no question selected */}
+          <PlayerTimer 
+            isActive={players.find(p => p.isActive)?.name !== "Computer" && !selectedQuestion && !isQuestionModalOpen}
+            playerName={players.find(p => p.isActive)?.name || ""}
+            onTimeout={handlePlayerTimeout}
+            onSkipTurn={handleSkipTurn}
+          />
+        </div>
       </div>
+      
       
       <GameBoard 
         categories={categories}
@@ -709,23 +736,6 @@ const Index = () => {
         isGameActive={true}
         rowCount={gameConfig.rowCount}
       />
-      
-      {/* Player Timer and AI Thinking Indicator - positioned below the game board with ample space */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Show AI thinking indicator when computer is active and thinking */}
-        <AIThinkingIndicator
-          isActive={players.find(p => p.isActive)?.name === "Computer"}
-          isSelectingQuestion={aiIsSelectingQuestion}
-          isAnswering={aiIsThinking && !aiIsSelectingQuestion}
-        />
-        
-        {/* Show human player timer when human is active and no question selected */}
-        <PlayerTimer 
-          isActive={players.find(p => p.isActive)?.name !== "Computer" && !selectedQuestion && !isQuestionModalOpen}
-          playerName={players.find(p => p.isActive)?.name || ""}
-          onTimeout={handlePlayerTimeout}
-        />
-      </div>
       
       <QuestionModal
         isOpen={isQuestionModalOpen || showTeacherMode}

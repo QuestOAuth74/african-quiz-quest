@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
-import { Brain } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Brain, SkipForward } from "lucide-react";
 import { useGameAudio } from "@/hooks/useGameAudio";
 
 interface PlayerTimerProps {
   isActive: boolean;
   playerName: string;
   onTimeout?: () => void;
+  onSkipTurn?: () => void;
 }
 
-export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProps) => {
+export const PlayerTimer = ({ isActive, playerName, onTimeout, onSkipTurn }: PlayerTimerProps) => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [isVisible, setIsVisible] = useState(false);
   const gameAudio = useGameAudio();
@@ -84,8 +86,19 @@ export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProp
             />
           </div>
           
-          <div className="text-center text-xs text-muted-foreground">
-            Select a question to continue
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-muted-foreground">
+              Select a question to continue
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSkipTurn}
+              className="h-6 px-2 text-xs flex items-center gap-1"
+            >
+              <SkipForward className="h-3 w-3" />
+              Skip Turn
+            </Button>
           </div>
         </div>
       </div>
