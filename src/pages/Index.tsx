@@ -76,7 +76,7 @@ const Index = () => {
     if (activePlayer?.name === "Computer" && gameConfigured) {
       console.log('AI is now active');
       
-      // If no question is selected, AI picks a random question
+      // Only act if no question is currently selected (AI's turn to pick)
       if (!isQuestionModalOpen && !selectedQuestion) {
         console.log('AI selecting random question');
         const timer = setTimeout(() => {
@@ -468,6 +468,7 @@ const Index = () => {
         isActive: !player.isActive
       })));
       
+      // Close modal and clear question selection for the next player
       setIsQuestionModalOpen(false);
       setSelectedQuestion(null);
       setSelectedQuestionGridId(null);
