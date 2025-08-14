@@ -66,13 +66,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				jeopardy: {
-					blue: 'hsl(var(--jeopardy-blue))',
-					'blue-light': 'hsl(var(--jeopardy-blue-light))',
-					'blue-dark': 'hsl(var(--jeopardy-blue-dark))',
-					gold: 'hsl(var(--jeopardy-gold))',
-					'gold-light': 'hsl(var(--jeopardy-gold-light))',
-					'gold-dark': 'hsl(var(--jeopardy-gold-dark))',
+				theme: {
+					brown: 'hsl(var(--theme-brown))',
+					'brown-light': 'hsl(var(--theme-brown-light))',
+					'brown-dark': 'hsl(var(--theme-brown-dark))',
+					yellow: 'hsl(var(--theme-yellow))',
+					'yellow-light': 'hsl(var(--theme-yellow-light))',
+					'yellow-dark': 'hsl(var(--theme-yellow-dark))',
 				}
 			},
 			borderRadius: {
@@ -98,8 +98,8 @@ export default {
 					'100%': { transform: 'scale(1)', opacity: '1' }
 				},
 				'glow': {
-					'0%, 100%': { boxShadow: '0 0 20px hsl(var(--jeopardy-gold) / 0.3)' },
-					'50%': { boxShadow: '0 0 30px hsl(var(--jeopardy-gold) / 0.6), 0 0 40px hsl(var(--jeopardy-gold) / 0.3)' }
+					'0%, 100%': { boxShadow: '0 0 20px hsl(var(--theme-yellow) / 0.3)' },
+					'50%': { boxShadow: '0 0 30px hsl(var(--theme-yellow) / 0.6), 0 0 40px hsl(var(--theme-yellow) / 0.3)' }
 				}
 			},
 			animation: {

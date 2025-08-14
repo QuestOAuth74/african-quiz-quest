@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock, CheckCircle, XCircle, SkipForward } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuestionModalProps {
   isOpen: boolean;
@@ -34,6 +35,8 @@ export function QuestionModal({
   const [showAnswer, setShowAnswer] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isOpen || !question) return;
@@ -43,6 +46,14 @@ export function QuestionModal({
     setHasAnswered(false);
     setSelectedAnswerIndex(null);
     
+    // Start countdown music
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {
+        // Silently handle autoplay restrictions
+      });
+    }
+    
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -50,6 +61,10 @@ export function QuestionModal({
             setShowAnswer(true);
             setHasAnswered(true);
             onAnswer('timeout');
+          }
+          // Stop music when time runs out
+          if (audioRef.current) {
+            audioRef.current.pause();
           }
           return 0;
         }
@@ -64,12 +79,20 @@ export function QuestionModal({
     setSelectedAnswerIndex(answerIndex);
     setHasAnswered(true);
     setShowAnswer(true);
+    // Stop music when answer is selected
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     onAnswer(answerIndex);
   };
 
   const handlePass = () => {
     setHasAnswered(true);
     setShowAnswer(true);
+    // Stop music when passing
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     onAnswer('pass');
   };
 
@@ -86,13 +109,25 @@ export function QuestionModal({
   const isTimeRunningOut = timeLeft <= 10;
 
   return (
+    <>
+      {/* Hidden audio element for countdown music */}
+      <audio
+        ref={audioRef}
+        loop
+        preload="auto"
+      >
+        <source src="https://www.soundjay.com/misc/sounds/countdown-clock.mp3" type="audio/mpeg" />
+        {/* Fallback for browsers that don't support MP3 */}
+        <source src="https://www.soundjay.com/misc/sounds/countdown-clock.wav" type="audio/wav" />
+      </audio>
+      
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl jeopardy-card border-jeopardy-gold/30">
         <DialogHeader className="text-center pb-6">
-          <DialogTitle className="font-orbitron font-black text-2xl md:text-3xl text-jeopardy-gold">
+          <DialogTitle className="font-orbitron font-black text-2xl md:text-3xl text-theme-yellow">
             {question.category.toUpperCase()}
           </DialogTitle>
-          <div className="font-orbitron font-bold text-xl text-jeopardy-gold-light">
+          <div className="font-orbitron font-bold text-xl text-theme-yellow-light">
             ${question.points.toLocaleString()}
           </div>
         </DialogHeader>
@@ -100,33 +135,33 @@ export function QuestionModal({
         <div className="space-y-8">
           {/* Timer */}
           <div className="space-y-3">
-            <div className="w-full bg-jeopardy-blue-dark rounded-full h-3 border border-jeopardy-gold/30">
+            <div className="w-full bg-theme-brown-dark rounded-full h-3 border border-theme-yellow/30">
               <div 
                 className={`h-3 rounded-full transition-all duration-1000 ${
                   isTimeRunningOut 
                     ? 'bg-gradient-to-r from-red-500 to-red-600 animate-pulse' 
-                    : 'bg-gradient-to-r from-jeopardy-gold to-jeopardy-gold-light'
+                    : 'bg-gradient-to-r from-theme-yellow to-theme-yellow-light'
                 }`}
                 style={{ width: `${timeProgress}%` }}
               />
             </div>
             <div className="flex items-center justify-center gap-2">
-              <Clock size={16} className={isTimeRunningOut ? 'text-red-400 animate-pulse' : 'text-jeopardy-gold'} />
-              <span className={`font-orbitron font-bold ${isTimeRunningOut ? 'text-red-400 animate-pulse' : 'text-jeopardy-gold'}`}>
+              <Clock size={16} className={isTimeRunningOut ? 'text-red-400 animate-pulse' : 'text-theme-yellow'} />
+              <span className={`font-orbitron font-bold ${isTimeRunningOut ? 'text-red-400 animate-pulse' : 'text-theme-yellow'}`}>
                 {timeLeft}s
               </span>
             </div>
           </div>
 
           {/* Question */}
-          <Card className="jeopardy-card border-jeopardy-blue-light/50 animate-scale-in">
+          <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
             <CardContent className="p-6">
               {question.imageUrl && (
                 <div className="mb-6 flex justify-center">
                   <img 
                     src={question.imageUrl} 
                     alt="Question illustration" 
-                    className="rounded-lg max-w-full h-48 object-cover border-2 border-jeopardy-gold/30"
+                    className="rounded-lg max-w-full h-48 object-cover border-2 border-theme-yellow/30"
                   />
                 </div>
               )}
@@ -145,9 +180,9 @@ export function QuestionModal({
                     key={index}
                     onClick={() => handleAnswer(index)}
                     variant="outline"
-                    className="p-6 h-auto text-left jeopardy-button font-exo text-base hover:scale-105 transition-all duration-300 border-jeopardy-gold/50 text-jeopardy-gold hover:text-jeopardy-gold-light"
+                    className="p-6 h-auto text-left jeopardy-button font-exo text-base hover:scale-105 transition-all duration-300 border-theme-yellow/50 text-theme-yellow hover:text-theme-yellow-light"
                   >
-                    <span className="font-orbitron font-bold mr-3 text-jeopardy-gold-light">
+                    <span className="font-orbitron font-bold mr-3 text-theme-yellow-light">
                       {String.fromCharCode(65 + index)}.
                     </span>
                     {option}
@@ -190,7 +225,7 @@ export function QuestionModal({
                       ) : (
                         <XCircle className="text-red-600" size={24} />
                       )}
-                      <p className="text-lg font-orbitron font-bold text-jeopardy-blue-dark uppercase tracking-wider">
+                      <p className="text-lg font-orbitron font-bold text-theme-brown-dark uppercase tracking-wider">
                         {selectedAnswerIndex === question.correctAnswerIndex 
                           ? 'Correct!' 
                           : selectedAnswerIndex === null 
@@ -199,11 +234,11 @@ export function QuestionModal({
                       </p>
                     </div>
                     {selectedAnswerIndex !== null && typeof selectedAnswerIndex === 'number' && (
-                      <p className="text-base mb-3 text-jeopardy-blue-dark">
+                      <p className="text-base mb-3 text-theme-brown-dark">
                         You selected: <strong>{question.options[selectedAnswerIndex]}</strong>
                       </p>
                     )}
-                    <p className="text-lg font-exo font-bold text-jeopardy-blue-dark">
+                    <p className="text-lg font-exo font-bold text-theme-brown-dark">
                       Correct Answer: {question.options[question.correctAnswerIndex]}
                     </p>
                   </div>
@@ -211,16 +246,16 @@ export function QuestionModal({
               </Card>
 
               {/* Explanation */}
-              <Card className="jeopardy-card border-jeopardy-blue-light/50">
+              <Card className="jeopardy-card border-theme-brown-light/50">
                 <CardContent className="p-6">
-                  <h3 className="text-lg font-orbitron font-bold text-jeopardy-gold mb-4 uppercase tracking-wider">
+                  <h3 className="text-lg font-orbitron font-bold text-theme-yellow mb-4 uppercase tracking-wider">
                     Explanation
                   </h3>
                   <p className="text-base font-exo leading-relaxed text-card-foreground mb-4">
                     {question.explanation}
                   </p>
-                  <div className="pt-4 border-t border-jeopardy-gold/30">
-                    <h4 className="text-base font-orbitron font-bold text-jeopardy-gold-light mb-3 uppercase tracking-wider">
+                  <div className="pt-4 border-t border-theme-yellow/30">
+                    <h4 className="text-base font-orbitron font-bold text-theme-yellow-light mb-3 uppercase tracking-wider">
                       Historical Context
                     </h4>
                     <p className="text-sm font-exo leading-relaxed text-card-foreground/90">
@@ -247,6 +282,7 @@ export function QuestionModal({
           )}
         </div>
       </DialogContent>
-    </Dialog>
+      </Dialog>
+    </>
   );
 }
