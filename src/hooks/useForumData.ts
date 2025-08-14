@@ -83,9 +83,11 @@ export const useForumData = (user: any, filters: ForumFilters) => {
       query = query.eq('category_id', filters.selectedCategory);
     }
 
-    // Search filter
-    if (filters.searchTerm) {
-      query = query.or(`title.ilike.%${filters.searchTerm}%,content.ilike.%${filters.searchTerm}%`);
+    // Enhanced Search filter
+    if (filters.searchTerm && filters.searchTerm.trim()) {
+      const searchTerm = filters.searchTerm.trim();
+      // Search in title, content, and user display names
+      query = query.or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%,profiles.display_name.ilike.%${searchTerm}%`);
     }
 
     // Time filter

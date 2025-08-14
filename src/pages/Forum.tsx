@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send, Filter } from 'lucide-react';
+import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send, Filter, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
@@ -356,11 +356,13 @@ const Forum = () => {
 
         {/* Search, Sort, and Filter Section */}
         <div className="space-y-4 mb-8">
-          {/* Search Bar */}
+          {/* Enhanced Search Bar */}
           <SearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
             placeholder="Search discussions by title or content..."
+            isLoading={loading}
+            resultCount={posts.length}
           />
           
           {/* Sorting and Filter Toggle */}
@@ -560,10 +562,30 @@ const Forum = () => {
             <Card className="border-0 bg-background/60 backdrop-blur-xl rounded-3xl shadow-2xl">
               <CardContent className="py-16 text-center">
                 <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center">
-                  <MessageCircle className="h-10 w-10 text-primary" />
+                  {searchTerm ? (
+                    <Search className="h-10 w-10 text-primary" />
+                  ) : (
+                    <MessageCircle className="h-10 w-10 text-primary" />
+                  )}
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-3">No posts yet</h3>
-                <p className="text-muted-foreground text-lg">Be the first to share something amazing!</p>
+                <h3 className="text-2xl font-bold text-foreground mb-3">
+                  {searchTerm ? `No results for "${searchTerm}"` : 'No posts yet'}
+                </h3>
+                <p className="text-muted-foreground text-lg mb-6">
+                  {searchTerm 
+                    ? 'Try searching for something else or check your spelling'
+                    : 'Be the first to share something amazing!'
+                  }
+                </p>
+                {searchTerm && (
+                  <Button
+                    onClick={() => setSearchTerm('')}
+                    variant="outline"
+                    className="rounded-full px-6"
+                  >
+                    Clear search
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ) : (
