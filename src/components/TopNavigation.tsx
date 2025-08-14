@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink, Youtube, Globe, Menu, X } from "lucide-react";
+import { ExternalLink, Youtube, Globe, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -92,18 +92,10 @@ const TopNavigation = () => {
             >
               <div className="flex flex-col h-full">
                 {/* Header */}
-                <div className="flex items-center justify-between pb-6 border-b border-theme-yellow/20">
+                <div className="pb-6 border-b border-theme-yellow/20">
                   <span className="text-theme-yellow font-semibold text-lg">
                     Historia Africana
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setOpen(false)}
-                    className="text-theme-yellow-light hover:text-theme-yellow"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
                 </div>
 
                 {/* Navigation Links */}
