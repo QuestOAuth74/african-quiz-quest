@@ -16,6 +16,7 @@ import { PlayerTimer } from "@/components/PlayerTimer";
 import { AIThinkingIndicator } from "@/components/AIThinkingIndicator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import WelcomeModal from "@/components/WelcomeModal";
 
 interface Question {
   id: string;
@@ -66,6 +67,20 @@ const Index = () => {
   const [aiCooldownUntil, setAiCooldownUntil] = useState<number | null>(null);
   const [aiIsThinking, setAiIsThinking] = useState(false);
   const [aiIsSelectingQuestion, setAiIsSelectingQuestion] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  // Check if user has seen the welcome modal before
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+    if (!hasSeenWelcome) {
+      setShowWelcomeModal(true);
+    }
+  }, []);
+
+  const handleCloseWelcome = () => {
+    setShowWelcomeModal(false);
+    localStorage.setItem('hasSeenWelcome', 'true');
+  };
 
   // Redirect to auth if not authenticated and trying to access admin
   useEffect(() => {
@@ -623,6 +638,9 @@ const Index = () => {
   if (!gameMode) {
     return (
       <div className="min-h-screen overflow-hidden relative">
+        {/* Welcome Modal */}
+        <WelcomeModal isOpen={showWelcomeModal} onClose={handleCloseWelcome} />
+        
         {/* Top Navigation */}
         <TopNavigation />
         
