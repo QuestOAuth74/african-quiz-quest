@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Brain } from "lucide-react";
+import { useGameAudio } from "@/hooks/useGameAudio";
 
 interface PlayerTimerProps {
   isActive: boolean;
@@ -11,17 +12,22 @@ interface PlayerTimerProps {
 export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProps) => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [isVisible, setIsVisible] = useState(false);
+  const gameAudio = useGameAudio();
 
   useEffect(() => {
     if (isActive && playerName !== "Computer") {
       setTimeLeft(60);
       setIsVisible(true);
       
+      // Start thinking countdown music
+      gameAudio.playThinkingCountdown();
+      
       const timer = setInterval(() => {
         setTimeLeft(prev => {
           if (prev <= 1) {
             clearInterval(timer);
             setIsVisible(false);
+            gameAudio.stopThinkingCountdown();
             onTimeout?.();
             return 0;
           }
@@ -32,9 +38,11 @@ export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProp
       return () => {
         clearInterval(timer);
         setIsVisible(false);
+        gameAudio.stopThinkingCountdown();
       };
     } else {
       setIsVisible(false);
+      gameAudio.stopThinkingCountdown();
     }
   }, [isActive, playerName, onTimeout]);
 

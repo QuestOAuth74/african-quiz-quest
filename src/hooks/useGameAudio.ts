@@ -5,12 +5,15 @@ interface GameAudioHook {
   playWrongAnswer: () => void;
   playCountdown: () => void;
   stopCountdown: () => void;
+  playThinkingCountdown: () => void;
+  stopThinkingCountdown: () => void;
 }
 
 export const useGameAudio = (): GameAudioHook => {
   const correctAudioRef = useRef<HTMLAudioElement | null>(null);
   const wrongAudioRef = useRef<HTMLAudioElement | null>(null);
   const countdownAudioRef = useRef<HTMLAudioElement | null>(null);
+  const thinkingCountdownAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const initializeAudio = useCallback((audioRef: React.MutableRefObject<HTMLAudioElement | null>, src: string) => {
     if (!audioRef.current) {
@@ -46,10 +49,26 @@ export const useGameAudio = (): GameAudioHook => {
     }
   }, []);
 
+  const playThinkingCountdown = useCallback(() => {
+    const audio = initializeAudio(thinkingCountdownAudioRef, 'https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/thinking-music.mp3');
+    audio.currentTime = 0;
+    audio.loop = true;
+    audio.play().catch(console.warn);
+  }, [initializeAudio]);
+
+  const stopThinkingCountdown = useCallback(() => {
+    if (thinkingCountdownAudioRef.current) {
+      thinkingCountdownAudioRef.current.pause();
+      thinkingCountdownAudioRef.current.currentTime = 0;
+    }
+  }, []);
+
   return {
     playCorrectAnswer,
     playWrongAnswer,
     playCountdown,
-    stopCountdown
+    stopCountdown,
+    playThinkingCountdown,
+    stopThinkingCountdown
   };
 };
