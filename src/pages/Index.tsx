@@ -652,17 +652,6 @@ const Index = () => {
         
         {/* Top Navigation */}
           <TopNavigation />
-          
-          {/* Quick Quiz Access */}
-          <div className="fixed top-4 right-4 z-50">
-            <Button
-              onClick={() => navigate('/quiz-setup')}
-              className="jeopardy-button bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg"
-            >
-              <BookOpen className="w-4 h-4 mr-2" />
-              Quick Quiz
-            </Button>
-          </div>
         
         {/* Global Audio Controls */}
         <div className="fixed top-4 right-4 z-50">

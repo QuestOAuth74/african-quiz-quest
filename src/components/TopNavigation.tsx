@@ -22,8 +22,8 @@ const TopNavigation = () => {
             size="sm"
             className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
           >
-            <a href="/quiz">
-              Quiz
+            <a href="/quiz-setup">
+              Start Quiz
             </a>
           </Button>
           
@@ -120,11 +120,11 @@ const TopNavigation = () => {
                   </a>
                   
                   <a
-                    href="/quiz"
+                    href="/quiz-setup"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
                   >
-                    <span>Quiz</span>
+                    <span>Start Quiz</span>
                   </a>
                   
                   <a
