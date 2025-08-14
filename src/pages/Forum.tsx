@@ -313,35 +313,43 @@ const Forum = () => {
         <ForumHeader />
       </div>
       
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
-        {/* Category Filter with Modern Design */}
-        <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-border/50 shadow-lg">
-          <h2 className="text-lg font-semibold mb-4 text-foreground">Explore Categories</h2>
-          <div className="flex flex-wrap gap-3">
-            <Button
-              variant={selectedCategory === 'all' ? 'default' : 'ghost'}
+      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6">
+        {/* Stories-like Category Filter */}
+        <div className="bg-background/80 backdrop-blur-sm rounded-3xl p-6 mb-6 border border-border/30 shadow-lg">
+          <h2 className="text-lg font-semibold mb-4 text-foreground">Explore Topics</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+            <button
               onClick={() => setSelectedCategory('all')}
-              className={`rounded-full px-6 h-10 font-medium transition-all duration-200 ${
+              className={`flex flex-col items-center gap-2 min-w-[80px] p-3 rounded-2xl transition-all duration-300 ${
                 selectedCategory === 'all' 
-                  ? 'shadow-lg shadow-primary/25 scale-105' 
-                  : 'hover:bg-muted/80 hover:scale-105'
+                  ? 'bg-primary text-primary-foreground shadow-lg scale-105' 
+                  : 'bg-muted/50 hover:bg-muted hover:scale-105'
               }`}
             >
-              All Categories
-            </Button>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                selectedCategory === 'all' ? 'bg-background/20' : 'bg-primary/10'
+              }`}>
+                <MessageCircle className="h-6 w-6" />
+              </div>
+              <span className="text-xs font-medium text-center">All</span>
+            </button>
             {categories.map((category) => (
-              <Button
+              <button
                 key={category.id}
-                variant={selectedCategory === category.id ? 'default' : 'ghost'}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`rounded-full px-6 h-10 font-medium transition-all duration-200 ${
+                className={`flex flex-col items-center gap-2 min-w-[80px] p-3 rounded-2xl transition-all duration-300 ${
                   selectedCategory === category.id 
-                    ? 'shadow-lg shadow-primary/25 scale-105' 
-                    : 'hover:bg-muted/80 hover:scale-105'
+                    ? 'bg-primary text-primary-foreground shadow-lg scale-105' 
+                    : 'bg-muted/50 hover:bg-muted hover:scale-105'
                 }`}
               >
-                {category.name}
-              </Button>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  selectedCategory === category.id ? 'bg-background/20' : 'bg-primary/10'
+                }`}>
+                  <MessageCircle className="h-6 w-6" />
+                </div>
+                <span className="text-xs font-medium text-center line-clamp-2">{category.name}</span>
+              </button>
             ))}
           </div>
         </div>
@@ -399,39 +407,45 @@ const Forum = () => {
           <ForumStats selectedCategory={selectedCategory} />
         </div>
 
-        {/* Modern Create Post Section */}
+        {/* Instagram-style Create Post Section */}
         {isAuthenticated ? (
-          <Card className="mb-8 border-border/50 shadow-xl bg-gradient-to-r from-card via-card to-card/80 backdrop-blur-sm overflow-hidden">
+          <Card className="mb-8 border-0 shadow-2xl bg-background/80 backdrop-blur-xl rounded-3xl overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-            <CardHeader className="relative">
+            <CardHeader className="relative p-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-xl">
-                    <MessageCircle className="h-6 w-6 text-primary" />
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent p-0.5">
+                      <div className="w-full h-full bg-background rounded-full flex items-center justify-center">
+                        <MessageCircle className="h-6 w-6 text-primary" />
+                      </div>
+                    </div>
                   </div>
                   <div>
-                    <CardTitle className="text-xl font-bold">Share Your Knowledge</CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">Start a new discussion about African history</p>
+                    <CardTitle className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                      Share Your Story
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">What's on your mind about African history?</p>
                   </div>
                 </div>
                 <Button
                   onClick={() => setShowCreatePost(!showCreatePost)}
-                  className={`rounded-full px-6 h-11 font-medium transition-all duration-300 ${
+                  className={`rounded-full px-6 h-12 font-semibold transition-all duration-300 shadow-lg ${
                     showCreatePost 
-                      ? 'bg-muted text-muted-foreground hover:bg-muted/80' 
-                      : 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105'
+                      ? 'bg-muted text-muted-foreground hover:bg-muted/80 shadow-none' 
+                      : 'bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:shadow-xl hover:scale-105'
                   }`}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {showCreatePost ? 'Cancel' : 'New Post'}
+                  <Plus className="h-5 w-5 mr-2" />
+                  {showCreatePost ? 'Cancel' : 'Create Post'}
                 </Button>
               </div>
             </CardHeader>
             {showCreatePost && (
-              <CardContent className="space-y-4">
+              <CardContent className="px-6 pb-6 space-y-6 animate-fade-in">
                 <Select value={newPost.category_id} onValueChange={(value) => setNewPost({ ...newPost, category_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                  <SelectTrigger className="rounded-xl border-border/30 bg-background/50 h-12">
+                    <SelectValue placeholder="Choose a category" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -441,38 +455,42 @@ const Forum = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                
                 <Input
-                  placeholder="Post title..."
+                  placeholder="What's your story about?"
                   value={newPost.title}
                   onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                  className="rounded-xl border-border/30 bg-background/50 h-12 text-base"
                 />
+                
                 <Textarea
-                  placeholder="What's on your mind?"
+                  placeholder="Share your thoughts, discoveries, or questions about African heritage..."
                   value={newPost.content}
                   onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
                   rows={4}
+                  className="rounded-xl border-border/30 bg-background/50 text-base resize-none"
                 />
                 
                 {/* Image Upload Section */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <ImageIcon className="h-4 w-4" />
-                    <span className="text-sm font-medium">Add Image (Optional)</span>
+                    <ImageIcon className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">Add Image</span>
                   </div>
                   
                   {imagePreview ? (
-                    <div className="relative">
+                    <div className="relative rounded-2xl overflow-hidden">
                       <img 
                         src={imagePreview} 
                         alt="Preview" 
-                        className="w-full max-w-xs rounded-lg border"
+                        className="w-full max-w-sm rounded-2xl border-2 border-border/20"
                       />
                       <Button
                         type="button"
                         variant="destructive"
                         size="sm"
                         onClick={removeImage}
-                        className="absolute top-2 right-2"
+                        className="absolute top-3 right-3 rounded-full w-8 h-8 p-0"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -490,23 +508,29 @@ const Forum = () => {
                         type="button"
                         variant="outline"
                         onClick={() => document.getElementById('image-upload')?.click()}
-                        className="flex items-center gap-2"
+                        className="rounded-xl border-2 border-dashed border-border/30 bg-background/50 hover:bg-background/80 h-24 w-full flex flex-col gap-2"
                       >
-                        <Upload className="h-4 w-4" />
-                        Upload Image
+                        <Upload className="h-6 w-6" />
+                        <span className="font-medium">Choose Image</span>
+                        <span className="text-xs text-muted-foreground">JPG or PNG, max 500KB</span>
                       </Button>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        JPG or PNG, max 500KB
-                      </p>
                     </div>
                   )}
                 </div>
                 
-                <div className="flex gap-2">
-                  <Button onClick={handleCreatePost} disabled={uploading}>
-                    {uploading ? 'Creating...' : 'Post'}
+                <div className="flex gap-3 pt-4 border-t border-border/20">
+                  <Button 
+                    onClick={handleCreatePost} 
+                    disabled={uploading}
+                    className="flex-1 rounded-xl h-12 font-semibold bg-gradient-to-r from-primary to-primary/90 hover:shadow-lg transition-all duration-300"
+                  >
+                    {uploading ? 'Sharing...' : 'Share Post'}
                   </Button>
-                  <Button variant="outline" onClick={() => setShowCreatePost(false)}>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowCreatePost(false)}
+                    className="rounded-xl h-12 px-6"
+                  >
                     Cancel
                   </Button>
                 </div>
@@ -514,153 +538,204 @@ const Forum = () => {
             )}
           </Card>
         ) : (
-          <Card className="mb-6">
-            <CardContent className="py-6 text-center">
-              <p className="text-muted-foreground mb-4">Sign in to join the discussion</p>
+          <Card className="mb-8 border-0 shadow-2xl bg-background/80 backdrop-blur-xl rounded-3xl overflow-hidden">
+            <CardContent className="py-8 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center">
+                <MessageCircle className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Join the Conversation</h3>
+              <p className="text-muted-foreground mb-6">Sign in to share your stories and connect with the community</p>
               <Link to="/auth">
-                <Button>Sign In</Button>
+                <Button className="rounded-full px-8 h-12 font-semibold bg-gradient-to-r from-primary to-primary/90 hover:shadow-lg transition-all duration-300">
+                  Sign In
+                </Button>
               </Link>
             </CardContent>
           </Card>
         )}
 
-        {/* Modern Posts List */}
-        <div className="space-y-6">
+        {/* Instagram-like Posts Feed */}
+        <div className="space-y-8">
           {posts.length === 0 ? (
-            <Card className="border-border/50 bg-gradient-to-br from-card to-muted/20">
-              <CardContent className="py-12 text-center">
-                <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">No discussions yet</h3>
-                <p className="text-muted-foreground">Be the first to start a conversation in this category!</p>
+            <Card className="border-0 bg-background/60 backdrop-blur-xl rounded-3xl shadow-2xl">
+              <CardContent className="py-16 text-center">
+                <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center">
+                  <MessageCircle className="h-10 w-10 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-3">No posts yet</h3>
+                <p className="text-muted-foreground text-lg">Be the first to share something amazing!</p>
               </CardContent>
             </Card>
           ) : (
             posts.map((post) => (
-              <Card key={post.id} className="border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm group hover:scale-[1.01]">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-transparent to-accent/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-lg" />
-                <CardHeader className="relative">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-4">
+              <Card key={post.id} className="border-0 bg-background/80 backdrop-blur-xl rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 group overflow-hidden animate-fade-in">
+                {/* Post Header - Instagram Style */}
+                <CardHeader className="p-6 pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
                         <UserAvatar 
                           displayName={post.profiles?.display_name}
                           email={post.profiles?.email}
                           size="lg"
                         />
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-3 mb-1">
-                            <span className="font-semibold text-foreground text-base">
-                              {post.profiles?.display_name || 'Anonymous User'}
-                            </span>
-                            <UserBadges userId={post.user_id} limit={3} size="sm" />
-                          </div>
-                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            <Badge variant="secondary" className="px-3 py-1 rounded-full font-medium">
-                              {post.forum_categories.name}
-                            </Badge>
-                            <span className="text-xs">•</span>
-                            <span className="text-xs">{formatDate(post.created_at)}</span>
-                          </div>
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-background rounded-full"></div>
                         </div>
                       </div>
-                      <CardTitle className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-200">{post.title}</CardTitle>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-foreground text-lg">
+                            {post.profiles?.display_name || 'Anonymous User'}
+                          </span>
+                          <UserBadges userId={post.user_id} limit={2} size="sm" />
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Badge variant="outline" className="px-2 py-0.5 text-xs rounded-full border-primary/20 bg-primary/5">
+                            {post.forum_categories.name}
+                          </Badge>
+                          <span>•</span>
+                          <span className="text-xs">{formatDate(post.created_at)}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {post.image_url && (
-                    <img 
-                      src={post.image_url} 
-                      alt="Post image" 
-                      className="w-full max-w-md rounded-lg border mb-4"
-                    />
-                  )}
-                  <p className="text-foreground whitespace-pre-wrap mb-4">{post.content}</p>
-                  
-                  {/* Post Actions */}
-                  <div className="flex items-center gap-4 pt-4 border-t border-border/50">
-                    <Button
-                      variant={userUpvotes.has(post.id) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleUpvote(post.id)}
-                      className="flex items-center gap-2"
-                    >
-                      <ThumbsUp className="h-4 w-4" />
-                      <span>{post.upvote_count}</span>
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleReplies(post.id)}
-                      className="flex items-center gap-2"
-                    >
-                      <Reply className="h-4 w-4" />
-                      <span>{replies[post.id]?.length || 0} Replies</span>
-                    </Button>
-
                     <BookmarkButton postId={post.id} size="sm" />
                   </div>
+                </CardHeader>
 
-                  {/* Replies Section */}
+                <CardContent className="px-6 pb-6">
+                  {/* Post Title */}
+                  <h2 className="text-xl font-bold text-foreground mb-4 leading-relaxed group-hover:text-primary transition-colors duration-300">
+                    {post.title}
+                  </h2>
+
+                  {/* Post Image - Full width like Instagram */}
+                  {post.image_url && (
+                    <div className="relative -mx-6 mb-6">
+                      <img 
+                        src={post.image_url} 
+                        alt="Post image" 
+                        className="w-full h-auto max-h-[500px] object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                  )}
+
+                  {/* Post Content */}
+                  <div className="space-y-4">
+                    <p className="text-foreground text-base leading-relaxed whitespace-pre-wrap">
+                      {post.content}
+                    </p>
+
+                    {/* Engagement Actions - Instagram Style */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border/30">
+                      <div className="flex items-center gap-6">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleUpvote(post.id)}
+                          className={`p-2 h-auto hover:scale-110 transition-transform duration-200 ${
+                            userUpvotes.has(post.id) 
+                              ? 'text-red-500 hover:text-red-600' 
+                              : 'text-muted-foreground hover:text-red-500'
+                          }`}
+                        >
+                          <ThumbsUp className={`h-6 w-6 ${userUpvotes.has(post.id) ? 'fill-current' : ''}`} />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleReplies(post.id)}
+                          className="p-2 h-auto text-muted-foreground hover:text-primary hover:scale-110 transition-all duration-200"
+                        >
+                          <Reply className="h-6 w-6" />
+                        </Button>
+                      </div>
+                      
+                      <div className="text-sm text-muted-foreground">
+                        <span className="font-medium">{post.upvote_count}</span> likes
+                        {replies[post.id] && replies[post.id].length > 0 && (
+                          <>
+                            <span className="mx-2">•</span>
+                            <span className="font-medium">{replies[post.id].length}</span> comments
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comments Section - Instagram Style */}
                   {showReplies.has(post.id) && (
-                    <div className="mt-4 space-y-4">
-                      {/* Reply Input */}
+                    <div className="mt-6 space-y-4 animate-fade-in">
+                      {/* Comment Input */}
                       {isAuthenticated && (
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Write a reply..."
-                            value={replyContent[post.id] || ''}
-                            onChange={(e) => setReplyContent(prev => ({ 
-                              ...prev, 
-                              [post.id]: e.target.value 
-                            }))}
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                submitReply(post.id);
-                              }
-                            }}
-                          />
-                          <Button
+                        <div className="flex gap-3 p-4 bg-muted/30 rounded-2xl border border-border/30">
+                          <UserAvatar 
+                            displayName={user?.email}
+                            email={user?.email || ''}
                             size="sm"
-                            onClick={() => submitReply(post.id)}
-                            disabled={submittingReply === post.id}
-                          >
-                            <Send className="h-4 w-4" />
-                          </Button>
+                          />
+                          <div className="flex-1 flex gap-2">
+                            <Input
+                              placeholder="Add a comment..."
+                              value={replyContent[post.id] || ''}
+                              onChange={(e) => setReplyContent(prev => ({ 
+                                ...prev, 
+                                [post.id]: e.target.value 
+                              }))}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault();
+                                  submitReply(post.id);
+                                }
+                              }}
+                              className="border-0 bg-background/50 rounded-xl focus:bg-background"
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() => submitReply(post.id)}
+                              disabled={submittingReply === post.id}
+                              className="rounded-xl px-4"
+                            >
+                              <Send className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       )}
 
-                      {/* Replies List */}
-                      <div className="space-y-3 ml-4">
-                        {replies[post.id]?.map((reply) => (
-                          <div key={reply.id} className="bg-muted/50 p-3 rounded-lg">
-                            <div className="flex items-start gap-3">
-                              <UserAvatar 
-                                displayName={reply.profiles?.display_name}
-                                email={reply.profiles?.email}
-                                size="sm"
-                              />
-                               <div className="flex-1">
-                                 <div className="flex items-center gap-2 mb-1">
-                                   <div className="flex items-center gap-2">
-                                     <span className="text-sm font-medium text-foreground">
-                                       {reply.profiles?.display_name || 'Anonymous User'}
-                                     </span>
-                                     <UserBadges userId={reply.user_id} limit={2} size="sm" />
-                                   </div>
-                                   <span className="text-xs text-muted-foreground">
-                                     {formatDate(reply.created_at)}
-                                   </span>
-                                 </div>
-                                <p className="text-sm text-foreground">{reply.content}</p>
+                      {/* Comments List */}
+                      <div className="space-y-4">
+                        {replies[post.id]?.map((reply, index) => (
+                          <div key={reply.id} className="flex gap-3 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+                            <UserAvatar 
+                              displayName={reply.profiles?.display_name}
+                              email={reply.profiles?.email}
+                              size="sm"
+                            />
+                            <div className="flex-1">
+                              <div className="bg-muted/30 rounded-2xl px-4 py-3 border border-border/20">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-foreground text-sm">
+                                    {reply.profiles?.display_name || 'Anonymous User'}
+                                  </span>
+                                  <UserBadges userId={reply.user_id} limit={1} size="sm" />
+                                  <span className="text-xs text-muted-foreground ml-auto">
+                                    {formatDate(reply.created_at)}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-foreground leading-relaxed">{reply.content}</p>
                               </div>
                             </div>
                           </div>
                         ))}
                         {(!replies[post.id] || replies[post.id].length === 0) && (
-                          <p className="text-sm text-muted-foreground">No replies yet. Be the first to reply!</p>
+                          <div className="text-center py-8">
+                            <div className="w-12 h-12 mx-auto mb-3 bg-muted/30 rounded-full flex items-center justify-center">
+                              <Reply className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <p className="text-muted-foreground">No comments yet. Be the first to comment!</p>
+                          </div>
                         )}
                       </div>
                     </div>
