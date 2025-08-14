@@ -19,15 +19,14 @@ export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProp
       setTimeLeft(60);
       setIsVisible(true);
       
-      // Start thinking countdown music
-      gameAudio.playThinkingCountdown();
+      // Sound disabled for thinking timer
       
       const timer = setInterval(() => {
         setTimeLeft(prev => {
           if (prev <= 1) {
             clearInterval(timer);
             setIsVisible(false);
-            gameAudio.stopThinkingCountdown();
+            // Sound disabled for thinking timer
             onTimeout?.();
             return 0;
           }
@@ -38,11 +37,11 @@ export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProp
       return () => {
         clearInterval(timer);
         setIsVisible(false);
-        gameAudio.stopThinkingCountdown();
+        // Sound disabled for thinking timer
       };
     } else {
       setIsVisible(false);
-      gameAudio.stopThinkingCountdown();
+      // Sound disabled for thinking timer
     }
   }, [isActive, playerName, onTimeout]);
 
