@@ -144,6 +144,45 @@ export type Database = {
           },
         ]
       }
+      user_games: {
+        Row: {
+          categories_played: string[]
+          completed_at: string
+          created_at: string
+          final_score: number
+          game_duration_seconds: number | null
+          game_mode: string
+          id: string
+          questions_answered: number
+          questions_correct: number
+          user_id: string
+        }
+        Insert: {
+          categories_played?: string[]
+          completed_at?: string
+          created_at?: string
+          final_score?: number
+          game_duration_seconds?: number | null
+          game_mode: string
+          id?: string
+          questions_answered?: number
+          questions_correct?: number
+          user_id: string
+        }
+        Update: {
+          categories_played?: string[]
+          completed_at?: string
+          created_at?: string
+          final_score?: number
+          game_duration_seconds?: number | null
+          game_mode?: string
+          id?: string
+          questions_answered?: number
+          questions_correct?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_question_attempts: {
         Row: {
           answered_correctly: boolean
@@ -200,6 +239,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          best_game_score: number
+          created_at: string
+          current_correct_streak: number
+          id: string
+          longest_correct_streak: number
+          total_games_played: number
+          total_points_earned: number
+          total_questions_answered: number
+          total_questions_correct: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_game_score?: number
+          created_at?: string
+          current_correct_streak?: number
+          id?: string
+          longest_correct_streak?: number
+          total_games_played?: number
+          total_points_earned?: number
+          total_questions_answered?: number
+          total_questions_correct?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_game_score?: number
+          created_at?: string
+          current_correct_streak?: number
+          id?: string
+          longest_correct_streak?: number
+          total_games_played?: number
+          total_points_earned?: number
+          total_questions_answered?: number
+          total_questions_correct?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -227,6 +308,10 @@ export type Database = {
       make_user_admin_by_email: {
         Args: { user_email: string }
         Returns: string
+      }
+      update_user_correct_streak: {
+        Args: { p_user_id: string; p_is_correct: boolean }
+        Returns: undefined
       }
     }
     Enums: {

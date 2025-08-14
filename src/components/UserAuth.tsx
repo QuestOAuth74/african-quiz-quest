@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { User, LogOut, LogIn, UserPlus } from "lucide-react";
+import { User, LogOut, LogIn, UserPlus, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const UserAuth = () => {
@@ -45,27 +45,37 @@ const UserAuth = () => {
   if (isAuthenticated) {
     return (
       <Card className="jeopardy-card border-theme-yellow/30">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-theme-yellow/20 flex items-center justify-center">
-                <User className="w-5 h-5 text-theme-yellow" />
-              </div>
-              <div>
-                <p className="font-semibold text-theme-yellow">Welcome back!</p>
-                <p className="text-sm text-theme-yellow-light">
-                  {user?.email}
-                </p>
-                <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400 border-green-500/30">
-                  Signed In
-                </Badge>
-              </div>
+        <CardContent className="p-4 space-y-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-full bg-theme-yellow/20 flex items-center justify-center">
+              <User className="w-5 h-5 text-theme-yellow" />
             </div>
+            <div>
+              <p className="font-semibold text-theme-yellow">Welcome back!</p>
+              <p className="text-sm text-theme-yellow-light">
+                {user?.email}
+              </p>
+              <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400 border-green-500/30">
+                Signed In
+              </Badge>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Link to="/leaderboard" className="flex-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full jeopardy-button border-theme-yellow/50 text-xs"
+              >
+                <Trophy className="w-3 h-3 mr-1" />
+                Leaderboard
+              </Button>
+            </Link>
             <Button
               onClick={handleSignOut}
               variant="outline"
               size="sm"
-              className="jeopardy-button border-theme-yellow/50 text-xs"
+              className="flex-1 jeopardy-button border-theme-yellow/50 text-xs"
             >
               <LogOut className="w-3 h-3 mr-1" />
               Sign Out

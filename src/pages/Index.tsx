@@ -44,6 +44,11 @@ const Index = () => {
   const [categories, setCategories] = useState([]);
   const [gameConfig, setGameConfig] = useState({ categories: [], rowCount: 5 });
   const [questionsData, setQuestionsData] = useState<{[key: string]: Question}>({});
+  const [gameStartTime, setGameStartTime] = useState<Date | null>(null);
+  const [gameStats, setGameStats] = useState({
+    questionsAnswered: 0,
+    questionsCorrect: 0
+  });
   const { toast } = useToast();
 
   // Redirect to auth if not authenticated and trying to access admin
@@ -219,6 +224,8 @@ const Index = () => {
     setGameConfig({ categories: gameCategories, rowCount });
     setCategories(gameCategories);
     setGameConfigured(true);
+    setGameStartTime(new Date());
+    setGameStats({ questionsAnswered: 0, questionsCorrect: 0 });
   };
 
   const handleQuestionSelect = (categoryId: string, questionId: string) => {
@@ -315,7 +322,23 @@ const Index = () => {
           console.error('Error recording answer attempt:', error);
           // Don't show toast for this error as it's not critical to gameplay
         }
+
+        // Update streak tracking
+        try {
+          await supabase.rpc('update_user_correct_streak', {
+            p_user_id: user.id,
+            p_is_correct: isCorrect
+          });
+        } catch (error) {
+          console.error('Error updating streak:', error);
+        }
       }
+
+      // Update game stats
+      setGameStats(prev => ({
+        questionsAnswered: prev.questionsAnswered + 1,
+        questionsCorrect: prev.questionsCorrect + (isCorrect ? 1 : 0)
+      }));
     }
     // For 'pass' and 'timeout', no points are gained or lost
     
@@ -334,6 +357,17 @@ const Index = () => {
       )
     })));
 
+    // Check if game is completed
+    const allQuestionsAnswered = categories.every(cat => 
+      cat.questions.every(q => q.isAnswered)
+    );
+    
+    if (allQuestionsAnswered) {
+      setTimeout(() => {
+        handleGameComplete();
+      }, 3500); // Wait a bit longer than the player switch delay
+    }
+
     // Switch active player after a delay to allow viewing the explanation
     setTimeout(() => {
       setPlayers(prev => prev.map(player => ({
@@ -341,6 +375,35 @@ const Index = () => {
         isActive: !player.isActive
       })));
     }, 3000);
+  };
+
+  const handleGameComplete = async () => {
+    if (!isAuthenticated || !user || !gameStartTime) return;
+
+    const currentPlayer = players.find(p => p.name !== "Computer") || players[0];
+    const gameDuration = Math.floor((new Date().getTime() - gameStartTime.getTime()) / 1000);
+
+    try {
+      await supabase
+        .from('user_games')
+        .insert({
+          user_id: user.id,
+          game_mode: gameMode || 'single',
+          final_score: currentPlayer.score,
+          questions_answered: gameStats.questionsAnswered,
+          questions_correct: gameStats.questionsCorrect,
+          categories_played: gameConfig.categories.map(cat => cat.name),
+          game_duration_seconds: gameDuration
+        });
+
+      toast({
+        title: "Game Completed!",
+        description: `Final Score: $${currentPlayer.score.toLocaleString()}. Check the leaderboard to see your ranking!`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Error recording game completion:', error);
+    }
   };
 
   const handleNewGame = () => {
@@ -351,6 +414,8 @@ const Index = () => {
       questions: cat.questions.map(q => ({ ...q, isAnswered: false }))
     })));
     setPlayers(prev => prev.map(player => ({ ...player, score: 0 })));
+    setGameStartTime(null);
+    setGameStats({ questionsAnswered: 0, questionsCorrect: 0 });
   };
 
   const handleBackToModeSelection = () => {
