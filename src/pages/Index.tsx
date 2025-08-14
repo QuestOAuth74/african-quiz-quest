@@ -150,31 +150,59 @@ const Index = () => {
     let pointChange = 0;
     
     if (selectedAnswerIndex === 'skip') {
-      const newSkipCount = skipCount + 1;
-      setSkipCount(newSkipCount);
+      const currentPlayer = players.find(p => p.isActive);
+      const nextPlayer = players.find(p => !p.isActive);
       
-      if (gameMode === 'multiplayer' && newSkipCount < 2) {
-        // First player skipped, switch to next player without showing answer
-        setPlayers(prev => prev.map(player => ({
-          ...player,
-          isActive: !player.isActive
-        })));
-        
-        // Reset timer for next player
+      // Switch to next player
+      setPlayers(prev => prev.map(player => ({
+        ...player,
+        isActive: !player.isActive
+      })));
+      
+      // If next player is computer/AI, automatically pick correct answer after short delay
+      if (nextPlayer?.name === "Computer") {
+        setIsQuestionModalOpen(false);
+        setTimeout(() => {
+          // AI picks correct answer
+          const correctAnswerIndex = selectedQuestion?.correctAnswerIndex;
+          if (typeof correctAnswerIndex === 'number') {
+            const aiPointChange = selectedQuestion.points;
+            
+            // Update AI score
+            setPlayers(prev => prev.map(player => 
+              player.name === "Computer" 
+                ? { ...player, score: player.score + aiPointChange, isActive: true }
+                : { ...player, isActive: false }
+            ));
+            
+            // Mark question as answered
+            setCategories(prev => prev.map(cat => ({
+              ...cat,
+              questions: cat.questions.map(q => 
+                q.id === selectedQuestion?.id ? { ...q, isAnswered: true } : q
+              )
+            })));
+            
+            // Show AI's correct answer briefly, then continue
+            setIsQuestionModalOpen(true);
+            setTimeout(() => {
+              setIsQuestionModalOpen(false);
+              setSelectedQuestion(null);
+              // Switch back to human player
+              setPlayers(prev => prev.map(player => ({
+                ...player,
+                isActive: player.name !== "Computer"
+              })));
+            }, 2000);
+          }
+        }, 1000);
+        return;
+      } else {
+        // For human vs human multiplayer, restart countdown for next player
         setIsQuestionModalOpen(false);
         setTimeout(() => {
           setIsQuestionModalOpen(true);
         }, 100);
-        return;
-      } else if (gameMode === 'multiplayer' && newSkipCount === 2) {
-        // Both players skipped - show teacher mode
-        setShowTeacherMode(true);
-        setSkipCount(0);
-        return;
-      } else if (gameMode === 'single') {
-        // Single player skipped - show teacher mode
-        setShowTeacherMode(true);
-        setSkipCount(0);
         return;
       }
     }
@@ -199,9 +227,6 @@ const Index = () => {
         q.id === selectedQuestion?.id ? { ...q, isAnswered: true } : q
       )
     })));
-
-    // Reset skip count after answering
-    setSkipCount(0);
 
     // Switch active player after a delay to allow viewing the explanation
     setTimeout(() => {
