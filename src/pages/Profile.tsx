@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User, Edit3, Save, X } from 'lucide-react';
+import { User, Edit3, Save, X, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import TopNavigation from '@/components/TopNavigation';
 import { Link } from 'react-router-dom';
+import { UserBadges } from '@/components/UserBadges';
 
 interface UserProfile {
   id: string;
@@ -176,6 +177,17 @@ const Profile = () => {
                   </Button>
                 </div>
               )}
+            </div>
+
+            {/* Achievements */}
+            <div className="pt-4 border-t">
+              <h3 className="font-medium text-foreground mb-3 flex items-center gap-2">
+                <Trophy className="h-4 w-4" />
+                Achievements
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                <UserBadges userId={user.id} showTooltip={true} />
+              </div>
             </div>
 
             {/* Account Info */}

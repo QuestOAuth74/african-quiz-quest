@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Bot, Sparkles, ArrowLeft } from "lucide-react";
+import { Users, Bot, Sparkles, ArrowLeft, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { UserBadges } from "./UserBadges";
 
 interface GameModeSelectorProps {
   onSelectMode: (mode: 'single' | 'multiplayer', playerCount?: number) => void;
 }
 
 export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
+  const { user, isAuthenticated } = useAuth();
   const [showPlayerSelect, setShowPlayerSelect] = useState(false);
   
   const handleModeSelect = (mode: 'single' | 'multiplayer') => {
@@ -59,6 +62,24 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Test your knowledge of African history in this authentic Jeopardy-style experience!
             </p>
+            
+            {/* Welcome Message with Badges for Authenticated Users */}
+            {isAuthenticated && user && (
+              <div className="mt-8 p-6 bg-background/80 backdrop-blur-sm rounded-lg border border-theme-yellow/20 max-w-xl mx-auto">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <Trophy className="h-5 w-5 text-theme-yellow" />
+                  <h3 className="text-xl font-semibold text-theme-yellow">
+                    Welcome back, Champion!
+                  </h3>
+                </div>
+                <div className="flex justify-center gap-2 mb-2">
+                  <UserBadges userId={user.id} limit={6} showTooltip={true} />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Keep playing to unlock more achievements!
+                </p>
+              </div>
+            )}
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">

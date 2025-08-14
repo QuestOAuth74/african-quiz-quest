@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
 import ForumHeader from '@/components/forum/ForumHeader';
 import { UserAvatar } from '@/components/UserAvatar';
+import { UserBadges } from '@/components/UserBadges';
 
 interface Category {
   id: string;
@@ -540,9 +541,12 @@ const Forum = () => {
                           size="md"
                         />
                         <div className="flex flex-col">
-                          <span className="font-medium text-foreground">
-                            {post.profiles?.display_name || 'Anonymous User'}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-foreground">
+                              {post.profiles?.display_name || 'Anonymous User'}
+                            </span>
+                            <UserBadges userId={post.user_id} limit={3} size="sm" />
+                          </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Badge variant="secondary">{post.forum_categories.name}</Badge>
                             <span>•</span>
@@ -627,15 +631,18 @@ const Forum = () => {
                                 email={reply.profiles?.email}
                                 size="sm"
                               />
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-sm font-medium text-foreground">
-                                    {reply.profiles?.display_name || 'Anonymous User'}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {formatDate(reply.created_at)}
-                                  </span>
-                                </div>
+                               <div className="flex-1">
+                                 <div className="flex items-center gap-2 mb-1">
+                                   <div className="flex items-center gap-2">
+                                     <span className="text-sm font-medium text-foreground">
+                                       {reply.profiles?.display_name || 'Anonymous User'}
+                                     </span>
+                                     <UserBadges userId={reply.user_id} limit={2} size="sm" />
+                                   </div>
+                                   <span className="text-xs text-muted-foreground">
+                                     {formatDate(reply.created_at)}
+                                   </span>
+                                 </div>
                                 <p className="text-sm text-foreground">{reply.content}</p>
                               </div>
                             </div>
