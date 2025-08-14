@@ -17,14 +17,26 @@ interface GameBoardProps {
   categories: Category[];
   onQuestionSelect: (categoryId: string, questionId: string) => void;
   isGameActive: boolean;
+  rowCount?: number;
 }
 
-const POINT_VALUES = [100, 200, 300, 400, 500];
+export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount = 5 }: GameBoardProps) {
+  // Generate point values based on row count
+  const pointValues = Array.from({ length: rowCount }, (_, index) => (index + 1) * 100);
+  
+  // Get the number of columns based on categories length
+  const colCount = categories.length;
+  const gridCols = colCount === 1 ? 'grid-cols-1' : 
+                   colCount === 2 ? 'grid-cols-2' : 
+                   colCount === 3 ? 'grid-cols-3' : 
+                   colCount === 4 ? 'grid-cols-4' : 
+                   colCount === 5 ? 'grid-cols-5' : 
+                   colCount === 6 ? 'grid-cols-6' : 
+                   'grid-cols-5'; // fallback
 
-export function GameBoard({ categories, onQuestionSelect, isGameActive }: GameBoardProps) {
   return (
     <div className="w-full max-w-6xl mx-auto p-4">
-      <div className="grid grid-cols-5 gap-2 bg-jeopardy-blue-dark p-3 rounded-xl border border-jeopardy-gold/20 shadow-2xl">
+      <div className={`grid ${gridCols} gap-2 bg-jeopardy-blue-dark p-3 rounded-xl border border-jeopardy-gold/20 shadow-2xl`}>
         {/* Category Headers */}
         {categories.map((category, index) => (
           <Card 
@@ -41,7 +53,7 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive }: GameBo
         ))}
         
         {/* Question Grid */}
-        {POINT_VALUES.map((points, pointIndex) => (
+        {pointValues.map((points, pointIndex) => (
           categories.map((category, catIndex) => {
             const question = category.questions.find(q => q.points === points);
             const isAnswered = question?.isAnswered || false;
@@ -54,7 +66,7 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive }: GameBo
                     ? 'jeopardy-card opacity-30 cursor-not-allowed' 
                     : 'jeopardy-button hover:scale-105 cursor-pointer'
                 }`}
-                style={{ animationDelay: `${(pointIndex * 5 + catIndex) * 0.05 + 0.5}s` }}
+                style={{ animationDelay: `${(pointIndex * colCount + catIndex) * 0.05 + 0.5}s` }}
               >
                 <CardContent className="p-0 h-full">
                   <Button

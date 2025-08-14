@@ -320,6 +320,7 @@ const Index = () => {
         categories={categories}
         onQuestionSelect={handleQuestionSelect}
         isGameActive={true}
+        rowCount={gameConfig.rowCount}
       />
       <QuestionModal
         isOpen={isQuestionModalOpen || showTeacherMode}
