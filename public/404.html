@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - QueryMD</title>
+    <script>
+        // Single Page Apps for GitHub Pages
+        // MIT License
+        // https://github.com/rafgraph/spa-github-pages
+        (function(l) {
+            if (l.search[1] === '/' ) {
+                var decoded = l.search.slice(1).split('&').map(function(s) { 
+                    return s.replace(/~and~/g, '&')
+                }).join('?');
+                window.history.replaceState(null, null,
+                    l.pathname.slice(0, -1) + decoded + l.hash
+                );
+            }
+        }(window.location))
+    </script>
+    <script>
+        // Redirect to the homepage to let React Router handle routing
+        sessionStorage.redirect = location.href;
+        window.location.href = "/";
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        h1 { font-size: 50px; }
+        p { font-size: 20px; }
+        a { color: #007acc; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>404</h1>
+    <p>Oops! We can't seem to find the page you're looking for.</p>
+    <p><a href="/">Go back home</a></p>
+</body>
+</html>
