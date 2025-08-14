@@ -158,25 +158,16 @@ const QuestionRating = ({
       )}
 
       {/* Average Rating Display */}
-      {showAverage && totalRatings > 0 && (
+      {showAverage && (
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
-            {renderStars(Math.round(averageRating))}
+            {renderStars(totalRatings > 0 ? Math.round(averageRating) : 0)}
           </div>
           <span className="text-sm text-muted-foreground">
-            {averageRating.toFixed(1)} ({totalRatings} rating{totalRatings !== 1 ? 's' : ''})
-          </span>
-        </div>
-      )}
-
-      {/* No ratings yet */}
-      {showAverage && totalRatings === 0 && (
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {renderStars(0)}
-          </div>
-          <span className="text-sm text-muted-foreground">
-            No ratings yet
+            {totalRatings > 0 
+              ? `${averageRating.toFixed(1)} (${totalRatings} rating${totalRatings !== 1 ? 's' : ''})` 
+              : 'No ratings yet'
+            }
           </span>
         </div>
       )}
