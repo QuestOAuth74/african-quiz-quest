@@ -188,7 +188,7 @@ const Index = () => {
       const sortedQuestions = categoryQuestions.sort((a, b) => a.points - b.points);
       const questionsForRows = sortedQuestions.slice(0, rowCount);
       
-      // Map questions to game format
+      // Map questions to game format - assign them sequentially to grid positions
       questionsForRows.forEach((q, index) => {
         const correctOption = q.question_options.find(opt => opt.option_type === 'correct');
         const correctAnswerIndex = q.question_options.findIndex(opt => opt.option_type === 'correct');
@@ -211,12 +211,12 @@ const Index = () => {
         name: cat.name,
         questions: Array.from({ length: rowCount }, (_, index) => {
           const expectedPoints = (index + 1) * 100;
-          const question = questionsForRows.find(q => q.points === expectedPoints);
+          const hasQuestion = index < questionsForRows.length; // Check if we have a question for this position
           return {
             id: `${cat.id}-${index + 1}`,
             points: expectedPoints,
             isAnswered: false,
-            hasQuestion: !!question
+            hasQuestion: hasQuestion
           };
         })
       };
