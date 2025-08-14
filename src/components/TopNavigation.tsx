@@ -22,6 +22,17 @@ const TopNavigation = () => {
               Baobab Talks
             </a>
           </Button>
+          
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
+          >
+            <a href="/profile">
+              Profile
+            </a>
+          </Button>
           <Button
             asChild
             variant="ghost"

@@ -15,6 +15,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -63,6 +64,15 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!displayName.trim()) {
+      toast({
+        title: "Display Name Required",
+        description: "Please enter a display name to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (password !== confirmPassword) {
       toast({
         title: "Password Mismatch",
@@ -90,7 +100,10 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            display_name: displayName.trim()
+          }
         }
       });
 
@@ -117,6 +130,7 @@ const Auth = () => {
         setEmail("");
         setPassword("");
         setConfirmPassword("");
+        setDisplayName("");
       }
     } catch (error) {
       toast({
@@ -235,6 +249,24 @@ const Auth = () => {
               
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="display-name" className="text-theme-yellow">
+                      Display Name
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-yellow/60 w-4 h-4" />
+                      <Input
+                        id="display-name"
+                        type="text"
+                        placeholder="Enter your display name"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        required
+                        className="jeopardy-button pl-10"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="signup-email" className="text-theme-yellow">
                       Email
