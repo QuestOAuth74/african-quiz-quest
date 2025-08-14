@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { GameModeSelector } from "@/components/GameModeSelector";
 import { GameHeader } from "@/components/GameHeader";
 import { GameBoard } from "@/components/GameBoard";
-import { QuestionModal } from "@/components/QuestionModal";
+import QuestionModal from "@/components/QuestionModal";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 
@@ -121,6 +121,8 @@ const Index = () => {
   const [gameMode, setGameMode] = useState<'single' | 'multiplayer' | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
+  const [showTeacherMode, setShowTeacherMode] = useState(false);
+  const [skipCount, setSkipCount] = useState(0);
   const [players, setPlayers] = useState([
     { id: "player1", name: "Player 1", score: 0, isActive: true },
     { id: "computer", name: "Computer", score: 0, isActive: false }
@@ -143,9 +145,39 @@ const Index = () => {
     setIsQuestionModalOpen(true);
   };
 
-  const handleAnswer = (selectedAnswerIndex: number | 'pass' | 'timeout') => {
+  const handleAnswer = (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
     let isCorrect = false;
     let pointChange = 0;
+    
+    if (selectedAnswerIndex === 'skip') {
+      const newSkipCount = skipCount + 1;
+      setSkipCount(newSkipCount);
+      
+      if (gameMode === 'multiplayer' && newSkipCount < 2) {
+        // First player skipped, switch to next player without showing answer
+        setPlayers(prev => prev.map(player => ({
+          ...player,
+          isActive: !player.isActive
+        })));
+        
+        // Reset timer for next player
+        setIsQuestionModalOpen(false);
+        setTimeout(() => {
+          setIsQuestionModalOpen(true);
+        }, 100);
+        return;
+      } else if (gameMode === 'multiplayer' && newSkipCount === 2) {
+        // Both players skipped - show teacher mode
+        setShowTeacherMode(true);
+        setSkipCount(0);
+        return;
+      } else if (gameMode === 'single') {
+        // Single player skipped - show teacher mode
+        setShowTeacherMode(true);
+        setSkipCount(0);
+        return;
+      }
+    }
     
     if (typeof selectedAnswerIndex === 'number') {
       isCorrect = selectedAnswerIndex === selectedQuestion?.correctAnswerIndex;
@@ -168,6 +200,9 @@ const Index = () => {
       )
     })));
 
+    // Reset skip count after answering
+    setSkipCount(0);
+
     // Switch active player after a delay to allow viewing the explanation
     setTimeout(() => {
       setPlayers(prev => prev.map(player => ({
@@ -189,6 +224,8 @@ const Index = () => {
   const handleCloseModal = () => {
     setIsQuestionModalOpen(false);
     setSelectedQuestion(null);
+    setShowTeacherMode(false);
+    setSkipCount(0);
   };
 
   if (!gameMode) {
@@ -218,10 +255,12 @@ const Index = () => {
         isGameActive={true}
       />
       <QuestionModal
-        isOpen={isQuestionModalOpen}
+        isOpen={isQuestionModalOpen || showTeacherMode}
         onClose={handleCloseModal}
         question={selectedQuestion}
         onAnswer={handleAnswer}
+        currentPlayer={players.find(p => p.isActive)?.name}
+        gameMode={gameMode}
       />
     </div>
   );
