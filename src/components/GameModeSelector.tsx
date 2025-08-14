@@ -28,20 +28,35 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
       </div>
       
       <div className="w-full max-w-5xl animate-fade-in">
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Sparkles className="text-theme-yellow animate-pulse" size={32} />
-            <h1 className="text-6xl md:text-7xl font-bold gradient-text animate-pulse-yellow">
-              JEOPARDY!
-            </h1>
-            <Sparkles className="text-theme-yellow animate-pulse" size={32} />
+        {/* Banner Image Section */}
+        <div className="mb-8">
+          <div className="relative rounded-xl overflow-hidden shadow-2xl border border-theme-yellow/20 mb-6">
+            <img 
+              src="https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/jeopardy%20game%20banner.png"
+              alt="African History Jeopardy Game Banner"
+              className="w-full h-48 md:h-64 lg:h-72 object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-theme-brown-dark/80 via-transparent to-transparent"></div>
           </div>
-          <div className="text-2xl md:text-3xl text-theme-yellow mb-4 font-light tracking-wide">
-            AFRICAN HISTORY EDITION
+          
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Sparkles className="text-theme-yellow animate-pulse" size={32} />
+              <h1 className="text-5xl md:text-6xl font-bold gradient-text animate-pulse-yellow">
+                JEOPARDY!
+              </h1>
+              <Sparkles className="text-theme-yellow animate-pulse" size={32} />
+            </div>
+            <div className="text-xl md:text-2xl text-theme-yellow mb-3 font-light tracking-wide">
+              AFRICAN HISTORY EDITION
+            </div>
+            <p className="text-theme-yellow-light text-sm md:text-base font-medium mb-2">
+              A free educational game from <span className="text-theme-yellow font-semibold">The Historia Africana</span> YouTube Channel
+            </p>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Test your knowledge of African history in this authentic Jeopardy-style experience!
+            </p>
           </div>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Test your knowledge of African history in this authentic Jeopardy-style experience!
-          </p>
         </div>
         
         <div className="grid md:grid-cols-2 gap-8">
@@ -93,8 +108,11 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
         </div>
         
         <div className="text-center mt-8">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mb-2">
             Think you know African history? Think again!
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Educational content crafted by <span className="text-theme-yellow font-medium">The Historia Africana</span> • Bringing African history to life
           </p>
         </div>
       </div>
