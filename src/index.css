@@ -169,6 +169,7 @@ All colors MUST be HSL.
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
 }
 
 /* Welcome Modal Animations */
