@@ -144,79 +144,89 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gradient-background)' }}>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
       <TopNavigation />
       
-      <div className="container mx-auto px-4 pt-16 pb-12 max-w-4xl">
-        {/* Hero Section */}
-        <div className="text-center mb-12 animate-fade-in">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/3 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/3 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-3/4 left-1/2 w-72 h-72 bg-secondary/3 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
+      </div>
+      
+      <div className="relative container mx-auto px-4 pt-20 pb-12 max-w-6xl">
+        {/* Modern Hero Section */}
+        <div className="text-center mb-16 animate-fade-in">
           <div className="relative mb-8">
             <UserAvatar 
               displayName={profile?.display_name} 
               email={user.email} 
               size="lg" 
-              className="w-24 h-24 text-2xl border-2 border-theme-yellow mx-auto mb-6"
+              className="w-28 h-28 text-3xl mx-auto mb-8 border-4 border-primary/20 shadow-xl shadow-primary/10"
             />
-            <h1 className="text-4xl font-bold gradient-text mb-2 jeopardy-text-glow">
+            <h1 className="text-5xl lg:text-6xl font-black text-foreground mb-4 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
               {profile?.display_name || 'Welcome!'}
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Jeopardy Champion in the making
+            <p className="text-muted-foreground text-xl">
+              Historia Quiz Champion in the making
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Profile Card */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="jeopardy-card border-theme-yellow/20 animate-scale-in">
-              <CardHeader className="text-center pb-4">
-                <CardTitle className="flex items-center justify-center gap-2 text-2xl text-theme-yellow">
-                  <User className="h-6 w-6" />
+          <div className="lg:col-span-2 space-y-8">
+            <Card className="border-border/50 shadow-xl bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-transparent to-accent/3 pointer-events-none" />
+              <CardHeader className="relative text-center">
+                <CardTitle className="flex items-center justify-center gap-3 text-2xl font-bold text-foreground">
+                  <div className="p-2 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl">
+                    <User className="h-6 w-6 text-primary" />
+                  </div>
                   Profile Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="relative space-y-8">
                 {/* Display Name Section */}
-                <div className="space-y-3">
-                  <Label htmlFor="displayName" className="text-theme-yellow font-medium">
+                <div className="space-y-4">
+                  <Label htmlFor="displayName" className="text-foreground font-semibold text-lg">
                     Display Name
                   </Label>
                   {editing ? (
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <Input
                         id="displayName"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         placeholder="Enter your display name"
-                        className="flex-1 bg-theme-brown-dark border-theme-yellow/30 focus:border-theme-yellow"
+                        className="flex-1 h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl"
                       />
                       <Button
                         onClick={handleUpdateProfile}
                         disabled={updating || !displayName.trim()}
-                        className="jeopardy-gold font-medium"
+                        className="h-12 px-6 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25"
                         size="sm"
                       >
                         <Save className="h-4 w-4" />
                       </Button>
                       <Button
                         onClick={handleCancel}
-                        variant="outline"
-                        className="border-theme-yellow/30 hover:border-theme-yellow"
+                        variant="ghost"
+                        className="h-12 px-6 rounded-xl bg-background/50 border border-border/50 hover:bg-background/80"
                         size="sm"
                       >
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between p-4 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
-                      <span className="text-foreground font-medium text-lg">
+                    <div className="flex items-center justify-between p-6 rounded-xl bg-gradient-to-br from-background/50 to-background/30 border border-border/30">
+                      <span className="text-foreground font-semibold text-xl">
                         {profile?.display_name || 'No display name set'}
                       </span>
                       <Button
                         onClick={() => setEditing(true)}
                         variant="ghost"
-                        className="hover:bg-theme-yellow/10 hover:text-theme-yellow"
+                        className="h-10 w-10 rounded-lg hover:bg-background/80 hover:scale-110 transition-all duration-200"
                         size="sm"
                       >
                         <Edit3 className="h-4 w-4" />
@@ -226,18 +236,23 @@ const Profile = () => {
                 </div>
 
                 {/* Account Info */}
-                <div className="space-y-4 p-4 rounded-lg bg-theme-brown-dark/30 border border-theme-yellow/10">
-                  <h3 className="font-semibold text-theme-yellow text-lg">Account Details</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div className="space-y-1">
-                      <span className="text-muted-foreground">Account ID:</span>
-                      <div className="font-mono text-xs bg-theme-brown/50 p-2 rounded border border-theme-yellow/20 break-all">
+                <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-background/50 to-background/30 border border-border/30">
+                  <h3 className="font-bold text-foreground text-xl flex items-center gap-2">
+                    <div className="p-1 bg-primary/20 rounded-lg">
+                      <User className="h-4 w-4 text-primary" />
+                    </div>
+                    Account Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <span className="text-muted-foreground font-medium">Account ID:</span>
+                      <div className="font-mono text-sm bg-background/50 p-3 rounded-lg border border-border/30 break-all">
                         {user.id}
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <span className="text-muted-foreground">Member since:</span>
-                      <div className="font-medium text-theme-yellow">
+                    <div className="space-y-2">
+                      <span className="text-muted-foreground font-medium">Member since:</span>
+                      <div className="font-semibold text-primary text-lg">
                         {new Date(profile?.created_at || '').toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'long',
@@ -250,100 +265,105 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* Achievements Section */}
-            <Card className="jeopardy-card border-theme-yellow/20 animate-scale-in" style={{ animationDelay: '0.1s' }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-2xl text-theme-yellow">
-                  <div className="p-2 rounded-full bg-theme-yellow/20">
-                    <Trophy className="h-6 w-6 text-theme-yellow" />
+            {/* Modern Achievements Section */}
+            <Card className="border-border/50 shadow-xl bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-transparent to-accent/3 pointer-events-none" />
+              <CardHeader className="relative">
+                <CardTitle className="flex items-center gap-4 text-2xl font-bold text-foreground">
+                  <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl shadow-lg">
+                    <Trophy className="h-7 w-7 text-primary" />
                   </div>
                   Achievements & Badges
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="min-h-[100px] flex items-center justify-center">
+              <CardContent className="relative">
+                <div className="min-h-[120px] flex items-center justify-center p-6 rounded-xl bg-gradient-to-br from-background/30 to-background/20 border border-border/20">
                   <UserBadges userId={user.id} showTooltip={true} size="lg" />
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
+          {/* Modern Sidebar */}
+          <div className="space-y-8">
             {/* Quick Stats Card */}
-            <Card className="jeopardy-card border-theme-yellow/20 animate-scale-in" style={{ animationDelay: '0.2s' }}>
-              <CardHeader>
-                <CardTitle className="text-center text-lg text-theme-yellow">
-                  Quick Stats
+            <Card className="border-border/50 shadow-xl bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-transparent to-accent/3 pointer-events-none" />
+              <CardHeader className="relative">
+                <CardTitle className="text-center text-xl font-bold text-foreground">
+                  Performance Stats
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-center space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
-                    <div className="text-2xl font-bold text-theme-yellow">
+              <CardContent className="relative space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 text-center bg-gradient-to-br from-background/50 to-background/30 rounded-xl border border-border/30">
+                    <div className="text-2xl font-black text-primary mb-1">
                       {userStats?.total_games_played || 0}
                     </div>
-                    <div className="text-muted-foreground">Games</div>
+                    <div className="text-sm text-muted-foreground font-medium">Games</div>
                   </div>
-                  <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
-                    <div className="text-2xl font-bold text-theme-yellow">
+                  <div className="p-4 text-center bg-gradient-to-br from-background/50 to-background/30 rounded-xl border border-border/30">
+                    <div className="text-2xl font-black text-primary mb-1">
                       {userStats?.best_game_score || 0}
                     </div>
-                    <div className="text-muted-foreground">Best Score</div>
+                    <div className="text-sm text-muted-foreground font-medium">Best Score</div>
                   </div>
-                  <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20 col-span-2">
-                    <div className="text-xl font-bold text-theme-yellow">
-                      {userStats?.total_questions_correct || 0}/{userStats?.total_questions_answered || 0}
-                    </div>
-                    <div className="text-muted-foreground">Correct Answers</div>
+                </div>
+                <div className="p-4 text-center bg-gradient-to-br from-background/50 to-background/30 rounded-xl border border-border/30">
+                  <div className="text-xl font-black text-primary mb-1">
+                    {userStats?.total_questions_correct || 0}/{userStats?.total_questions_answered || 0}
                   </div>
-                  <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
-                    <div className="text-xl font-bold text-theme-yellow">
+                  <div className="text-sm text-muted-foreground font-medium">Correct Answers</div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 text-center bg-gradient-to-br from-background/50 to-background/30 rounded-xl border border-border/30">
+                    <div className="text-xl font-black text-primary mb-1">
                       {userStats?.current_correct_streak || 0}
                     </div>
-                    <div className="text-muted-foreground">Current Streak</div>
+                    <div className="text-sm text-muted-foreground font-medium">Current Streak</div>
                   </div>
-                  <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
-                    <div className="text-xl font-bold text-theme-yellow">
+                  <div className="p-4 text-center bg-gradient-to-br from-background/50 to-background/30 rounded-xl border border-border/30">
+                    <div className="text-xl font-black text-primary mb-1">
                       {userStats?.longest_correct_streak || 0}
                     </div>
-                    <div className="text-muted-foreground">Best Streak</div>
+                    <div className="text-sm text-muted-foreground font-medium">Best Streak</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Quick Actions */}
-            <Card className="jeopardy-card border-theme-yellow/20 animate-scale-in" style={{ animationDelay: '0.3s' }}>
-              <CardHeader>
-                <CardTitle className="text-center text-lg text-theme-yellow">
+            <Card className="border-border/50 shadow-xl bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-transparent to-accent/3 pointer-events-none" />
+              <CardHeader className="relative">
+                <CardTitle className="text-center text-xl font-bold text-foreground">
                   Quick Actions
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="relative space-y-4">
                 <Link to="/forum" className="block">
                   <Button 
-                    className="w-full jeopardy-button text-theme-yellow border-theme-yellow/30 hover:border-theme-yellow"
-                    variant="outline"
+                    className="w-full h-12 rounded-xl bg-background/50 text-foreground border border-border/50 hover:bg-background/80 hover:scale-[1.02] transition-all duration-200 shadow-lg"
+                    variant="ghost"
                   >
-                    <MessageSquare className="h-4 w-4 mr-2" />
+                    <MessageSquare className="h-5 w-5 mr-3" />
                     Visit Forum
                   </Button>
                 </Link>
                 <Link to="/leaderboard" className="block">
                   <Button 
-                    className="w-full jeopardy-button text-theme-yellow border-theme-yellow/30 hover:border-theme-yellow"
-                    variant="outline"
+                    className="w-full h-12 rounded-xl bg-background/50 text-foreground border border-border/50 hover:bg-background/80 hover:scale-[1.02] transition-all duration-200 shadow-lg"
+                    variant="ghost"
                   >
-                    <Trophy className="h-4 w-4 mr-2" />
+                    <Trophy className="h-5 w-5 mr-3" />
                     Leaderboard
                   </Button>
                 </Link>
                 <Link to="/" className="block">
                   <Button 
-                    className="w-full jeopardy-gold font-medium"
+                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02]"
                   >
-                    <Play className="h-4 w-4 mr-2" />
+                    <Play className="h-5 w-5 mr-3" />
                     Play Game
                   </Button>
                 </Link>

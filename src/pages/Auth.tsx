@@ -144,56 +144,69 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Back to Home */}
-        <div className="mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 flex items-center justify-center p-4">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-secondary/3 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
+      </div>
+      
+      <div className="relative w-full max-w-md z-10">
+        {/* Modern Back Button */}
+        <div className="mb-8">
           <Link to="/">
-            <Button variant="outline" className="jeopardy-button border-theme-yellow/50">
+            <Button variant="ghost" className="rounded-full px-6 h-12 bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-background/80 hover:scale-105 transition-all duration-200 shadow-lg">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Game
             </Button>
           </Link>
         </div>
 
-        <Card className="jeopardy-card border-theme-yellow/30">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-theme-yellow/20 flex items-center justify-center">
-              <User className="w-8 h-8 text-theme-yellow" />
+        {/* Modern Auth Card */}
+        <Card className="border-border/50 shadow-2xl bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-lg overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-accent/3 pointer-events-none" />
+          
+          <CardHeader className="relative text-center pb-8">
+            {/* Modern Avatar Icon */}
+            <div className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shadow-lg backdrop-blur-sm border border-border/30">
+              <User className="w-10 h-10 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-orbitron gradient-text">
+            
+            <CardTitle className="text-3xl font-black text-foreground mb-3 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
               Welcome to Historia Quiz
             </CardTitle>
-            <CardDescription className="text-theme-yellow-light">
+            <CardDescription className="text-muted-foreground text-lg">
               Sign in to track your progress and compete with others
             </CardDescription>
           </CardHeader>
           
-          <CardContent>
+          <CardContent className="relative">
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-theme-brown-dark border border-theme-yellow/30">
+              {/* Modern Tab Navigation */}
+              <TabsList className="grid w-full grid-cols-2 bg-muted/50 backdrop-blur-sm rounded-xl p-1 border border-border/30 mb-8">
                 <TabsTrigger 
                   value="signin" 
-                  className="data-[state=active]:bg-theme-yellow data-[state=active]:text-theme-brown-dark text-theme-yellow"
+                  className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground font-semibold transition-all duration-200"
                 >
                   Sign In
                 </TabsTrigger>
                 <TabsTrigger 
                   value="signup"
-                  className="data-[state=active]:bg-theme-yellow data-[state=active]:text-theme-brown-dark text-theme-yellow"
+                  className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground font-semibold transition-all duration-200"
                 >
                   Sign Up
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
+              <TabsContent value="signin" className="space-y-6">
+                <form onSubmit={handleSignIn} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="signin-email" className="text-theme-yellow">
-                      Email
+                    <Label htmlFor="signin-email" className="text-foreground font-medium">
+                      Email Address
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-yellow/60 w-4 h-4" />
+                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                       <Input
                         id="signin-email"
                         type="email"
@@ -201,17 +214,17 @@ const Auth = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="jeopardy-button pl-10"
+                        className="pl-12 h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password" className="text-theme-yellow">
+                    <Label htmlFor="signin-password" className="text-foreground font-medium">
                       Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-yellow/60 w-4 h-4" />
+                      <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                       <Input
                         id="signin-password"
                         type={showPassword ? "text" : "password"}
@@ -219,19 +232,19 @@ const Auth = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="jeopardy-button pl-10 pr-10"
+                        className="pl-12 pr-12 h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10 rounded-lg hover:bg-muted/50"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-theme-yellow/60" />
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <Eye className="h-4 w-4 text-theme-yellow/60" />
+                          <Eye className="h-4 w-4 text-muted-foreground" />
                         )}
                       </Button>
                     </div>
@@ -240,21 +253,21 @@ const Auth = () => {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full jeopardy-button"
+                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02]"
                   >
                     {isLoading ? "Signing In..." : "Sign In"}
                   </Button>
                 </form>
               </TabsContent>
               
-              <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
+              <TabsContent value="signup" className="space-y-6">
+                <form onSubmit={handleSignUp} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="display-name" className="text-theme-yellow">
+                    <Label htmlFor="display-name" className="text-foreground font-medium">
                       Display Name
                     </Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-yellow/60 w-4 h-4" />
+                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                       <Input
                         id="display-name"
                         type="text"
@@ -262,17 +275,17 @@ const Auth = () => {
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         required
-                        className="jeopardy-button pl-10"
+                        className="pl-12 h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-theme-yellow">
-                      Email
+                    <Label htmlFor="signup-email" className="text-foreground font-medium">
+                      Email Address
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-yellow/60 w-4 h-4" />
+                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                       <Input
                         id="signup-email"
                         type="email"
@@ -280,17 +293,17 @@ const Auth = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="jeopardy-button pl-10"
+                        className="pl-12 h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-theme-yellow">
+                    <Label htmlFor="signup-password" className="text-foreground font-medium">
                       Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-yellow/60 w-4 h-4" />
+                      <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                       <Input
                         id="signup-password"
                         type={showPassword ? "text" : "password"}
@@ -298,30 +311,30 @@ const Auth = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="jeopardy-button pl-10 pr-10"
+                        className="pl-12 pr-12 h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10 rounded-lg hover:bg-muted/50"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-theme-yellow/60" />
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <Eye className="h-4 w-4 text-theme-yellow/60" />
+                          <Eye className="h-4 w-4 text-muted-foreground" />
                         )}
                       </Button>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-theme-yellow">
+                    <Label htmlFor="confirm-password" className="text-foreground font-medium">
                       Confirm Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-yellow/60 w-4 h-4" />
+                      <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                       <Input
                         id="confirm-password"
                         type={showPassword ? "text" : "password"}
@@ -329,7 +342,7 @@ const Auth = () => {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
-                        className="jeopardy-button pl-10"
+                        className="pl-12 h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl"
                       />
                     </div>
                   </div>
@@ -337,7 +350,7 @@ const Auth = () => {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full jeopardy-button"
+                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02]"
                   >
                     {isLoading ? "Creating Account..." : "Create Account"}
                   </Button>
