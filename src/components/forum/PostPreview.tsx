@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MessageCircle, ThumbsUp, Eye, Calendar } from 'lucide-react';
 import { UserAvatar } from '@/components/UserAvatar';
 import { UserBadges } from '@/components/UserBadges';
+import { getDisplayName } from '@/lib/username-generator';
 
 interface PostPreviewProps {
   post: {
@@ -53,12 +54,13 @@ const PostPreview = ({
           <div className="flex items-center gap-3 flex-1">
             <UserAvatar 
               displayName={post.profiles?.display_name}
+              userId={post.user_id}
               size="md"
             />
             <div className="flex flex-col flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-medium text-foreground">
-                  {post.profiles?.display_name || 'Anonymous User'}
+                  {getDisplayName(post.profiles?.display_name, post.user_id)}
                 </span>
                 <UserBadges userId={post.user_id} limit={2} size="sm" />
               </div>

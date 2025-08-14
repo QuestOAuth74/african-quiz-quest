@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface UserStats {
   user_id: string;
-  email: string;
+  display_name: string;
   total_points_vs_computer: number;
   best_category_name: string;
   best_category_points: number;
@@ -362,7 +362,7 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
                       </div>
                       <div>
                         <div className="font-semibold text-foreground flex items-center gap-2">
-                          {stat.email}
+                          {stat.display_name}
                           {stat.user_id === user?.id && (
                             <Badge variant="secondary" className="text-xs rounded-full px-2 py-1">You</Badge>
                           )}

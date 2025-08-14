@@ -95,7 +95,7 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
       const players = [
         { 
           id: user?.id, 
-          name: user?.email?.split('@')[0] || 'You', 
+          name: 'You', 
           score: 0,
           user_id: user?.id 
         },

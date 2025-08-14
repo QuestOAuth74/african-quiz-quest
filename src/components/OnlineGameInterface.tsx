@@ -230,7 +230,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
         onClose={() => setIsQuestionModalOpen(false)}
         question={selectedQuestion}
         onAnswer={handleAnswer}
-        currentPlayer={user?.email?.split('@')[0] || 'You'}
+        currentPlayer="You"
         gameMode="online-multiplayer"
       />
     </div>

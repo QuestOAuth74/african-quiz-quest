@@ -1,13 +1,15 @@
 import { cn } from '@/lib/utils';
+import { getDisplayName } from '@/lib/username-generator';
 
 interface UserAvatarProps {
   displayName?: string | null;
   email?: string;
+  userId?: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-export const UserAvatar = ({ displayName, email, size = 'md', className }: UserAvatarProps) => {
+export const UserAvatar = ({ displayName, email, userId, size = 'md', className }: UserAvatarProps) => {
   // Generate a consistent color based on display name or email
   const generateColor = (text: string) => {
     let hash = 0;
@@ -19,7 +21,7 @@ export const UserAvatar = ({ displayName, email, size = 'md', className }: UserA
     return `hsl(${hue}, 70%, 50%)`;
   };
 
-  const getInitials = (name?: string | null, fallbackEmail?: string) => {
+  const getInitials = (name: string) => {
     if (name && name.trim()) {
       return name
         .trim()
@@ -28,10 +30,6 @@ export const UserAvatar = ({ displayName, email, size = 'md', className }: UserA
         .join('')
         .toUpperCase()
         .slice(0, 2);
-    }
-    
-    if (fallbackEmail) {
-      return fallbackEmail[0].toUpperCase();
     }
     
     return '?';
@@ -43,9 +41,9 @@ export const UserAvatar = ({ displayName, email, size = 'md', className }: UserA
     lg: 'h-12 w-12 text-base'
   };
 
-  const text = displayName || email || '';
-  const backgroundColor = generateColor(text);
-  const initials = getInitials(displayName, email);
+  const finalDisplayName = getDisplayName(displayName, userId, email);
+  const backgroundColor = generateColor(finalDisplayName);
+  const initials = getInitials(finalDisplayName);
 
   return (
     <div 

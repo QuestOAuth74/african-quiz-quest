@@ -866,7 +866,7 @@ export type Database = {
         Returns: {
           best_category_name: string
           best_category_points: number
-          email: string
+          display_name: string
           total_games_vs_computer: number
           total_points_vs_computer: number
           user_id: string
