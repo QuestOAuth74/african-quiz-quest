@@ -14,16 +14,19 @@ interface Category {
   name: string;
 }
 
+type QuestionFilter = 'all' | 'fresh' | 'correct' | 'incorrect';
+
 interface GameSetupProps {
   gameMode: 'single' | 'multiplayer';
   onBack: () => void;
-  onStartGame: (selectedCategories: Category[], rowCount: number) => void;
+  onStartGame: (selectedCategories: Category[], rowCount: number, questionFilter: QuestionFilter) => void;
 }
 
 const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [rowCount, setRowCount] = useState<number>(5);
+  const [questionFilter, setQuestionFilter] = useState<QuestionFilter>('all');
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -98,7 +101,7 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
       selectedCategories.includes(cat.id)
     );
     
-    onStartGame(selectedCategoryData, rowCount);
+    onStartGame(selectedCategoryData, rowCount, questionFilter);
   };
 
   if (loading) {
@@ -213,6 +216,34 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
                   <p className="text-xs text-muted-foreground mt-2">
                     Point values: {Array.from({length: rowCount}, (_, i) => `$${(i + 1) * 100}`).join(', ')}
                   </p>
+                </CardContent>
+              </Card>
+
+              {/* Question Filter Selection */}
+              <Card className="jeopardy-card">
+                <CardHeader>
+                  <CardTitle className="text-lg font-orbitron text-accent">
+                    Question Type
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Select value={questionFilter} onValueChange={(value: QuestionFilter) => setQuestionFilter(value)}>
+                    <SelectTrigger className="jeopardy-button">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-theme-yellow/30">
+                      <SelectItem value="all">All Questions</SelectItem>
+                      <SelectItem value="fresh">Fresh Questions Only</SelectItem>
+                      <SelectItem value="correct">Previously Correct</SelectItem>
+                      <SelectItem value="incorrect">Previously Wrong</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    {questionFilter === 'all' && 'Include all available questions'}
+                    {questionFilter === 'fresh' && 'Only questions you haven\'t attempted'}
+                    {questionFilter === 'correct' && 'Questions you answered correctly before'}
+                    {questionFilter === 'incorrect' && 'Questions you answered incorrectly before'}
+                  </div>
                 </CardContent>
               </Card>
 

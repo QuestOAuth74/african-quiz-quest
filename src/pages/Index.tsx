@@ -29,7 +29,7 @@ interface Question {
 }
 
 const Index = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<'single' | 'multiplayer' | null>(null);
   const [gameConfigured, setGameConfigured] = useState(false);
@@ -69,10 +69,10 @@ const Index = () => {
     }
   };
 
-  const handleGameSetup = async (selectedCategories: any[], rowCount: number) => {
+  const handleGameSetup = async (selectedCategories: any[], rowCount: number, questionFilter: 'all' | 'fresh' | 'correct' | 'incorrect') => {
     try {
       // Load questions for selected categories
-      await loadQuestionsForCategories(selectedCategories, rowCount);
+      await loadQuestionsForCategories(selectedCategories, rowCount, questionFilter);
     } catch (error) {
       console.error('Error setting up game:', error);
       toast({
@@ -83,8 +83,8 @@ const Index = () => {
     }
   };
 
-  const loadQuestionsForCategories = async (selectedCategories: any[], rowCount: number) => {
-    const { data: questions, error } = await supabase
+  const loadQuestionsForCategories = async (selectedCategories: any[], rowCount: number, questionFilter: 'all' | 'fresh' | 'correct' | 'incorrect') => {
+    let questionQuery = supabase
       .from('questions')
       .select(`
         *,
@@ -92,6 +92,50 @@ const Index = () => {
         question_options (*)
       `)
       .in('category_id', selectedCategories.map(cat => cat.id));
+
+    // Apply question filtering based on user's answer history
+    if (isAuthenticated && questionFilter !== 'all') {
+      const { data: userAttempts, error: attemptsError } = await supabase
+        .from('user_question_attempts')
+        .select('question_id, answered_correctly')
+        .eq('user_id', user?.id);
+
+      if (attemptsError) {
+        console.error('Error loading user attempts:', attemptsError);
+        // Continue without filtering if there's an error
+      } else {
+        const attemptedQuestionIds = userAttempts?.map(attempt => attempt.question_id) || [];
+        
+        if (questionFilter === 'fresh') {
+          // Only questions not attempted before
+          if (attemptedQuestionIds.length > 0) {
+            questionQuery = questionQuery.not('id', 'in', `(${attemptedQuestionIds.join(',')})`);
+          }
+        } else if (questionFilter === 'correct') {
+          // Only questions answered correctly before
+          const correctQuestionIds = userAttempts?.filter(attempt => attempt.answered_correctly)
+            .map(attempt => attempt.question_id) || [];
+          if (correctQuestionIds.length > 0) {
+            questionQuery = questionQuery.in('id', correctQuestionIds);
+          } else {
+            // No correct answers yet, show empty result
+            questionQuery = questionQuery.eq('id', '00000000-0000-0000-0000-000000000000'); // Non-existent ID
+          }
+        } else if (questionFilter === 'incorrect') {
+          // Only questions answered incorrectly before
+          const incorrectQuestionIds = userAttempts?.filter(attempt => !attempt.answered_correctly)
+            .map(attempt => attempt.question_id) || [];
+          if (incorrectQuestionIds.length > 0) {
+            questionQuery = questionQuery.in('id', incorrectQuestionIds);
+          } else {
+            // No incorrect answers yet, show empty result
+            questionQuery = questionQuery.eq('id', '00000000-0000-0000-0000-000000000000'); // Non-existent ID
+          }
+        }
+      }
+    }
+
+    const { data: questions, error } = await questionQuery;
 
     if (error) {
       console.error('Error loading questions:', error);
@@ -104,9 +148,25 @@ const Index = () => {
     }
 
     if (!questions || questions.length === 0) {
+      let description = "The selected categories don't have any questions yet. Please add questions using the admin panel.";
+      
+      if (isAuthenticated) {
+        switch (questionFilter) {
+          case 'fresh':
+            description = "You've already attempted all questions in the selected categories. Try selecting 'All Questions' or different categories.";
+            break;
+          case 'correct':
+            description = "You haven't answered any questions correctly in the selected categories yet. Try playing some questions first!";
+            break;
+          case 'incorrect':
+            description = "You haven't answered any questions incorrectly in the selected categories. Great job! Try selecting 'All Questions' for more practice.";
+            break;
+        }
+      }
+      
       toast({
         title: "No Questions Found",
-        description: "The selected categories don't have any questions yet. Please add questions using the admin panel.",
+        description,
         variant: "destructive",
       });
       return;
@@ -175,7 +235,7 @@ const Index = () => {
     setIsQuestionModalOpen(true);
   };
 
-  const handleAnswer = (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
+  const handleAnswer = async (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
     let isCorrect = false;
     let pointChange = 0;
     
@@ -240,6 +300,22 @@ const Index = () => {
     if (typeof selectedAnswerIndex === 'number') {
       isCorrect = selectedAnswerIndex === selectedQuestion?.correctAnswerIndex;
       pointChange = isCorrect ? selectedQuestion.points : -selectedQuestion.points;
+      
+      // Record the user's answer attempt if authenticated
+      if (isAuthenticated && user && selectedQuestion) {
+        try {
+          await supabase
+            .from('user_question_attempts')
+            .insert({
+              user_id: user.id,
+              question_id: selectedQuestion.id,
+              answered_correctly: isCorrect
+            });
+        } catch (error) {
+          console.error('Error recording answer attempt:', error);
+          // Don't show toast for this error as it's not critical to gameplay
+        }
+      }
     }
     // For 'pass' and 'timeout', no points are gained or lost
     
