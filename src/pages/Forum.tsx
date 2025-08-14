@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Plus, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
@@ -27,9 +27,18 @@ interface Post {
   user_id: string;
   category_id: string;
   image_url: string | null;
+  upvote_count: number;
   forum_categories: {
     name: string;
   };
+}
+
+interface Reply {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
 }
 
 const Forum = () => {
@@ -43,11 +52,19 @@ const Forum = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userUpvotes, setUserUpvotes] = useState<Set<string>>(new Set());
+  const [replies, setReplies] = useState<{ [postId: string]: Reply[] }>({});
+  const [showReplies, setShowReplies] = useState<Set<string>>(new Set());
+  const [replyContent, setReplyContent] = useState<{ [postId: string]: string }>({});
+  const [submittingReply, setSubmittingReply] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCategories();
     fetchPosts();
-  }, [selectedCategory]);
+    if (user) {
+      fetchUserUpvotes();
+    }
+  }, [selectedCategory, user]);
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
@@ -85,6 +102,137 @@ const Forum = () => {
     
     setPosts(data || []);
     setLoading(false);
+  };
+
+  const fetchUserUpvotes = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('forum_post_upvotes')
+      .select('post_id')
+      .eq('user_id', user.id);
+
+    if (!error && data) {
+      setUserUpvotes(new Set(data.map(upvote => upvote.post_id)));
+    }
+  };
+
+  const fetchReplies = async (postId: string) => {
+    const { data, error } = await supabase
+      .from('forum_post_replies')
+      .select('*')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+
+    if (!error && data) {
+      setReplies(prev => ({ ...prev, [postId]: data }));
+    }
+  };
+
+  const toggleUpvote = async (postId: string) => {
+    if (!user) {
+      toast.error('Please sign in to upvote posts');
+      return;
+    }
+
+    const isUpvoted = userUpvotes.has(postId);
+
+    try {
+      if (isUpvoted) {
+        // Remove upvote
+        const { error } = await supabase
+          .from('forum_post_upvotes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+
+        if (error) {
+          toast.error('Failed to remove upvote');
+          return;
+        }
+
+        setUserUpvotes(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(postId);
+          return newSet;
+        });
+      } else {
+        // Add upvote
+        const { error } = await supabase
+          .from('forum_post_upvotes')
+          .insert({ post_id: postId, user_id: user.id });
+
+        if (error) {
+          toast.error('Failed to upvote post');
+          return;
+        }
+
+        setUserUpvotes(prev => new Set(prev).add(postId));
+      }
+
+      // Update post upvote count in local state
+      setPosts(prev => prev.map(post => 
+        post.id === postId 
+          ? { ...post, upvote_count: post.upvote_count + (isUpvoted ? -1 : 1) }
+          : post
+      ));
+
+    } catch (error) {
+      toast.error('Error updating upvote');
+    }
+  };
+
+  const toggleReplies = async (postId: string) => {
+    if (showReplies.has(postId)) {
+      setShowReplies(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+    } else {
+      setShowReplies(prev => new Set(prev).add(postId));
+      if (!replies[postId]) {
+        await fetchReplies(postId);
+      }
+    }
+  };
+
+  const submitReply = async (postId: string) => {
+    if (!user) {
+      toast.error('Please sign in to reply');
+      return;
+    }
+
+    const content = replyContent[postId]?.trim();
+    if (!content) {
+      toast.error('Please enter a reply');
+      return;
+    }
+
+    setSubmittingReply(postId);
+
+    try {
+      const { error } = await supabase
+        .from('forum_post_replies')
+        .insert({
+          post_id: postId,
+          user_id: user.id,
+          content: content
+        });
+
+      if (error) {
+        toast.error('Failed to submit reply');
+        return;
+      }
+
+      toast.success('Reply submitted!');
+      setReplyContent(prev => ({ ...prev, [postId]: '' }));
+      await fetchReplies(postId);
+    } catch (error) {
+      toast.error('Error submitting reply');
+    } finally {
+      setSubmittingReply(null);
+    }
   };
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -389,7 +537,77 @@ const Forum = () => {
                       className="w-full max-w-md rounded-lg border mb-4"
                     />
                   )}
-                  <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+                  <p className="text-foreground whitespace-pre-wrap mb-4">{post.content}</p>
+                  
+                  {/* Post Actions */}
+                  <div className="flex items-center gap-4 pt-4 border-t border-border/50">
+                    <Button
+                      variant={userUpvotes.has(post.id) ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleUpvote(post.id)}
+                      className="flex items-center gap-2"
+                    >
+                      <ThumbsUp className="h-4 w-4" />
+                      <span>{post.upvote_count}</span>
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toggleReplies(post.id)}
+                      className="flex items-center gap-2"
+                    >
+                      <Reply className="h-4 w-4" />
+                      <span>{replies[post.id]?.length || 0} Replies</span>
+                    </Button>
+                  </div>
+
+                  {/* Replies Section */}
+                  {showReplies.has(post.id) && (
+                    <div className="mt-4 space-y-4">
+                      {/* Reply Input */}
+                      {isAuthenticated && (
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Write a reply..."
+                            value={replyContent[post.id] || ''}
+                            onChange={(e) => setReplyContent(prev => ({ 
+                              ...prev, 
+                              [post.id]: e.target.value 
+                            }))}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                submitReply(post.id);
+                              }
+                            }}
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => submitReply(post.id)}
+                            disabled={submittingReply === post.id}
+                          >
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Replies List */}
+                      <div className="space-y-3 ml-4">
+                        {replies[post.id]?.map((reply) => (
+                          <div key={reply.id} className="bg-muted/50 p-3 rounded-lg">
+                            <p className="text-sm text-foreground">{reply.content}</p>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              {formatDate(reply.created_at)}
+                            </p>
+                          </div>
+                        ))}
+                        {(!replies[post.id] || replies[post.id].length === 0) && (
+                          <p className="text-sm text-muted-foreground">No replies yet. Be the first to reply!</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))
