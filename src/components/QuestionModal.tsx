@@ -110,15 +110,15 @@ export function QuestionModal({
 
   return (
     <>
-      {/* Hidden audio element for countdown music */}
+      {/* Hidden audio element for Jeopardy thinking music */}
       <audio
         ref={audioRef}
         loop
         preload="auto"
       >
-        <source src="https://www.soundjay.com/misc/sounds/countdown-clock.mp3" type="audio/mpeg" />
-        {/* Fallback for browsers that don't support MP3 */}
-        <source src="https://www.soundjay.com/misc/sounds/countdown-clock.wav" type="audio/wav" />
+        <source src="https://www.myinstants.com/media/sounds/jeopardy-thinking-music.mp3" type="audio/mpeg" />
+        {/* Fallback URL */}
+        <source src="https://audio.jukehost.co.uk/XrOb5vQ8DLh5s9BnBaA2E8uMllonK0vj" type="audio/mpeg" />
       </audio>
       
     <Dialog open={isOpen} onOpenChange={handleClose}>
