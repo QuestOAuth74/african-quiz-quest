@@ -73,6 +73,9 @@ const QuestionModal = ({
 
     if (!isOpen || !question || hasAnswered) return;
     
+    // Start countdown music
+    gameAudio.playCountdown();
+    
     
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -82,6 +85,8 @@ const QuestionModal = ({
             setHasAnswered(true);
             onAnswer('timeout');
           }
+          // Stop countdown music when time runs out
+          gameAudio.stopCountdown();
           return 0;
         }
         return prev - 1;
@@ -99,6 +104,7 @@ const QuestionModal = ({
   const handleSkip = () => {
     soundEffects.playButtonClick();
     setHasAnswered(true);
+    gameAudio.stopCountdown();
     onAnswer('skip');
   };
 
@@ -109,6 +115,7 @@ const QuestionModal = ({
       setSelectedAnswerIndex(answerIndex);
       setHasAnswered(true);
       setShowAnswer(true);
+      gameAudio.stopCountdown();
       
       // Play correct/wrong answer sound
       const selectedOptionObj = question.options?.find(opt => opt.id === selectedOption);
@@ -126,6 +133,7 @@ const QuestionModal = ({
   const handlePass = () => {
     setHasAnswered(true);
     setShowAnswer(true);
+    gameAudio.stopCountdown();
     onAnswer('pass');
   };
 
