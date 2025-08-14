@@ -11,16 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 
 interface UserStats {
   user_id: string;
-  total_games_played: number;
-  total_questions_answered: number;
-  total_questions_correct: number;
-  total_points_earned: number;
-  best_game_score: number;
-  current_correct_streak: number;
-  longest_correct_streak: number;
-  user_email?: string;
-  accuracy_percentage: number;
-  avg_score_per_game: number;
+  email: string;
+  total_points_vs_computer: number;
+  best_category_name: string;
+  best_category_points: number;
+  total_games_vs_computer: number;
   rank: number;
 }
 
@@ -47,51 +42,35 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
     try {
       setLoading(true);
       
-      // Get leaderboard data
+      // Get single player stats using our custom function
       const { data: statsData, error: statsError } = await supabase
-        .from('user_stats')
-        .select('*')
-        .order(getOrderByField(), { ascending: false })
-        .limit(100);
+        .rpc('get_single_player_stats');
 
       if (statsError) throw statsError;
 
-      // Get user emails and filter out admin users
-      const userIds = statsData?.map(stat => stat.user_id) || [];
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, email, is_admin')
-        .in('user_id', userIds);
+      // Process the data and add rank
+      const processedData = (statsData || []).map((stat, index) => ({
+        ...stat,
+        rank: index + 1
+      }));
 
-      if (profilesError) {
-        console.warn('Could not load user profiles:', profilesError);
-      }
+      // Sort by active tab
+      const sortedData = [...processedData].sort((a, b) => {
+        switch (activeTab) {
+          case "best-category":
+            return b.best_category_points - a.best_category_points;
+          default:
+            return b.total_points_vs_computer - a.total_points_vs_computer;
+        }
+      }).map((stat, index) => ({
+        ...stat,
+        rank: index + 1
+      }));
 
-      // Filter out admin users and process the data
-      const nonAdminProfiles = profilesData?.filter(profile => !profile.is_admin) || [];
-      const nonAdminUserIds = nonAdminProfiles.map(profile => profile.user_id);
-      
-      const processedData = statsData
-        ?.filter(stat => nonAdminUserIds.includes(stat.user_id))
-        ?.map((stat, index) => {
-          const profile = nonAdminProfiles.find(p => p.user_id === stat.user_id);
-          return {
-            ...stat,
-            user_email: profile?.email || 'Anonymous User',
-            accuracy_percentage: stat.total_questions_answered > 0 
-              ? Math.round((stat.total_questions_correct / stat.total_questions_answered) * 100)
-              : 0,
-            avg_score_per_game: stat.total_games_played > 0 
-              ? Math.round(stat.total_points_earned / stat.total_games_played)
-              : 0,
-            rank: index + 1
-          };
-        }) || [];
-
-      setLeaderboardData(processedData);
+      setLeaderboardData(sortedData);
 
       // Find current user's stats
-      const currentUserStats = processedData.find(stat => stat.user_id === user?.id);
+      const currentUserStats = sortedData.find(stat => stat.user_id === user?.id);
       setUserStats(currentUserStats || null);
 
     } catch (error) {
@@ -106,18 +85,6 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
     }
   };
 
-  const getOrderByField = () => {
-    switch (activeTab) {
-      case "best-score":
-        return "best_game_score";
-      case "accuracy":
-        return "total_questions_correct";
-      case "streak":
-        return "longest_correct_streak";
-      default:
-        return "total_points_earned";
-    }
-  };
 
   const handleResetStats = async () => {
     if (!user) return;
@@ -176,27 +143,19 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
 
   const getStatValue = (stat: UserStats) => {
     switch (activeTab) {
-      case "best-score":
-        return `$${stat.best_game_score.toLocaleString()}`;
-      case "accuracy":
-        return `${stat.accuracy_percentage}%`;
-      case "streak":
-        return `${stat.longest_correct_streak} correct`;
+      case "best-category":
+        return `$${stat.best_category_points.toLocaleString()}`;
       default:
-        return `$${stat.total_points_earned.toLocaleString()}`;
+        return `$${stat.total_points_vs_computer.toLocaleString()}`;
     }
   };
 
   const getStatDescription = (stat: UserStats) => {
     switch (activeTab) {
-      case "best-score":
-        return `${stat.total_games_played} games played`;
-      case "accuracy":
-        return `${stat.total_questions_correct}/${stat.total_questions_answered} correct`;
-      case "streak":
-        return `Current: ${stat.current_correct_streak}`;
+      case "best-category":
+        return stat.best_category_name || "No category played";
       default:
-        return `Avg: $${stat.avg_score_per_game}/game`;
+        return `${stat.total_games_vs_computer} games played`;
     }
   };
 
@@ -304,32 +263,28 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-theme-yellow">
-                      #{userStats.rank}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Overall Rank</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-theme-yellow">
-                      ${userStats.total_points_earned.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Total Points</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-theme-yellow">
-                      {userStats.accuracy_percentage}%
-                    </div>
-                    <div className="text-xs text-muted-foreground">Accuracy</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-theme-yellow">
-                      {userStats.current_correct_streak}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Current Streak</div>
-                  </div>
-                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                   <div className="text-center">
+                     <div className="text-2xl font-bold text-theme-yellow">
+                       #{userStats.rank}
+                     </div>
+                     <div className="text-xs text-muted-foreground">Overall Rank</div>
+                   </div>
+                   <div className="text-center">
+                     <div className="text-2xl font-bold text-theme-yellow">
+                       ${userStats.total_points_vs_computer.toLocaleString()}
+                     </div>
+                     <div className="text-xs text-muted-foreground">Total Points vs Computer</div>
+                   </div>
+                   <div className="text-center">
+                     <div className="text-2xl font-bold text-theme-yellow">
+                       {userStats.best_category_name || "None"}
+                     </div>
+                     <div className="text-xs text-muted-foreground">
+                       Best Category (${userStats.best_category_points})
+                     </div>
+                   </div>
+                 </div>
               </CardContent>
             </Card>
           )}
@@ -337,26 +292,18 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
           {/* Leaderboard Tabs */}
           <Card className="jeopardy-card">
             <CardHeader>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-4 bg-theme-brown-dark">
-                  <TabsTrigger value="total-points" className="text-xs">
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                    Total Points
-                  </TabsTrigger>
-                  <TabsTrigger value="best-score" className="text-xs">
-                    <Trophy className="w-4 h-4 mr-1" />
-                    Best Score
-                  </TabsTrigger>
-                  <TabsTrigger value="accuracy" className="text-xs">
-                    <Target className="w-4 h-4 mr-1" />
-                    Accuracy
-                  </TabsTrigger>
-                  <TabsTrigger value="streak" className="text-xs">
-                    <Zap className="w-4 h-4 mr-1" />
-                    Best Streak
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                 <TabsList className="grid w-full grid-cols-2 bg-theme-brown-dark">
+                   <TabsTrigger value="total-points" className="text-sm">
+                     <TrendingUp className="w-4 h-4 mr-2" />
+                     Total Points
+                   </TabsTrigger>
+                   <TabsTrigger value="best-category" className="text-sm">
+                     <Trophy className="w-4 h-4 mr-2" />
+                     Best Category
+                   </TabsTrigger>
+                 </TabsList>
+               </Tabs>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -381,25 +328,25 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
                         <div className="flex items-center justify-center w-8 h-8">
                           {getRankIcon(stat.rank)}
                         </div>
-                        <div>
-                          <div className="font-medium text-card-foreground">
-                            {stat.user_email}
-                            {stat.user_id === user?.id && (
-                              <Badge variant="secondary" className="ml-2 text-xs">You</Badge>
-                            )}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {getStatDescription(stat)}
-                          </div>
-                        </div>
+                         <div>
+                           <div className="font-medium text-card-foreground">
+                             {stat.email}
+                             {stat.user_id === user?.id && (
+                               <Badge variant="secondary" className="ml-2 text-xs">You</Badge>
+                             )}
+                           </div>
+                           <div className="text-sm text-muted-foreground">
+                             {getStatDescription(stat)}
+                           </div>
+                         </div>
                       </div>
                       <div className="text-right">
                         <div className="font-bold text-theme-yellow">
                           {getStatValue(stat)}
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {stat.total_games_played} games
-                        </div>
+                         <div className="text-xs text-muted-foreground">
+                           {stat.total_games_vs_computer} games
+                         </div>
                       </div>
                     </div>
                   ))
