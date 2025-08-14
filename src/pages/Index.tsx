@@ -63,12 +63,55 @@ const mockCategories = [
   }
 ];
 
-const mockQuestion = {
-  id: "1",
-  text: "This ancient Egyptian queen was known for her relationships with Julius Caesar and Mark Antony.",
-  answer: "Who is Cleopatra VII?",
-  points: 100,
-  category: "Ancient Civilizations"
+const mockQuestions = {
+  "1": {
+    id: "1",
+    text: "This ancient Egyptian queen was known for her relationships with Julius Caesar and Mark Antony.",
+    options: [
+      "Nefertiti",
+      "Cleopatra VII",
+      "Hatshepsut",
+      "Ankhesenamun"
+    ],
+    correctAnswerIndex: 1,
+    points: 100,
+    category: "Ancient Civilizations",
+    explanation: "Cleopatra VII (69-30 BCE) was the last active pharaoh of Ancient Egypt. She was highly educated, speaking at least nine languages, and was known for her intelligence and political acumen. Her relationships with Julius Caesar and later Mark Antony were strategic political alliances aimed at preserving Egypt's independence from Rome.",
+    historicalContext: "Cleopatra ruled during the Ptolemaic period, a dynasty that had controlled Egypt for nearly 300 years after Alexander the Great's conquest. Her death marked the end of both the Ptolemaic dynasty and Egypt's independence, as the country became a Roman province.",
+    imageUrl: "https://images.unsplash.com/photo-1539650116574-75c0c6d73def?w=400&h=300&fit=crop&crop=center"
+  },
+  "2": {
+    id: "2",
+    text: "Which ancient civilization built Machu Picchu?",
+    options: [
+      "Aztecs",
+      "Mayans", 
+      "Incas",
+      "Olmecs"
+    ],
+    correctAnswerIndex: 2,
+    points: 200,
+    category: "Ancient Civilizations",
+    explanation: "Machu Picchu was built by the Inca Empire around 1450 CE during the reign of Inca Pachacuti. This remarkable citadel sits at 2,430 meters above sea level in the Andes Mountains of Peru.",
+    historicalContext: "The site was likely a royal estate and sacred center. It was abandoned around 1572 during the Spanish conquest but remained hidden from the outside world until American historian Hiram Bingham brought it to international attention in 1911.",
+    imageUrl: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=400&h=300&fit=crop&crop=center"
+  },
+  "6": {
+    id: "6", 
+    text: "Who was the first Holy Roman Emperor?",
+    options: [
+      "Charlemagne",
+      "Otto I",
+      "Frederick Barbarossa",
+      "Henry IV"
+    ],
+    correctAnswerIndex: 0,
+    points: 100,
+    category: "Great Kingdoms",
+    explanation: "Charlemagne (Charles the Great) was crowned as the first Holy Roman Emperor by Pope Leo III on Christmas Day, 800 CE. This event marked the revival of the Western Roman Empire concept in medieval Europe.",
+    historicalContext: "Charlemagne's empire stretched across much of Western and Central Europe. His coronation established the precedent for the Holy Roman Empire, which would last for over 1,000 years until 1806.",
+    imageUrl: "https://images.unsplash.com/photo-1543422655-9d6a50c12bca?w=400&h=300&fit=crop&crop=center"
+  }
 };
 
 const Index = () => {
@@ -92,15 +135,18 @@ const Index = () => {
   };
 
   const handleQuestionSelect = (categoryId: string, questionId: string) => {
-    setSelectedQuestion(mockQuestion);
+    const question = mockQuestions[questionId] || mockQuestions["1"];
+    setSelectedQuestion(question);
     setIsQuestionModalOpen(true);
   };
 
-  const handleAnswer = (isCorrect: boolean) => {
+  const handleAnswer = (selectedAnswerIndex: number) => {
+    const isCorrect = selectedAnswerIndex === selectedQuestion?.correctAnswerIndex;
+    
     if (isCorrect) {
       setPlayers(prev => prev.map(player => 
         player.isActive 
-          ? { ...player, score: player.score + mockQuestion.points }
+          ? { ...player, score: player.score + selectedQuestion.points }
           : player
       ));
     }
@@ -113,11 +159,13 @@ const Index = () => {
       )
     })));
 
-    // Switch active player
-    setPlayers(prev => prev.map(player => ({
-      ...player,
-      isActive: !player.isActive
-    })));
+    // Switch active player after a delay to allow viewing the explanation
+    setTimeout(() => {
+      setPlayers(prev => prev.map(player => ({
+        ...player,
+        isActive: !player.isActive
+      })));
+    }, 3000);
   };
 
   const handleNewGame = () => {

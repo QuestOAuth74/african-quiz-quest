@@ -10,11 +10,15 @@ interface QuestionModalProps {
   question: {
     id: string;
     text: string;
-    answer: string;
+    options: string[];
+    correctAnswerIndex: number;
     points: number;
     category: string;
+    explanation: string;
+    historicalContext: string;
+    imageUrl?: string;
   } | null;
-  onAnswer: (isCorrect: boolean) => void;
+  onAnswer: (selectedAnswerIndex: number) => void;
   timeLimit?: number;
 }
 
@@ -28,6 +32,7 @@ export function QuestionModal({
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [showAnswer, setShowAnswer] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
+  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isOpen || !question) return;
@@ -35,6 +40,7 @@ export function QuestionModal({
     setTimeLeft(timeLimit);
     setShowAnswer(false);
     setHasAnswered(false);
+    setSelectedAnswerIndex(null);
     
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -49,15 +55,17 @@ export function QuestionModal({
     return () => clearInterval(timer);
   }, [isOpen, question, timeLimit]);
 
-  const handleAnswer = (isCorrect: boolean) => {
+  const handleAnswer = (answerIndex: number) => {
+    setSelectedAnswerIndex(answerIndex);
     setHasAnswered(true);
     setShowAnswer(true);
-    onAnswer(isCorrect);
+    onAnswer(answerIndex);
   };
 
   const handleClose = () => {
     setShowAnswer(false);
     setHasAnswered(false);
+    setSelectedAnswerIndex(null);
     onClose();
   };
 
@@ -101,50 +109,90 @@ export function QuestionModal({
 
           {/* Question */}
           <Card className="jeopardy-card border-jeopardy-blue-light/50 animate-scale-in">
-            <CardContent className="p-8">
-              <p className="text-xl md:text-2xl text-center font-exo font-medium leading-relaxed text-card-foreground">
+            <CardContent className="p-6">
+              {question.imageUrl && (
+                <div className="mb-6 flex justify-center">
+                  <img 
+                    src={question.imageUrl} 
+                    alt="Question illustration" 
+                    className="rounded-lg max-w-full h-48 object-cover border-2 border-jeopardy-gold/30"
+                  />
+                </div>
+              )}
+              <p className="text-lg md:text-xl text-center font-exo font-medium leading-relaxed text-card-foreground">
                 {question.text}
               </p>
             </CardContent>
           </Card>
 
-          {/* Answer Section */}
+          {/* Answer Options */}
           {!showAnswer && !hasAnswered && timeLeft > 0 && (
-            <div className="flex gap-6 justify-center animate-fade-in">
-              <Button 
-                onClick={() => handleAnswer(true)} 
-                className="px-8 py-4 jeopardy-gold font-orbitron font-bold text-lg hover:scale-105 transition-all duration-300"
-                size="lg"
-              >
-                <CheckCircle className="mr-2" size={20} />
-                I KNOW THIS!
-              </Button>
-              <Button 
-                onClick={() => handleAnswer(false)} 
-                variant="outline"
-                className="px-8 py-4 jeopardy-button font-orbitron font-bold text-lg hover:scale-105 transition-all duration-300 border-jeopardy-gold/50 text-jeopardy-gold hover:text-jeopardy-gold-light"
-                size="lg"
-              >
-                <XCircle className="mr-2" size={20} />
-                PASS
-              </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+              {question.options.map((option, index) => (
+                <Button
+                  key={index}
+                  onClick={() => handleAnswer(index)}
+                  variant="outline"
+                  className="p-6 h-auto text-left jeopardy-button font-exo text-base hover:scale-105 transition-all duration-300 border-jeopardy-gold/50 text-jeopardy-gold hover:text-jeopardy-gold-light"
+                >
+                  <span className="font-orbitron font-bold mr-3 text-jeopardy-gold-light">
+                    {String.fromCharCode(65 + index)}.
+                  </span>
+                  {option}
+                </Button>
+              ))}
             </div>
           )}
 
-          {/* Show Answer */}
+          {/* Show Results and Explanation */}
           {showAnswer && (
-            <Card className="jeopardy-gold border-none animate-fade-in">
-              <CardContent className="p-8">
-                <div className="text-center">
-                  <p className="text-sm font-orbitron font-bold text-jeopardy-blue-dark mb-4 uppercase tracking-wider">
-                    Correct Answer:
+            <div className="space-y-6 animate-fade-in">
+              {/* Results */}
+              <Card className={`border-none ${selectedAnswerIndex === question.correctAnswerIndex ? 'jeopardy-gold' : 'bg-red-900/20 border-red-500/50'}`}>
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      {selectedAnswerIndex === question.correctAnswerIndex ? (
+                        <CheckCircle className="text-jeopardy-blue-dark" size={24} />
+                      ) : (
+                        <XCircle className="text-red-600" size={24} />
+                      )}
+                      <p className="text-lg font-orbitron font-bold text-jeopardy-blue-dark uppercase tracking-wider">
+                        {selectedAnswerIndex === question.correctAnswerIndex ? 'Correct!' : 'Incorrect'}
+                      </p>
+                    </div>
+                    {selectedAnswerIndex !== null && (
+                      <p className="text-base mb-3 text-jeopardy-blue-dark">
+                        You selected: <strong>{question.options[selectedAnswerIndex]}</strong>
+                      </p>
+                    )}
+                    <p className="text-lg font-exo font-bold text-jeopardy-blue-dark">
+                      Correct Answer: {question.options[question.correctAnswerIndex]}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Explanation */}
+              <Card className="jeopardy-card border-jeopardy-blue-light/50">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-orbitron font-bold text-jeopardy-gold mb-4 uppercase tracking-wider">
+                    Explanation
+                  </h3>
+                  <p className="text-base font-exo leading-relaxed text-card-foreground mb-4">
+                    {question.explanation}
                   </p>
-                  <p className="text-2xl md:text-3xl font-exo font-bold text-jeopardy-blue-dark">
-                    {question.answer}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="pt-4 border-t border-jeopardy-gold/30">
+                    <h4 className="text-base font-orbitron font-bold text-jeopardy-gold-light mb-3 uppercase tracking-wider">
+                      Historical Context
+                    </h4>
+                    <p className="text-sm font-exo leading-relaxed text-card-foreground/90">
+                      {question.historicalContext}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {/* Close Button */}
