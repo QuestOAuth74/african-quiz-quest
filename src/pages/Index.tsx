@@ -139,7 +139,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-hidden">
       <GameHeader 
         players={players}
         gameMode={gameMode}

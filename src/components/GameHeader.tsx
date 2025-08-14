@@ -22,34 +22,35 @@ export function GameHeader({ players, gameMode, onNewGame, currentRound = 1, tot
   const leader = sortedPlayers[0];
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Sparkles className="text-jeopardy-gold animate-pulse" size={28} />
-          <h1 className="text-4xl md:text-5xl font-orbitron font-black gradient-text">
+    <div className="w-full max-w-6xl mx-auto p-4">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Sparkles className="text-jeopardy-gold animate-pulse" size={24} />
+          <h1 className="text-3xl md:text-4xl font-orbitron font-black gradient-text">
             JEOPARDY!
           </h1>
-          <Sparkles className="text-jeopardy-gold animate-pulse" size={28} />
+          <Sparkles className="text-jeopardy-gold animate-pulse" size={24} />
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="text-sm text-muted-foreground font-exo">Round</div>
-            <div className="text-xl font-orbitron font-bold text-jeopardy-gold">
+            <div className="text-xs text-muted-foreground font-exo">Round</div>
+            <div className="text-lg font-orbitron font-bold text-jeopardy-gold">
               {currentRound} / {totalRounds}
             </div>
           </div>
           <Button 
             onClick={onNewGame} 
             variant="outline"
-            className="jeopardy-button font-orbitron font-bold hover:jeopardy-gold"
+            className="jeopardy-button font-orbitron font-bold hover:jeopardy-gold text-sm"
+            size="sm"
           >
-            <Home className="mr-2" size={16} />
+            <Home className="mr-2" size={14} />
             NEW GAME
           </Button>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {players.map((player, index) => (
           <Card 
             key={player.id} 
@@ -59,27 +60,27 @@ export function GameHeader({ players, gameMode, onNewGame, currentRound = 1, tot
                 : 'border-jeopardy-blue-light/30'
             }`}
           >
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                    <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
                       player.isActive 
                         ? 'bg-jeopardy-gold animate-pulse shadow-lg shadow-jeopardy-gold/50' 
                         : 'bg-muted'
                     }`} />
                     {player.id === leader.id && player.score > 0 && (
-                      <Trophy className="absolute -top-1 -right-1 text-jeopardy-gold" size={12} />
+                      <Trophy className="absolute -top-1 -right-1 text-jeopardy-gold" size={10} />
                     )}
                   </div>
                   <div>
-                    <div className="font-orbitron font-bold text-xl text-jeopardy-gold">
+                    <div className="font-orbitron font-bold text-lg text-jeopardy-gold">
                       {player.name}
                     </div>
                     <div className="flex items-center gap-2">
                       {gameMode === 'single' && player.id === 'computer' && (
                         <span className="text-xs jeopardy-gold px-2 py-1 rounded-full font-orbitron font-bold">
-                          AI OPPONENT
+                          AI
                         </span>
                       )}
                       {player.id === leader.id && player.score > 0 && (
@@ -91,7 +92,7 @@ export function GameHeader({ players, gameMode, onNewGame, currentRound = 1, tot
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-orbitron font-black text-jeopardy-gold jeopardy-text-glow">
+                  <div className="text-2xl font-orbitron font-black text-jeopardy-gold jeopardy-text-glow">
                     ${player.score.toLocaleString()}
                   </div>
                 </div>
