@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { GameModeSelector } from "@/components/GameModeSelector";
+import GameSetup from "@/components/GameSetup";
 import { GameHeader } from "@/components/GameHeader";
 import { GameBoard } from "@/components/GameBoard";
 import QuestionModal from "@/components/QuestionModal";
@@ -119,6 +120,7 @@ const mockQuestions = {
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<'single' | 'multiplayer' | null>(null);
+  const [gameConfigured, setGameConfigured] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [showTeacherMode, setShowTeacherMode] = useState(false);
@@ -128,15 +130,39 @@ const Index = () => {
     { id: "computer", name: "Computer", score: 0, isActive: false }
   ]);
   const [categories, setCategories] = useState(mockCategories);
+  const [gameConfig, setGameConfig] = useState({ categories: mockCategories, rowCount: 5 });
 
   const handleModeSelect = (mode: 'single' | 'multiplayer') => {
     setGameMode(mode);
+    setGameConfigured(false);
     if (mode === 'multiplayer') {
       setPlayers([
         { id: "player1", name: "Player 1", score: 0, isActive: true },
         { id: "player2", name: "Player 2", score: 0, isActive: false }
       ]);
+    } else {
+      setPlayers([
+        { id: "player1", name: "Player 1", score: 0, isActive: true },
+        { id: "computer", name: "Computer", score: 0, isActive: false }
+      ]);
     }
+  };
+
+  const handleGameSetup = (selectedCategories: any[], rowCount: number) => {
+    // Generate questions structure based on selected categories and row count
+    const gameCategories = selectedCategories.map(cat => ({
+      id: cat.id,
+      name: cat.name,
+      questions: Array.from({ length: rowCount }, (_, index) => ({
+        id: `${cat.id}-${index + 1}`,
+        points: (index + 1) * 100,
+        isAnswered: false
+      }))
+    }));
+    
+    setGameConfig({ categories: gameCategories, rowCount });
+    setCategories(gameCategories);
+    setGameConfigured(true);
   };
 
   const handleQuestionSelect = (categoryId: string, questionId: string) => {
@@ -239,11 +265,17 @@ const Index = () => {
 
   const handleNewGame = () => {
     setGameMode(null);
-    setCategories(mockCategories.map(cat => ({
+    setGameConfigured(false);
+    setCategories(gameConfig.categories.map(cat => ({
       ...cat,
       questions: cat.questions.map(q => ({ ...q, isAnswered: false }))
     })));
     setPlayers(prev => prev.map(player => ({ ...player, score: 0 })));
+  };
+
+  const handleBackToModeSelection = () => {
+    setGameMode(null);
+    setGameConfigured(false);
   };
 
   const handleCloseModal = () => {
@@ -255,6 +287,16 @@ const Index = () => {
 
   if (!gameMode) {
     return <GameModeSelector onSelectMode={handleModeSelect} />;
+  }
+
+  if (!gameConfigured) {
+    return (
+      <GameSetup
+        gameMode={gameMode}
+        onBack={handleBackToModeSelection}
+        onStartGame={handleGameSetup}
+      />
+    );
   }
 
   return (
