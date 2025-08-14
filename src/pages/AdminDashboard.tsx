@@ -9,7 +9,8 @@ import CategoryManager from "@/components/admin/CategoryManager";
 import { CSVUpload } from "@/components/admin/CSVUpload";
 import QuestionManager from "@/components/admin/QuestionManager";
 import ForumModeration from "@/components/admin/ForumModeration";
-import { LogOut, Users, FileQuestion, FolderOpen, Upload } from "lucide-react";
+import FlaggedQuestionsManager from "@/components/admin/FlaggedQuestionsManager";
+import { LogOut, Users, FileQuestion, FolderOpen, Upload, AlertTriangle } from "lucide-react";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
@@ -17,6 +18,7 @@ const AdminDashboard = () => {
     totalQuestions: 0,
     totalCategories: 0,
     totalAdmins: 0,
+    flaggedQuestions: 0,
   });
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -49,16 +51,18 @@ const AdminDashboard = () => {
 
   const loadStats = async () => {
     try {
-      const [questionsRes, categoriesRes, adminsRes] = await Promise.all([
+      const [questionsRes, categoriesRes, adminsRes, flaggedRes] = await Promise.all([
         supabase.from("questions").select("id", { count: "exact", head: true }),
         supabase.from("categories").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_admin", true)
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_admin", true),
+        supabase.from("questions").select("id", { count: "exact", head: true }).eq("is_flagged", true)
       ]);
 
       setStats({
         totalQuestions: questionsRes.count || 0,
         totalCategories: categoriesRes.count || 0,
         totalAdmins: adminsRes.count || 0,
+        flaggedQuestions: flaggedRes.count || 0,
       });
     } catch (error) {
       console.error("Error loading stats:", error);
@@ -89,7 +93,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="jeopardy-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Questions</CardTitle>
@@ -119,13 +123,28 @@ const AdminDashboard = () => {
               <div className="text-2xl font-bold text-accent">{stats.totalAdmins}</div>
             </CardContent>
           </Card>
+          
+          <Card className="jeopardy-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Flagged Questions</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-500">{stats.flaggedQuestions}</div>
+              <p className="text-xs text-muted-foreground">Need review</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Content */}
         <Tabs defaultValue="questions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-card">
+          <TabsList className="grid w-full grid-cols-5 bg-card">
             <TabsTrigger value="questions" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Questions
+            </TabsTrigger>
+            <TabsTrigger value="flagged" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              Flagged ({stats.flaggedQuestions})
             </TabsTrigger>
             <TabsTrigger value="upload" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               <Upload className="h-4 w-4 mr-2" />
@@ -141,6 +160,10 @@ const AdminDashboard = () => {
           
           <TabsContent value="questions">
             <QuestionManager onStatsUpdate={loadStats} />
+          </TabsContent>
+          
+          <TabsContent value="flagged">
+            <FlaggedQuestionsManager onStatsUpdate={loadStats} />
           </TabsContent>
           
           <TabsContent value="upload">

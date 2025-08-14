@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import TopNavigation from "@/components/TopNavigation";
 import QuizAdminOverlay from "@/components/admin/QuizAdminOverlay";
 import { useRealtimeQuestions } from "@/hooks/useRealtimeQuestions";
+import QuestionRating from "@/components/QuestionRating";
 
 interface Question {
   id: string;
@@ -497,6 +498,24 @@ const Quiz = () => {
               )}
             </CardContent>
           </Card>
+        )}
+
+        {/* Question Rating Component */}
+        {showResult && (
+          <div className="mt-6">
+            <Card className="bg-theme-brown border-theme-yellow/20">
+              <CardHeader>
+                <CardTitle className="text-theme-yellow text-lg">Rate This Question</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <QuestionRating 
+                  questionId={currentQuestion.id}
+                  showAverage={true}
+                  size="md"
+                />
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>

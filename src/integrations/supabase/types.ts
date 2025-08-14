@@ -325,44 +325,97 @@ export type Database = {
           },
         ]
       }
+      question_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          question_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_ratings_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questions: {
         Row: {
+          average_rating: number | null
           category_id: string
           created_at: string
           created_by: string | null
           explanation: string | null
+          flagged_at: string | null
           has_image: boolean
           historical_context: string | null
           id: string
           image_url: string | null
+          is_flagged: boolean | null
           points: number
+          reviewed_at: string | null
+          reviewed_by: string | null
           text: string
+          total_ratings: number | null
           updated_at: string
         }
         Insert: {
+          average_rating?: number | null
           category_id: string
           created_at?: string
           created_by?: string | null
           explanation?: string | null
+          flagged_at?: string | null
           has_image?: boolean
           historical_context?: string | null
           id?: string
           image_url?: string | null
+          is_flagged?: boolean | null
           points?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           text: string
+          total_ratings?: number | null
           updated_at?: string
         }
         Update: {
+          average_rating?: number | null
           category_id?: string
           created_at?: string
           created_by?: string | null
           explanation?: string | null
+          flagged_at?: string | null
           has_image?: boolean
           historical_context?: string | null
           id?: string
           image_url?: string | null
+          is_flagged?: boolean | null
           points?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           text?: string
+          total_ratings?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -583,6 +636,10 @@ export type Database = {
       make_user_admin_by_email: {
         Args: { user_email: string }
         Returns: string
+      }
+      update_question_rating_stats: {
+        Args: { question_uuid: string }
+        Returns: undefined
       }
       update_user_correct_streak: {
         Args: { p_is_correct: boolean; p_user_id: string }
