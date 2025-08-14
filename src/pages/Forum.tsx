@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useForumData } from '@/hooks/useForumData';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,11 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send } from 'lucide-react';
+import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
 import ForumHeader from '@/components/forum/ForumHeader';
+import ForumStats from '@/components/forum/ForumStats';
+import PostSorting from '@/components/forum/PostSorting';
+import SearchBar from '@/components/forum/SearchBar';
+import PostFilters from '@/components/forum/PostFilters';
 import { UserAvatar } from '@/components/UserAvatar';
 import { UserBadges } from '@/components/UserBadges';
 
@@ -53,147 +58,68 @@ interface Reply {
 
 const Forum = () => {
   const { user, isAuthenticated } = useAuth();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [posts, setPosts] = useState<Post[]>([]);
+  
+  // Filter states
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [timeFilter, setTimeFilter] = useState<string>('all');
+  const [userFilter, setUserFilter] = useState<string>('all');
+  const [popularityFilter, setPopularityFilter] = useState<string>('all');
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Post creation states
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', content: '', category_id: '' });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [userUpvotes, setUserUpvotes] = useState<Set<string>>(new Set());
-  const [replies, setReplies] = useState<{ [postId: string]: Reply[] }>({});
+  
+  // Reply states
   const [showReplies, setShowReplies] = useState<Set<string>>(new Set());
   const [replyContent, setReplyContent] = useState<{ [postId: string]: string }>({});
   const [submittingReply, setSubmittingReply] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchCategories();
-    fetchPosts();
-    if (user) {
-      fetchUserUpvotes();
-    }
-  }, [selectedCategory, user]);
-
-  const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('forum_categories')
-      .select('*')
-      .order('name');
-    
-    if (error) {
-      toast.error('Failed to load categories');
-      return;
-    }
-    setCategories(data || []);
+  // Build filters object
+  const filters = {
+    selectedCategory,
+    searchTerm,
+    sortBy,
+    sortOrder,
+    timeFilter,
+    userFilter,
+    popularityFilter
   };
 
-  const fetchPosts = async () => {
-    let query = supabase
-      .from('forum_posts')
-      .select(`
-        *,
-        forum_categories!fk_forum_posts_category_id(name),
-        profiles!fk_forum_posts_user_id(display_name, email)
-      `)
-      .order('created_at', { ascending: false });
+  // Use the custom hook for forum data
+  const {
+    categories,
+    posts,
+    replies,
+    userUpvotes,
+    loading,
+    fetchPosts,
+    fetchReplies,
+    toggleUpvote
+  } = useForumData(user, filters);
 
-    if (selectedCategory !== 'all') {
-      query = query.eq('category_id', selectedCategory);
-    }
+  // Calculate active filters count
+  const activeFiltersCount = [
+    timeFilter !== 'all',
+    userFilter !== 'all',
+    popularityFilter !== 'all'
+  ].filter(Boolean).length;
 
-    const { data, error } = await query;
-    
-    if (error) {
-      toast.error('Failed to load posts');
-      setLoading(false);
-      return;
-    }
-    
-    setPosts(data || []);
-    setLoading(false);
+  // Filter handlers
+  const handleClearFilters = () => {
+    setTimeFilter('all');
+    setUserFilter('all');
+    setPopularityFilter('all');
   };
 
-  const fetchUserUpvotes = async () => {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from('forum_post_upvotes')
-      .select('post_id')
-      .eq('user_id', user.id);
-
-    if (!error && data) {
-      setUserUpvotes(new Set(data.map(upvote => upvote.post_id)));
-    }
-  };
-
-  const fetchReplies = async (postId: string) => {
-    const { data, error } = await supabase
-      .from('forum_post_replies')
-      .select(`
-        *,
-        profiles!fk_forum_post_replies_user_id(display_name, email)
-      `)
-      .eq('post_id', postId)
-      .order('created_at', { ascending: true });
-
-    if (!error && data) {
-      setReplies(prev => ({ ...prev, [postId]: data }));
-    }
-  };
-
-  const toggleUpvote = async (postId: string) => {
-    if (!user) {
-      toast.error('Please sign in to upvote posts');
-      return;
-    }
-
-    const isUpvoted = userUpvotes.has(postId);
-
-    try {
-      if (isUpvoted) {
-        // Remove upvote
-        const { error } = await supabase
-          .from('forum_post_upvotes')
-          .delete()
-          .eq('post_id', postId)
-          .eq('user_id', user.id);
-
-        if (error) {
-          toast.error('Failed to remove upvote');
-          return;
-        }
-
-        setUserUpvotes(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(postId);
-          return newSet;
-        });
-      } else {
-        // Add upvote
-        const { error } = await supabase
-          .from('forum_post_upvotes')
-          .insert({ post_id: postId, user_id: user.id });
-
-        if (error) {
-          toast.error('Failed to upvote post');
-          return;
-        }
-
-        setUserUpvotes(prev => new Set(prev).add(postId));
-      }
-
-      // Update post upvote count in local state
-      setPosts(prev => prev.map(post => 
-        post.id === postId 
-          ? { ...post, upvote_count: post.upvote_count + (isUpvoted ? -1 : 1) }
-          : post
-      ));
-
-    } catch (error) {
-      toast.error('Error updating upvote');
-    }
+  const handleSortOrderChange = () => {
+    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
   };
 
   const toggleReplies = async (postId: string) => {
@@ -417,6 +343,59 @@ const Forum = () => {
               </Button>
             ))}
           </div>
+        </div>
+
+        {/* Search, Sort, and Filter Section */}
+        <div className="space-y-4 mb-8">
+          {/* Search Bar */}
+          <SearchBar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="Search discussions by title or content..."
+          />
+          
+          {/* Sorting and Filter Toggle */}
+          <div className="flex flex-col lg:flex-row gap-4 justify-between">
+            <PostSorting
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSortChange={setSortBy}
+              onOrderChange={handleSortOrderChange}
+            />
+            
+            <div className="flex items-center gap-3">
+              <Button
+                variant={showFilters ? "default" : "outline"}
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                Filters
+                {activeFiltersCount > 0 && (
+                  <Badge variant="secondary" className="ml-1 px-1.5 py-0.5 text-xs">
+                    {activeFiltersCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+          </div>
+          
+          {/* Advanced Filters */}
+          {showFilters && (
+            <PostFilters
+              timeFilter={timeFilter}
+              userFilter={userFilter}
+              popularityFilter={popularityFilter}
+              onTimeFilterChange={setTimeFilter}
+              onUserFilterChange={setUserFilter}
+              onPopularityFilterChange={setPopularityFilter}
+              onClearFilters={handleClearFilters}
+              activeFiltersCount={activeFiltersCount}
+            />
+          )}
+          
+          {/* Forum Statistics */}
+          <ForumStats selectedCategory={selectedCategory} />
         </div>
 
         {/* Modern Create Post Section */}
