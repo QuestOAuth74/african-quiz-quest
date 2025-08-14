@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ExternalLink, Youtube, Globe, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Link } from "react-router-dom";
 
 const TopNavigation = () => {
   const [open, setOpen] = useState(false);
@@ -22,9 +23,9 @@ const TopNavigation = () => {
             size="sm"
             className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
           >
-            <a href="/quiz-setup">
+            <Link to="/quiz-setup">
               Start Quiz
-            </a>
+            </Link>
           </Button>
           
           <Button
@@ -33,9 +34,9 @@ const TopNavigation = () => {
             size="sm"
             className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
           >
-            <a href="/forum">
+            <Link to="/forum">
               Baobab Talks
-            </a>
+            </Link>
           </Button>
           
           <Button
@@ -44,9 +45,9 @@ const TopNavigation = () => {
             size="sm"
             className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
           >
-            <a href="/profile">
+            <Link to="/profile">
               Profile
-            </a>
+            </Link>
           </Button>
           <Button
             asChild
@@ -111,45 +112,45 @@ const TopNavigation = () => {
 
                 {/* Navigation Links */}
                 <nav className="flex flex-col space-y-4 pt-6">
-                  <a
-                    href="/"
+                  <Link
+                    to="/"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
                   >
                     <span>Home</span>
-                  </a>
+                  </Link>
                   
-                  <a
-                    href="/quiz-setup"
+                  <Link
+                    to="/quiz-setup"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
                   >
                     <span>Start Quiz</span>
-                  </a>
+                  </Link>
                   
-                  <a
-                    href="/forum"
+                  <Link
+                    to="/forum"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
                   >
                     <span>Baobab Talks</span>
-                  </a>
+                  </Link>
                   
-                  <a
-                    href="/profile"
+                  <Link
+                    to="/profile"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
                   >
                     <span>Profile</span>
-                  </a>
+                  </Link>
                   
-                  <a
-                    href="/leaderboard"
+                  <Link
+                    to="/leaderboard"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
                   >
                     <span>Leaderboard</span>
-                  </a>
+                  </Link>
 
                   {/* Divider */}
                   <div className="border-t border-theme-yellow/20 my-4"></div>
@@ -182,13 +183,13 @@ const TopNavigation = () => {
 
                 {/* Auth Link at Bottom */}
                 <div className="mt-auto pt-6 border-t border-theme-yellow/20">
-                  <a
-                    href="/auth"
+                  <Link
+                    to="/auth"
                     onClick={() => setOpen(false)}
                     className="flex items-center justify-center gap-2 text-theme-brown-dark bg-theme-yellow hover:bg-theme-yellow/90 transition-colors p-3 rounded-md font-medium"
                   >
                     <span>Sign In / Sign Up</span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </SheetContent>
