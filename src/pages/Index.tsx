@@ -9,7 +9,7 @@ import UserAuth from "@/components/UserAuth";
 import TopNavigation from "@/components/TopNavigation";
 import { AudioControls } from "@/components/AudioControls";
 import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
+import { Settings, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import GameCompletionModal from "@/components/GameCompletionModal";
 import { PlayerTimer } from "@/components/PlayerTimer";
@@ -651,7 +651,18 @@ const Index = () => {
         <WelcomeModal isOpen={showWelcomeModal} onClose={handleCloseWelcome} />
         
         {/* Top Navigation */}
-        <TopNavigation />
+          <TopNavigation />
+          
+          {/* Quick Quiz Access */}
+          <div className="fixed top-4 right-4 z-50">
+            <Button
+              onClick={() => navigate('/quiz-setup')}
+              className="jeopardy-button bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Quick Quiz
+            </Button>
+          </div>
         
         {/* Global Audio Controls */}
         <div className="fixed top-4 right-4 z-50">

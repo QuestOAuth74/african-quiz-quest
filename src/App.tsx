@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Forum from "./pages/Forum";
 import Profile from "./pages/Profile";
 import Quiz from "./pages/Quiz";
+import QuizSetup from "./pages/QuizSetup";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/forum" element={<Forum />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/quiz" element={<Quiz />} />
+            <Route path="/quiz-setup" element={<QuizSetup />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             {/* Catch-all route must be last */}

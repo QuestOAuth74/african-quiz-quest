@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ interface Category {
 const Quiz = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [options, setOptions] = useState<QuestionOption[]>([]);
@@ -58,11 +59,17 @@ const Quiz = () => {
     if (user) {
       loadQuizData();
     }
-  }, [user]);
+  }, [user, searchParams]);
 
   const loadQuizData = async () => {
     try {
       setIsLoadingQuestions(true);
+      
+      // Get URL parameters
+      const categoriesParam = searchParams.get('categories');
+      const countParam = searchParams.get('count');
+      const selectedCategoryIds = categoriesParam ? categoriesParam.split(',') : [];
+      const questionCount = countParam ? parseInt(countParam) : 10;
       
       // Load categories first
       const { data: categoriesData, error: categoriesError } = await supabase
@@ -72,11 +79,18 @@ const Quiz = () => {
       if (categoriesError) throw categoriesError;
       setCategories(categoriesData || []);
 
-      // Load questions without random() since it's not supported in Supabase PostgREST
-      const { data: questionsData, error: questionsError } = await supabase
+      // Build questions query
+      let questionsQuery = supabase
         .from('questions')
         .select('*')
         .limit(50); // Get more questions to shuffle client-side
+      
+      // Filter by selected categories if provided
+      if (selectedCategoryIds.length > 0) {
+        questionsQuery = questionsQuery.in('category_id', selectedCategoryIds);
+      }
+
+      const { data: questionsData, error: questionsError } = await questionsQuery;
 
       if (questionsError) {
         console.error('Questions error:', questionsError);
@@ -84,8 +98,8 @@ const Quiz = () => {
       }
       
       if (questionsData && questionsData.length > 0) {
-        // Shuffle questions client-side and take first 10
-        const shuffledQuestions = [...questionsData].sort(() => Math.random() - 0.5).slice(0, 10);
+        // Shuffle questions client-side and take the requested number
+        const shuffledQuestions = [...questionsData].sort(() => Math.random() - 0.5).slice(0, questionCount);
         setQuestions(shuffledQuestions);
         loadOptionsForQuestion(shuffledQuestions[0].id);
       } else {
@@ -264,12 +278,12 @@ const Quiz = () => {
       <TopNavigation />
       <div className="pt-20 container mx-auto px-4 py-8 max-w-4xl">
         <Button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/quiz-setup')}
           variant="ghost"
           className="mb-6 text-theme-yellow-light hover:text-theme-yellow"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
+          Back to Quiz Setup
         </Button>
 
         {/* Quiz Header */}
