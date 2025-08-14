@@ -22,6 +22,7 @@ interface UserProfile {
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [userStats, setUserStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState('');
@@ -30,6 +31,7 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       fetchProfile();
+      fetchUserStats();
     }
   }, [user]);
 
@@ -54,6 +56,27 @@ const Profile = () => {
       toast.error('Error loading profile');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserStats = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_stats')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Failed to load user stats:', error);
+        return;
+      }
+
+      setUserStats(data || null);
+    } catch (error) {
+      console.error('Error loading user stats:', error);
     }
   };
 
@@ -259,12 +282,34 @@ const Profile = () => {
               <CardContent className="text-center space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
-                    <div className="text-2xl font-bold text-theme-yellow">--</div>
+                    <div className="text-2xl font-bold text-theme-yellow">
+                      {userStats?.total_games_played || 0}
+                    </div>
                     <div className="text-muted-foreground">Games</div>
                   </div>
                   <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
-                    <div className="text-2xl font-bold text-theme-yellow">--</div>
-                    <div className="text-muted-foreground">Score</div>
+                    <div className="text-2xl font-bold text-theme-yellow">
+                      {userStats?.best_game_score || 0}
+                    </div>
+                    <div className="text-muted-foreground">Best Score</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20 col-span-2">
+                    <div className="text-xl font-bold text-theme-yellow">
+                      {userStats?.total_questions_correct || 0}/{userStats?.total_questions_answered || 0}
+                    </div>
+                    <div className="text-muted-foreground">Correct Answers</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
+                    <div className="text-xl font-bold text-theme-yellow">
+                      {userStats?.current_correct_streak || 0}
+                    </div>
+                    <div className="text-muted-foreground">Current Streak</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-theme-brown-dark/50 border border-theme-yellow/20">
+                    <div className="text-xl font-bold text-theme-yellow">
+                      {userStats?.longest_correct_streak || 0}
+                    </div>
+                    <div className="text-muted-foreground">Best Streak</div>
                   </div>
                 </div>
               </CardContent>
