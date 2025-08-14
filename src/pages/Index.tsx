@@ -241,6 +241,22 @@ const Index = () => {
     }
     setSelectedQuestion(question);
     setIsQuestionModalOpen(true);
+    
+    // Check if AI is the active player and auto-play after a short delay
+    const activePlayer = players.find(p => p.isActive);
+    if (activePlayer?.name === "Computer") {
+      setTimeout(() => {
+        handleAITurn(question);
+      }, 2000); // Give 2 seconds to show the question
+    }
+  };
+
+  const handleAITurn = (question: Question) => {
+    const correctAnswerIndex = question.correctAnswerIndex;
+    if (typeof correctAnswerIndex === 'number') {
+      // AI automatically selects the correct answer
+      handleAnswer(correctAnswerIndex);
+    }
   };
 
   const handleAnswer = async (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
@@ -375,6 +391,20 @@ const Index = () => {
         ...player,
         isActive: !player.isActive
       })));
+      
+      // Check if the new active player is AI and there's a selected question
+      const newActivePlayers = players.map(player => ({
+        ...player,
+        isActive: !player.isActive
+      }));
+      const newActivePlayer = newActivePlayers.find(p => p.isActive);
+      
+      // If AI becomes active and there's still a question modal open, AI should answer
+      if (newActivePlayer?.name === "Computer" && selectedQuestion && isQuestionModalOpen) {
+        setTimeout(() => {
+          handleAITurn(selectedQuestion);
+        }, 1000);
+      }
     }, 3000);
   };
 
