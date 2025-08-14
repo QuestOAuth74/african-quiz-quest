@@ -6,6 +6,7 @@ import { GameHeader } from "@/components/GameHeader";
 import { GameBoard } from "@/components/GameBoard";
 import QuestionModal from "@/components/QuestionModal";
 import UserAuth from "@/components/UserAuth";
+import { AudioControls } from "@/components/AudioControls";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -433,6 +434,10 @@ const Index = () => {
   if (!gameMode) {
     return (
       <div className="min-h-screen overflow-hidden relative">
+        {/* Global Audio Controls */}
+        <div className="fixed top-4 right-4 z-50">
+          <AudioControls />
+        </div>
 
         {/* User Authentication Section */}
         <div className="container mx-auto px-4 pt-20 pb-8">
@@ -449,16 +454,26 @@ const Index = () => {
 
   if (!gameConfigured) {
     return (
-      <GameSetup
-        gameMode={gameMode}
-        onBack={handleBackToModeSelection}
-        onStartGame={handleGameSetup}
-      />
+      <div className="min-h-screen overflow-hidden relative">
+        {/* Global Audio Controls */}
+        <div className="fixed top-4 right-4 z-50">
+          <AudioControls />
+        </div>
+        <GameSetup
+          gameMode={gameMode}
+          onBack={handleBackToModeSelection}
+          onStartGame={handleGameSetup}
+        />
+      </div>
     );
   }
 
   return (
     <div className="min-h-screen overflow-hidden relative">
+      {/* Global Audio Controls */}
+      <div className="fixed top-4 right-4 z-50">
+        <AudioControls />
+      </div>
 
       <GameHeader 
         players={players}

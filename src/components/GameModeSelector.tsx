@@ -1,151 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Users, Bot, Sparkles, Settings, Volume2, VolumeX, Volume1 } from "lucide-react";
+import { Users, Bot, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useBackgroundMusic } from "@/hooks/useBackgroundMusic";
-import { useState, useEffect } from "react";
 
 interface GameModeSelectorProps {
   onSelectMode: (mode: 'single' | 'multiplayer') => void;
 }
 
 export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
-  const [musicEnabled, setMusicEnabled] = useState(true);
-  const [volume, setVolume] = useState(40); // Volume as percentage (0-100)
-  
-  const {
-    isPlaying,
-    error,
-    playMusic,
-    pauseMusic,
-    setVolumeLevel,
-    handleUserInteraction
-  } = useBackgroundMusic(
-    "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/game-background%20ha1.mp3",
-    {
-      autoPlay: true,
-      loop: true,
-      volume: volume / 100 // Convert percentage to decimal
-    }
-  );
-
-  // Update audio volume when slider changes
-  useEffect(() => {
-    setVolumeLevel(volume / 100);
-  }, [volume, setVolumeLevel]);
-
   const handleModeSelect = (mode: 'single' | 'multiplayer') => {
-    // Stop background music when starting game
-    pauseMusic();
     onSelectMode(mode);
   };
 
-  const toggleMusic = () => {
-    if (isPlaying) {
-      pauseMusic();
-      setMusicEnabled(false);
-    } else {
-      playMusic();
-      setMusicEnabled(true);
-    }
-  };
-
-  const getVolumeIcon = () => {
-    if (!isPlaying || volume === 0) return VolumeX;
-    if (volume < 50) return Volume1;
-    return Volume2;
-  };
-
-  const VolumeIcon = getVolumeIcon();
-
   return (
-    <div 
-      className="min-h-screen relative overflow-hidden"
-      onClick={handleUserInteraction}
+    <div className="min-h-screen relative overflow-hidden"
     >
-      {/* Admin Access and Music Controls */}
-      <div className="absolute top-4 right-4 z-50 flex gap-2">
-        {/* Music Controls */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-white hover:text-theme-yellow-light hover:bg-white/10 border border-white/20"
-            >
-              <VolumeIcon className="w-4 h-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 bg-card border-border">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Background Music</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleMusic}
-                  className="h-6 w-6 p-0"
-                >
-                  {isPlaying ? (
-                    <Volume2 className="w-4 h-4 text-theme-yellow" />
-                  ) : (
-                    <VolumeX className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </Button>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Volume</span>
-                  <span>{volume}%</span>
-                </div>
-                <Slider
-                  value={[volume]}
-                  onValueChange={(value) => setVolume(value[0])}
-                  max={100}
-                  min={0}
-                  step={5}
-                  className="w-full"
-                  disabled={!isPlaying}
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setVolume(25)}
-                  className="flex-1 text-xs"
-                  disabled={!isPlaying}
-                >
-                  Low
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setVolume(50)}
-                  className="flex-1 text-xs"
-                  disabled={!isPlaying}
-                >
-                  Medium
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setVolume(75)}
-                  className="flex-1 text-xs"
-                  disabled={!isPlaying}
-                >
-                  High
-                </Button>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-      </div>
       
       {/* Full Height Banner Image */}
       <div className="w-full h-screen">
@@ -158,14 +27,6 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
 
       {/* Content Section Below Banner */}
       <div className="bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown p-8">
-        {error && (
-          <div className="max-w-5xl mx-auto mb-4">
-            <div className="bg-theme-yellow/10 border border-theme-yellow/20 rounded-lg p-3 text-center">
-              <p className="text-theme-yellow text-sm">{error}</p>
-            </div>
-          </div>
-        )}
-        
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-6">
