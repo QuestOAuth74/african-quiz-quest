@@ -7,7 +7,7 @@ export function TopNavigation() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-theme-yellow font-semibold text-lg">
-            The Historia Africana
+            Historia Africana
           </span>
         </div>
         
