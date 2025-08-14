@@ -1,0 +1,55 @@
+import { useRef, useCallback } from 'react';
+
+interface GameAudioHook {
+  playCorrectAnswer: () => void;
+  playWrongAnswer: () => void;
+  playCountdown: () => void;
+  stopCountdown: () => void;
+}
+
+export const useGameAudio = (): GameAudioHook => {
+  const correctAudioRef = useRef<HTMLAudioElement | null>(null);
+  const wrongAudioRef = useRef<HTMLAudioElement | null>(null);
+  const countdownAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const initializeAudio = useCallback((audioRef: React.MutableRefObject<HTMLAudioElement | null>, src: string) => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(src);
+      audioRef.current.preload = 'auto';
+    }
+    return audioRef.current;
+  }, []);
+
+  const playCorrectAnswer = useCallback(() => {
+    const audio = initializeAudio(correctAudioRef, 'https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/cheers.mp3');
+    audio.currentTime = 0;
+    audio.play().catch(console.warn);
+  }, [initializeAudio]);
+
+  const playWrongAnswer = useCallback(() => {
+    const audio = initializeAudio(wrongAudioRef, 'https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/boo.mp3');
+    audio.currentTime = 0;
+    audio.play().catch(console.warn);
+  }, [initializeAudio]);
+
+  const playCountdown = useCallback(() => {
+    const audio = initializeAudio(countdownAudioRef, 'https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/countdown%20ha1.mp3');
+    audio.currentTime = 0;
+    audio.loop = true;
+    audio.play().catch(console.warn);
+  }, [initializeAudio]);
+
+  const stopCountdown = useCallback(() => {
+    if (countdownAudioRef.current) {
+      countdownAudioRef.current.pause();
+      countdownAudioRef.current.currentTime = 0;
+    }
+  }, []);
+
+  return {
+    playCorrectAnswer,
+    playWrongAnswer,
+    playCountdown,
+    stopCountdown
+  };
+};

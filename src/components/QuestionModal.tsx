@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, CheckCircle, XCircle, SkipForward } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { useGameAudio } from "@/hooks/useGameAudio";
 
 interface Question {
   id: string;
@@ -44,6 +45,7 @@ const QuestionModal = ({
   timeLimit = 30 
 }: QuestionModalProps) => {
   const soundEffects = useSoundEffects();
+  const gameAudio = useGameAudio();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [showTeacherMode, setShowTeacherMode] = useState(false);
@@ -72,12 +74,7 @@ const QuestionModal = ({
     if (!isOpen || !question || hasAnswered) return;
     
     // Start countdown music
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {
-        // Silently handle autoplay restrictions
-      });
-    }
+    gameAudio.playCountdown();
     
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -87,10 +84,8 @@ const QuestionModal = ({
             setHasAnswered(true);
             onAnswer('timeout');
           }
-          // Stop music when time runs out
-          if (audioRef.current) {
-            audioRef.current.pause();
-          }
+          // Stop countdown music when time runs out
+          gameAudio.stopCountdown();
           return 0;
         }
         return prev - 1;
@@ -108,9 +103,7 @@ const QuestionModal = ({
   const handleSkip = () => {
     soundEffects.playButtonClick();
     setHasAnswered(true);
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    gameAudio.stopCountdown();
     onAnswer('skip');
   };
 
@@ -120,9 +113,18 @@ const QuestionModal = ({
       setSelectedAnswerIndex(answerIndex);
       setHasAnswered(true);
       setShowAnswer(true);
-      if (audioRef.current) {
-        audioRef.current.pause();
+      gameAudio.stopCountdown();
+      
+      // Play correct/wrong answer sound
+      const correctOption = question.options?.find(opt => opt.option_type === 'correct');
+      const selectedOptionObj = question.options?.find(opt => opt.id === selectedOption);
+      
+      if (selectedOptionObj?.option_type === 'correct') {
+        gameAudio.playCorrectAnswer();
+      } else {
+        gameAudio.playWrongAnswer();
       }
+      
       onAnswer(answerIndex);
     }
   };
@@ -130,9 +132,7 @@ const QuestionModal = ({
   const handlePass = () => {
     setHasAnswered(true);
     setShowAnswer(true);
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    gameAudio.stopCountdown();
     onAnswer('pass');
   };
 
