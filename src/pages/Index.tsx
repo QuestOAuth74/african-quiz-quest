@@ -1,14 +1,16 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { GameModeSelector } from "@/components/GameModeSelector";
 import GameSetup from "@/components/GameSetup";
 import { GameHeader } from "@/components/GameHeader";
 import { GameBoard } from "@/components/GameBoard";
 import QuestionModal from "@/components/QuestionModal";
+import UserAuth from "@/components/UserAuth";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Question {
   id: string;
@@ -27,6 +29,8 @@ interface Question {
 }
 
 const Index = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<'single' | 'multiplayer' | null>(null);
   const [gameConfigured, setGameConfigured] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
@@ -41,6 +45,13 @@ const Index = () => {
   const [gameConfig, setGameConfig] = useState({ categories: [], rowCount: 5 });
   const [questionsData, setQuestionsData] = useState<{[key: string]: Question}>({});
   const { toast } = useToast();
+
+  // Redirect to auth if not authenticated and trying to access admin
+  useEffect(() => {
+    if (window.location.pathname.includes('/admin') && !isAuthenticated) {
+      navigate('/auth');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleModeSelect = (mode: 'single' | 'multiplayer') => {
     setGameMode(mode);
@@ -279,7 +290,29 @@ const Index = () => {
   };
 
   if (!gameMode) {
-    return <GameModeSelector onSelectMode={handleModeSelect} />;
+    return (
+      <div className="min-h-screen overflow-hidden relative">
+        {/* Admin Access Button */}
+        <div className="absolute top-4 right-4 z-50">
+          <Link to="/admin/login">
+            <Button variant="ghost" size="sm" className="text-theme-yellow hover:text-theme-yellow-light hover:bg-theme-yellow/10 border border-theme-yellow/20">
+              <Settings className="w-4 h-4 mr-2" />
+              Admin
+            </Button>
+          </Link>
+        </div>
+
+        {/* User Authentication Section */}
+        <div className="container mx-auto px-4 pt-20 pb-8">
+          <div className="max-w-md mx-auto">
+            <UserAuth />
+          </div>
+        </div>
+
+        {/* Game Mode Selector */}
+        <GameModeSelector onSelectMode={handleModeSelect} />
+      </div>
+    );
   }
 
   if (!gameConfigured) {
