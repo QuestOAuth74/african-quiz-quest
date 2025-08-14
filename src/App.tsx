@@ -19,11 +19,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          {/* Catch-all route must be last */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
