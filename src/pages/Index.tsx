@@ -278,37 +278,8 @@ const Index = () => {
       if (nextPlayer?.name === "Computer") {
         setIsQuestionModalOpen(false);
         setTimeout(() => {
-          // AI picks correct answer
-          const correctAnswerIndex = selectedQuestion?.correctAnswerIndex;
-          if (typeof correctAnswerIndex === 'number') {
-            const aiPointChange = selectedQuestion.points;
-            
-            // Update AI score
-            setPlayers(prev => prev.map(player => 
-              player.name === "Computer" 
-                ? { ...player, score: player.score + aiPointChange, isActive: true }
-                : { ...player, isActive: false }
-            ));
-            
-            // Mark question as answered
-            setCategories(prev => prev.map(cat => ({
-              ...cat,
-              questions: cat.questions.map(q => 
-                q.id === selectedQuestion?.id ? { ...q, isAnswered: true } : q
-              )
-            })));
-            
-            // Show AI's correct answer briefly, then continue
-            setIsQuestionModalOpen(true);
-            setTimeout(() => {
-              setIsQuestionModalOpen(false);
-              setSelectedQuestion(null);
-              // Switch back to human player
-              setPlayers(prev => prev.map(player => ({
-                ...player,
-                isActive: player.name !== "Computer"
-              })));
-            }, 2000);
+          if (selectedQuestion) {
+            handleAITurn(selectedQuestion);
           }
         }, 1000);
         return;
