@@ -433,29 +433,60 @@ const Index = () => {
       isCorrect = selectedAnswerIndex === selectedQuestion?.correctAnswerIndex;
       pointChange = isCorrect ? selectedQuestion.points : -selectedQuestion.points;
       
-      // Record the user's answer attempt if authenticated
-      if (isAuthenticated && user && selectedQuestion) {
-        try {
-          await supabase
-            .from('user_question_attempts')
-            .insert({
-              user_id: user.id,
-              question_id: selectedQuestion.id,
-              answered_correctly: isCorrect
-            });
-        } catch (error) {
-          console.error('Error recording answer attempt:', error);
-          // Don't show toast for this error as it's not critical to gameplay
-        }
+      // Record the user's answer attempt if authenticated (only for the current active player)
+      if (isAuthenticated && user && selectedQuestion && gameMode === 'single') {
+        // In single player mode, only record for the human player
+        const activePlayer = players.find(p => p.isActive);
+        if (activePlayer && activePlayer.name !== "Computer") {
+          try {
+            await supabase
+              .from('user_question_attempts')
+              .insert({
+                user_id: user.id,
+                question_id: selectedQuestion.id,
+                answered_correctly: isCorrect
+              });
+          } catch (error) {
+            console.error('Error recording answer attempt:', error);
+            // Don't show toast for this error as it's not critical to gameplay
+          }
 
-        // Update streak tracking
-        try {
-          await supabase.rpc('update_user_correct_streak', {
-            p_user_id: user.id,
-            p_is_correct: isCorrect
-          });
-        } catch (error) {
-          console.error('Error updating streak:', error);
+          // Update streak tracking
+          try {
+            await supabase.rpc('update_user_correct_streak', {
+              p_user_id: user.id,
+              p_is_correct: isCorrect
+            });
+          } catch (error) {
+            console.error('Error updating streak:', error);
+          }
+        }
+      } else if (isAuthenticated && user && selectedQuestion && gameMode === 'multiplayer') {
+        // In multiplayer mode, record answers for all human players
+        const activePlayer = players.find(p => p.isActive);
+        if (activePlayer) {
+          try {
+            await supabase
+              .from('user_question_attempts')
+              .insert({
+                user_id: user.id,
+                question_id: selectedQuestion.id,
+                answered_correctly: isCorrect
+              });
+          } catch (error) {
+            console.error('Error recording answer attempt:', error);
+            // Don't show toast for this error as it's not critical to gameplay
+          }
+
+          // Update streak tracking
+          try {
+            await supabase.rpc('update_user_correct_streak', {
+              p_user_id: user.id,
+              p_is_correct: isCorrect
+            });
+          } catch (error) {
+            console.error('Error updating streak:', error);
+          }
         }
       }
 
