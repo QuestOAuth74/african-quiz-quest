@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Category {
@@ -49,6 +50,7 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
     options: ["", "", "", ""],
     correctAnswer: 0,
   });
+  const soundEffects = useSoundEffects();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -250,9 +252,11 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
       toast({
         title: editingQuestion ? "Question updated successfully" : "Question created successfully",
       });
+      soundEffects.playSuccess();
 
       onClose();
     } catch (error: any) {
+      soundEffects.playError();
       toast({
         title: editingQuestion ? "Error updating question" : "Error creating question",
         description: error.message,
