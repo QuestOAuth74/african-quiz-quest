@@ -216,13 +216,13 @@ const Index = () => {
         id: cat.id,
         name: cat.name,
         questions: Array.from({ length: rowCount }, (_, index) => {
-          const hasQuestion = index < questionsForRows.length;
           const actualQuestion = questionsForRows[index];
+          const hasQuestion = !!actualQuestion; // Only false if no question exists at this position
           return {
             id: `${cat.id}-${index + 1}`,
-            points: hasQuestion ? actualQuestion.points : (index + 1) * 100, // Use actual points if question exists
-            isAnswered: false,
-            hasQuestion: hasQuestion
+            points: hasQuestion ? actualQuestion.points : (index + 1) * 100,
+            isAnswered: false, // Always start as not answered
+            hasQuestion: hasQuestion // True if we have a real question, false if empty slot
           };
         })
       };
