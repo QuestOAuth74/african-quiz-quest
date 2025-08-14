@@ -36,6 +36,7 @@ const Index = () => {
   const [gameMode, setGameMode] = useState<'single' | 'multiplayer' | null>(null);
   const [gameConfigured, setGameConfigured] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [selectedQuestionGridId, setSelectedQuestionGridId] = useState<string | null>(null);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [showTeacherMode, setShowTeacherMode] = useState(false);
   const [skipCount, setSkipCount] = useState(0);
@@ -268,6 +269,7 @@ const Index = () => {
       return;
     }
     setSelectedQuestion(question);
+    setSelectedQuestionGridId(questionId); // Store the grid ID for marking as answered
     setIsQuestionModalOpen(true);
     setAiTurnInProgress(false); // Reset AI turn flag for new question
     
@@ -443,11 +445,11 @@ const Index = () => {
       return updated;
     });
     
-    // Mark question as answered
+    // Mark question as answered using the grid ID
     setCategories(prev => prev.map(cat => ({
       ...cat,
       questions: cat.questions.map(q => 
-        q.id === selectedQuestion?.id ? { ...q, isAnswered: true } : q
+        q.id === selectedQuestionGridId ? { ...q, isAnswered: true } : q
       )
     })));
 
