@@ -28,7 +28,7 @@ interface QuestionPreviewProps {
   question: Question | null;
 }
 
-export const QuestionPreview = ({ isOpen, onClose, question }: QuestionPreviewProps) => {
+const QuestionPreview = ({ isOpen, onClose, question }: QuestionPreviewProps) => {
   const [options, setOptions] = useState<QuestionOption[]>([]);
 
   useEffect(() => {
@@ -144,3 +144,5 @@ export const QuestionPreview = ({ isOpen, onClose, question }: QuestionPreviewPr
     </Dialog>
   );
 };
+
+export default QuestionPreview;

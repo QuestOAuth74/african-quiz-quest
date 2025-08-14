@@ -18,7 +18,7 @@ interface Category {
 interface Question {
   id: string;
   text: string;
-  points: string;
+  points: number;
   explanation?: string;
   historical_context?: string;
   image_url?: string;
@@ -32,13 +32,13 @@ interface QuestionFormProps {
   editingQuestion?: Question | null;
 }
 
-export const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) => {
+const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     text: "",
     categoryId: "",
-    points: "100",
+    points: 100,
     explanation: "",
     historicalContext: "",
     imageUrl: "",
@@ -117,7 +117,7 @@ export const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormP
     setFormData({
       text: "",
       categoryId: "",
-      points: "100",
+      points: 100,
       explanation: "",
       historicalContext: "",
       imageUrl: "",
@@ -262,7 +262,7 @@ export const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormP
 
               <div className="space-y-2">
                 <Label htmlFor="points">Points *</Label>
-                <Select value={formData.points} onValueChange={(value) => setFormData({ ...formData, points: value })}>
+                <Select value={formData.points.toString()} onValueChange={(value) => setFormData({ ...formData, points: parseInt(value) })}>
                   <SelectTrigger className="bg-input border-border">
                     <SelectValue />
                   </SelectTrigger>
@@ -367,3 +367,5 @@ export const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormP
     </Dialog>
   );
 };
+
+export default QuestionForm;

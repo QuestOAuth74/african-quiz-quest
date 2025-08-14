@@ -20,7 +20,7 @@ interface CategoryManagerProps {
   onStatsUpdate: () => void;
 }
 
-export const CategoryManager = ({ onStatsUpdate }: CategoryManagerProps) => {
+const CategoryManager = ({ onStatsUpdate }: CategoryManagerProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -40,7 +40,7 @@ export const CategoryManager = ({ onStatsUpdate }: CategoryManagerProps) => {
         .order("name");
 
       if (error) throw error;
-      setCategories(data as Category[] || []);
+      setCategories(data || []);
     } catch (error: any) {
       toast({
         title: "Error loading categories",
@@ -58,7 +58,7 @@ export const CategoryManager = ({ onStatsUpdate }: CategoryManagerProps) => {
       if (editingCategory) {
         const { error } = await supabase
           .from("categories")
-          .update({ name: newCategoryName } as any)
+          .update({ name: newCategoryName })
           .eq("id", editingCategory.id);
 
         if (error) throw error;
@@ -66,7 +66,7 @@ export const CategoryManager = ({ onStatsUpdate }: CategoryManagerProps) => {
       } else {
         const { error } = await supabase
           .from("categories")
-          .insert({ name: newCategoryName } as any);
+          .insert({ name: newCategoryName });
 
         if (error) throw error;
         toast({ title: "Category created successfully" });
@@ -222,3 +222,5 @@ export const CategoryManager = ({ onStatsUpdate }: CategoryManagerProps) => {
     </div>
   );
 };
+
+export default CategoryManager;

@@ -28,7 +28,7 @@ const AdminLogin = () => {
 
       // Check if user is admin
       const { data: adminData, error: adminError } = await supabase
-        .rpc("is_admin", { user_id: data.user.id });
+        .rpc("is_admin", { user_uuid: data.user.id });
 
       if (adminError || !adminData) {
         await supabase.auth.signOut();

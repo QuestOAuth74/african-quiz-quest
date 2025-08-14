@@ -5,8 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit, Eye } from "lucide-react";
-import { QuestionForm } from "./QuestionForm";
-import { QuestionPreview } from "./QuestionPreview";
+import QuestionForm from "./QuestionForm";
+import QuestionPreview from "./QuestionPreview";
 
 interface Question {
   id: string;
@@ -25,7 +25,7 @@ interface QuestionManagerProps {
   onStatsUpdate: () => void;
 }
 
-export const QuestionManager = ({ onStatsUpdate }: QuestionManagerProps) => {
+const QuestionManager = ({ onStatsUpdate }: QuestionManagerProps) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -190,3 +190,5 @@ export const QuestionManager = ({ onStatsUpdate }: QuestionManagerProps) => {
     </div>
   );
 };
+
+export default QuestionManager;

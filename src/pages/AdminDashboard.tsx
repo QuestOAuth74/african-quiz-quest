@@ -5,8 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { CategoryManager } from "@/components/admin/CategoryManager";
-import { QuestionManager } from "@/components/admin/QuestionManager";
+import CategoryManager from "@/components/admin/CategoryManager";
+import QuestionManager from "@/components/admin/QuestionManager";
 import { LogOut, Users, FileQuestion, FolderOpen } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -34,7 +34,7 @@ const AdminDashboard = () => {
 
     // Check if user is admin
     const { data: adminData, error } = await supabase
-      .rpc("is_admin", { user_id: user.id });
+      .rpc("is_admin", { user_uuid: user.id });
 
     if (error || !adminData) {
       await supabase.auth.signOut();
@@ -47,15 +47,16 @@ const AdminDashboard = () => {
 
   const loadStats = async () => {
     try {
-      const [questionsRes, categoriesRes] = await Promise.all([
-        supabase.from("questions").select("id", { count: "exact" }),
-        supabase.from("categories").select("id", { count: "exact" }),
+      const [questionsRes, categoriesRes, adminsRes] = await Promise.all([
+        supabase.from("questions").select("id", { count: "exact", head: true }),
+        supabase.from("categories").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_admin", true)
       ]);
 
       setStats({
         totalQuestions: questionsRes.count || 0,
         totalCategories: categoriesRes.count || 0,
-        totalAdmins: 1, // Simplified for now
+        totalAdmins: adminsRes.count || 0,
       });
     } catch (error) {
       console.error("Error loading stats:", error);

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
-export const AdminSignup = () => {
+const AdminSignup = () => {
   const [email, setEmail] = useState("quemile@gmail.com");
   const [password, setPassword] = useState("144245");
   const [isLoading, setIsLoading] = useState(false);
@@ -27,10 +27,9 @@ export const AdminSignup = () => {
       }
 
       if (data.user) {
-        // Add user to admin_users table
-        const { error: adminError } = await supabase.rpc('add_user_to_admin', {
-          user_email: email
-        });
+        // Make user admin
+        const { error: adminError } = await supabase
+          .rpc('make_user_admin', { user_email: email });
 
         if (adminError) {
           console.error('Admin role assignment error:', adminError);
@@ -85,3 +84,5 @@ export const AdminSignup = () => {
     </Card>
   );
 };
+
+export default AdminSignup;
