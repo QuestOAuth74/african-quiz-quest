@@ -70,68 +70,71 @@ const ForumHeader = () => {
   const currentSlideData = slides[currentSlide];
 
   return (
-    <div className="relative overflow-hidden mb-8">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--primary))_0%,transparent_50%)]" />
+    <div className="relative overflow-hidden mb-12">
+      {/* Modern Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.1),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_30%,hsl(var(--accent)/0.05)_50%,transparent_70%)]" />
       </div>
       
-      {/* Glowing Band Container */}
-      <div className="relative p-1 rounded-2xl bg-gradient-to-r from-primary/30 via-accent/40 to-secondary/30 shadow-[0_0_30px_rgba(var(--primary-rgb),0.3),0_0_60px_rgba(var(--accent-rgb),0.2),0_0_90px_rgba(var(--secondary-rgb),0.1)] animate-pulse">
-        <Card className={`border-0 shadow-none ${currentSlideData.gradient} transition-all duration-500 ease-in-out rounded-xl overflow-hidden backdrop-blur-sm`}>
-          <CardContent className="relative px-8 py-12">
-            {/* Carousel Content */}
-            <div className="flex items-center justify-between">
-              <div className="flex-1 max-w-4xl animate-fade-in">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-primary/10 rounded-lg">
+      {/* Modern Content Container */}
+      <div className="relative">
+        <Card className={`border-none shadow-2xl ${currentSlideData.gradient} transition-all duration-700 ease-in-out backdrop-blur-lg overflow-hidden`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-background/60 to-background/40" />
+          <CardContent className="relative px-8 lg:px-12 py-16">
+            {/* Modern Hero Content */}
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              <div className="flex-1 text-center lg:text-left animate-fade-in">
+                <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
+                  <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl backdrop-blur-sm border border-border/50">
                     {currentSlideData.icon}
                   </div>
-                  <Badge variant="secondary" className="text-xs font-medium">
+                  <Badge variant="secondary" className="px-4 py-2 text-sm font-semibold rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-border/30">
                     {currentSlideData.badge}
                   </Badge>
                 </div>
                 
-                <h1 className="text-5xl font-bold text-foreground mb-4 tracking-tight">
+                <h1 className="text-4xl lg:text-6xl font-black text-foreground mb-6 tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
                   {currentSlideData.title}
                 </h1>
                 
-                <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
+                <p className="text-lg lg:text-xl text-muted-foreground max-w-3xl leading-relaxed mx-auto lg:mx-0">
                   {currentSlideData.description}
                 </p>
               </div>
 
-              {/* Carousel Controls */}
-              <div className="flex flex-col items-center gap-4 ml-8">
-                <div className="flex gap-2">
+              {/* Modern Navigation */}
+              <div className="flex flex-col items-center gap-6 lg:ml-8">
+                <div className="flex gap-3">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     onClick={prevSlide}
-                    className="h-10 w-10 rounded-full hover:scale-105 transition-transform"
+                    className="h-12 w-12 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-background/80 hover:scale-110 transition-all duration-200 shadow-lg"
                   >
-                    <ChevronLeft className="h-4 w-4" />
+                    <ChevronLeft className="h-5 w-5" />
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     onClick={nextSlide}
-                    className="h-10 w-10 rounded-full hover:scale-105 transition-transform"
+                    className="h-12 w-12 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-background/80 hover:scale-110 transition-all duration-200 shadow-lg"
                   >
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronRight className="h-5 w-5" />
                   </Button>
                 </div>
                 
-                {/* Slide Indicators */}
-                <div className="flex gap-2">
+                {/* Modern Slide Indicators */}
+                <div className="flex gap-3">
                   {slides.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentSlide(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      className={`h-3 rounded-full transition-all duration-500 ${
                         index === currentSlide 
-                          ? 'bg-primary w-6' 
-                          : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                          ? 'bg-primary w-8 shadow-lg shadow-primary/30' 
+                          : 'bg-muted-foreground/40 w-3 hover:bg-muted-foreground/60 hover:w-6'
                       }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />

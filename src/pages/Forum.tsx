@@ -378,48 +378,72 @@ const Forum = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
       <TopNavigation />
-      <div className="container mx-auto px-4 py-8">
+      
+      {/* Modern Header Section */}
+      <div className="relative">
         <ForumHeader />
-
-        {/* Category Filter */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <Button
-            variant={selectedCategory === 'all' ? 'default' : 'outline'}
-            onClick={() => setSelectedCategory('all')}
-            size="sm"
-          >
-            All Categories
-          </Button>
-          {categories.map((category) => (
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
+        {/* Category Filter with Modern Design */}
+        <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-border/50 shadow-lg">
+          <h2 className="text-lg font-semibold mb-4 text-foreground">Explore Categories</h2>
+          <div className="flex flex-wrap gap-3">
             <Button
-              key={category.id}
-              variant={selectedCategory === category.id ? 'default' : 'outline'}
-              onClick={() => setSelectedCategory(category.id)}
-              size="sm"
+              variant={selectedCategory === 'all' ? 'default' : 'ghost'}
+              onClick={() => setSelectedCategory('all')}
+              className={`rounded-full px-6 h-10 font-medium transition-all duration-200 ${
+                selectedCategory === 'all' 
+                  ? 'shadow-lg shadow-primary/25 scale-105' 
+                  : 'hover:bg-muted/80 hover:scale-105'
+              }`}
             >
-              {category.name}
+              All Categories
             </Button>
-          ))}
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                variant={selectedCategory === category.id ? 'default' : 'ghost'}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`rounded-full px-6 h-10 font-medium transition-all duration-200 ${
+                  selectedCategory === category.id 
+                    ? 'shadow-lg shadow-primary/25 scale-105' 
+                    : 'hover:bg-muted/80 hover:scale-105'
+                }`}
+              >
+                {category.name}
+              </Button>
+            ))}
+          </div>
         </div>
 
-        {/* Create Post Section */}
+        {/* Modern Create Post Section */}
         {isAuthenticated ? (
-          <Card className="mb-6">
-            <CardHeader>
+          <Card className="mb-8 border-border/50 shadow-xl bg-gradient-to-r from-card via-card to-card/80 backdrop-blur-sm overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+            <CardHeader className="relative">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5" />
-                  Start a Discussion
-                </CardTitle>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-xl">
+                    <MessageCircle className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-bold">Share Your Knowledge</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">Start a new discussion about African history</p>
+                  </div>
+                </div>
                 <Button
                   onClick={() => setShowCreatePost(!showCreatePost)}
-                  variant="outline"
-                  size="sm"
+                  className={`rounded-full px-6 h-11 font-medium transition-all duration-300 ${
+                    showCreatePost 
+                      ? 'bg-muted text-muted-foreground hover:bg-muted/80' 
+                      : 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105'
+                  }`}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  New Post
+                  {showCreatePost ? 'Cancel' : 'New Post'}
                 </Button>
               </div>
             </CardHeader>
@@ -520,41 +544,46 @@ const Forum = () => {
           </Card>
         )}
 
-        {/* Posts List */}
-        <div className="space-y-4">
+        {/* Modern Posts List */}
+        <div className="space-y-6">
           {posts.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                No posts found in this category. Be the first to start a discussion!
+            <Card className="border-border/50 bg-gradient-to-br from-card to-muted/20">
+              <CardContent className="py-12 text-center">
+                <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">No discussions yet</h3>
+                <p className="text-muted-foreground">Be the first to start a conversation in this category!</p>
               </CardContent>
             </Card>
           ) : (
             posts.map((post) => (
-              <Card key={post.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
+              <Card key={post.id} className="border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm group hover:scale-[1.01]">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-transparent to-accent/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-lg" />
+                <CardHeader className="relative">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-4 mb-4">
                         <UserAvatar 
                           displayName={post.profiles?.display_name}
                           email={post.profiles?.email}
-                          size="md"
+                          size="lg"
                         />
                         <div className="flex flex-col">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-foreground">
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className="font-semibold text-foreground text-base">
                               {post.profiles?.display_name || 'Anonymous User'}
                             </span>
                             <UserBadges userId={post.user_id} limit={3} size="sm" />
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Badge variant="secondary">{post.forum_categories.name}</Badge>
-                            <span>•</span>
-                            <span>{formatDate(post.created_at)}</span>
+                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                            <Badge variant="secondary" className="px-3 py-1 rounded-full font-medium">
+                              {post.forum_categories.name}
+                            </Badge>
+                            <span className="text-xs">•</span>
+                            <span className="text-xs">{formatDate(post.created_at)}</span>
                           </div>
                         </div>
                       </div>
-                      <CardTitle className="text-lg mb-2">{post.title}</CardTitle>
+                      <CardTitle className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-200">{post.title}</CardTitle>
                     </div>
                   </div>
                 </CardHeader>
