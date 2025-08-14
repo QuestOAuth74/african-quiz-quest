@@ -631,15 +631,15 @@ const Index = () => {
           <AudioControls />
         </div>
 
+        {/* Game Mode Selector */}
+        <GameModeSelector onSelectMode={handleModeSelect} />
+
         {/* User Authentication Section */}
-        <div className="container mx-auto px-4 pt-24 pb-8">
+        <div className="container mx-auto px-4 py-8">
           <div className="max-w-md mx-auto">
             <UserAuth />
           </div>
         </div>
-
-        {/* Game Mode Selector */}
-        <GameModeSelector onSelectMode={handleModeSelect} />
       </div>
     );
   }
