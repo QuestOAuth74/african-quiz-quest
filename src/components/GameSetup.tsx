@@ -22,17 +22,31 @@ interface GameSetupProps {
   onStartGame: (selectedCategories: Category[], rowCount: number, questionFilter: QuestionFilter) => void;
 }
 
+interface QuestionCounts {
+  all: number;
+  fresh: number;
+  correct: number;
+  incorrect: number;
+}
+
 const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [rowCount, setRowCount] = useState<number>(5);
   const [questionFilter, setQuestionFilter] = useState<QuestionFilter>('all');
   const [loading, setLoading] = useState(true);
+  const [questionCounts, setQuestionCounts] = useState<QuestionCounts>({ all: 0, fresh: 0, correct: 0, incorrect: 0 });
   const { toast } = useToast();
 
   useEffect(() => {
     loadCategories();
   }, []);
+
+  useEffect(() => {
+    if (selectedCategories.length > 0) {
+      loadQuestionCounts();
+    }
+  }, [selectedCategories]);
 
   const loadCategories = async () => {
     try {
@@ -68,6 +82,56 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
       setSelectedCategories([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadQuestionCounts = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Get total questions for selected categories
+      const { data: allQuestions, error: allError } = await supabase
+        .from('questions')
+        .select('id')
+        .in('category_id', selectedCategories);
+
+      if (allError) throw allError;
+      const allCount = allQuestions?.length || 0;
+
+      if (!user) {
+        setQuestionCounts({ all: allCount, fresh: allCount, correct: 0, incorrect: 0 });
+        return;
+      }
+
+      // Get user's attempted questions
+      const { data: attempts, error: attemptsError } = await supabase
+        .from('user_question_attempts')
+        .select('question_id, answered_correctly')
+        .eq('user_id', user.id);
+
+      if (attemptsError) throw attemptsError;
+
+      const attemptedQuestionIds = new Set(attempts?.map(a => a.question_id) || []);
+      const correctQuestionIds = new Set(
+        attempts?.filter(a => a.answered_correctly).map(a => a.question_id) || []
+      );
+      const incorrectQuestionIds = new Set(
+        attempts?.filter(a => !a.answered_correctly).map(a => a.question_id) || []
+      );
+
+      const freshCount = allQuestions?.filter(q => !attemptedQuestionIds.has(q.id)).length || 0;
+      const correctCount = allQuestions?.filter(q => correctQuestionIds.has(q.id)).length || 0;
+      const incorrectCount = allQuestions?.filter(q => incorrectQuestionIds.has(q.id)).length || 0;
+
+      setQuestionCounts({
+        all: allCount,
+        fresh: freshCount,
+        correct: correctCount,
+        incorrect: incorrectCount
+      });
+    } catch (error) {
+      console.error('Error loading question counts:', error);
+      setQuestionCounts({ all: 0, fresh: 0, correct: 0, incorrect: 0 });
     }
   };
 
@@ -232,10 +296,10 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-theme-yellow/30">
-                      <SelectItem value="all">All Questions</SelectItem>
-                      <SelectItem value="fresh">Fresh Questions Only</SelectItem>
-                      <SelectItem value="correct">Previously Correct</SelectItem>
-                      <SelectItem value="incorrect">Previously Wrong</SelectItem>
+                      <SelectItem value="all">All Questions ({questionCounts.all})</SelectItem>
+                      <SelectItem value="fresh">Fresh Questions Only ({questionCounts.fresh})</SelectItem>
+                      <SelectItem value="correct">Previously Correct ({questionCounts.correct})</SelectItem>
+                      <SelectItem value="incorrect">Previously Wrong ({questionCounts.incorrect})</SelectItem>
                     </SelectContent>
                   </Select>
                   <div className="text-xs text-muted-foreground mt-2">

@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Medal, Award, TrendingUp, Target, Zap, Crown } from "lucide-react";
+import { Trophy, Medal, Award, TrendingUp, Target, Zap, Crown, RotateCcw } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +32,7 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
   const [leaderboardData, setLeaderboardData] = useState<UserStats[]>([]);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resetting, setResetting] = useState(false);
   const [activeTab, setActiveTab] = useState("total-points");
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -109,6 +111,54 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
         return "longest_correct_streak";
       default:
         return "total_points_earned";
+    }
+  };
+
+  const handleResetStats = async () => {
+    if (!user) return;
+
+    try {
+      setResetting(true);
+
+      // Delete user's game history, question attempts, and stats
+      const { error: gamesError } = await supabase
+        .from('user_games')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (gamesError) throw gamesError;
+
+      const { error: attemptsError } = await supabase
+        .from('user_question_attempts')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (attemptsError) throw attemptsError;
+
+      const { error: statsError } = await supabase
+        .from('user_stats')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (statsError) throw statsError;
+
+      toast({
+        title: "Stats Reset Successfully",
+        description: "All your game history and statistics have been reset.",
+        variant: "default",
+      });
+
+      // Reload the leaderboard data
+      loadLeaderboardData();
+    } catch (error) {
+      console.error('Error resetting stats:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reset stats. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -209,10 +259,44 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
           {userStats && (
             <Card className="jeopardy-card mb-6">
               <CardHeader>
-                <CardTitle className="text-lg font-orbitron text-accent flex items-center gap-2">
-                  <Target className="w-5 h-5" />
-                  Your Stats
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-orbitron text-accent flex items-center gap-2">
+                    <Target className="w-5 h-5" />
+                    Your Stats
+                  </CardTitle>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="jeopardy-button text-xs"
+                        disabled={resetting}
+                      >
+                        <RotateCcw className="w-3 h-3 mr-1" />
+                        Reset Stats
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="jeopardy-card">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="text-accent">Reset All Statistics?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete all your game history, question attempts, and statistics. 
+                          This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="jeopardy-button">Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleResetStats}
+                          disabled={resetting}
+                          className="jeopardy-button bg-destructive hover:bg-destructive/90"
+                        >
+                          {resetting ? "Resetting..." : "Reset Stats"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
