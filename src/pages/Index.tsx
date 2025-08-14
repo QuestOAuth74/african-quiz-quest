@@ -75,18 +75,25 @@ const Index = () => {
     const activePlayer = players.find(p => p.isActive);
     const now = Date.now();
     
-    // Check if AI is in cooldown period
-    if (aiCooldownUntil && now < aiCooldownUntil) {
-      console.log('AI is in cooldown, waiting...', Math.round((aiCooldownUntil - now) / 1000), 'seconds remaining');
-      return;
-    }
-    
     if (activePlayer?.name === "Computer" && gameConfigured) {
       console.log('AI is active, checking conditions:', {
         hasQuestion: !!selectedQuestion,
         modalOpen: isQuestionModalOpen,
-        cooldownExpired: !aiCooldownUntil || now >= aiCooldownUntil
+        cooldownUntil: aiCooldownUntil,
+        cooldownActive: aiCooldownUntil && now < aiCooldownUntil
       });
+      
+      // Clear cooldown when it's AI's turn to pick a new question (turn has switched)
+      if (!selectedQuestion && !isQuestionModalOpen && aiCooldownUntil) {
+        console.log('AI turn started - clearing cooldown');
+        setAiCooldownUntil(null);
+      }
+      
+      // Check if AI is in cooldown period (only for answering, not for picking questions)
+      if (aiCooldownUntil && now < aiCooldownUntil && selectedQuestion && isQuestionModalOpen) {
+        console.log('AI is in cooldown for answering, waiting...', Math.round((aiCooldownUntil - now) / 1000), 'seconds remaining');
+        return;
+      }
       
       // AI picks a question when it's their turn and no question is selected
       if (!selectedQuestion && !isQuestionModalOpen) {
@@ -98,7 +105,7 @@ const Index = () => {
       }
       
       // AI answers the question when modal is open and question is selected
-      if (selectedQuestion && isQuestionModalOpen) {
+      if (selectedQuestion && isQuestionModalOpen && (!aiCooldownUntil || now >= aiCooldownUntil)) {
         console.log('AI turn: answering selected question');
         const timer = setTimeout(() => {
           handleAITurn(selectedQuestion);
