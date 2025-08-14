@@ -11,6 +11,7 @@ import TopNavigation from '@/components/TopNavigation';
 import { Link } from 'react-router-dom';
 import { UserBadges } from '@/components/UserBadges';
 import { UserAvatar } from '@/components/UserAvatar';
+import { OrbProgress } from '@/components/OrbProgress';
 
 interface UserProfile {
   id: string;
@@ -286,6 +287,9 @@ const Profile = () => {
 
           {/* Modern Sidebar */}
           <div className="space-y-8">
+            {/* Orb Progress Card */}
+            <OrbProgress userId={user.id} />
+            
             {/* Quick Stats Card */}
             <Card className="border-border/50 shadow-xl bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-transparent to-accent/3 pointer-events-none" />

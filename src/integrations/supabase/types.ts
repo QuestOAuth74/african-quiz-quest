@@ -692,6 +692,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_orbs: {
+        Row: {
+          created_at: string
+          id: string
+          orbs_from_posts: number
+          orbs_from_quiz_points: number
+          orbs_from_replies: number
+          pdf_claimed: boolean
+          pdf_claimed_at: string | null
+          total_orbs: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          orbs_from_posts?: number
+          orbs_from_quiz_points?: number
+          orbs_from_replies?: number
+          pdf_claimed?: boolean
+          pdf_claimed_at?: string | null
+          total_orbs?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          orbs_from_posts?: number
+          orbs_from_quiz_points?: number
+          orbs_from_replies?: number
+          pdf_claimed?: boolean
+          pdf_claimed_at?: string | null
+          total_orbs?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_question_attempts: {
         Row: {
           answered_correctly: boolean
@@ -818,6 +857,10 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_user_orbs: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       check_and_award_badges: {
         Args: { p_user_id: string }
         Returns: undefined
