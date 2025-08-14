@@ -707,10 +707,10 @@ const Index = () => {
         <TopNavigation />
         
         {/* Global Audio Controls */}
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-50">
           <AudioControls />
         </div>
-        <div className="pt-16">
+        <div className="pt-16 p-2 sm:p-4">
           <GameSetup
             gameMode={gameMode}
             playerCount={playerCount}

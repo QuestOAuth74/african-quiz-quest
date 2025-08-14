@@ -7,10 +7,10 @@ import { Link } from "react-router-dom";
 const TopNavigation = () => {
   const [open, setOpen] = useState(false);
   return (
-    <nav className="w-full bg-theme-brown-dark/95 backdrop-blur-sm border-b border-theme-yellow/20 py-3 px-4 fixed top-0 z-40">
+    <nav className="w-full bg-theme-brown-dark/95 backdrop-blur-sm border-b border-theme-yellow/20 py-2 sm:py-3 px-3 sm:px-4 fixed top-0 z-40">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-theme-yellow font-semibold text-lg">
+          <span className="text-theme-yellow font-semibold text-base sm:text-lg truncate">
             Historia Africana
           </span>
         </div>

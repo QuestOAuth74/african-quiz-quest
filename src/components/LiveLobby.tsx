@@ -202,45 +202,45 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-2 sm:p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
             <Button
               onClick={onBack}
               variant="outline"
               size="sm"
-              className="text-white border-white/20"
+              className="text-white border-white/20 flex-shrink-0"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4 mr-1" />
               Back
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-                <Zap className="w-8 h-8 text-yellow-400" />
-                Live Multiplayer Lobby
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
+                <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400 flex-shrink-0" />
+                <span className="truncate">Live Multiplayer Lobby</span>
               </h1>
-              <p className="text-blue-200">Find players to challenge in real-time!</p>
+              <p className="text-blue-200 text-sm sm:text-base">Find players to challenge in real-time!</p>
             </div>
           </div>
 
           {/* Status indicator and controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full animate-pulse ${getStatusColor(currentStatus)}`} />
-              <span className="text-white capitalize">{currentStatus}</span>
+              <span className="text-white capitalize text-sm sm:text-base">{currentStatus}</span>
             </div>
             
             {/* Active game indicator */}
             {activeGame && (
               <Button
                 onClick={handleRejoinGame}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
                 size="sm"
               >
                 <Crown className="w-4 h-4 mr-2" />
-                Rejoin Game ({activeGame.room_code})
+                <span className="truncate">Rejoin Game ({activeGame.room_code})</span>
               </Button>
             )}
             
@@ -250,14 +250,14 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
                 onClick={leaveWaitingLobby}
                 variant="outline"
                 size="sm"
-                className="text-yellow-400 border-yellow-400"
+                className="text-yellow-400 border-yellow-400 w-full sm:w-auto"
               >
                 Leave Queue
               </Button>
             ) : (
               <Button
                 onClick={enterWaitingLobby}
-                className="bg-yellow-600 hover:bg-yellow-700"
+                className="bg-yellow-600 hover:bg-yellow-700 w-full sm:w-auto"
                 size="sm"
               >
                 Join Queue
@@ -267,32 +267,32 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-col sm:flex-row gap-2 mb-6 overflow-x-auto">
           <Button
             onClick={() => setSelectedTab('lobby')}
             variant={selectedTab === 'lobby' ? 'default' : 'outline'}
-            className={selectedTab === 'lobby' ? 'bg-blue-600' : 'text-white border-white/20'}
+            className={`${selectedTab === 'lobby' ? 'bg-blue-600' : 'text-white border-white/20'} whitespace-nowrap text-sm`}
           >
-            <Users className="w-4 h-4 mr-2" />
-            Online Players ({onlinePlayers.length})
+            <Users className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Online Players </span>({onlinePlayers.length})
           </Button>
           <Button
             onClick={() => setSelectedTab('waiting')}
             variant={selectedTab === 'waiting' ? 'default' : 'outline'}
-            className={selectedTab === 'waiting' ? 'bg-yellow-600' : 'text-white border-white/20'}
+            className={`${selectedTab === 'waiting' ? 'bg-yellow-600' : 'text-white border-white/20'} whitespace-nowrap text-sm`}
           >
-            <Clock className="w-4 h-4 mr-2" />
-            Waiting to Play ({waitingPlayers.length})
+            <Clock className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Waiting </span>({waitingPlayers.length})
           </Button>
           <Button
             onClick={() => setSelectedTab('requests')}
             variant={selectedTab === 'requests' ? 'default' : 'outline'}
-            className={selectedTab === 'requests' ? 'bg-green-600' : 'text-white border-white/20'}
+            className={`${selectedTab === 'requests' ? 'bg-green-600' : 'text-white border-white/20'} whitespace-nowrap text-sm`}
           >
-            <Send className="w-4 h-4 mr-2" />
-            Match Requests ({incomingRequests.length + outgoingRequests.length})
+            <Send className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Requests </span>({incomingRequests.length + outgoingRequests.length})
             {incomingRequests.length > 0 && (
-              <Badge variant="destructive" className="ml-2">
+              <Badge variant="destructive" className="ml-1 sm:ml-2 text-xs">
                 {incomingRequests.length}
               </Badge>
             )}
@@ -315,24 +315,24 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   {onlinePlayers.map((player) => (
                     <Card key={player.user_id} className="bg-white/10 border-white/20">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <Avatar>
-                              <AvatarFallback className="bg-blue-600 text-white">
+                      <CardContent className="p-3 sm:p-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+                              <AvatarFallback className="bg-blue-600 text-white text-sm">
                                 {getPlayerDisplayName(player).charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <div>
-                              <h3 className="text-white font-medium">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="text-white font-medium text-sm sm:text-base truncate">
                                 {getPlayerDisplayName(player)}
                               </h3>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1 sm:gap-2">
                                 <div className={`w-2 h-2 rounded-full ${getStatusColor(player.player_status)}`} />
-                                <span className="text-sm text-gray-300 capitalize">
+                                <span className="text-xs sm:text-sm text-gray-300 capitalize">
                                   {player.player_status}
                                 </span>
                               </div>
@@ -342,10 +342,11 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
                             <Button
                               onClick={() => handleChallengePlayer(player)}
                               size="sm"
-                              className="bg-green-600 hover:bg-green-700"
+                              className="bg-green-600 hover:bg-green-700 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3"
                             >
-                              <Settings className="w-4 h-4 mr-1" />
-                              Challenge
+                              <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                              <span className="hidden sm:inline">Challenge</span>
+                              <span className="sm:hidden">+</span>
                             </Button>
                           )}
                         </div>

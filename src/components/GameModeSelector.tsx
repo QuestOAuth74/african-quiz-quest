@@ -33,7 +33,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
     >
       
       {/* Full Height Banner Image with Glowing Gold Band */}
-      <div className="w-full h-screen p-2">
+      <div className="w-full h-[50vh] sm:h-[60vh] md:h-screen p-2">
         <div className="w-full h-full relative rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,215,0,0.3),0_0_60px_rgba(255,215,0,0.2),0_0_90px_rgba(255,215,0,0.1)] bg-gradient-to-r from-yellow-400/20 via-yellow-500/30 to-yellow-400/20 p-1">
           <img 
             src="https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/jeopardy%20game%20banner.png"
@@ -44,47 +44,47 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
       </div>
 
       {/* Content Section Below Banner */}
-      <div className="bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown p-8">
+      <div className="bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown p-4 sm:p-6 md:p-8">
         <div className="max-w-5xl mx-auto">
           
           {/* Welcome Message with Badges for Authenticated Users - Below banner */}
           {isAuthenticated && user && (
-            <div className="mb-8 p-6 bg-background/80 backdrop-blur-sm rounded-lg border border-theme-yellow/20 max-w-xl mx-auto">
+            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-background/80 backdrop-blur-sm rounded-lg border border-theme-yellow/20 max-w-xl mx-auto">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Trophy className="h-5 w-5 text-theme-yellow" />
-                <h3 className="text-xl font-semibold text-theme-yellow">
+                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-theme-yellow" />
+                <h3 className="text-lg sm:text-xl font-semibold text-theme-yellow">
                   Welcome back, Champion!
                 </h3>
               </div>
               <div className="flex justify-center gap-2 mb-2">
                 <UserBadges userId={user.id} limit={6} showTooltip={true} />
               </div>
-              <p className="text-sm text-muted-foreground text-center">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center">
                 Keep playing to unlock more achievements!
               </p>
             </div>
           )}
 
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <Sparkles className="text-theme-yellow animate-pulse" size={32} />
-              <h1 className="text-6xl md:text-7xl font-bold gradient-text animate-pulse-yellow">
+          <div className="text-center mb-8 sm:mb-12">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <Sparkles className="text-theme-yellow animate-pulse" size={24} />
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold gradient-text animate-pulse-yellow">
                 JEOPARDY!
               </h1>
-              <Sparkles className="text-theme-yellow animate-pulse" size={32} />
+              <Sparkles className="text-theme-yellow animate-pulse" size={24} />
             </div>
-            <div className="text-2xl md:text-3xl text-theme-yellow mb-4 font-light tracking-wide">
+            <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-theme-yellow mb-3 sm:mb-4 font-light tracking-wide">
               AFRICAN HISTORY EDITION
             </div>
-            <p className="text-theme-yellow-light text-lg md:text-xl font-medium mb-4">
+            <p className="text-theme-yellow-light text-sm sm:text-base md:text-lg lg:text-xl font-medium mb-3 sm:mb-4 px-2">
               A free educational game from <span className="text-theme-yellow font-semibold">The Historia Africana</span> YouTube Channel
             </p>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
               Test your knowledge of African history in this authentic Jeopardy-style experience!
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
@@ -157,7 +157,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
             </Card>
           </div>
           
-          <div className="text-center mt-8">
+          <div className="text-center mt-6 sm:mt-8 px-4">
             <p className="text-sm text-muted-foreground mb-2">
               Think you know African history? Think again!
             </p>
