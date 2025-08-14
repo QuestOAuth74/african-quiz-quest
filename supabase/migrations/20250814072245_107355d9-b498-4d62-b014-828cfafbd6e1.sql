@@ -1,0 +1,1 @@
+UPDATE questions SET points = 200;
