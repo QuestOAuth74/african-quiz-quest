@@ -253,20 +253,21 @@ export const OnlineMultiplayerLobby = ({
                 </Button>
                 <div className="text-center text-white/70">or</div>
                 <div className="space-y-2">
+                  <div className="text-sm text-white/60 text-center">Have an invitation code?</div>
                   <Input
-                    placeholder="Enter room code"
+                    placeholder="Enter 6-digit code"
                     value={joinCode}
-                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                    className="text-center bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    onChange={(e) => setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                    className="text-center tracking-widest text-lg bg-white/10 border-white/20 text-white placeholder:text-white/50 font-mono"
                     maxLength={6}
                   />
                   <Button
                     onClick={handleJoinRoom}
-                    disabled={loading || !joinCode.trim()}
+                    disabled={loading || joinCode.length !== 6}
                     variant="outline"
-                    className="w-full text-white border-white/20"
+                    className="w-full text-white border-white/20 hover:bg-white/10"
                   >
-                    Join Room
+                    {loading ? 'Joining...' : 'Join with Code'}
                   </Button>
                 </div>
               </>
@@ -274,27 +275,35 @@ export const OnlineMultiplayerLobby = ({
 
             {mode === 'join' && (
               <div className="space-y-4">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-white mb-2">Join Private Room</h3>
+                  <p className="text-sm text-white/60">Enter the invitation code shared by the host</p>
+                </div>
                 <Input
-                  placeholder="Enter 6-digit room code"
+                  placeholder="XXXXXX"
                   value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                  className="text-center text-lg bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  onChange={(e) => setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                  className="text-center text-2xl tracking-widest bg-white/10 border-white/20 text-white placeholder:text-white/30 font-mono h-14"
                   maxLength={6}
+                  autoFocus
                 />
+                <div className="text-xs text-white/50 text-center">
+                  {joinCode.length}/6 characters
+                </div>
                 <div className="flex gap-2">
                   <Button
                     onClick={() => setMode('menu')}
                     variant="outline"
-                    className="flex-1 text-white border-white/20"
+                    className="flex-1 text-white border-white/20 hover:bg-white/10"
                   >
                     Back
                   </Button>
                   <Button
                     onClick={handleJoinRoom}
-                    disabled={loading || !joinCode.trim()}
+                    disabled={loading || joinCode.length !== 6}
                     className="flex-1 bg-primary hover:bg-primary/90"
                   >
-                    Join
+                    {loading ? 'Joining...' : 'Join Room'}
                   </Button>
                 </div>
               </div>

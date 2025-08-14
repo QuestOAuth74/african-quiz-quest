@@ -171,7 +171,10 @@ export const useGameRoom = () => {
         .single();
 
       if (roomError || !roomData) {
-        throw new Error('Room not found or game already started');
+        if (roomError?.message?.includes('No rows')) {
+          throw new Error('Invalid invitation code. Please check the code and try again.');
+        }
+        throw new Error('Room not found or game has already started');
       }
 
       // Check if room is full
