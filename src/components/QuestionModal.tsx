@@ -6,6 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Clock, CheckCircle, XCircle, SkipForward, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { useGameAudio } from "@/hooks/useGameAudio";
 
 interface Question {
   id: string;
@@ -42,6 +44,8 @@ const QuestionModal = ({
   gameMode,
   timeLimit = 30 
 }: QuestionModalProps) => {
+  const soundEffects = useSoundEffects();
+  const gameAudio = useGameAudio();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [showTeacherMode, setShowTeacherMode] = useState(false);
@@ -88,10 +92,12 @@ const QuestionModal = ({
   }, [isOpen, question, timeLimit, hasAnswered, showTeacherMode]);
 
   const handleOptionSelect = (optionId: string) => {
+    soundEffects.playButtonClick();
     setSelectedOption(optionId);
   };
 
   const handleSkip = () => {
+    soundEffects.playButtonClick();
     setHasAnswered(true);
     onAnswer('skip');
   };
@@ -103,6 +109,15 @@ const QuestionModal = ({
       setSelectedAnswerIndex(answerIndex);
       setHasAnswered(true);
       setShowAnswer(true);
+      
+      // Play correct/wrong answer sound
+      const selectedOptionObj = question.options?.find(opt => opt.id === selectedOption);
+      
+      if (selectedOptionObj?.option_type === 'correct') {
+        gameAudio.playCorrectAnswer();
+      } else {
+        gameAudio.playWrongAnswer();
+      }
       
       onAnswer(answerIndex);
     }
