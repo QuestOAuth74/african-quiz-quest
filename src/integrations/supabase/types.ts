@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string
@@ -2092,6 +2110,10 @@ export type Database = {
       }
     }
     Functions: {
+      add_user_to_admin: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
       bulk_upload_questions: {
         Args: { _questions: Json; _user_id: string }
         Returns: {
@@ -2119,6 +2141,10 @@ export type Database = {
       check_admin_status: {
         Args: { user_id: string }
         Returns: boolean
+      }
+      create_admin_user: {
+        Args: { email: string; password: string }
+        Returns: string
       }
       fetch_quiz_questions: {
         Args: {
