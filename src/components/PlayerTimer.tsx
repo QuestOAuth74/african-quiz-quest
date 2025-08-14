@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Brain } from "lucide-react";
-import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 interface PlayerTimerProps {
   isActive: boolean;
@@ -12,7 +11,6 @@ interface PlayerTimerProps {
 export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProps) => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [isVisible, setIsVisible] = useState(false);
-  const soundEffects = useSoundEffects();
 
   useEffect(() => {
     if (isActive && playerName !== "Computer") {
@@ -27,12 +25,6 @@ export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProp
             onTimeout?.();
             return 0;
           }
-          
-          // Play tick sound only during the last 10 seconds
-          if (prev <= 10) {
-            soundEffects.playTimerTick();
-          }
-          
           return prev - 1;
         });
       }, 1000);
