@@ -245,7 +245,10 @@ const Index = () => {
     
     // Check if AI is the active player and auto-play after a short delay
     const activePlayer = players.find(p => p.isActive);
+    console.log('Question selected:', questionId, 'Active player:', activePlayer?.name);
+    
     if (activePlayer?.name === "Computer") {
+      console.log('AI is active, scheduling AI turn in 2 seconds');
       setTimeout(() => {
         handleAITurn(question);
       }, 2000); // Give 2 seconds to show the question
@@ -253,10 +256,14 @@ const Index = () => {
   };
 
   const handleAITurn = (question: Question) => {
+    console.log('AI Turn triggered for question:', question.text, 'Points:', question.points);
     const correctAnswerIndex = question.correctAnswerIndex;
     if (typeof correctAnswerIndex === 'number') {
+      console.log('AI selecting correct answer at index:', correctAnswerIndex);
       // AI automatically selects the correct answer
       handleAnswer(correctAnswerIndex);
+    } else {
+      console.log('No correct answer index found for AI');
     }
   };
 
@@ -332,6 +339,9 @@ const Index = () => {
     // For 'pass' and 'timeout', no points are gained or lost
     
     // Update player score
+    if (pointChange !== 0) {
+      console.log('Updating player score. Point change:', pointChange, 'Active player:', players.find(p => p.isActive)?.name);
+    }
     setPlayers(prev => prev.map(player => 
       player.isActive 
         ? { ...player, score: Math.max(0, player.score + pointChange) } // Prevent negative scores
@@ -373,9 +383,12 @@ const Index = () => {
       
       // If AI becomes active and there's still a question modal open, AI should answer
       if (newActivePlayer?.name === "Computer" && selectedQuestion && isQuestionModalOpen) {
+        console.log('AI becoming active after player switch, triggering AI turn');
         setTimeout(() => {
           handleAITurn(selectedQuestion);
         }, 1000);
+      } else {
+        console.log('Player switch complete. New active player:', newActivePlayer?.name, 'Modal open:', isQuestionModalOpen);
       }
     }, 3000);
   };
