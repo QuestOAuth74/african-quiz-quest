@@ -19,49 +19,22 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      // Call the admin login edge function
-      const { data, error } = await supabase.functions.invoke('admin-login', {
-        body: {
-          email,
-          password,
-        },
+      // Direct login with Supabase auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      if (error) {
-        console.error('Login error:', error);
-        toast({
-          title: "Login Failed",
-          description: error.message || "Authentication failed",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (authError) throw authError;
 
-      if (!data || !data.success) {
-        toast({
-          title: "Login Failed",
-          description: data?.error || "Authentication failed",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Set the session manually if login was successful
-      if (data.session) {
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-        });
-
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          toast({
-            title: "Error",
-            description: "Failed to establish session",
-            variant: "destructive",
-          });
-          return;
-        }
+      // Check if user is admin
+      const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+      
+      if (adminError) throw adminError;
+      
+      if (!isAdmin) {
+        await supabase.auth.signOut();
+        throw new Error('Access denied. Admin privileges required.');
       }
 
       toast({
@@ -70,11 +43,10 @@ const AdminLogin = () => {
       });
 
       navigate('/admin/dashboard');
-    } catch (error) {
-      console.error('Unexpected error:', error);
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred",
+        title: "Login Failed",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
