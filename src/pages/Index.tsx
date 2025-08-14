@@ -190,39 +190,53 @@ const Index = () => {
     const gameCategories = selectedCategories.map(cat => {
       const categoryQuestions = questions.filter(q => q.category_id === cat.id);
       
-      // Sort questions by points and take only the amount needed for rowCount
-      const sortedQuestions = categoryQuestions.sort((a, b) => a.points - b.points);
-      const questionsForRows = sortedQuestions.slice(0, rowCount);
-      
-      // Map questions to game format - assign them sequentially to grid positions
-      questionsForRows.forEach((q, index) => {
-        const correctOption = q.question_options.find(opt => opt.option_type === 'correct');
-        const correctAnswerIndex = q.question_options.findIndex(opt => opt.option_type === 'correct');
+      // Create questions for each row/point tier
+      const questionsForGrid = Array.from({ length: rowCount }, (_, index) => {
+        const pointTier = (index + 1) * 100; // 100, 200, 300, 400, 500
         
-        questionsMap[`${cat.id}-${index + 1}`] = {
-          id: q.id,
-          text: q.text,
-          points: q.points, // Use actual database point value
-          category: q.categories.name,
-          explanation: q.explanation,
-          historicalContext: q.historical_context,
-          imageUrl: q.image_url,
-          options: q.question_options as Array<{id: string; text: string; option_type: 'correct' | 'incorrect'}>,
-          correctAnswerIndex: correctAnswerIndex
-        };
+        // Find questions for this point tier, or use any available question
+        let questionForTier = categoryQuestions.find(q => q.points === pointTier);
+        
+        // If no exact match, find any unassigned question
+        if (!questionForTier) {
+          questionForTier = categoryQuestions.find(q => 
+            !questionsForGrid.slice(0, index).some(gridQ => gridQ && gridQ.id === q.id)
+          );
+        }
+        
+        if (questionForTier) {
+          const correctAnswerIndex = questionForTier.question_options.findIndex(opt => opt.option_type === 'correct');
+          
+          // Map to questionsMap using grid position as key
+          questionsMap[`${cat.id}-${index + 1}`] = {
+            id: questionForTier.id,
+            text: questionForTier.text,
+            points: questionForTier.points,
+            category: questionForTier.categories.name,
+            explanation: questionForTier.explanation,
+            historicalContext: questionForTier.historical_context,
+            imageUrl: questionForTier.image_url,
+            options: questionForTier.question_options as Array<{id: string; text: string; option_type: 'correct' | 'incorrect'}>,
+            correctAnswerIndex: correctAnswerIndex
+          };
+          
+          return questionForTier;
+        }
+        
+        return null; // No question available for this position
       });
-
+      
       return {
         id: cat.id,
         name: cat.name,
         questions: Array.from({ length: rowCount }, (_, index) => {
-          const actualQuestion = questionsForRows[index];
-          const hasQuestion = !!actualQuestion; // Only false if no question exists at this position
+          const hasQuestion = questionsForGrid[index] !== null;
+          const actualQuestion = questionsForGrid[index];
           return {
             id: `${cat.id}-${index + 1}`,
             points: hasQuestion ? actualQuestion.points : (index + 1) * 100,
-            isAnswered: false, // Always start as not answered
-            hasQuestion: hasQuestion // True if we have a real question, false if empty slot
+            isAnswered: false,
+            hasQuestion: hasQuestion
           };
         })
       };
