@@ -1,57 +1,18 @@
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate, Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { Crown, Mail, Lock, ArrowLeft } from 'lucide-react';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
-
-  // Temporary function to create the initial admin user
-  const createInitialAdmin = async () => {
-    try {
-      setIsLoading(true);
-      
-      // First, sign up the user
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: "quemile@gmail.com",
-        password: "144245",
-        options: {
-          emailRedirectTo: `${window.location.origin}/admin/login`
-        }
-      });
-
-      if (signUpError) throw signUpError;
-
-      if (signUpData.user) {
-        // Now make them admin
-        const { data: adminResult, error: adminError } = await supabase
-          .rpc("make_user_admin_by_email", { user_email: "quemile@gmail.com" });
-
-        if (adminError) throw adminError;
-
-        toast({
-          title: "Admin user created",
-          description: "Admin user created successfully. You can now log in.",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Failed to create admin",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,27 +24,53 @@ const AdminLogin = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        toast({
+          title: "Login Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
 
       // Check if user is admin
-      const { data: adminData, error: adminError } = await supabase
-        .rpc("is_admin", { user_uuid: data.user.id });
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('user_id', data.user.id)
+        .single();
 
-      if (adminError || !adminData) {
-        await supabase.auth.signOut();
-        throw new Error("You don't have admin privileges");
+      if (profileError) {
+        console.error('Profile error:', profileError);
+        toast({
+          title: "Error",
+          description: "Failed to verify admin status",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!profile.is_admin) {
+        toast({
+          title: "Access Denied",
+          description: "You do not have administrator privileges",
+          variant: "destructive",
+        });
+        return;
       }
 
       toast({
-        title: "Login successful",
+        title: "Login Successful",
         description: "Welcome to the admin dashboard",
       });
 
-      navigate("/admin/dashboard");
-    } catch (error: any) {
+      navigate('/admin/dashboard');
+    } catch (error) {
+      console.error('Unexpected error:', error);
       toast({
-        title: "Login failed",
-        description: error.message,
+        title: "Error",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -92,60 +79,75 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md jeopardy-card">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl gradient-text">Admin Login</CardTitle>
-          <CardDescription>Enter your credentials to access the admin panel</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-input border-border"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-input border-border"
-              />
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full jeopardy-button" 
-              disabled={isLoading}
-            >
-              {isLoading ? "Signing in..." : "Sign In"}
-            </Button>
-          </form>
-          
-          <div className="mt-4 pt-4 border-t border-border">
-            <p className="text-sm text-muted-foreground text-center mb-2">
-              Initial setup only:
-            </p>
-            <Button 
-              onClick={createInitialAdmin}
-              variant="outline"
-              className="w-full"
-              disabled={isLoading}
-            >
-              Create Initial Admin User
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown opacity-90" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--theme-yellow)/0.1),transparent_70%)]" />
+      
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {/* Back to Game Button */}
+          <Link to="/" className="inline-flex items-center gap-2 text-theme-yellow hover:text-theme-yellow-light transition-colors mb-8 group">
+            <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-2px] transition-transform" />
+            Back to Game
+          </Link>
+
+          <Card className="jeopardy-card border-theme-yellow/20 backdrop-blur-sm">
+            <CardHeader className="text-center space-y-4">
+              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-theme-yellow to-theme-yellow-dark flex items-center justify-center">
+                <Crown className="w-8 h-8 text-theme-brown" />
+              </div>
+              <div>
+                <CardTitle className="text-3xl font-bold gradient-text">Admin Portal</CardTitle>
+                <CardDescription className="text-muted-foreground mt-2">
+                  Access the administrative dashboard to manage questions and categories
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="email"
+                    placeholder="Administrator Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 h-12 bg-background/50 border-border/50 focus:border-theme-yellow transition-colors"
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 h-12 bg-background/50 border-border/50 focus:border-theme-yellow transition-colors"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 jeopardy-gold font-semibold text-lg hover:scale-[1.02] transform transition-all duration-200" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-theme-brown border-t-transparent rounded-full animate-spin" />
+                      Authenticating...
+                    </div>
+                  ) : (
+                    'Access Dashboard'
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
