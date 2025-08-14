@@ -74,6 +74,11 @@ const Index = () => {
     const activePlayer = players.find(p => p.isActive);
     
     if (activePlayer?.name === "Computer" && gameConfigured) {
+      console.log('AI is active, checking conditions:', {
+        hasQuestion: !!selectedQuestion,
+        modalOpen: isQuestionModalOpen
+      });
+      
       // AI picks a question when it's their turn and no question is selected
       if (!selectedQuestion && !isQuestionModalOpen) {
         console.log('AI turn: selecting random question');
@@ -463,10 +468,15 @@ const Index = () => {
 
     // Switch active player after a delay to allow viewing the explanation
     setTimeout(() => {
-      setPlayers(prev => prev.map(player => ({
-        ...player,
-        isActive: !player.isActive
-      })));
+      console.log('Switching turns after answer');
+      setPlayers(prev => {
+        const newPlayers = prev.map(player => ({
+          ...player,
+          isActive: !player.isActive
+        }));
+        console.log('New active player:', newPlayers.find(p => p.isActive)?.name);
+        return newPlayers;
+      });
       
       // Close modal and clear question selection for the next player
       setIsQuestionModalOpen(false);
