@@ -20,7 +20,7 @@ const ForumHeader = () => {
     {
       id: '1',
       title: 'Welcome to Baobab Talks',
-      description: 'Explore the rich tapestry of African history and share knowledge about our heritage',
+      description: 'Explore the rich history of Africa and share knowledge about our heritage',
       badge: 'African Heritage',
       icon: <MessageCircle className="h-6 w-6" />,
       gradient: 'bg-gradient-to-r from-primary/20 to-accent/20'
