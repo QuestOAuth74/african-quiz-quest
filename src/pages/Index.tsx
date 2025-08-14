@@ -453,12 +453,28 @@ const Index = () => {
       )
     })));
 
-    // Check if game is completed
-    const allQuestionsAnswered = categories.every(cat => 
+    // Check if game is completed (using the updated categories state)
+    const updatedCategories = categories.map(cat => ({
+      ...cat,
+      questions: cat.questions.map(q => 
+        q.id === selectedQuestionGridId ? { ...q, isAnswered: true } : q
+      )
+    }));
+    
+    const allQuestionsAnswered = updatedCategories.every(cat => 
       cat.questions.every(q => q.isAnswered)
     );
     
+    console.log('Game completion check:', {
+      allQuestionsAnswered,
+      totalQuestions: updatedCategories.reduce((total, cat) => total + cat.questions.length, 0),
+      answeredQuestions: updatedCategories.reduce((total, cat) => 
+        total + cat.questions.filter(q => q.isAnswered).length, 0
+      )
+    });
+    
     if (allQuestionsAnswered) {
+      console.log('Game completed! Calling handleGameComplete in 3.5 seconds...');
       setTimeout(() => {
         handleGameComplete();
       }, 3500); // Wait a bit longer than the player switch delay
@@ -511,13 +527,27 @@ const Index = () => {
   };
 
   const handleGameComplete = async () => {
-    if (!isAuthenticated || !user || !gameStartTime) return;
+    console.log('handleGameComplete called', { isAuthenticated, user: !!user, gameStartTime: !!gameStartTime });
+    if (!isAuthenticated || !user || !gameStartTime) {
+      console.log('Game completion aborted - missing requirements');
+      return;
+    }
 
     const currentPlayer = players.find(p => p.name !== "Computer") || players[0];
     const gameDuration = Math.floor((new Date().getTime() - gameStartTime.getTime()) / 1000);
 
+    console.log('Recording game completion:', {
+      user_id: user.id,
+      game_mode: gameMode || 'single',
+      final_score: currentPlayer.score,
+      questions_answered: gameStats.questionsAnswered,
+      questions_correct: gameStats.questionsCorrect,
+      categories_played: gameConfig.categories.map(cat => cat.name),
+      game_duration_seconds: gameDuration
+    });
+
     try {
-      await supabase
+      const { error } = await supabase
         .from('user_games')
         .insert({
           user_id: user.id,
@@ -529,6 +559,13 @@ const Index = () => {
           game_duration_seconds: gameDuration
         });
 
+      if (error) {
+        console.error('Error inserting game record:', error);
+        throw error;
+      }
+
+      console.log('Game record inserted successfully!');
+
       toast({
         title: "Game Completed!",
         description: `Final Score: $${currentPlayer.score.toLocaleString()}. Check the leaderboard to see your ranking!`,
@@ -536,6 +573,11 @@ const Index = () => {
       });
     } catch (error) {
       console.error('Error recording game completion:', error);
+      toast({
+        title: "Error",
+        description: "Failed to record game completion. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
