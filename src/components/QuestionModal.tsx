@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle, XCircle, SkipForward } from "lucide-react";
+import { Clock, CheckCircle, XCircle, SkipForward, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useGameAudio } from "@/hooks/useGameAudio";
@@ -289,6 +289,52 @@ const QuestionModal = ({
   // Regular Game Mode View
   const timeProgress = (timeLeft / timeLimit) * 100;
   const isTimeRunningOut = timeLeft <= 10;
+  const isAIPlayer = currentPlayer === "Computer";
+
+  // Dynamic styling based on player type
+  const getModalClasses = () => {
+    if (isAIPlayer) {
+      return "max-w-4xl max-h-[85vh] jeopardy-card border-blue-500/50 bg-gradient-to-br from-blue-900/20 to-purple-900/20";
+    }
+    return "max-w-4xl max-h-[85vh] jeopardy-card border-theme-yellow/30";
+  };
+
+  const getHeaderClasses = () => {
+    if (isAIPlayer) {
+      return "font-orbitron font-black text-2xl md:text-3xl text-blue-400";
+    }
+    return "font-orbitron font-black text-2xl md:text-3xl text-theme-yellow";
+  };
+
+  const getPointsClasses = () => {
+    if (isAIPlayer) {
+      return "font-orbitron font-bold text-xl text-blue-300";
+    }
+    return "font-orbitron font-bold text-xl text-theme-yellow-light";
+  };
+
+  const getPlayerClasses = () => {
+    if (isAIPlayer) {
+      return "text-blue-400 font-medium";
+    }
+    return "text-theme-yellow font-medium";
+  };
+
+  const getTimerClasses = () => {
+    if (isTimeRunningOut) {
+      return 'bg-gradient-to-r from-red-500 to-red-600 animate-pulse';
+    }
+    if (isAIPlayer) {
+      return 'bg-gradient-to-r from-blue-400 to-purple-400';
+    }
+    return 'bg-gradient-to-r from-theme-yellow to-theme-yellow-light';
+  };
+
+  const getClockColor = () => {
+    if (isTimeRunningOut) return 'text-red-400 animate-pulse';
+    if (isAIPlayer) return 'text-blue-400';
+    return 'text-theme-yellow';
+  };
 
   return (
     <>
@@ -304,17 +350,30 @@ const QuestionModal = ({
       </audio>
       
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-4xl max-h-[85vh] jeopardy-card border-theme-yellow/30">
+        <DialogContent className={getModalClasses()}>
           <DialogHeader className="text-center pb-4 flex-shrink-0">
-            <DialogTitle className="font-orbitron font-black text-2xl md:text-3xl text-theme-yellow">
-              {question.category.toUpperCase()}
-            </DialogTitle>
-            <div className="font-orbitron font-bold text-xl text-theme-yellow-light">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              {isAIPlayer && (
+                <Bot className="h-6 w-6 text-blue-400 animate-pulse" />
+              )}
+              <DialogTitle className={getHeaderClasses()}>
+                {question.category.toUpperCase()}
+              </DialogTitle>
+              {isAIPlayer && (
+                <Bot className="h-6 w-6 text-purple-400 animate-pulse" />
+              )}
+            </div>
+            <div className={getPointsClasses()}>
               ${question.points.toLocaleString()}
             </div>
             {currentPlayer && (
               <div className="text-sm text-muted-foreground">
-                Current Player: <span className="text-theme-yellow font-medium">{currentPlayer}</span>
+                Current Player: 
+                <span className={`${getPlayerClasses()} flex items-center gap-1 justify-center mt-1`}>
+                  {isAIPlayer && <Bot className="h-4 w-4 animate-bounce" />}
+                  {currentPlayer}
+                  {isAIPlayer && <Bot className="h-4 w-4 animate-bounce" style={{ animationDelay: '0.5s' }} />}
+                </span>
               </div>
             )}
           </DialogHeader>
@@ -323,24 +382,20 @@ const QuestionModal = ({
             <div className="space-y-6 pr-4">
               {/* Timer */}
               {!showAnswer && !hasAnswered && (
-                <div className="space-y-3">
-                  <div className="w-full bg-theme-brown-dark rounded-full h-3 border border-theme-yellow/30">
-                    <div 
-                      className={`h-3 rounded-full transition-all duration-1000 ${
-                        isTimeRunningOut 
-                          ? 'bg-gradient-to-r from-red-500 to-red-600 animate-pulse' 
-                          : 'bg-gradient-to-r from-theme-yellow to-theme-yellow-light'
-                      }`}
-                      style={{ width: `${timeProgress}%` }}
-                    />
+                  <div className="space-y-3">
+                    <div className="w-full bg-theme-brown-dark rounded-full h-3 border border-theme-yellow/30">
+                      <div 
+                        className={`h-3 rounded-full transition-all duration-1000 ${getTimerClasses()}`}
+                        style={{ width: `${timeProgress}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <Clock size={16} className={getClockColor()} />
+                      <span className={`font-orbitron font-bold ${getClockColor()}`}>
+                        {timeLeft}s
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <Clock size={16} className={isTimeRunningOut ? 'text-red-400 animate-pulse' : 'text-theme-yellow'} />
-                    <span className={`font-orbitron font-bold ${isTimeRunningOut ? 'text-red-400 animate-pulse' : 'text-theme-yellow'}`}>
-                      {timeLeft}s
-                    </span>
-                  </div>
-                </div>
               )}
 
               {/* Question */}
