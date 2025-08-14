@@ -30,6 +30,15 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
     respondToMatchRequest
   } = usePlayerLobby();
 
+  // Debug logging
+  console.log('LiveLobby Debug:', {
+    user: user ? { id: user.id, email: user.email } : null,
+    onlinePlayers: onlinePlayers.length,
+    waitingPlayers: waitingPlayers.length,
+    matchmakingRequests: matchmakingRequests.length,
+    currentStatus
+  });
+
   const [selectedTab, setSelectedTab] = useState<'lobby' | 'waiting' | 'requests'>('lobby');
 
   // Auto-switch to requests tab when new requests come in
