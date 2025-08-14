@@ -114,10 +114,18 @@ const Quiz = () => {
         .select('*')
         .eq('question_id', questionId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Options error:', error);
+        throw error;
+      }
       setOptions(optionsData || []);
     } catch (error) {
       console.error('Error loading options:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load question options.",
+        variant: "destructive",
+      });
     }
   };
 
