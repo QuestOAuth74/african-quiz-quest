@@ -69,25 +69,28 @@ const Index = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // AI turn management - only triggers when it's truly AI's turn to pick a question
+  // AI turn management - handles both question selection and answering
   useEffect(() => {
     const activePlayer = players.find(p => p.isActive);
     
-    // AI should only act when:
-    // 1. AI is active
-    // 2. Game is configured 
-    // 3. No question is currently selected (meaning it's time to pick a new question)
-    // 4. No modal is open (meaning previous turn is completely finished)
-    if (activePlayer?.name === "Computer" && 
-        gameConfigured && 
-        !selectedQuestion && 
-        !isQuestionModalOpen) {
+    if (activePlayer?.name === "Computer" && gameConfigured) {
+      // AI picks a question when it's their turn and no question is selected
+      if (!selectedQuestion && !isQuestionModalOpen) {
+        console.log('AI turn: selecting random question');
+        const timer = setTimeout(() => {
+          handleAISelectQuestion();
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
       
-      console.log('AI turn: selecting random question');
-      const timer = setTimeout(() => {
-        handleAISelectQuestion();
-      }, 1500);
-      return () => clearTimeout(timer);
+      // AI answers the question when modal is open and question is selected
+      if (selectedQuestion && isQuestionModalOpen) {
+        console.log('AI turn: answering selected question');
+        const timer = setTimeout(() => {
+          handleAITurn(selectedQuestion);
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
     }
   }, [players, selectedQuestion, isQuestionModalOpen, gameConfigured]);
 
@@ -298,14 +301,6 @@ const Index = () => {
     
     const activePlayer = players.find(p => p.isActive);
     console.log('Question selected:', questionId, 'Active player:', activePlayer?.name);
-    
-    // If AI selected the question, it should answer after a delay
-    if (activePlayer?.name === "Computer") {
-      console.log('AI will answer its selected question');
-      setTimeout(() => {
-        handleAITurn(question);
-      }, 2000);
-    }
   };
 
   const handleAISelectQuestion = () => {
