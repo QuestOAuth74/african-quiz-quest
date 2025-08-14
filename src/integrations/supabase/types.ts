@@ -290,6 +290,17 @@ export type Database = {
         Args: { user_email: string; user_password: string }
         Returns: string
       }
+      get_single_player_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          best_category_name: string
+          best_category_points: number
+          email: string
+          total_games_vs_computer: number
+          total_points_vs_computer: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
