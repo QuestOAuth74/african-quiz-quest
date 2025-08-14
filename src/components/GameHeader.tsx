@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trophy, Home, Sparkles } from "lucide-react";
+import { Trophy, Home, Sparkles, Bot } from "lucide-react";
 
 interface Player {
   id: string;
@@ -65,21 +65,35 @@ export function GameHeader({ players, gameMode, onNewGame, currentRound = 1, tot
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     {/* Custom Player Icons */}
-                    <div className={`w-12 h-12 rounded-full overflow-hidden border-2 transition-all duration-300 ${
-                      player.isActive 
-                        ? 'border-jeopardy-gold shadow-lg shadow-jeopardy-gold/50 animate-pulse' 
-                        : 'border-muted opacity-70'
-                    }`}>
-                      <img 
-                        src={
-                          player.id === 'player1' || player.id === 'computer'
-                            ? "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/historia%20africana%201.png"
-                            : "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/historia%20africana%202.png"
-                        }
-                        alt={`${player.name} avatar`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                    {player.id === 'computer' ? (
+                      // Robot icon for AI player
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                        player.isActive 
+                          ? 'border-jeopardy-gold bg-jeopardy-gold/10 shadow-lg shadow-jeopardy-gold/50 animate-pulse' 
+                          : 'border-muted bg-muted/10 opacity-70'
+                      }`}>
+                        <Bot className={`w-6 h-6 ${
+                          player.isActive ? 'text-jeopardy-gold' : 'text-muted-foreground'
+                        }`} />
+                      </div>
+                    ) : (
+                      // Historia Africana icons for human players
+                      <div className={`w-12 h-12 rounded-full overflow-hidden border-2 transition-all duration-300 ${
+                        player.isActive 
+                          ? 'border-jeopardy-gold shadow-lg shadow-jeopardy-gold/50 animate-pulse' 
+                          : 'border-muted opacity-70'
+                      }`}>
+                        <img 
+                          src={
+                            player.id === 'player1'
+                              ? "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/historia%20africana%201.png"
+                              : "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/historia%20africana%202.png"
+                          }
+                          alt={`${player.name} avatar`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                     {player.id === leader.id && player.score > 0 && (
                       <Trophy className="absolute -top-1 -right-1 text-jeopardy-gold bg-background rounded-full p-0.5" size={16} />
                     )}
