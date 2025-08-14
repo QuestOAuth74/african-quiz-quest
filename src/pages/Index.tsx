@@ -671,19 +671,22 @@ const Index = () => {
         />
       </div>
       
-      {/* Player Timer - only show when human player is active and no question selected */}
-      <PlayerTimer 
-        isActive={players.find(p => p.isActive)?.name !== "Computer" && !selectedQuestion && !isQuestionModalOpen}
-        playerName={players.find(p => p.isActive)?.name || ""}
-        onTimeout={handlePlayerTimeout}
-      />
-      
       <GameBoard 
         categories={categories}
         onQuestionSelect={handleQuestionSelect}
         isGameActive={true}
         rowCount={gameConfig.rowCount}
       />
+      
+      {/* Player Timer - positioned below the game board with ample space */}
+      <div className="container mx-auto px-4 py-8">
+        <PlayerTimer 
+          isActive={players.find(p => p.isActive)?.name !== "Computer" && !selectedQuestion && !isQuestionModalOpen}
+          playerName={players.find(p => p.isActive)?.name || ""}
+          onTimeout={handlePlayerTimeout}
+        />
+      </div>
+      
       <QuestionModal
         isOpen={isQuestionModalOpen || showTeacherMode}
         onClose={handleCloseModal}

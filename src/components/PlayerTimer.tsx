@@ -48,18 +48,18 @@ export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProp
   };
 
   return (
-    <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
-      <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-4 shadow-lg min-w-[300px]">
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <Brain className="h-5 w-5 text-primary animate-pulse" />
-          <span className="text-lg font-semibold text-foreground">
+    <div className="w-full max-w-md mx-auto animate-fade-in">
+      <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-md">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Brain className="h-4 w-4 text-primary animate-pulse" />
+          <span className="text-sm font-medium text-foreground">
             THINKING...
           </span>
-          <Brain className="h-5 w-5 text-primary animate-pulse" />
+          <Brain className="h-4 w-4 text-primary animate-pulse" />
         </div>
         
         <div className="space-y-2">
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex justify-between items-center text-xs">
             <span className="text-muted-foreground">{playerName}'s Turn</span>
             <span className="font-mono text-foreground font-bold">
               {timeLeft}s
@@ -69,10 +69,10 @@ export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProp
           <div className="relative">
             <Progress 
               value={progressValue} 
-              className="h-3 bg-muted"
+              className="h-2 bg-muted"
             />
             <div 
-              className={`absolute top-0 left-0 h-3 rounded-full transition-all duration-1000 ${getProgressColor()}`}
+              className={`absolute top-0 left-0 h-2 rounded-full transition-all duration-1000 ${getProgressColor()}`}
               style={{ width: `${progressValue}%` }}
             />
           </div>
