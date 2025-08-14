@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -91,6 +91,11 @@ const AdminLogin = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+          <div className="mt-4 text-center">
+            <Link to="/admin/signup" className="text-sm text-muted-foreground hover:underline">
+              Need to create an admin account? Sign up here
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
