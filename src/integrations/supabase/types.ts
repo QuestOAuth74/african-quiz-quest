@@ -284,6 +284,124 @@ export type Database = {
           },
         ]
       }
+      game_room_players: {
+        Row: {
+          id: string
+          is_active: boolean
+          is_host: boolean
+          joined_at: string
+          player_name: string
+          room_id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_active?: boolean
+          is_host?: boolean
+          joined_at?: string
+          player_name: string
+          room_id: string
+          score?: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_active?: boolean
+          is_host?: boolean
+          joined_at?: string
+          player_name?: string
+          room_id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "game_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_room_questions: {
+        Row: {
+          answered_at: string | null
+          answered_by: string | null
+          id: string
+          is_answered: boolean
+          question_id: string
+          room_id: string
+        }
+        Insert: {
+          answered_at?: string | null
+          answered_by?: string | null
+          id?: string
+          is_answered?: boolean
+          question_id: string
+          room_id: string
+        }
+        Update: {
+          answered_at?: string | null
+          answered_by?: string | null
+          id?: string
+          is_answered?: boolean
+          question_id?: string
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_room_questions_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "game_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_rooms: {
+        Row: {
+          created_at: string
+          current_player_count: number
+          current_turn_user_id: string | null
+          finished_at: string | null
+          game_config: Json
+          host_user_id: string
+          id: string
+          max_players: number
+          room_code: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          current_player_count?: number
+          current_turn_user_id?: string | null
+          finished_at?: string | null
+          game_config: Json
+          host_user_id: string
+          id?: string
+          max_players?: number
+          room_code: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          current_player_count?: number
+          current_turn_user_id?: string | null
+          finished_at?: string | null
+          game_config?: Json
+          host_user_id?: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -626,6 +744,10 @@ export type Database = {
       }
       create_admin_user: {
         Args: { user_email: string; user_password: string }
+        Returns: string
+      }
+      generate_room_code: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       get_single_player_stats: {
