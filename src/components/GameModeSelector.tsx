@@ -246,7 +246,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
               Think you know African history? Think again!
             </p>
             <p className="text-xs text-muted-foreground">
-              Educational content crafted by <span className="text-theme-yellow font-medium">The Historia Africana</span> • Bringing African history to life
+              Educational content crafted by <span className="text-theme-yellow font-medium">The Historia Africana Youtube Channel</span> • Bringing African history to life
             </p>
           </div>
         </div>
