@@ -9,6 +9,7 @@ import LeaderboardPage from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import Forum from "./pages/Forum";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/forum" element={<Forum />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           {/* Catch-all route must be last */}

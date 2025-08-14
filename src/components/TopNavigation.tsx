@@ -18,6 +18,16 @@ export function TopNavigation() {
             size="sm"
             className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
           >
+            <a href="/forum">
+              Baobab Talks
+            </a>
+          </Button>
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
+          >
             <a
               href="https://www.youtube.com/@HistoriaAfricana"
               target="_blank"

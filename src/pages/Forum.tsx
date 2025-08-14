@@ -1,0 +1,261 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { MessageCircle, Plus } from 'lucide-react';
+import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
+import { TopNavigation } from '@/components/TopNavigation';
+
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  category_id: string;
+  forum_categories: {
+    name: string;
+  };
+}
+
+const Forum = () => {
+  const { user, isAuthenticated } = useAuth();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [newPost, setNewPost] = useState({ title: '', content: '', category_id: '' });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchPosts();
+  }, [selectedCategory]);
+
+  const fetchCategories = async () => {
+    const { data, error } = await supabase
+      .from('forum_categories')
+      .select('*')
+      .order('name');
+    
+    if (error) {
+      toast.error('Failed to load categories');
+      return;
+    }
+    setCategories(data || []);
+  };
+
+  const fetchPosts = async () => {
+    let query = supabase
+      .from('forum_posts')
+      .select(`
+        *,
+        forum_categories(name)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (selectedCategory !== 'all') {
+      query = query.eq('category_id', selectedCategory);
+    }
+
+    const { data, error } = await query;
+    
+    if (error) {
+      toast.error('Failed to load posts');
+      setLoading(false);
+      return;
+    }
+    
+    setPosts(data || []);
+    setLoading(false);
+  };
+
+  const handleCreatePost = async () => {
+    if (!user || !newPost.title.trim() || !newPost.content.trim() || !newPost.category_id) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('forum_posts')
+      .insert({
+        title: newPost.title.trim(),
+        content: newPost.content.trim(),
+        category_id: newPost.category_id,
+        user_id: user.id
+      });
+
+    if (error) {
+      toast.error('Failed to create post');
+      return;
+    }
+
+    toast.success('Post created successfully!');
+    setNewPost({ title: '', content: '', category_id: '' });
+    setShowCreatePost(false);
+    fetchPosts();
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <TopNavigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <TopNavigation />
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-foreground mb-2">Baobab Talks</h1>
+          <p className="text-muted-foreground">Join the conversation with fellow trivia enthusiasts</p>
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            variant={selectedCategory === 'all' ? 'default' : 'outline'}
+            onClick={() => setSelectedCategory('all')}
+            size="sm"
+          >
+            All Categories
+          </Button>
+          {categories.map((category) => (
+            <Button
+              key={category.id}
+              variant={selectedCategory === category.id ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory(category.id)}
+              size="sm"
+            >
+              {category.name}
+            </Button>
+          ))}
+        </div>
+
+        {/* Create Post Section */}
+        {isAuthenticated ? (
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" />
+                  Start a Discussion
+                </CardTitle>
+                <Button
+                  onClick={() => setShowCreatePost(!showCreatePost)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Post
+                </Button>
+              </div>
+            </CardHeader>
+            {showCreatePost && (
+              <CardContent className="space-y-4">
+                <Select value={newPost.category_id} onValueChange={(value) => setNewPost({ ...newPost, category_id: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="Post title..."
+                  value={newPost.title}
+                  onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                />
+                <Textarea
+                  placeholder="What's on your mind?"
+                  value={newPost.content}
+                  onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                  rows={4}
+                />
+                <div className="flex gap-2">
+                  <Button onClick={handleCreatePost}>Post</Button>
+                  <Button variant="outline" onClick={() => setShowCreatePost(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        ) : (
+          <Card className="mb-6">
+            <CardContent className="py-6 text-center">
+              <p className="text-muted-foreground mb-4">Sign in to join the discussion</p>
+              <Link to="/auth">
+                <Button>Sign In</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Posts List */}
+        <div className="space-y-4">
+          {posts.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                No posts found in this category. Be the first to start a discussion!
+              </CardContent>
+            </Card>
+          ) : (
+            posts.map((post) => (
+              <Card key={post.id} className="hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg mb-2">{post.title}</CardTitle>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Badge variant="secondary">{post.forum_categories.name}</Badge>
+                        <span>•</span>
+                        <span>{formatDate(post.created_at)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Forum;
