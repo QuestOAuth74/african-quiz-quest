@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -31,9 +32,10 @@ interface QuestionFormProps {
   isOpen: boolean;
   onClose: () => void;
   editingQuestion?: Question | null;
+  isRealtimeMode?: boolean;
 }
 
-const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) => {
+const QuestionForm = ({ isOpen, onClose, editingQuestion, isRealtimeMode = false }: QuestionFormProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -249,8 +251,15 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
 
       if (optionsError) throw optionsError;
 
+      const successMessage = editingQuestion 
+        ? isRealtimeMode 
+          ? "Question updated in real-time!" 
+          : "Question updated successfully"
+        : "Question created successfully";
+
       toast({
-        title: editingQuestion ? "Question updated successfully" : "Question created successfully",
+        title: successMessage,
+        ...(isRealtimeMode && { description: "Changes are live for all quiz participants" })
       });
       soundEffects.playSuccess();
 
@@ -278,9 +287,19 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] jeopardy-card">
         <DialogHeader>
-          <DialogTitle>{editingQuestion ? "Edit Question" : "Create New Question"}</DialogTitle>
+          <DialogTitle>
+            {editingQuestion ? "Edit Question" : "Create New Question"}
+            {isRealtimeMode && (
+              <Badge variant="destructive" className="ml-2 text-xs">
+                LIVE EDITING
+              </Badge>
+            )}
+          </DialogTitle>
           <DialogDescription>
-            Fill in all the details for the question
+            {isRealtimeMode 
+              ? "⚡ Changes will be applied immediately to the active quiz"
+              : "Fill in all the details for the question"
+            }
           </DialogDescription>
         </DialogHeader>
         

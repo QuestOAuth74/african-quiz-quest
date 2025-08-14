@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, CheckCircle, XCircle, Info } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TopNavigation from "@/components/TopNavigation";
+import QuizAdminOverlay from "@/components/admin/QuizAdminOverlay";
+import { useRealtimeQuestions } from "@/hooks/useRealtimeQuestions";
 
 interface Question {
   id: string;
@@ -24,6 +26,7 @@ interface QuestionOption {
   id: string;
   text: string;
   option_type: string;
+  question_id: string;
 }
 
 interface Category {
@@ -48,6 +51,10 @@ const Quiz = () => {
     correct: boolean;
     selectedOption: string;
   }[]>([]);
+
+  // Get all question IDs for realtime subscription
+  const questionIds = questions.map(q => q.id);
+  const { getQuestion, getOptions, hasUpdates } = useRealtimeQuestions(questionIds);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -123,23 +130,38 @@ const Quiz = () => {
 
   const loadOptionsForQuestion = async (questionId: string) => {
     try {
-      const { data: optionsData, error } = await supabase
+      const { data: optionsData, error: optionsError } = await supabase
         .from('question_options')
         .select('*')
-        .eq('question_id', questionId);
+        .eq('question_id', questionId)
+        .order('created_at');
 
-      if (error) {
-        console.error('Options error:', error);
-        throw error;
+      if (optionsError) {
+        console.error('Options error:', optionsError);
+        toast({
+          title: "Failed to load question options",
+          description: optionsError.message,
+          variant: "destructive",
+        });
+        return;
       }
+
       setOptions(optionsData || []);
     } catch (error) {
       console.error('Error loading options:', error);
       toast({
-        title: "Error",
-        description: "Failed to load question options.",
+        title: "Error loading options",
+        description: "Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  // Force reload current question options when realtime updates occur
+  const handleRealtimeUpdate = () => {
+    if (questions.length > 0 && currentQuestionIndex < questions.length) {
+      const currentQuestionId = questions[currentQuestionIndex].id;
+      loadOptionsForQuestion(currentQuestionId);
     }
   };
 
@@ -228,12 +250,38 @@ const Quiz = () => {
     return categories.find(c => c.id === question.category_id);
   };
 
-  if (loading || isLoadingQuestions) {
+  // Get current question with potential realtime updates
+  const currentQuestion = questions.length > 0 && currentQuestionIndex < questions.length 
+    ? getQuestion(questions[currentQuestionIndex].id, questions[currentQuestionIndex])
+    : null;
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-theme-brown-dark">
+      <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light flex items-center justify-center">
         <TopNavigation />
-        <div className="pt-20 flex items-center justify-center min-h-screen">
-          <div className="text-theme-yellow-light text-xl">Loading quiz...</div>
+        <QuizAdminOverlay 
+          currentQuestionId={currentQuestion?.id}
+          onQuestionUpdate={handleRealtimeUpdate}
+        />
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-yellow mx-auto mb-4"></div>
+          <p className="text-theme-yellow font-orbitron">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoadingQuestions) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light flex items-center justify-center">
+        <TopNavigation />
+        <QuizAdminOverlay 
+          currentQuestionId={currentQuestion?.id}
+          onQuestionUpdate={handleRealtimeUpdate}
+        />
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-yellow mx-auto mb-4"></div>
+          <p className="text-theme-yellow font-orbitron">Loading quiz questions...</p>
         </div>
       </div>
     );
@@ -269,14 +317,23 @@ const Quiz = () => {
     );
   }
 
-  const currentQuestion = questions[currentQuestionIndex];
+  // Get current options with potential realtime updates  
+  const currentOptions = currentQuestion 
+    ? getOptions(currentQuestion.id, options)
+    : options;
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
   const category = getCurrentCategory();
 
   return (
-    <div className="min-h-screen bg-theme-brown-dark">
+    <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light">
       <TopNavigation />
-      <div className="pt-20 container mx-auto px-4 py-8 max-w-4xl">
+      
+      <QuizAdminOverlay 
+        currentQuestionId={currentQuestion?.id}
+        onQuestionUpdate={handleRealtimeUpdate}
+      />
+
+      <div className="container mx-auto px-4 py-24 max-w-4xl">
         <Button
           onClick={() => navigate('/quiz-setup')}
           variant="ghost"
@@ -305,8 +362,13 @@ const Quiz = () => {
                 </Badge>
               )}
               <Badge variant="outline" className="border-theme-yellow/30 text-theme-yellow-light">
-                {currentQuestion.points} points
+                {currentQuestion?.points} points
               </Badge>
+              {hasUpdates && (
+                <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-800">
+                  Updated Live
+                </Badge>
+              )}
             </div>
             <div className="text-theme-yellow-light">
               Current Score: <span className="text-theme-yellow font-semibold">{score}</span>
@@ -334,7 +396,7 @@ const Quiz = () => {
 
             {/* Answer Options */}
             <div className="space-y-3">
-              {options.map((option, index) => {
+              {currentOptions.map((option, index) => {
                 const isSelected = selectedAnswer === option.id;
                 const isCorrect = option.option_type === 'correct';
                 const showCorrectness = showResult;
