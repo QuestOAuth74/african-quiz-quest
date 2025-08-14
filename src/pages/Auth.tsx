@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, ArrowLeft, User, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, User, Mail, Lock, Shield } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+
+const HCAPTCHA_SITE_KEY = "3aea831e-1fce-42ba-a638-0fe8210e1d4a";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,11 +20,25 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [signInCaptchaToken, setSignInCaptchaToken] = useState<string | null>(null);
+  const [signUpCaptchaToken, setSignUpCaptchaToken] = useState<string | null>(null);
+  const signInCaptchaRef = useRef<HCaptcha>(null);
+  const signUpCaptchaRef = useRef<HCaptcha>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!signInCaptchaToken) {
+      toast({
+        title: "Verification Required",
+        description: "Please complete the security verification to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -49,6 +66,9 @@ const Auth = () => {
           title: "Welcome back!",
           description: "You have successfully signed in.",
         });
+        // Clear captcha token after successful login
+        setSignInCaptchaToken(null);
+        signInCaptchaRef.current?.resetCaptcha();
         navigate("/");
       }
     } catch (error) {
@@ -64,6 +84,15 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!signUpCaptchaToken) {
+      toast({
+        title: "Verification Required",
+        description: "Please complete the security verification to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     if (!displayName.trim()) {
       toast({
@@ -127,11 +156,13 @@ const Auth = () => {
           title: "Account Created!",
           description: "Please check your email to verify your account before signing in.",
         });
-        // Clear form
+        // Clear form and captcha
         setEmail("");
         setPassword("");
         setConfirmPassword("");
         setDisplayName("");
+        setSignUpCaptchaToken(null);
+        signUpCaptchaRef.current?.resetCaptcha();
       }
     } catch (error) {
       toast({
@@ -280,10 +311,27 @@ const Auth = () => {
                     </div>
                   </div>
                   
+                  {/* hCaptcha for Sign In */}
+                  <div className="space-y-2">
+                    <Label className="text-foreground font-medium flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-primary" />
+                      Security Verification
+                    </Label>
+                    <div className="flex justify-center p-4 bg-background/30 rounded-xl border border-border/30">
+                      <HCaptcha
+                        ref={signInCaptchaRef}
+                        sitekey={HCAPTCHA_SITE_KEY}
+                        onVerify={(token) => setSignInCaptchaToken(token)}
+                        onExpire={() => setSignInCaptchaToken(null)}
+                        onError={() => setSignInCaptchaToken(null)}
+                      />
+                    </div>
+                  </div>
+                  
                   <Button
                     type="submit"
-                    disabled={isLoading}
-                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02]"
+                    disabled={isLoading || !signInCaptchaToken}
+                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
                   >
                     {isLoading ? "Signing In..." : "Sign In"}
                   </Button>
@@ -397,10 +445,27 @@ const Auth = () => {
                     </div>
                   </div>
                   
+                  {/* hCaptcha for Sign Up */}
+                  <div className="space-y-2">
+                    <Label className="text-foreground font-medium flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-primary" />
+                      Security Verification
+                    </Label>
+                    <div className="flex justify-center p-4 bg-background/30 rounded-xl border border-border/30">
+                      <HCaptcha
+                        ref={signUpCaptchaRef}
+                        sitekey={HCAPTCHA_SITE_KEY}
+                        onVerify={(token) => setSignUpCaptchaToken(token)}
+                        onExpire={() => setSignUpCaptchaToken(null)}
+                        onError={() => setSignUpCaptchaToken(null)}
+                      />
+                    </div>
+                  </div>
+                  
                   <Button
                     type="submit"
-                    disabled={isLoading}
-                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02]"
+                    disabled={isLoading || !signUpCaptchaToken}
+                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
                   >
                     {isLoading ? "Creating Account..." : "Create Account"}
                   </Button>
