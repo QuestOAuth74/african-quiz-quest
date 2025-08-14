@@ -21,6 +21,7 @@ interface Question {
   points: number;
   image_url: string | null;
   category_id: string;
+  question_options?: QuestionOption[]; // Added for unified data structure
 }
 
 interface QuestionOption {
@@ -79,21 +80,26 @@ const Quiz = () => {
       const selectedCategoryIds = categoriesParam ? categoriesParam.split(',') : [];
       const questionCount = countParam ? parseInt(countParam) : 10;
       
-      // Load categories first
+      // Load categories first (same logic as Jeopardy)
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
-        .select('*');
+        .select('*')
+        .order('name');
 
       if (categoriesError) throw categoriesError;
       setCategories(categoriesData || []);
 
-      // Build questions query
+      // Build questions query (unified with Jeopardy logic)
       let questionsQuery = supabase
         .from('questions')
-        .select('*')
+        .select(`
+          *,
+          categories (name),
+          question_options (*)
+        `)
         .limit(50); // Get more questions to shuffle client-side
       
-      // Filter by selected categories if provided
+      // Filter by selected categories if provided (same as Jeopardy)
       if (selectedCategoryIds.length > 0) {
         questionsQuery = questionsQuery.in('category_id', selectedCategoryIds);
       }
@@ -109,7 +115,10 @@ const Quiz = () => {
         // Shuffle questions client-side and take the requested number
         const shuffledQuestions = [...questionsData].sort(() => Math.random() - 0.5).slice(0, questionCount);
         setQuestions(shuffledQuestions);
-        loadOptionsForQuestion(shuffledQuestions[0].id);
+        // Load options from the joined data (unified with Jeopardy)
+        if (shuffledQuestions[0]?.question_options) {
+          setOptions(shuffledQuestions[0].question_options);
+        }
       } else {
         toast({
           title: "No Questions Available",
@@ -131,6 +140,14 @@ const Quiz = () => {
 
   const loadOptionsForQuestion = async (questionId: string) => {
     try {
+      // Find the question in current questions data (unified approach)
+      const currentQuestion = questions.find(q => q.id === questionId);
+      if (currentQuestion?.question_options) {
+        setOptions(currentQuestion.question_options);
+        return;
+      }
+
+      // Fallback to database query if options not in current data
       const { data: optionsData, error: optionsError } = await supabase
         .from('question_options')
         .select('*')

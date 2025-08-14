@@ -38,6 +38,7 @@ const QuizSetup = () => {
 
   const loadCategories = async () => {
     try {
+      // Use same category loading logic as Jeopardy
       const { data, error } = await supabase
         .from('categories')
         .select('*')
