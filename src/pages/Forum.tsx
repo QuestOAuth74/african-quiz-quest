@@ -93,8 +93,8 @@ const Forum = () => {
       .from('forum_posts')
       .select(`
         *,
-        forum_categories(name),
-        profiles(display_name, email)
+        forum_categories!fk_forum_posts_category_id(name),
+        profiles!fk_forum_posts_user_id(display_name, email)
       `)
       .order('created_at', { ascending: false });
 
@@ -132,7 +132,7 @@ const Forum = () => {
       .from('forum_post_replies')
       .select(`
         *,
-        profiles(display_name, email)
+        profiles!fk_forum_post_replies_user_id(display_name, email)
       `)
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
