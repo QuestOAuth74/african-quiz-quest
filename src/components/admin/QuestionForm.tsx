@@ -35,6 +35,9 @@ interface QuestionFormProps {
 const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     text: "",
     categoryId: "",
@@ -104,6 +107,11 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
         options: optionTexts,
         correctAnswer: correctIndex,
       });
+
+      // Set image preview if editing question has image
+      if (editingQuestion.image_url) {
+        setImagePreview(editingQuestion.image_url);
+      }
     } catch (error: any) {
       toast({
         title: "Error loading question data",
@@ -125,6 +133,40 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
       options: ["", "", "", ""],
       correctAnswer: 0,
     });
+    setSelectedFile(null);
+    setImagePreview(null);
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    
+    const { data, error } = await supabase.storage
+      .from('question-images')
+      .upload(fileName, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('question-images')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setFormData({ ...formData, hasImage: true });
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,6 +177,15 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
       // Validate form
       if (!formData.text || !formData.categoryId || formData.options.some(opt => !opt.trim())) {
         throw new Error("Please fill in all required fields");
+      }
+
+      let imageUrl = formData.imageUrl;
+      
+      // Upload new image if selected
+      if (selectedFile) {
+        setUploadingImage(true);
+        imageUrl = await uploadImage(selectedFile);
+        setUploadingImage(false);
       }
 
       let questionId = editingQuestion?.id;
@@ -149,8 +200,8 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
             points: formData.points,
             explanation: formData.explanation || null,
             historical_context: formData.historicalContext || null,
-            image_url: formData.imageUrl || null,
-            has_image: formData.hasImage,
+            image_url: imageUrl || null,
+            has_image: formData.hasImage && !!imageUrl,
           })
           .eq("id", editingQuestion.id);
 
@@ -172,8 +223,8 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
             points: formData.points,
             explanation: formData.explanation || null,
             historical_context: formData.historicalContext || null,
-            image_url: formData.imageUrl || null,
-            has_image: formData.hasImage,
+            image_url: imageUrl || null,
+            has_image: formData.hasImage && !!imageUrl,
             created_by: userData.user?.id,
           })
           .select()
@@ -209,6 +260,7 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
       });
     } finally {
       setIsLoading(false);
+      setUploadingImage(false);
     }
   };
 
@@ -329,21 +381,58 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
                 <Checkbox
                   id="hasImage"
                   checked={formData.hasImage}
-                  onCheckedChange={(checked) => setFormData({ ...formData, hasImage: !!checked })}
+                  onCheckedChange={(checked) => {
+                    setFormData({ ...formData, hasImage: !!checked });
+                    if (!checked) {
+                      setSelectedFile(null);
+                      setImagePreview(null);
+                    }
+                  }}
                 />
                 <Label htmlFor="hasImage">This question has an image</Label>
               </div>
 
               {formData.hasImage && (
-                <div className="space-y-2">
-                  <Label htmlFor="imageUrl">Image URL</Label>
-                  <Input
-                    id="imageUrl"
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                    className="bg-input border-border"
-                  />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="imageFile">Upload Image</Label>
+                    <input
+                      id="imageFile"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                  
+                  {imagePreview && (
+                    <div className="space-y-2">
+                      <Label>Image Preview</Label>
+                      <div className="border border-border rounded-lg p-2">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="max-w-full h-48 object-contain mx-auto rounded"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="imageUrl">Or paste Image URL</Label>
+                    <Input
+                      id="imageUrl"
+                      value={formData.imageUrl}
+                      onChange={(e) => {
+                        setFormData({ ...formData, imageUrl: e.target.value });
+                        if (e.target.value && !selectedFile) {
+                          setImagePreview(e.target.value);
+                        }
+                      }}
+                      placeholder="https://example.com/image.jpg"
+                      className="bg-input border-border"
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -357,8 +446,10 @@ const QuestionForm = ({ isOpen, onClose, editingQuestion }: QuestionFormProps) =
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading} className="jeopardy-button">
-                {isLoading ? "Saving..." : editingQuestion ? "Update Question" : "Create Question"}
+              <Button type="submit" disabled={isLoading || uploadingImage} className="jeopardy-button">
+                {isLoading ? (
+                  uploadingImage ? "Uploading Image..." : "Saving..."
+                ) : editingQuestion ? "Update Question" : "Create Question"}
               </Button>
             </div>
           </form>
