@@ -56,32 +56,37 @@ export function Leaderboard({ onBack }: LeaderboardProps) {
 
       if (statsError) throw statsError;
 
-      // Get user emails separately
+      // Get user emails and filter out admin users
       const userIds = statsData?.map(stat => stat.user_id) || [];
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('user_id, email')
+        .select('user_id, email, is_admin')
         .in('user_id', userIds);
 
       if (profilesError) {
         console.warn('Could not load user profiles:', profilesError);
       }
 
-      // Process the data and add rankings
-      const processedData = statsData?.map((stat, index) => {
-        const profile = profilesData?.find(p => p.user_id === stat.user_id);
-        return {
-          ...stat,
-          user_email: profile?.email || 'Anonymous User',
-          accuracy_percentage: stat.total_questions_answered > 0 
-            ? Math.round((stat.total_questions_correct / stat.total_questions_answered) * 100)
-            : 0,
-          avg_score_per_game: stat.total_games_played > 0 
-            ? Math.round(stat.total_points_earned / stat.total_games_played)
-            : 0,
-          rank: index + 1
-        };
-      }) || [];
+      // Filter out admin users and process the data
+      const nonAdminProfiles = profilesData?.filter(profile => !profile.is_admin) || [];
+      const nonAdminUserIds = nonAdminProfiles.map(profile => profile.user_id);
+      
+      const processedData = statsData
+        ?.filter(stat => nonAdminUserIds.includes(stat.user_id))
+        ?.map((stat, index) => {
+          const profile = nonAdminProfiles.find(p => p.user_id === stat.user_id);
+          return {
+            ...stat,
+            user_email: profile?.email || 'Anonymous User',
+            accuracy_percentage: stat.total_questions_answered > 0 
+              ? Math.round((stat.total_questions_correct / stat.total_questions_answered) * 100)
+              : 0,
+            avg_score_per_game: stat.total_games_played > 0 
+              ? Math.round(stat.total_points_earned / stat.total_games_played)
+              : 0,
+            rank: index + 1
+          };
+        }) || [];
 
       setLeaderboardData(processedData);
 
