@@ -239,7 +239,7 @@ const Forum = () => {
         return;
       }
 
-      toast.success('Reply submitted!');
+      toast.success('Reply submitted! It will be visible once approved by a moderator.');
       setReplyContent(prev => ({ ...prev, [postId]: '' }));
       await fetchReplies(postId);
     } catch (error) {
@@ -344,7 +344,7 @@ const Forum = () => {
         return;
       }
 
-      toast.success('Post created successfully!');
+      toast.success('Post created successfully! It will be visible once approved by a moderator.');
       setNewPost({ title: '', content: '', category_id: '' });
       removeImage();
       setShowCreatePost(false);

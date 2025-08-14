@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import CategoryManager from "@/components/admin/CategoryManager";
 import { CSVUpload } from "@/components/admin/CSVUpload";
 import QuestionManager from "@/components/admin/QuestionManager";
+import ForumModeration from "@/components/admin/ForumModeration";
 import { LogOut, Users, FileQuestion, FolderOpen, Upload } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -122,7 +123,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="questions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-card">
+          <TabsList className="grid w-full grid-cols-4 bg-card">
             <TabsTrigger value="questions" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Questions
             </TabsTrigger>
@@ -132,6 +133,9 @@ const AdminDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="categories" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Categories
+            </TabsTrigger>
+            <TabsTrigger value="moderation" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              Moderation
             </TabsTrigger>
           </TabsList>
           
@@ -145,6 +149,10 @@ const AdminDashboard = () => {
           
           <TabsContent value="categories">
             <CategoryManager onStatsUpdate={loadStats} />
+          </TabsContent>
+          
+          <TabsContent value="moderation">
+            <ForumModeration />
           </TabsContent>
         </Tabs>
       </div>

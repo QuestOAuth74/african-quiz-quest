@@ -100,6 +100,9 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: string
           post_id: string
           updated_at: string
           user_id: string
@@ -108,6 +111,9 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string
           post_id: string
           updated_at?: string
           user_id: string
@@ -116,6 +122,9 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string
           post_id?: string
           updated_at?: string
           user_id?: string
@@ -194,6 +203,9 @@ export type Database = {
           created_at: string
           id: string
           image_url: string | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: string
           title: string
           updated_at: string
           upvote_count: number
@@ -205,6 +217,9 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string
           title: string
           updated_at?: string
           upvote_count?: number
@@ -216,6 +231,9 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string
           title?: string
           updated_at?: string
           upvote_count?: number
