@@ -69,32 +69,27 @@ const Index = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // AI turn management - triggers when AI becomes active
+  // AI turn management - only triggers when it's truly AI's turn to pick a question
   useEffect(() => {
     const activePlayer = players.find(p => p.isActive);
     
-    if (activePlayer?.name === "Computer" && gameConfigured) {
-      console.log('AI is now active');
+    // AI should only act when:
+    // 1. AI is active
+    // 2. Game is configured 
+    // 3. No question is currently selected (meaning it's time to pick a new question)
+    // 4. No modal is open (meaning previous turn is completely finished)
+    if (activePlayer?.name === "Computer" && 
+        gameConfigured && 
+        !selectedQuestion && 
+        !isQuestionModalOpen) {
       
-      // Only act if no question is currently selected (AI's turn to pick)
-      if (!isQuestionModalOpen && !selectedQuestion) {
-        console.log('AI selecting random question');
-        const timer = setTimeout(() => {
-          handleAISelectQuestion();
-        }, 1500);
-        return () => clearTimeout(timer);
-      }
-      
-      // If a question is already selected and modal is open, AI answers it
-      if (isQuestionModalOpen && selectedQuestion) {
-        console.log('AI answering existing question');
-        const timer = setTimeout(() => {
-          handleAITurn(selectedQuestion);
-        }, 2000);
-        return () => clearTimeout(timer);
-      }
+      console.log('AI turn: selecting random question');
+      const timer = setTimeout(() => {
+        handleAISelectQuestion();
+      }, 1500);
+      return () => clearTimeout(timer);
     }
-  }, [players, isQuestionModalOpen, selectedQuestion, gameConfigured]);
+  }, [players, selectedQuestion, isQuestionModalOpen, gameConfigured]);
 
   const [playerCount, setPlayerCount] = useState<number>(2);
 
@@ -298,9 +293,19 @@ const Index = () => {
       return;
     }
     setSelectedQuestion(question);
-    setSelectedQuestionGridId(questionId); // Store the grid ID for marking as answered
+    setSelectedQuestionGridId(questionId);
     setIsQuestionModalOpen(true);
-    console.log('Question selected:', questionId, 'Active player:', players.find(p => p.isActive)?.name);
+    
+    const activePlayer = players.find(p => p.isActive);
+    console.log('Question selected:', questionId, 'Active player:', activePlayer?.name);
+    
+    // If AI selected the question, it should answer after a delay
+    if (activePlayer?.name === "Computer") {
+      console.log('AI will answer its selected question');
+      setTimeout(() => {
+        handleAITurn(question);
+      }, 2000);
+    }
   };
 
   const handleAISelectQuestion = () => {
