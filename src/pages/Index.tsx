@@ -196,7 +196,7 @@ const Index = () => {
         questionsMap[`${cat.id}-${index + 1}`] = {
           id: q.id,
           text: q.text,
-          points: q.points,
+          points: q.points, // Use actual database point value
           category: q.categories.name,
           explanation: q.explanation,
           historicalContext: q.historical_context,
@@ -210,11 +210,11 @@ const Index = () => {
         id: cat.id,
         name: cat.name,
         questions: Array.from({ length: rowCount }, (_, index) => {
-          const expectedPoints = (index + 1) * 100;
-          const hasQuestion = index < questionsForRows.length; // Check if we have a question for this position
+          const hasQuestion = index < questionsForRows.length;
+          const actualQuestion = questionsForRows[index];
           return {
             id: `${cat.id}-${index + 1}`,
-            points: expectedPoints,
+            points: hasQuestion ? actualQuestion.points : (index + 1) * 100, // Use actual points if question exists
             isAnswered: false,
             hasQuestion: hasQuestion
           };
