@@ -64,13 +64,24 @@ export function GameHeader({ players, gameMode, onNewGame, currentRound = 1, tot
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    {/* Custom Player Icons */}
+                    <div className={`w-12 h-12 rounded-full overflow-hidden border-2 transition-all duration-300 ${
                       player.isActive 
-                        ? 'bg-jeopardy-gold animate-pulse shadow-lg shadow-jeopardy-gold/50' 
-                        : 'bg-muted'
-                    }`} />
+                        ? 'border-jeopardy-gold shadow-lg shadow-jeopardy-gold/50 animate-pulse' 
+                        : 'border-muted opacity-70'
+                    }`}>
+                      <img 
+                        src={
+                          player.id === 'player1' || player.id === 'computer'
+                            ? "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/historia%20africana%201.png"
+                            : "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/historia%20africana%202.png"
+                        }
+                        alt={`${player.name} avatar`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     {player.id === leader.id && player.score > 0 && (
-                      <Trophy className="absolute -top-1 -right-1 text-jeopardy-gold" size={10} />
+                      <Trophy className="absolute -top-1 -right-1 text-jeopardy-gold bg-background rounded-full p-0.5" size={16} />
                     )}
                   </div>
                   <div>
