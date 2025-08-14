@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GameModeSelector } from "@/components/GameModeSelector";
 import GameSetup from "@/components/GameSetup";
 import { GameHeader } from "@/components/GameHeader";
@@ -11,8 +11,9 @@ import { AudioControls } from "@/components/AudioControls";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import GameCompletionModal from "@/components/GameCompletionModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface Question {
   id: string;
@@ -53,9 +54,11 @@ const Index = () => {
   const [gameConfig, setGameConfig] = useState({ categories: [], rowCount: 5 });
   const [questionsData, setQuestionsData] = useState<{[key: string]: Question}>({});
   const [gameStartTime, setGameStartTime] = useState<Date | null>(null);
+  const [isGameCompletionModalOpen, setIsGameCompletionModalOpen] = useState(false);
   const [gameStats, setGameStats] = useState({
     questionsAnswered: 0,
-    questionsCorrect: 0
+    questionsCorrect: 0,
+    streakCount: 0
   });
   const [aiTurnInProgress, setAiTurnInProgress] = useState(false); // Prevent multiple AI turns
   const { toast } = useToast();
@@ -255,7 +258,7 @@ const Index = () => {
     setCategories(gameCategories);
     setGameConfigured(true);
     setGameStartTime(new Date());
-    setGameStats({ questionsAnswered: 0, questionsCorrect: 0 });
+    setGameStats({ questionsAnswered: 0, questionsCorrect: 0, streakCount: 0 });
   };
 
   const handleQuestionSelect = (categoryId: string, questionId: string) => {
@@ -418,7 +421,8 @@ const Index = () => {
       // Update game stats
       setGameStats(prev => ({
         questionsAnswered: prev.questionsAnswered + 1,
-        questionsCorrect: prev.questionsCorrect + (isCorrect ? 1 : 0)
+        questionsCorrect: prev.questionsCorrect + (isCorrect ? 1 : 0),
+        streakCount: prev.streakCount
       }));
     }
     // For 'pass' and 'timeout', no points are gained or lost
@@ -566,11 +570,8 @@ const Index = () => {
 
       console.log('Game record inserted successfully!');
 
-      toast({
-        title: "Game Completed!",
-        description: `Final Score: $${currentPlayer.score.toLocaleString()}. Check the leaderboard to see your ranking!`,
-        variant: "default",
-      });
+      // Show completion modal instead of toast
+      setIsGameCompletionModalOpen(true);
     } catch (error) {
       console.error('Error recording game completion:', error);
       toast({
@@ -582,6 +583,7 @@ const Index = () => {
   };
 
   const handleNewGame = () => {
+    setIsGameCompletionModalOpen(false);
     setGameMode(null);
     setGameConfigured(false);
     setCategories(gameConfig.categories.map(cat => ({
@@ -590,7 +592,14 @@ const Index = () => {
     })));
     setPlayers(prev => prev.map(player => ({ ...player, score: 0 })));
     setGameStartTime(null);
-    setGameStats({ questionsAnswered: 0, questionsCorrect: 0 });
+    setGameStats({ questionsAnswered: 0, questionsCorrect: 0, streakCount: 0 });
+    setIsQuestionModalOpen(false);
+    setSelectedQuestion(null);
+    setSelectedQuestionGridId('');
+  };
+
+  const handleViewLeaderboard = () => {
+    navigate('/leaderboard');
   };
 
   const handleBackToModeSelection = () => {
@@ -682,6 +691,14 @@ const Index = () => {
         onAnswer={handleAnswer}
         currentPlayer={players.find(p => p.isActive)?.name}
         gameMode={gameMode}
+      />
+      
+      <GameCompletionModal
+        isOpen={isGameCompletionModalOpen}
+        onClose={() => setIsGameCompletionModalOpen(false)}
+        players={players}
+        onNewGame={handleNewGame}
+        onViewLeaderboard={handleViewLeaderboard}
       />
     </div>
   );
