@@ -11,6 +11,7 @@ import { MessageCircle, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
+import ForumHeader from '@/components/forum/ForumHeader';
 
 interface Category {
   id: string;
@@ -133,10 +134,7 @@ const Forum = () => {
     <div className="min-h-screen bg-background">
       <TopNavigation />
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Baobab Talks</h1>
-          <p className="text-muted-foreground">Join the conversation with fellow trivia enthusiasts</p>
-        </div>
+        <ForumHeader />
 
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2 mb-6">
