@@ -60,7 +60,6 @@ const Index = () => {
     questionsCorrect: 0,
     streakCount: 0
   });
-  const [aiTurnInProgress, setAiTurnInProgress] = useState(false); // Prevent multiple AI turns
   const { toast } = useToast();
 
   // Redirect to auth if not authenticated and trying to access admin
@@ -69,6 +68,33 @@ const Index = () => {
       navigate('/auth');
     }
   }, [isAuthenticated, navigate]);
+
+  // AI turn management - triggers when AI becomes active
+  useEffect(() => {
+    const activePlayer = players.find(p => p.isActive);
+    
+    if (activePlayer?.name === "Computer" && gameConfigured) {
+      console.log('AI is now active');
+      
+      // If no question is selected, AI picks a random question
+      if (!isQuestionModalOpen && !selectedQuestion) {
+        console.log('AI selecting random question');
+        const timer = setTimeout(() => {
+          handleAISelectQuestion();
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
+      
+      // If a question is already selected and modal is open, AI answers it
+      if (isQuestionModalOpen && selectedQuestion) {
+        console.log('AI answering existing question');
+        const timer = setTimeout(() => {
+          handleAITurn(selectedQuestion);
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [players, isQuestionModalOpen, selectedQuestion, gameConfigured]);
 
   const [playerCount, setPlayerCount] = useState<number>(2);
 
@@ -274,26 +300,7 @@ const Index = () => {
     setSelectedQuestion(question);
     setSelectedQuestionGridId(questionId); // Store the grid ID for marking as answered
     setIsQuestionModalOpen(true);
-    setAiTurnInProgress(false); // Reset AI turn flag for new question
-    
-    // Check if AI is the active player and auto-play after a short delay
-    const activePlayer = players.find(p => p.isActive);
-    console.log('Question selected:', questionId, 'Active player:', activePlayer?.name);
-    
-    if (activePlayer?.name === "Computer" && !aiTurnInProgress) {
-      console.log('AI is active, scheduling AI turn in 2 seconds');
-      setAiTurnInProgress(true);
-      setTimeout(() => {
-        // Double-check AI is still active and question is still open
-        const currentActivePlayer = players.find(p => p.isActive);
-        if (currentActivePlayer?.name === "Computer" && selectedQuestion?.id === question.id) {
-          handleAITurn(question);
-        } else {
-          console.log('AI turn cancelled - conditions changed');
-          setAiTurnInProgress(false);
-        }
-      }, 2000);
-    }
+    console.log('Question selected:', questionId, 'Active player:', players.find(p => p.isActive)?.name);
   };
 
   const handleAISelectQuestion = () => {
@@ -330,22 +337,14 @@ const Index = () => {
   };
 
   const handleAITurn = (question: Question) => {
-    console.log('AI Turn triggered for question:', question.text, 'Points:', question.points);
-    console.log('AI turn in progress flag:', aiTurnInProgress);
-    
-    if (!aiTurnInProgress) {
-      console.log('AI turn not in progress, skipping');
-      return;
-    }
+    console.log('AI answering question:', question.text, 'Points:', question.points);
     
     const correctAnswerIndex = question.correctAnswerIndex;
     if (typeof correctAnswerIndex === 'number') {
       console.log('AI selecting correct answer at index:', correctAnswerIndex);
-      setAiTurnInProgress(false); // Reset flag before handling answer
       handleAnswer(correctAnswerIndex);
     } else {
       console.log('No correct answer index found for AI');
-      setAiTurnInProgress(false);
     }
   };
 
@@ -354,38 +353,16 @@ const Index = () => {
     let pointChange = 0;
     
     if (selectedAnswerIndex === 'skip') {
-      const currentPlayer = players.find(p => p.isActive);
-      const nextPlayer = players.find(p => !p.isActive);
-      
       // Switch to next player
       setPlayers(prev => prev.map(player => ({
         ...player,
         isActive: !player.isActive
       })));
       
-      // If next player is computer/AI, automatically pick correct answer after short delay
-      if (nextPlayer?.name === "Computer" && !aiTurnInProgress) {
-        setIsQuestionModalOpen(false);
-        setAiTurnInProgress(true);
-        setTimeout(() => {
-          if (selectedQuestion && !aiTurnInProgress) {
-            console.log('Skip handler - AI turn conditions no longer valid');
-            setAiTurnInProgress(false);
-            return;
-          }
-          if (selectedQuestion) {
-            handleAITurn(selectedQuestion);
-          }
-        }, 1000);
-        return;
-      } else {
-        // For human vs human multiplayer, restart countdown for next player
-        setIsQuestionModalOpen(false);
-        setTimeout(() => {
-          setIsQuestionModalOpen(true);
-        }, 100);
-        return;
-      }
+      setIsQuestionModalOpen(false);
+      setSelectedQuestion(null);
+      setSelectedQuestionGridId(null);
+      return;
     }
     
     if (typeof selectedAnswerIndex === 'number') {
@@ -491,42 +468,9 @@ const Index = () => {
         isActive: !player.isActive
       })));
       
-      // Check if the new active player is AI and there's no question modal open
-      const newActivePlayers = players.map(player => ({
-        ...player,
-        isActive: !player.isActive
-      }));
-      const newActivePlayer = newActivePlayers.find(p => p.isActive);
-      
-      if (newActivePlayer?.name === "Computer" && !isQuestionModalOpen && !aiTurnInProgress) {
-        console.log('AI becomes active, selecting its own question');
-        setAiTurnInProgress(true);
-        setTimeout(() => {
-          // Double-check AI is still active and no modal is open
-          const stillActivePlayer = players.find(p => !p.isActive)?.name; // Will be the new active player
-          if (stillActivePlayer === "Computer" && !isQuestionModalOpen) {
-            handleAISelectQuestion();
-          } else {
-            console.log('AI question selection cancelled - conditions changed');
-            setAiTurnInProgress(false);
-          }
-        }, 1500); // Give a bit of time for the UI to update
-      } else if (newActivePlayer?.name === "Computer" && selectedQuestion && isQuestionModalOpen && !aiTurnInProgress) {
-        console.log('AI becoming active with existing question, triggering AI turn');
-        setAiTurnInProgress(true);
-        setTimeout(() => {
-          // Double-check conditions are still valid
-          const stillActivePlayer = players.find(p => !p.isActive)?.name; // Will be the new active player
-          if (stillActivePlayer === "Computer" && selectedQuestion && isQuestionModalOpen) {
-            handleAITurn(selectedQuestion);
-          } else {
-            console.log('AI turn after switch cancelled - conditions changed');
-            setAiTurnInProgress(false);
-          }
-        }, 1000);
-      } else {
-        console.log('Player switch complete. New active player:', newActivePlayer?.name, 'Modal open:', isQuestionModalOpen, 'AI in progress:', aiTurnInProgress);
-      }
+      setIsQuestionModalOpen(false);
+      setSelectedQuestion(null);
+      setSelectedQuestionGridId(null);
     }, 3000);
   };
 
@@ -612,7 +556,6 @@ const Index = () => {
     setSelectedQuestion(null);
     setShowTeacherMode(false);
     setSkipCount(0);
-    setAiTurnInProgress(false); // Reset AI turn flag when modal closes
   };
 
   if (!gameMode) {
