@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import WelcomeModal from "@/components/WelcomeModal";
 import { OnlineMultiplayerLobby } from "@/components/OnlineMultiplayerLobby";
+import { OnlineGameInterface } from "@/components/OnlineGameInterface";
 
 interface Question {
   id: string;
@@ -715,6 +716,33 @@ const Index = () => {
             playerCount={playerCount}
             onBack={handleBackToModeSelection}
             onStartGame={handleGameSetup}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Render online game interface for online multiplayer
+  if (gameMode === 'online-multiplayer' && onlineGameRoomId) {
+    return (
+      <div className="min-h-screen overflow-hidden relative">
+        {/* Top Navigation */}
+        <TopNavigation />
+        
+        {/* Global Audio Controls */}
+        <div className="fixed top-4 right-4 z-50">
+          <AudioControls />
+        </div>
+
+        <div className="pt-16">
+          <OnlineGameInterface
+            roomId={onlineGameRoomId}
+            onBack={() => {
+              setGameMode(null);
+              setGameConfigured(false);
+              setOnlineGameRoomId(null);
+              setPlayers([]);
+            }}
           />
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Clock, Zap, Crown, ArrowLeft, Send, Check, X } from 'lucide-react';
+import { Users, Clock, Zap, Crown, ArrowLeft, Send, Check, X, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePlayerLobby } from '@/hooks/usePlayerLobby';
 import { useAuth } from '@/hooks/useAuth';
 import { useGameRoom } from '@/hooks/useGameRoom';
+import { GameConfigModal } from './GameConfigModal';
 import { toast } from 'sonner';
 
 interface LiveLobbyProps {
@@ -34,6 +35,8 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
   
   const { createRoom, addPlayerToRoom, findActiveGame, loading: roomLoading } = useGameRoom();
   const [activeGame, setActiveGame] = useState<any>(null);
+  const [configModalOpen, setConfigModalOpen] = useState(false);
+  const [challengeTarget, setChallengeTarget] = useState<any>(null);
 
   // Debug logging
   console.log('LiveLobby Debug:', {
@@ -55,6 +58,27 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
       setSelectedTab('requests');
     }
   }, [matchmakingRequests, user?.id]);
+
+  const handleChallengePlayer = (player: any) => {
+    setChallengeTarget(player);
+    setConfigModalOpen(true);
+  };
+
+  const handleSendConfiguredChallenge = async (config: { categories: string[]; rowCount: number }) => {
+    if (!user || !challengeTarget) return;
+    
+    try {
+      await sendMatchRequest(challengeTarget.user_id, config);
+      toast.success(`Challenge sent to ${challengeTarget.display_name}!`);
+      setConfigModalOpen(false);
+      setChallengeTarget(null);
+    } catch (error) {
+      console.error('Failed to send challenge:', error);
+      toast.error('Failed to send challenge');
+      setConfigModalOpen(false);
+      setChallengeTarget(null);
+    }
+  };
 
   const handleSendMatchRequest = async (targetUserId: string) => {
     const success = await sendMatchRequest(targetUserId, gameConfig);
@@ -316,10 +340,11 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
                           </div>
                           {player.player_status === 'waiting' && player.user_id !== user?.id && (
                             <Button
-                              onClick={() => handleSendMatchRequest(player.user_id)}
+                              onClick={() => handleChallengePlayer(player)}
                               size="sm"
                               className="bg-green-600 hover:bg-green-700"
                             >
+                              <Settings className="w-4 h-4 mr-1" />
                               Challenge
                             </Button>
                           )}
@@ -368,11 +393,11 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
                             </div>
                           </div>
                           <Button
-                            onClick={() => handleSendMatchRequest(player.user_id)}
+                            onClick={() => handleChallengePlayer(player)}
                             size="sm"
                             className="bg-green-600 hover:bg-green-700"
                           >
-                            <Send className="w-4 h-4 mr-2" />
+                            <Settings className="w-4 h-4 mr-1" />
                             Challenge
                           </Button>
                         </div>
@@ -496,6 +521,17 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
           )}
         </div>
       </div>
+
+      {/* Game Configuration Modal */}
+      <GameConfigModal
+        isOpen={configModalOpen}
+        onClose={() => {
+          setConfigModalOpen(false);
+          setChallengeTarget(null);
+        }}
+        onConfirm={handleSendConfiguredChallenge}
+        playerName={challengeTarget?.display_name || 'Player'}
+      />
     </div>
   );
 };
