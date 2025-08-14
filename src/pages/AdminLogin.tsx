@@ -19,45 +19,49 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Call the admin login edge function
+      const { data, error } = await supabase.functions.invoke('admin-login', {
+        body: {
+          email,
+          password,
+        },
       });
 
       if (error) {
         console.error('Login error:', error);
         toast({
           title: "Login Failed",
-          description: error.message,
+          description: error.message || "Authentication failed",
           variant: "destructive",
         });
         return;
       }
 
-      // Check if user is admin
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('user_id', data.user.id)
-        .single();
-
-      if (profileError) {
-        console.error('Profile error:', profileError);
+      if (!data || !data.success) {
         toast({
-          title: "Error",
-          description: "Failed to verify admin status",
+          title: "Login Failed",
+          description: data?.error || "Authentication failed",
           variant: "destructive",
         });
         return;
       }
 
-      if (!profile.is_admin) {
-        toast({
-          title: "Access Denied",
-          description: "You do not have administrator privileges",
-          variant: "destructive",
+      // Set the session manually if login was successful
+      if (data.session) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
         });
-        return;
+
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          toast({
+            title: "Error",
+            description: "Failed to establish session",
+            variant: "destructive",
+          });
+          return;
+        }
       }
 
       toast({
