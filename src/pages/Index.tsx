@@ -249,26 +249,29 @@ const Index = () => {
       return;
     }
 
-    // Group questions by category and organize by points
+    // Group questions by category and randomly assign to point tiers
     const questionsMap: {[key: string]: Question} = {};
     const gameCategories = selectedCategories.map(cat => {
       const categoryQuestions = questions.filter(q => q.category_id === cat.id);
+      
+      // Shuffle the questions randomly for this category
+      const shuffledQuestions = [...categoryQuestions].sort(() => Math.random() - 0.5);
       
       // Create questions for each row/point tier (100, 200, 300, 400, 500)
       const questionsForGrid = Array.from({ length: rowCount }, (_, index) => {
         const pointTier = (index + 1) * 100; // 100, 200, 300, 400, 500
         
-        // Find question for this exact point tier
-        const questionForTier = categoryQuestions.find(q => q.points === pointTier);
+        // Get the next available shuffled question for this tier
+        const questionForTier = shuffledQuestions[index];
         
         if (questionForTier) {
           const correctAnswerIndex = questionForTier.question_options.findIndex(opt => opt.option_type === 'correct');
           
-          // Map to questionsMap using grid position as key
+          // Map to questionsMap using grid position as key, but override points with tier points
           questionsMap[`${cat.id}-${index + 1}`] = {
             id: questionForTier.id,
             text: questionForTier.text,
-            points: questionForTier.points,
+            points: pointTier, // Use the tier points instead of original question points
             category: questionForTier.categories.name,
             explanation: questionForTier.explanation,
             historicalContext: questionForTier.historical_context,
@@ -280,7 +283,7 @@ const Index = () => {
           return questionForTier;
         }
         
-        return null; // No question available for this point tier
+        return null; // No question available for this tier
       });
       
       return {
