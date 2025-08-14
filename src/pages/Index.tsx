@@ -7,121 +7,29 @@ import { GameBoard } from "@/components/GameBoard";
 import QuestionModal from "@/components/QuestionModal";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-// Mock data for demonstration
-const mockCategories = [
-  {
-    id: "ancient",
-    name: "Ancient Civilizations",
-    questions: [
-      { id: "1", points: 100, isAnswered: false },
-      { id: "2", points: 200, isAnswered: false },
-      { id: "3", points: 300, isAnswered: false },
-      { id: "4", points: 400, isAnswered: false },
-      { id: "5", points: 500, isAnswered: false },
-    ]
-  },
-  {
-    id: "kingdoms",
-    name: "Great Kingdoms",
-    questions: [
-      { id: "6", points: 100, isAnswered: false },
-      { id: "7", points: 200, isAnswered: false },
-      { id: "8", points: 300, isAnswered: false },
-      { id: "9", points: 400, isAnswered: false },
-      { id: "10", points: 500, isAnswered: false },
-    ]
-  },
-  {
-    id: "independence",
-    name: "Independence",
-    questions: [
-      { id: "11", points: 100, isAnswered: false },
-      { id: "12", points: 200, isAnswered: false },
-      { id: "13", points: 300, isAnswered: false },
-      { id: "14", points: 400, isAnswered: false },
-      { id: "15", points: 500, isAnswered: false },
-    ]
-  },
-  {
-    id: "leaders",
-    name: "Leaders",
-    questions: [
-      { id: "16", points: 100, isAnswered: false },
-      { id: "17", points: 200, isAnswered: false },
-      { id: "18", points: 300, isAnswered: false },
-      { id: "19", points: 400, isAnswered: false },
-      { id: "20", points: 500, isAnswered: false },
-    ]
-  },
-  {
-    id: "culture",
-    name: "Culture & Arts",
-    questions: [
-      { id: "21", points: 100, isAnswered: false },
-      { id: "22", points: 200, isAnswered: false },
-      { id: "23", points: 300, isAnswered: false },
-      { id: "24", points: 400, isAnswered: false },
-      { id: "25", points: 500, isAnswered: false },
-    ]
-  }
-];
-
-const mockQuestions = {
-  "1": {
-    id: "1",
-    text: "This ancient Egyptian queen was known for her relationships with Julius Caesar and Mark Antony.",
-    options: [
-      { id: "1a", text: "Nefertiti", option_type: "incorrect" },
-      { id: "1b", text: "Cleopatra VII", option_type: "correct" },
-      { id: "1c", text: "Hatshepsut", option_type: "incorrect" },
-      { id: "1d", text: "Ankhesenamun", option_type: "incorrect" }
-    ],
-    correctAnswerIndex: 1,
-    points: 100,
-    category: "Ancient Civilizations",
-    explanation: "Cleopatra VII (69-30 BCE) was the last active pharaoh of Ancient Egypt. She was highly educated, speaking at least nine languages, and was known for her intelligence and political acumen. Her relationships with Julius Caesar and later Mark Antony were strategic political alliances aimed at preserving Egypt's independence from Rome.",
-    historicalContext: "Cleopatra ruled during the Ptolemaic period, a dynasty that had controlled Egypt for nearly 300 years after Alexander the Great's conquest. Her death marked the end of both the Ptolemaic dynasty and Egypt's independence, as the country became a Roman province.",
-    imageUrl: "https://images.unsplash.com/photo-1539650116574-75c0c6d73def?w=400&h=300&fit=crop&crop=center"
-  },
-  "2": {
-    id: "2",
-    text: "Which ancient civilization built Machu Picchu?",
-    options: [
-      { id: "2a", text: "Aztecs", option_type: "incorrect" },
-      { id: "2b", text: "Mayans", option_type: "incorrect" }, 
-      { id: "2c", text: "Incas", option_type: "correct" },
-      { id: "2d", text: "Olmecs", option_type: "incorrect" }
-    ],
-    correctAnswerIndex: 2,
-    points: 200,
-    category: "Ancient Civilizations",
-    explanation: "Machu Picchu was built by the Inca Empire around 1450 CE during the reign of Inca Pachacuti. This remarkable citadel sits at 2,430 meters above sea level in the Andes Mountains of Peru.",
-    historicalContext: "The site was likely a royal estate and sacred center. It was abandoned around 1572 during the Spanish conquest but remained hidden from the outside world until American historian Hiram Bingham brought it to international attention in 1911.",
-    imageUrl: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=400&h=300&fit=crop&crop=center"
-  },
-  "6": {
-    id: "6", 
-    text: "Who was the first Holy Roman Emperor?",
-    options: [
-      { id: "6a", text: "Charlemagne", option_type: "correct" },
-      { id: "6b", text: "Otto I", option_type: "incorrect" },
-      { id: "6c", text: "Frederick Barbarossa", option_type: "incorrect" },
-      { id: "6d", text: "Henry IV", option_type: "incorrect" }
-    ],
-    correctAnswerIndex: 0,
-    points: 100,
-    category: "Great Kingdoms",
-    explanation: "Charlemagne (Charles the Great) was crowned as the first Holy Roman Emperor by Pope Leo III on Christmas Day, 800 CE. This event marked the revival of the Western Roman Empire concept in medieval Europe.",
-    historicalContext: "Charlemagne's empire stretched across much of Western and Central Europe. His coronation established the precedent for the Holy Roman Empire, which would last for over 1,000 years until 1806.",
-    imageUrl: "https://images.unsplash.com/photo-1543422655-9d6a50c12bca?w=400&h=300&fit=crop&crop=center"
-  }
-};
+interface Question {
+  id: string;
+  text: string;
+  points: number;
+  category: string;
+  explanation?: string;
+  historicalContext?: string;
+  imageUrl?: string;
+  options?: Array<{
+    id: string;
+    text: string;
+    option_type: 'correct' | 'incorrect';
+  }>;
+  correctAnswerIndex?: number;
+}
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<'single' | 'multiplayer' | null>(null);
   const [gameConfigured, setGameConfigured] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [showTeacherMode, setShowTeacherMode] = useState(false);
   const [skipCount, setSkipCount] = useState(0);
@@ -129,8 +37,10 @@ const Index = () => {
     { id: "player1", name: "Player 1", score: 0, isActive: true },
     { id: "computer", name: "Computer", score: 0, isActive: false }
   ]);
-  const [categories, setCategories] = useState(mockCategories);
-  const [gameConfig, setGameConfig] = useState({ categories: mockCategories, rowCount: 5 });
+  const [categories, setCategories] = useState([]);
+  const [gameConfig, setGameConfig] = useState({ categories: [], rowCount: 5 });
+  const [questionsData, setQuestionsData] = useState<{[key: string]: Question}>({});
+  const { toast } = useToast();
 
   const handleModeSelect = (mode: 'single' | 'multiplayer') => {
     setGameMode(mode);
@@ -148,25 +58,108 @@ const Index = () => {
     }
   };
 
-  const handleGameSetup = (selectedCategories: any[], rowCount: number) => {
-    // Generate questions structure based on selected categories and row count
-    const gameCategories = selectedCategories.map(cat => ({
-      id: cat.id,
-      name: cat.name,
-      questions: Array.from({ length: rowCount }, (_, index) => ({
-        id: `${cat.id}-${index + 1}`,
-        points: (index + 1) * 100,
-        isAnswered: false
-      }))
-    }));
+  const handleGameSetup = async (selectedCategories: any[], rowCount: number) => {
+    try {
+      // Load questions for selected categories
+      await loadQuestionsForCategories(selectedCategories, rowCount);
+    } catch (error) {
+      console.error('Error setting up game:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load questions. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadQuestionsForCategories = async (selectedCategories: any[], rowCount: number) => {
+    const { data: questions, error } = await supabase
+      .from('questions')
+      .select(`
+        *,
+        categories (name),
+        question_options (*)
+      `)
+      .in('category_id', selectedCategories.map(cat => cat.id));
+
+    if (error) {
+      console.error('Error loading questions:', error);
+      toast({
+        title: "No Questions Available",
+        description: "Please add questions to the selected categories first using the admin panel.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!questions || questions.length === 0) {
+      toast({
+        title: "No Questions Found",
+        description: "The selected categories don't have any questions yet. Please add questions using the admin panel.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Group questions by category and organize by points
+    const questionsMap: {[key: string]: Question} = {};
+    const gameCategories = selectedCategories.map(cat => {
+      const categoryQuestions = questions.filter(q => q.category_id === cat.id);
+      
+      // Sort questions by points and take only the amount needed for rowCount
+      const sortedQuestions = categoryQuestions.sort((a, b) => a.points - b.points);
+      const questionsForRows = sortedQuestions.slice(0, rowCount);
+      
+      // Map questions to game format
+      questionsForRows.forEach((q, index) => {
+        const correctOption = q.question_options.find(opt => opt.option_type === 'correct');
+        const correctAnswerIndex = q.question_options.findIndex(opt => opt.option_type === 'correct');
+        
+        questionsMap[`${cat.id}-${index + 1}`] = {
+          id: q.id,
+          text: q.text,
+          points: q.points,
+          category: q.categories.name,
+          explanation: q.explanation,
+          historicalContext: q.historical_context,
+          imageUrl: q.image_url,
+          options: q.question_options as Array<{id: string; text: string; option_type: 'correct' | 'incorrect'}>,
+          correctAnswerIndex: correctAnswerIndex
+        };
+      });
+
+      return {
+        id: cat.id,
+        name: cat.name,
+        questions: Array.from({ length: rowCount }, (_, index) => {
+          const expectedPoints = (index + 1) * 100;
+          const question = questionsForRows.find(q => q.points === expectedPoints);
+          return {
+            id: `${cat.id}-${index + 1}`,
+            points: expectedPoints,
+            isAnswered: false,
+            hasQuestion: !!question
+          };
+        })
+      };
+    });
     
+    setQuestionsData(questionsMap);
     setGameConfig({ categories: gameCategories, rowCount });
     setCategories(gameCategories);
     setGameConfigured(true);
   };
 
   const handleQuestionSelect = (categoryId: string, questionId: string) => {
-    const question = mockQuestions[questionId] || mockQuestions["1"];
+    const question = questionsData[questionId];
+    if (!question) {
+      toast({
+        title: "Question Not Available",
+        description: "This question is not available. Please select another one.",
+        variant: "destructive",
+      });
+      return;
+    }
     setSelectedQuestion(question);
     setIsQuestionModalOpen(true);
   };

@@ -11,6 +11,7 @@ interface Question {
   id: string;
   points: number;
   isAnswered: boolean;
+  hasQuestion?: boolean;
 }
 
 interface GameBoardProps {
@@ -57,6 +58,7 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
           categories.map((category, catIndex) => {
             const question = category.questions.find(q => q.points === points);
             const isAnswered = question?.isAnswered || false;
+            const hasQuestion = question?.hasQuestion !== false; // Default to true for backwards compatibility
             
             return (
               <Card 
@@ -64,7 +66,9 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
                 className={`aspect-square transition-all duration-500 animate-scale-in ${
                   isAnswered 
                     ? 'bg-theme-brown-dark/50 border-theme-brown opacity-40 cursor-not-allowed' 
-                    : 'jeopardy-button hover:scale-105 cursor-pointer'
+                    : !hasQuestion
+                      ? 'bg-muted/30 border-muted opacity-50 cursor-not-allowed'
+                      : 'jeopardy-button hover:scale-105 cursor-pointer'
                 }`}
                 style={{ animationDelay: `${(pointIndex * colCount + catIndex) * 0.05 + 0.5}s` }}
               >
@@ -76,15 +80,24 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
                     </div>
                   )}
                   
+                  {/* No question available overlay */}
+                  {!hasQuestion && !isAnswered && (
+                    <div className="absolute inset-0 bg-muted/60 flex items-center justify-center z-10 rounded-lg">
+                      <div className="text-2xl text-muted-foreground/60">—</div>
+                    </div>
+                  )}
+                  
                   <Button
                     variant="ghost"
                     className={`w-full h-full transition-all duration-300 font-orbitron font-black text-lg md:text-xl border-0 bg-transparent relative ${
                       isAnswered 
                         ? 'text-theme-brown-light/30 cursor-not-allowed pointer-events-none' 
-                        : 'text-jeopardy-gold hover:text-jeopardy-gold-light hover:scale-110 jeopardy-text-glow hover:bg-transparent'
+                        : !hasQuestion
+                          ? 'text-muted-foreground/40 cursor-not-allowed pointer-events-none'
+                          : 'text-jeopardy-gold hover:text-jeopardy-gold-light hover:scale-110 jeopardy-text-glow hover:bg-transparent'
                     }`}
-                    onClick={() => question && !isAnswered && onQuestionSelect(category.id, question.id)}
-                    disabled={!isGameActive || isAnswered || !question}
+                    onClick={() => question && !isAnswered && hasQuestion && onQuestionSelect(category.id, question.id)}
+                    disabled={!isGameActive || isAnswered || !question || !hasQuestion}
                   >
                     {`$${points.toLocaleString()}`}
                   </Button>

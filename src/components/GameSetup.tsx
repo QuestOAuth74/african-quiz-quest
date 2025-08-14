@@ -45,35 +45,24 @@ const GameSetup = ({ gameMode, onBack, onStartGame }: GameSetupProps) => {
         // Auto-select first 5 categories by default
         setSelectedCategories(data.slice(0, Math.min(5, data.length)).map(cat => cat.id));
       } else {
-        // If no categories in database, use mock categories
-        const mockCategories = [
-          { id: "ancient", name: "Ancient Civilizations" },
-          { id: "kingdoms", name: "Great Kingdoms" },
-          { id: "independence", name: "Independence" },
-          { id: "leaders", name: "Leaders" },
-          { id: "culture", name: "Culture & Arts" }
-        ];
-        setCategories(mockCategories);
-        setSelectedCategories(mockCategories.map(cat => cat.id));
+        // Show message about no categories
+        toast({
+          title: "No Categories Available",
+          description: "Please create categories first using the admin panel before starting a game.",
+          variant: "destructive",
+        });
+        setCategories([]);
+        setSelectedCategories([]);
       }
     } catch (error) {
       console.error('Error loading categories:', error);
       toast({
         title: "Error",
-        description: "Failed to load categories. Using default categories.",
+        description: "Failed to load categories. Please create categories using the admin panel.",
         variant: "destructive",
       });
-      
-      // Fallback to mock categories
-      const mockCategories = [
-        { id: "ancient", name: "Ancient Civilizations" },
-        { id: "kingdoms", name: "Great Kingdoms" },
-        { id: "independence", name: "Independence" },
-        { id: "leaders", name: "Leaders" },
-        { id: "culture", name: "Culture & Arts" }
-      ];
-      setCategories(mockCategories);
-      setSelectedCategories(mockCategories.map(cat => cat.id));
+      setCategories([]);
+      setSelectedCategories([]);
     } finally {
       setLoading(false);
     }
