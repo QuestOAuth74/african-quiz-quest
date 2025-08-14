@@ -128,7 +128,7 @@ All colors MUST be HSL.
 
   .jeopardy-gold {
     background: var(--gradient-yellow);
-    color: hsl(var(--theme-brown-dark));
+    color: hsl(35 35% 10%); /* Dark brown for better contrast on yellow */
     box-shadow: var(--shadow-yellow);
   }
 

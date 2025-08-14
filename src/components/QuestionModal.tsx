@@ -219,13 +219,19 @@ export function QuestionModal({
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-3 mb-4">
                       {selectedAnswerIndex === question.correctAnswerIndex ? (
-                        <CheckCircle className="text-jeopardy-blue-dark" size={24} />
+                        <CheckCircle className="text-green-800" size={24} />
                       ) : selectedAnswerIndex === null ? (
                         <SkipForward className="text-orange-600" size={24} />
                       ) : (
                         <XCircle className="text-red-600" size={24} />
                       )}
-                      <p className="text-lg font-orbitron font-bold text-theme-brown-dark uppercase tracking-wider">
+                      <p className={`text-lg font-orbitron font-bold uppercase tracking-wider ${
+                        selectedAnswerIndex === question.correctAnswerIndex 
+                          ? 'text-green-800' 
+                          : selectedAnswerIndex === null 
+                            ? 'text-orange-100' 
+                            : 'text-red-100'
+                      }`}>
                         {selectedAnswerIndex === question.correctAnswerIndex 
                           ? 'Correct!' 
                           : selectedAnswerIndex === null 
@@ -234,11 +240,19 @@ export function QuestionModal({
                       </p>
                     </div>
                     {selectedAnswerIndex !== null && typeof selectedAnswerIndex === 'number' && (
-                      <p className="text-base mb-3 text-theme-brown-dark">
+                      <p className={`text-base mb-3 ${
+                        selectedAnswerIndex === question.correctAnswerIndex 
+                          ? 'text-green-800' 
+                          : 'text-red-100'
+                      }`}>
                         You selected: <strong>{question.options[selectedAnswerIndex]}</strong>
                       </p>
                     )}
-                    <p className="text-lg font-exo font-bold text-theme-brown-dark">
+                    <p className={`text-lg font-exo font-bold ${
+                      selectedAnswerIndex === question.correctAnswerIndex 
+                        ? 'text-green-800' 
+                        : 'text-white'
+                    }`}>
                       Correct Answer: {question.options[question.correctAnswerIndex]}
                     </p>
                   </div>
