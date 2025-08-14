@@ -18,7 +18,7 @@ interface Category {
 type QuestionFilter = 'all' | 'fresh' | 'correct' | 'incorrect';
 
 interface GameSetupProps {
-  gameMode: 'single' | 'multiplayer';
+  gameMode: 'single' | 'multiplayer' | 'online-multiplayer';
   playerCount?: number;
   onBack: () => void;
   onStartGame: (selectedCategories: Category[], rowCount: number, questionFilter: QuestionFilter, playerNames?: string[]) => void;

@@ -31,7 +31,7 @@ interface QuestionModalProps {
   onClose: () => void;
   onAnswer: (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => void;
   currentPlayer?: string;
-  gameMode?: 'single' | 'multiplayer';
+  gameMode?: 'single' | 'multiplayer' | 'online-multiplayer';
   timeLimit?: number;
 }
 

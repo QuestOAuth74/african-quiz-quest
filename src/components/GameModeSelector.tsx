@@ -7,14 +7,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { UserBadges } from "./UserBadges";
 
 interface GameModeSelectorProps {
-  onSelectMode: (mode: 'single' | 'multiplayer', playerCount?: number) => void;
+  onSelectMode: (mode: 'single' | 'multiplayer' | 'online-multiplayer', playerCount?: number) => void;
 }
 
 export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
   const { user, isAuthenticated } = useAuth();
   const [showPlayerSelect, setShowPlayerSelect] = useState(false);
   
-  const handleModeSelect = (mode: 'single' | 'multiplayer') => {
+  const handleModeSelect = (mode: 'single' | 'multiplayer' | 'online-multiplayer') => {
     if (mode === 'multiplayer') {
       setShowPlayerSelect(true);
     } else {

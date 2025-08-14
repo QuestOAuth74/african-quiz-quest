@@ -37,8 +37,9 @@ interface Question {
 const Index = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const [gameMode, setGameMode] = useState<'single' | 'multiplayer' | null>(null);
+  const [gameMode, setGameMode] = useState<'single' | 'multiplayer' | 'online-multiplayer' | null>(null);
   const [gameConfigured, setGameConfigured] = useState(false);
+  const [onlineGameRoomId, setOnlineGameRoomId] = useState<string | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [selectedQuestionGridId, setSelectedQuestionGridId] = useState<string | null>(null);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);

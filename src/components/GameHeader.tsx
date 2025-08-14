@@ -11,7 +11,7 @@ interface Player {
 
 interface GameHeaderProps {
   players: Player[];
-  gameMode: 'single' | 'multiplayer';
+  gameMode: 'single' | 'multiplayer' | 'online-multiplayer';
   onNewGame: () => void;
   currentRound?: number;
   totalRounds?: number;
