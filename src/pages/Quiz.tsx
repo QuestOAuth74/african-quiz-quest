@@ -72,18 +72,22 @@ const Quiz = () => {
       if (categoriesError) throw categoriesError;
       setCategories(categoriesData || []);
 
-      // Load random questions (10 questions for a quiz)
+      // Load questions without random() since it's not supported in Supabase PostgREST
       const { data: questionsData, error: questionsError } = await supabase
         .from('questions')
         .select('*')
-        .order('random()')
-        .limit(10);
+        .limit(50); // Get more questions to shuffle client-side
 
-      if (questionsError) throw questionsError;
+      if (questionsError) {
+        console.error('Questions error:', questionsError);
+        throw questionsError;
+      }
       
       if (questionsData && questionsData.length > 0) {
-        setQuestions(questionsData);
-        loadOptionsForQuestion(questionsData[0].id);
+        // Shuffle questions client-side and take first 10
+        const shuffledQuestions = [...questionsData].sort(() => Math.random() - 0.5).slice(0, 10);
+        setQuestions(shuffledQuestions);
+        loadOptionsForQuestion(shuffledQuestions[0].id);
       } else {
         toast({
           title: "No Questions Available",
@@ -95,7 +99,7 @@ const Quiz = () => {
       console.error('Error loading quiz data:', error);
       toast({
         title: "Error",
-        description: "Failed to load quiz questions.",
+        description: "Failed to load quiz questions. Please make sure you're logged in.",
         variant: "destructive",
       });
     } finally {
