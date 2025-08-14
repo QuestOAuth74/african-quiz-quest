@@ -162,6 +162,13 @@ export type Database = {
             foreignKeyName: "fk_forum_post_replies_user_id"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "online_players"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_forum_post_replies_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
@@ -200,6 +207,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "forum_posts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_forum_post_upvotes_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "online_players"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "fk_forum_post_upvotes_user_id"
@@ -267,6 +281,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "forum_categories"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_forum_posts_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "online_players"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "fk_forum_posts_user_id"
@@ -402,6 +423,36 @@ export type Database = {
         }
         Relationships: []
       }
+      matchmaking_requests: {
+        Row: {
+          created_at: string
+          expires_at: string
+          game_config: Json
+          id: string
+          requester_id: string
+          status: string
+          target_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          game_config: Json
+          id?: string
+          requester_id: string
+          status?: string
+          target_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          game_config?: Json
+          id?: string
+          requester_id?: string
+          status?: string
+          target_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -409,6 +460,8 @@ export type Database = {
           email: string
           id: string
           is_admin: boolean
+          last_seen: string | null
+          player_status: string | null
           updated_at: string
           user_id: string
         }
@@ -418,6 +471,8 @@ export type Database = {
           email: string
           id?: string
           is_admin?: boolean
+          last_seen?: string | null
+          player_status?: string | null
           updated_at?: string
           user_id: string
         }
@@ -427,6 +482,8 @@ export type Database = {
           email?: string
           id?: string
           is_admin?: boolean
+          last_seen?: string | null
+          player_status?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -735,16 +792,55 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      online_players: {
+        Row: {
+          display_name: string | null
+          email: string | null
+          is_online: boolean | null
+          last_seen: string | null
+          player_status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          display_name?: string | null
+          email?: string | null
+          is_online?: never
+          last_seen?: string | null
+          player_status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          display_name?: string | null
+          email?: string | null
+          is_online?: never
+          last_seen?: string | null
+          player_status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_and_award_badges: {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      cleanup_expired_requests: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_admin_user: {
         Args: { user_email: string; user_password: string }
         Returns: string
+      }
+      find_waiting_players: {
+        Args: { exclude_user_id?: string }
+        Returns: {
+          display_name: string
+          email: string
+          last_seen: string
+          user_id: string
+        }[]
       }
       generate_room_code: {
         Args: Record<PropertyKey, never>
@@ -779,6 +875,10 @@ export type Database = {
       make_user_admin_by_email: {
         Args: { user_email: string }
         Returns: string
+      }
+      update_player_status: {
+        Args: { new_status: string }
+        Returns: undefined
       }
       update_question_rating_stats: {
         Args: { question_uuid: string }
