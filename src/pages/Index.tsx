@@ -61,6 +61,7 @@ const Index = () => {
     streakCount: 0
   });
   const { toast } = useToast();
+  const [aiCooldownUntil, setAiCooldownUntil] = useState<number | null>(null);
 
   // Redirect to auth if not authenticated and trying to access admin
   useEffect(() => {
@@ -69,14 +70,22 @@ const Index = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // AI turn management - handles both question selection and answering
+  // AI turn management - handles both question selection and answering with cooldown
   useEffect(() => {
     const activePlayer = players.find(p => p.isActive);
+    const now = Date.now();
+    
+    // Check if AI is in cooldown period
+    if (aiCooldownUntil && now < aiCooldownUntil) {
+      console.log('AI is in cooldown, waiting...', Math.round((aiCooldownUntil - now) / 1000), 'seconds remaining');
+      return;
+    }
     
     if (activePlayer?.name === "Computer" && gameConfigured) {
       console.log('AI is active, checking conditions:', {
         hasQuestion: !!selectedQuestion,
-        modalOpen: isQuestionModalOpen
+        modalOpen: isQuestionModalOpen,
+        cooldownExpired: !aiCooldownUntil || now >= aiCooldownUntil
       });
       
       // AI picks a question when it's their turn and no question is selected
@@ -97,7 +106,7 @@ const Index = () => {
         return () => clearTimeout(timer);
       }
     }
-  }, [players, selectedQuestion, isQuestionModalOpen, gameConfigured]);
+  }, [players, selectedQuestion, isQuestionModalOpen, gameConfigured, aiCooldownUntil]);
 
   const [playerCount, setPlayerCount] = useState<number>(2);
 
@@ -347,6 +356,12 @@ const Index = () => {
     const correctAnswerIndex = question.correctAnswerIndex;
     if (typeof correctAnswerIndex === 'number') {
       console.log('AI selecting correct answer at index:', correctAnswerIndex);
+      
+      // Set AI cooldown for 60 seconds after answering
+      const cooldownEnd = Date.now() + 60000; // 60 seconds
+      setAiCooldownUntil(cooldownEnd);
+      console.log('AI cooldown set for 60 seconds');
+      
       handleAnswer(correctAnswerIndex);
     } else {
       console.log('No correct answer index found for AI');
