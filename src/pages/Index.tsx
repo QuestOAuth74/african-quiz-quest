@@ -254,9 +254,10 @@ const Index = () => {
     
     if (activePlayer?.name === "Computer") {
       console.log('AI is active, scheduling AI turn in 2 seconds');
-      setTimeout(() => {
-        handleAITurn(question);
-      }, 2000); // Give 2 seconds to show the question
+      // TEMPORARILY DISABLED TO DEBUG SCORE ISSUE
+      // setTimeout(() => {
+      //   handleAITurn(question);
+      // }, 2000); // Give 2 seconds to show the question
     }
   };
 
@@ -291,7 +292,9 @@ const Index = () => {
         setIsQuestionModalOpen(false);
         setTimeout(() => {
           if (selectedQuestion) {
-            handleAITurn(selectedQuestion);
+            // TEMPORARILY DISABLED TO DEBUG SCORE ISSUE
+            // handleAITurn(selectedQuestion);
+            console.log('AI turn in skip handler - DISABLED for debugging');
           }
         }, 1000);
         return;
@@ -401,9 +404,10 @@ const Index = () => {
       // If AI becomes active and there's still a question modal open, AI should answer
       if (newActivePlayer?.name === "Computer" && selectedQuestion && isQuestionModalOpen) {
         console.log('AI becoming active after player switch, triggering AI turn');
-        setTimeout(() => {
-          handleAITurn(selectedQuestion);
-        }, 1000);
+        // TEMPORARILY DISABLED TO DEBUG SCORE ISSUE
+        // setTimeout(() => {
+        //   handleAITurn(selectedQuestion);
+        // }, 1000);
       } else {
         console.log('Player switch complete. New active player:', newActivePlayer?.name, 'Modal open:', isQuestionModalOpen);
       }
