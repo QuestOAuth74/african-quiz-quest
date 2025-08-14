@@ -27,14 +27,28 @@ const AdminLogin = () => {
 
       if (authError) throw authError;
 
-      // Check if user is admin
-      const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+      if (!authData.user) {
+        throw new Error('Authentication failed - no user data');
+      }
+
+      // Wait a moment for the session to be fully established
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Check if user is admin using the profiles table directly
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('user_id', authData.user.id)
+        .single();
       
-      if (adminError) throw adminError;
+      if (profileError) {
+        console.error('Profile lookup error:', profileError);
+        throw new Error('Failed to verify admin status');
+      }
       
-      if (!isAdmin) {
+      if (!profile?.is_admin) {
         await supabase.auth.signOut();
-        throw new Error('Access denied. Admin privileges required.');
+        throw new Error('Access denied. Administrator privileges required.');
       }
 
       toast({
@@ -44,9 +58,10 @@ const AdminLogin = () => {
 
       navigate('/admin/dashboard');
     } catch (error: any) {
+      console.error('Admin login error:', error);
       toast({
         title: "Login Failed",
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
         variant: "destructive",
       });
     } finally {
