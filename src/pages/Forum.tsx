@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Plus } from 'lucide-react';
+import { MessageCircle, Plus, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
@@ -26,6 +26,7 @@ interface Post {
   created_at: string;
   user_id: string;
   category_id: string;
+  image_url: string | null;
   forum_categories: {
     name: string;
   };
@@ -38,6 +39,9 @@ const Forum = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', content: '', category_id: '' });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -83,30 +87,111 @@ const Forum = () => {
     setLoading(false);
   };
 
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+      toast.error('Please select a JPG or PNG image');
+      return;
+    }
+
+    // Validate file size (500KB limit)
+    if (file.size > 500 * 1024) {
+      toast.error('Image size must be less than 500KB');
+      return;
+    }
+
+    setSelectedImage(file);
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImagePreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    // Reset file input
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('forum-images')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        return null;
+      }
+
+      const { data } = supabase.storage
+        .from('forum-images')
+        .getPublicUrl(fileName);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
   const handleCreatePost = async () => {
     if (!user || !newPost.title.trim() || !newPost.content.trim() || !newPost.category_id) {
       toast.error('Please fill in all fields');
       return;
     }
 
-    const { error } = await supabase
-      .from('forum_posts')
-      .insert({
-        title: newPost.title.trim(),
-        content: newPost.content.trim(),
-        category_id: newPost.category_id,
-        user_id: user.id
-      });
+    setUploading(true);
 
-    if (error) {
-      toast.error('Failed to create post');
-      return;
+    try {
+      let imageUrl = null;
+      
+      // Upload image if selected
+      if (selectedImage) {
+        imageUrl = await uploadImage(selectedImage);
+        if (!imageUrl) {
+          toast.error('Failed to upload image');
+          setUploading(false);
+          return;
+        }
+      }
+
+      const { error } = await supabase
+        .from('forum_posts')
+        .insert({
+          title: newPost.title.trim(),
+          content: newPost.content.trim(),
+          category_id: newPost.category_id,
+          user_id: user.id,
+          image_url: imageUrl
+        });
+
+      if (error) {
+        toast.error('Failed to create post');
+        return;
+      }
+
+      toast.success('Post created successfully!');
+      setNewPost({ title: '', content: '', category_id: '' });
+      removeImage();
+      setShowCreatePost(false);
+      fetchPosts();
+    } catch (error) {
+      toast.error('Error creating post');
+    } finally {
+      setUploading(false);
     }
-
-    toast.success('Post created successfully!');
-    setNewPost({ title: '', content: '', category_id: '' });
-    setShowCreatePost(false);
-    fetchPosts();
   };
 
   const formatDate = (dateString: string) => {
@@ -201,8 +286,60 @@ const Forum = () => {
                   onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
                   rows={4}
                 />
+                
+                {/* Image Upload Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4" />
+                    <span className="text-sm font-medium">Add Image (Optional)</span>
+                  </div>
+                  
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img 
+                        src={imagePreview} 
+                        alt="Preview" 
+                        className="w-full max-w-xs rounded-lg border"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={removeImage}
+                        className="absolute top-2 right-2"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('image-upload')?.click()}
+                        className="flex items-center gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Upload Image
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        JPG or PNG, max 500KB
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
                 <div className="flex gap-2">
-                  <Button onClick={handleCreatePost}>Post</Button>
+                  <Button onClick={handleCreatePost} disabled={uploading}>
+                    {uploading ? 'Creating...' : 'Post'}
+                  </Button>
                   <Button variant="outline" onClick={() => setShowCreatePost(false)}>
                     Cancel
                   </Button>
@@ -245,6 +382,13 @@ const Forum = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  {post.image_url && (
+                    <img 
+                      src={post.image_url} 
+                      alt="Post image" 
+                      className="w-full max-w-md rounded-lg border mb-4"
+                    />
+                  )}
                   <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
                 </CardContent>
               </Card>
