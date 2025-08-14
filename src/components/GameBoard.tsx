@@ -56,7 +56,7 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
         {/* Question Grid */}
         {pointValues.map((points, pointIndex) => (
           categories.map((category, catIndex) => {
-            const question = category.questions[pointIndex]; // Get question by index, not by points
+            const question = category.questions.find(q => q.points === points);
             const isAnswered = question?.isAnswered || false;
             const hasQuestion = question?.hasQuestion !== false; // Default to true for backwards compatibility
             
@@ -99,7 +99,7 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
                     onClick={() => question && !isAnswered && hasQuestion && onQuestionSelect(category.id, question.id)}
                     disabled={!isGameActive || isAnswered || !question || !hasQuestion}
                   >
-                    {`$${question?.points ? question.points.toLocaleString() : points.toLocaleString()}`}
+                    {`$${points.toLocaleString()}`}
                   </Button>
                 </CardContent>
               </Card>
