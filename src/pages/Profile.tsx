@@ -147,18 +147,16 @@ const Profile = () => {
     <div className="min-h-screen" style={{ background: 'var(--gradient-background)' }}>
       <TopNavigation />
       
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 pt-16 pb-12 max-w-4xl">
         {/* Hero Section */}
         <div className="text-center mb-12 animate-fade-in">
           <div className="relative mb-8">
-            <div className="inline-flex items-center justify-center w-32 h-32 rounded-full jeopardy-card mb-6 mx-auto">
-              <UserAvatar 
-                displayName={profile?.display_name} 
-                email={user.email} 
-                size="lg" 
-                className="w-28 h-28 text-3xl border-3 border-theme-yellow"
-              />
-            </div>
+            <UserAvatar 
+              displayName={profile?.display_name} 
+              email={user.email} 
+              size="lg" 
+              className="w-24 h-24 text-2xl border-2 border-theme-yellow mx-auto mb-6"
+            />
             <h1 className="text-4xl font-bold gradient-text mb-2 jeopardy-text-glow">
               {profile?.display_name || 'Welcome!'}
             </h1>
