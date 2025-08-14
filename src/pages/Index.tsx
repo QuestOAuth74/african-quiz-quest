@@ -71,10 +71,10 @@ const mockQuestions = {
     id: "1",
     text: "This ancient Egyptian queen was known for her relationships with Julius Caesar and Mark Antony.",
     options: [
-      "Nefertiti",
-      "Cleopatra VII",
-      "Hatshepsut",
-      "Ankhesenamun"
+      { id: "1a", text: "Nefertiti", option_type: "incorrect" },
+      { id: "1b", text: "Cleopatra VII", option_type: "correct" },
+      { id: "1c", text: "Hatshepsut", option_type: "incorrect" },
+      { id: "1d", text: "Ankhesenamun", option_type: "incorrect" }
     ],
     correctAnswerIndex: 1,
     points: 100,
@@ -87,10 +87,10 @@ const mockQuestions = {
     id: "2",
     text: "Which ancient civilization built Machu Picchu?",
     options: [
-      "Aztecs",
-      "Mayans", 
-      "Incas",
-      "Olmecs"
+      { id: "2a", text: "Aztecs", option_type: "incorrect" },
+      { id: "2b", text: "Mayans", option_type: "incorrect" }, 
+      { id: "2c", text: "Incas", option_type: "correct" },
+      { id: "2d", text: "Olmecs", option_type: "incorrect" }
     ],
     correctAnswerIndex: 2,
     points: 200,
@@ -103,10 +103,10 @@ const mockQuestions = {
     id: "6", 
     text: "Who was the first Holy Roman Emperor?",
     options: [
-      "Charlemagne",
-      "Otto I",
-      "Frederick Barbarossa",
-      "Henry IV"
+      { id: "6a", text: "Charlemagne", option_type: "correct" },
+      { id: "6b", text: "Otto I", option_type: "incorrect" },
+      { id: "6c", text: "Frederick Barbarossa", option_type: "incorrect" },
+      { id: "6d", text: "Henry IV", option_type: "incorrect" }
     ],
     correctAnswerIndex: 0,
     points: 100,

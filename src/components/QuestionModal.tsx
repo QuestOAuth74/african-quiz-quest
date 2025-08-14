@@ -219,7 +219,7 @@ const QuestionModal = ({
                   <div className="space-y-3">
                     {question.options?.map((option, index) => (
                       <div
-                        key={option.id}
+                        key={`teacher-option-${option.id}`}
                         className={`p-3 rounded-lg border ${
                           option.option_type === 'correct'
                             ? "bg-green-100 border-green-300 text-green-800 dark:bg-green-900/20 dark:border-green-700 dark:text-green-300"
@@ -367,7 +367,7 @@ const QuestionModal = ({
                   <div className="space-y-3">
                     {question.options?.map((option, index) => (
                       <Button
-                        key={option.id}
+                        key={`game-option-${option.id}`}
                         onClick={() => handleOptionSelect(option.id)}
                         variant={selectedOption === option.id ? "default" : "outline"}
                         className={`w-full p-4 h-auto text-left justify-start transition-all duration-300 ${
