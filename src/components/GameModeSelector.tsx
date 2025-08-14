@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Users, Bot, Sparkles, ArrowLeft, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -83,23 +84,46 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20">
-              <CardHeader className="text-center pb-6">
-                <div className="mx-auto mb-6 p-6 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
-                  <Bot size={56} className="text-theme-brown" />
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
+                  <Bot size={40} className="text-theme-brown" />
                 </div>
-                <CardTitle className="text-3xl font-bold text-theme-yellow">
+                <CardTitle className="text-2xl font-bold text-theme-yellow">
                   SINGLE PLAYER
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-center px-8 pb-8">
-                <p className="text-card-foreground mb-8 text-lg leading-relaxed">
-                  Challenge our intelligent AI opponent. Perfect for practicing and mastering African history!
+              <CardContent className="text-center px-6 pb-6">
+                <p className="text-card-foreground mb-6 text-base leading-relaxed">
+                  Challenge our intelligent AI opponent. Perfect for practicing!
                 </p>
                 <Button 
                   onClick={() => handleModeSelect('single')} 
-                  className="w-full jeopardy-gold font-bold text-lg py-6 hover:scale-105 transition-all duration-300"
+                  className="w-full jeopardy-gold font-bold text-base py-4 hover:scale-105 transition-all duration-300"
+                  size="lg"
+                >
+                  START GAME
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20" style={{ animationDelay: '0.1s' }}>
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
+                  <Users size={40} className="text-theme-brown" />
+                </div>
+                <CardTitle className="text-2xl font-bold text-theme-yellow">
+                  LOCAL MULTIPLAYER
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center px-6 pb-6">
+                <p className="text-card-foreground mb-6 text-base leading-relaxed">
+                  Play with 2-4 friends on the same device. Classic couch gaming!
+                </p>
+                <Button 
+                  onClick={() => handleModeSelect('multiplayer')} 
+                  className="w-full jeopardy-gold font-bold text-base py-4 hover:scale-105 transition-all duration-300"
                   size="lg"
                 >
                   START GAME
@@ -108,24 +132,26 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
             </Card>
 
             <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20" style={{ animationDelay: '0.2s' }}>
-              <CardHeader className="text-center pb-6">
-                <div className="mx-auto mb-6 p-6 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
-                  <Users size={56} className="text-theme-brown" />
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-xl w-fit shadow-lg relative">
+                  <Users size={40} className="text-white" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
                 </div>
-                <CardTitle className="text-3xl font-bold text-theme-yellow">
-                  MULTIPLAYER
+                <CardTitle className="text-2xl font-bold text-theme-yellow flex items-center justify-center gap-2">
+                  ONLINE MULTIPLAYER
+                  <Badge variant="secondary" className="text-xs bg-green-600 text-white">LIVE</Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-center px-8 pb-8">
-                <p className="text-card-foreground mb-8 text-lg leading-relaxed">
-                  Compete with 2-4 players. Who knows more about the rich history of Africa?
+              <CardContent className="text-center px-6 pb-6">
+                <p className="text-card-foreground mb-6 text-base leading-relaxed">
+                  Join players worldwide in real-time! Create or join rooms instantly.
                 </p>
                 <Button 
-                  onClick={() => handleModeSelect('multiplayer')} 
-                  className="w-full jeopardy-gold font-bold text-lg py-6 hover:scale-105 transition-all duration-300"
+                  onClick={() => handleModeSelect('online-multiplayer')} 
+                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold text-base py-4 hover:scale-105 transition-all duration-300"
                   size="lg"
                 >
-                  START GAME
+                  JOIN LIVE GAME
                 </Button>
               </CardContent>
             </Card>
