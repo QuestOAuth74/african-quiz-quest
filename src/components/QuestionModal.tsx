@@ -54,6 +54,7 @@ const QuestionModal = ({
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
   const [reviewTimeLeft, setReviewTimeLeft] = useState(15);
   const [isReviewPeriodActive, setIsReviewPeriodActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
@@ -67,6 +68,7 @@ const QuestionModal = ({
       setSelectedAnswerIndex(null);
       setReviewTimeLeft(15);
       setIsReviewPeriodActive(false);
+      setIsPaused(false);
     }
   }, [isOpen, question, timeLimit]);
 
@@ -102,7 +104,7 @@ const QuestionModal = ({
 
   // Review period timer - 15 seconds after answer is revealed
   useEffect(() => {
-    if (showAnswer && !showTeacherMode) {
+    if (showAnswer && !showTeacherMode && !isPaused) {
       setIsReviewPeriodActive(true);
       setReviewTimeLeft(15);
       
@@ -118,7 +120,17 @@ const QuestionModal = ({
 
       return () => clearInterval(reviewTimer);
     }
-  }, [showAnswer, showTeacherMode]);
+  }, [showAnswer, showTeacherMode, isPaused]);
+
+  const handleKeepReviewing = () => {
+    setIsPaused(true);
+    setIsReviewPeriodActive(false);
+  };
+
+  const handleContinueAfterPause = () => {
+    setIsPaused(false);
+    handleClose();
+  };
 
   const handleOptionSelect = (optionId: string) => {
     soundEffects.playButtonClick();
@@ -569,22 +581,47 @@ const QuestionModal = ({
                     </Card>
                   )}
 
-                  {/* Close Button with Review Timer */}
+                  {/* Review Controls */}
                   <div className="text-center pt-2">
-                    <Button 
-                      onClick={handleClose}
-                      disabled={isReviewPeriodActive}
-                      className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isReviewPeriodActive ? (
-                        <>
+                    {isReviewPeriodActive ? (
+                      /* During mandatory 15-second review */
+                      <div className="space-y-3">
+                        <Button 
+                          onClick={handleClose}
+                          disabled={true}
+                          className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                           <Clock className="mr-2 h-4 w-4 animate-spin" />
                           CONTINUE IN {reviewTimeLeft}s
-                        </>
-                      ) : (
-                        'CONTINUE GAME'
-                      )}
-                    </Button>
+                        </Button>
+                        <Button 
+                          onClick={handleKeepReviewing}
+                          variant="outline"
+                          className="px-4 py-2 text-sm jeopardy-button border-blue-500/50 text-blue-400 hover:text-blue-300"
+                        >
+                          Keep Reviewing
+                        </Button>
+                      </div>
+                    ) : isPaused ? (
+                      /* When user chose to keep reviewing */
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground mb-3">Take your time to review the answer</p>
+                        <Button 
+                          onClick={handleContinueAfterPause}
+                          className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300"
+                        >
+                          CONTINUE GAME
+                        </Button>
+                      </div>
+                    ) : (
+                      /* After 15 seconds, normal continue */
+                      <Button 
+                        onClick={handleClose}
+                        className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300"
+                      >
+                        CONTINUE GAME
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
