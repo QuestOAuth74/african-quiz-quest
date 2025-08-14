@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Trophy, Home, Sparkles } from "lucide-react";
 
 interface Player {
   id: string;
@@ -17,34 +18,83 @@ interface GameHeaderProps {
 }
 
 export function GameHeader({ players, gameMode, onNewGame, currentRound = 1, totalRounds = 1 }: GameHeaderProps) {
+  const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+  const leader = sortedPlayers[0];
+
   return (
-    <div className="w-full max-w-6xl mx-auto p-4">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-4xl font-bold text-primary">African History Jeopardy</h1>
+    <div className="w-full max-w-7xl mx-auto p-6">
+      <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <span className="text-muted-foreground">Round {currentRound} of {totalRounds}</span>
-          <Button onClick={onNewGame} variant="outline">
-            New Game
+          <Sparkles className="text-jeopardy-gold animate-pulse" size={28} />
+          <h1 className="text-4xl md:text-5xl font-orbitron font-black gradient-text">
+            JEOPARDY!
+          </h1>
+          <Sparkles className="text-jeopardy-gold animate-pulse" size={28} />
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground font-exo">Round</div>
+            <div className="text-xl font-orbitron font-bold text-jeopardy-gold">
+              {currentRound} / {totalRounds}
+            </div>
+          </div>
+          <Button 
+            onClick={onNewGame} 
+            variant="outline"
+            className="jeopardy-button font-orbitron font-bold hover:jeopardy-gold"
+          >
+            <Home className="mr-2" size={16} />
+            NEW GAME
           </Button>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {players.map((player) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {players.map((player, index) => (
           <Card 
             key={player.id} 
-            className={`${player.isActive ? 'ring-2 ring-primary bg-primary/5' : ''} transition-all`}
+            className={`jeopardy-card transition-all duration-300 ${
+              player.isActive 
+                ? 'animate-glow border-jeopardy-gold/60' 
+                : 'border-jeopardy-blue-light/30'
+            }`}
           >
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${player.isActive ? 'bg-primary' : 'bg-muted'}`} />
-                <span className="font-semibold text-lg">{player.name}</span>
-                {gameMode === 'single' && player.id === 'computer' && (
-                  <span className="text-xs bg-secondary px-2 py-1 rounded-full">AI</span>
-                )}
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-primary">${player.score}</div>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                      player.isActive 
+                        ? 'bg-jeopardy-gold animate-pulse shadow-lg shadow-jeopardy-gold/50' 
+                        : 'bg-muted'
+                    }`} />
+                    {player.id === leader.id && player.score > 0 && (
+                      <Trophy className="absolute -top-1 -right-1 text-jeopardy-gold" size={12} />
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-orbitron font-bold text-xl text-jeopardy-gold">
+                      {player.name}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {gameMode === 'single' && player.id === 'computer' && (
+                        <span className="text-xs jeopardy-gold px-2 py-1 rounded-full font-orbitron font-bold">
+                          AI OPPONENT
+                        </span>
+                      )}
+                      {player.id === leader.id && player.score > 0 && (
+                        <span className="text-xs bg-jeopardy-gold text-jeopardy-blue-dark px-2 py-1 rounded-full font-orbitron font-bold">
+                          LEADER
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-orbitron font-black text-jeopardy-gold jeopardy-text-glow">
+                    ${player.score.toLocaleString()}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
