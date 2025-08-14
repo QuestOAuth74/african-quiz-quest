@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
 import ForumHeader from '@/components/forum/ForumHeader';
+import { UserAvatar } from '@/components/UserAvatar';
 
 interface Category {
   id: string;
@@ -31,6 +32,10 @@ interface Post {
   forum_categories: {
     name: string;
   };
+  profiles: {
+    display_name: string | null;
+    email: string;
+  };
 }
 
 interface Reply {
@@ -39,6 +44,10 @@ interface Reply {
   user_id: string;
   content: string;
   created_at: string;
+  profiles: {
+    display_name: string | null;
+    email: string;
+  };
 }
 
 const Forum = () => {
@@ -84,7 +93,8 @@ const Forum = () => {
       .from('forum_posts')
       .select(`
         *,
-        forum_categories(name)
+        forum_categories(name),
+        profiles(display_name, email)
       `)
       .order('created_at', { ascending: false });
 
@@ -120,7 +130,10 @@ const Forum = () => {
   const fetchReplies = async (postId: string) => {
     const { data, error } = await supabase
       .from('forum_post_replies')
-      .select('*')
+      .select(`
+        *,
+        profiles(display_name, email)
+      `)
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
 
@@ -520,12 +533,24 @@ const Forum = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <CardTitle className="text-lg mb-2">{post.title}</CardTitle>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Badge variant="secondary">{post.forum_categories.name}</Badge>
-                        <span>•</span>
-                        <span>{formatDate(post.created_at)}</span>
+                      <div className="flex items-center gap-3 mb-3">
+                        <UserAvatar 
+                          displayName={post.profiles?.display_name}
+                          email={post.profiles?.email}
+                          size="md"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-medium text-foreground">
+                            {post.profiles?.display_name || 'Anonymous User'}
+                          </span>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Badge variant="secondary">{post.forum_categories.name}</Badge>
+                            <span>•</span>
+                            <span>{formatDate(post.created_at)}</span>
+                          </div>
+                        </div>
                       </div>
+                      <CardTitle className="text-lg mb-2">{post.title}</CardTitle>
                     </div>
                   </div>
                 </CardHeader>
@@ -596,10 +621,24 @@ const Forum = () => {
                       <div className="space-y-3 ml-4">
                         {replies[post.id]?.map((reply) => (
                           <div key={reply.id} className="bg-muted/50 p-3 rounded-lg">
-                            <p className="text-sm text-foreground">{reply.content}</p>
-                            <p className="text-xs text-muted-foreground mt-2">
-                              {formatDate(reply.created_at)}
-                            </p>
+                            <div className="flex items-start gap-3">
+                              <UserAvatar 
+                                displayName={reply.profiles?.display_name}
+                                email={reply.profiles?.email}
+                                size="sm"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-sm font-medium text-foreground">
+                                    {reply.profiles?.display_name || 'Anonymous User'}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatDate(reply.created_at)}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-foreground">{reply.content}</p>
+                              </div>
+                            </div>
                           </div>
                         ))}
                         {(!replies[post.id] || replies[post.id].length === 0) && (
