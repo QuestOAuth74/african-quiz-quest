@@ -109,14 +109,14 @@ const QuestionModal = ({
 
   const handleSubmit = () => {
     if (selectedOption !== null) {
-      const answerIndex = parseInt(selectedOption);
+      // Find the index of the selected option in the options array
+      const answerIndex = question.options?.findIndex(opt => opt.id === selectedOption) ?? -1;
       setSelectedAnswerIndex(answerIndex);
       setHasAnswered(true);
       setShowAnswer(true);
       gameAudio.stopCountdown();
       
       // Play correct/wrong answer sound
-      const correctOption = question.options?.find(opt => opt.option_type === 'correct');
       const selectedOptionObj = question.options?.find(opt => opt.id === selectedOption);
       
       if (selectedOptionObj?.option_type === 'correct') {
