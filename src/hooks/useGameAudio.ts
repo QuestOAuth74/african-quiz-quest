@@ -7,6 +7,7 @@ interface GameAudioHook {
   stopCountdown: () => void;
   playThinkingCountdown: () => void;
   stopThinkingCountdown: () => void;
+  setEffectsVolume: (volume: number) => void;
 }
 
 export const useGameAudio = (): GameAudioHook => {
@@ -14,11 +15,13 @@ export const useGameAudio = (): GameAudioHook => {
   const wrongAudioRef = useRef<HTMLAudioElement | null>(null);
   const countdownAudioRef = useRef<HTMLAudioElement | null>(null);
   const thinkingCountdownAudioRef = useRef<HTMLAudioElement | null>(null);
+  const volumeRef = useRef<number>(0.5); // Default 50% volume
 
   const initializeAudio = useCallback((audioRef: React.MutableRefObject<HTMLAudioElement | null>, src: string) => {
     if (!audioRef.current) {
       audioRef.current = new Audio(src);
       audioRef.current.preload = 'auto';
+      audioRef.current.volume = volumeRef.current;
     }
     return audioRef.current;
   }, []);
@@ -63,12 +66,22 @@ export const useGameAudio = (): GameAudioHook => {
     }
   }, []);
 
+  const setEffectsVolume = useCallback((volume: number) => {
+    volumeRef.current = volume;
+    // Update volume for all existing audio instances
+    if (correctAudioRef.current) correctAudioRef.current.volume = volume;
+    if (wrongAudioRef.current) wrongAudioRef.current.volume = volume;
+    if (countdownAudioRef.current) countdownAudioRef.current.volume = volume;
+    if (thinkingCountdownAudioRef.current) thinkingCountdownAudioRef.current.volume = volume;
+  }, []);
+
   return {
     playCorrectAnswer,
     playWrongAnswer,
     playCountdown,
     stopCountdown,
     playThinkingCountdown,
-    stopThinkingCountdown
+    stopThinkingCountdown,
+    setEffectsVolume
   };
 };

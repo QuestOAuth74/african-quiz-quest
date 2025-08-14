@@ -4,10 +4,12 @@ import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Volume2, VolumeX, Volume1 } from "lucide-react";
 import { useBackgroundMusic } from "@/hooks/useBackgroundMusic";
+import { useGameAudio } from "@/hooks/useGameAudio";
 
 export function AudioControls() {
   const [musicEnabled, setMusicEnabled] = useState(true);
   const [volume, setVolume] = useState(40); // Volume as percentage (0-100)
+  const [effectsVolume, setEffectsVolume] = useState(50); // Effects volume as percentage (0-100)
   
   const {
     isPlaying,
@@ -25,10 +27,17 @@ export function AudioControls() {
     }
   );
 
+  const { setEffectsVolume: setGameEffectsVolume } = useGameAudio();
+
   // Update audio volume when slider changes
   useEffect(() => {
     setVolumeLevel(volume / 100);
   }, [volume, setVolumeLevel]);
+
+  // Update effects volume when slider changes
+  useEffect(() => {
+    setGameEffectsVolume(effectsVolume / 100);
+  }, [effectsVolume, setGameEffectsVolume]);
 
   const toggleMusic = () => {
     if (isPlaying) {
@@ -78,50 +87,98 @@ export function AudioControls() {
               </Button>
             </div>
             
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Volume</span>
-                <span>{volume}%</span>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Music Volume</span>
+                  <span>{volume}%</span>
+                </div>
+                <Slider
+                  value={[volume]}
+                  onValueChange={(value) => setVolume(value[0])}
+                  max={100}
+                  min={0}
+                  step={5}
+                  className="w-full"
+                  disabled={!isPlaying}
+                />
               </div>
-              <Slider
-                value={[volume]}
-                onValueChange={(value) => setVolume(value[0])}
-                max={100}
-                min={0}
-                step={5}
-                className="w-full"
-                disabled={!isPlaying}
-              />
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Effects Volume</span>
+                  <span>{effectsVolume}%</span>
+                </div>
+                <Slider
+                  value={[effectsVolume]}
+                  onValueChange={(value) => setEffectsVolume(value[0])}
+                  max={100}
+                  min={0}
+                  step={5}
+                  className="w-full"
+                />
+              </div>
             </div>
             
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setVolume(25)}
-                className="flex-1 text-xs"
-                disabled={!isPlaying}
-              >
-                Low
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setVolume(50)}
-                className="flex-1 text-xs"
-                disabled={!isPlaying}
-              >
-                Medium
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setVolume(75)}
-                className="flex-1 text-xs"
-                disabled={!isPlaying}
-              >
-                High
-              </Button>
+            <div className="space-y-2">
+              <div className="text-xs text-muted-foreground mb-1">Music Presets</div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVolume(25)}
+                  className="flex-1 text-xs"
+                  disabled={!isPlaying}
+                >
+                  Low
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVolume(50)}
+                  className="flex-1 text-xs"
+                  disabled={!isPlaying}
+                >
+                  Medium
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVolume(75)}
+                  className="flex-1 text-xs"
+                  disabled={!isPlaying}
+                >
+                  High
+                </Button>
+              </div>
+              
+              <div className="text-xs text-muted-foreground mb-1">Effects Presets</div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEffectsVolume(25)}
+                  className="flex-1 text-xs"
+                >
+                  Low
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEffectsVolume(50)}
+                  className="flex-1 text-xs"
+                >
+                  Medium
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEffectsVolume(75)}
+                  className="flex-1 text-xs"
+                >
+                  High
+                </Button>
+              </div>
             </div>
           </div>
         </PopoverContent>
