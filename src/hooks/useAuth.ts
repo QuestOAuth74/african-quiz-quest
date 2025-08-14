@@ -28,12 +28,27 @@ export const useAuth = () => {
   }, []);
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      setUser(null);
-      setSession(null);
+    // Check if there's actually a session to sign out from
+    if (!session) {
+      // User is already signed out, no need to do anything
+      return { error: null };
     }
-    return { error };
+
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      // Don't manually update state here - let onAuthStateChange handle it
+      // Only return actual errors that need user attention
+      if (error && error.message !== 'Session not found') {
+        return { error };
+      }
+      
+      // Treat "session not found" as success since user is effectively signed out
+      return { error: null };
+    } catch (error) {
+      // Handle unexpected errors
+      return { error: error as any };
+    }
   };
 
   return {
