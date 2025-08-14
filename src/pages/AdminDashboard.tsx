@@ -6,8 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import CategoryManager from "@/components/admin/CategoryManager";
+import { CSVUpload } from "@/components/admin/CSVUpload";
 import QuestionManager from "@/components/admin/QuestionManager";
-import { LogOut, Users, FileQuestion, FolderOpen } from "lucide-react";
+import { LogOut, Users, FileQuestion, FolderOpen, Upload } from "lucide-react";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
@@ -121,9 +122,13 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="questions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-card">
+          <TabsList className="grid w-full grid-cols-3 bg-card">
             <TabsTrigger value="questions" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Questions
+            </TabsTrigger>
+            <TabsTrigger value="upload" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              <Upload className="h-4 w-4 mr-2" />
+              Bulk Upload
             </TabsTrigger>
             <TabsTrigger value="categories" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Categories
@@ -132,6 +137,10 @@ const AdminDashboard = () => {
           
           <TabsContent value="questions">
             <QuestionManager onStatsUpdate={loadStats} />
+          </TabsContent>
+          
+          <TabsContent value="upload">
+            <CSVUpload />
           </TabsContent>
           
           <TabsContent value="categories">
