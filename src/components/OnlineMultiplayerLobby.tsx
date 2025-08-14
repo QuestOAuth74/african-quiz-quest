@@ -174,7 +174,12 @@ export const OnlineMultiplayerLobby = ({
                         )}
                         {!canStart && players.length < 2 && (
                           <p className="text-yellow-300 text-sm">
-                            Need at least 2 players to start
+                            Need exactly 2 players to start
+                          </p>
+                        )}
+                        {!canStart && players.length > 2 && (
+                          <p className="text-yellow-300 text-sm">
+                            Too many players - private rooms support only 2 players
                           </p>
                         )}
                       </div>

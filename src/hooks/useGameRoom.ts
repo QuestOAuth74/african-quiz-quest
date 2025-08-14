@@ -112,14 +112,15 @@ export const useGameRoom = () => {
 
       if (roomCodeError) throw roomCodeError;
 
-      // Create room
+      // Create room with max 2 players for private rooms
       const { data: roomData, error: roomError } = await supabase
         .from('game_rooms')
         .insert({
           room_code: roomCodeData,
           host_user_id: user.id,
           game_config: gameConfig,
-          status: 'waiting'
+          status: 'waiting',
+          max_players: 2
         })
         .select()
         .single();
@@ -284,8 +285,8 @@ export const useGameRoom = () => {
       return false;
     }
 
-    if (players.length < 2) {
-      toast.error('Need at least 2 players to start');
+    if (players.length !== 2) {
+      toast.error('Need exactly 2 players to start a private room');
       return false;
     }
 
@@ -388,7 +389,7 @@ export const useGameRoom = () => {
     findActiveGame,
     addPlayerToRoom,
     isHost: currentRoom?.host_user_id === user?.id,
-    canStart: currentRoom?.status === 'waiting' && players.length >= 2,
+    canStart: currentRoom?.status === 'waiting' && players.length === 2,
     canDelete: currentRoom?.host_user_id === user?.id && currentRoom?.status !== 'playing'
   };
 };
