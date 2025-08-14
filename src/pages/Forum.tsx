@@ -17,6 +17,7 @@ import ForumStats from '@/components/forum/ForumStats';
 import PostSorting from '@/components/forum/PostSorting';
 import SearchBar from '@/components/forum/SearchBar';
 import PostFilters from '@/components/forum/PostFilters';
+import BookmarkButton from '@/components/forum/BookmarkButton';
 import { UserAvatar } from '@/components/UserAvatar';
 import { UserBadges } from '@/components/UserBadges';
 
@@ -597,6 +598,8 @@ const Forum = () => {
                       <Reply className="h-4 w-4" />
                       <span>{replies[post.id]?.length || 0} Replies</span>
                     </Button>
+
+                    <BookmarkButton postId={post.id} size="sm" />
                   </div>
 
                   {/* Replies Section */}
