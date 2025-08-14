@@ -169,6 +169,13 @@ export type Database = {
             foreignKeyName: "fk_forum_post_replies_user_id"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "online_players_secure"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_forum_post_replies_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
@@ -213,6 +220,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "online_players"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_forum_post_upvotes_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "online_players_secure"
             referencedColumns: ["user_id"]
           },
           {
@@ -287,6 +301,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "online_players"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_forum_posts_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "online_players_secure"
             referencedColumns: ["user_id"]
           },
           {
@@ -819,6 +840,30 @@ export type Database = {
         }
         Relationships: []
       }
+      online_players_secure: {
+        Row: {
+          display_name: string | null
+          is_online: boolean | null
+          last_seen: string | null
+          player_status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          display_name?: string | null
+          is_online?: never
+          last_seen?: string | null
+          player_status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          display_name?: string | null
+          is_online?: never
+          last_seen?: string | null
+          player_status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_and_award_badges: {
@@ -846,6 +891,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_forum_author_info: {
+        Args: { author_user_id: string }
+        Returns: {
+          display_name: string
+          email: string
+          user_id: string
+        }[]
+      }
       get_single_player_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -856,6 +909,10 @@ export type Database = {
           total_points_vs_computer: number
           user_id: string
         }[]
+      }
+      get_user_email_for_moderation: {
+        Args: { target_user_id: string }
+        Returns: string
       }
       has_role: {
         Args: {
