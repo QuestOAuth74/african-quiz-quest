@@ -137,7 +137,7 @@ const WelcomeModal = ({ isOpen, onClose }: WelcomeModalProps) => {
             
             {/* Description */}
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '1.5s', animationFillMode: 'both' }}>
-              Embark on a journey through the rich tapestry of African history. 
+              Embark on a rich journey through the authentic history of the mother continent which gave birth to humanity. 
               Test your knowledge and discover the wisdom of ancient civilizations.
             </p>
           </div>
