@@ -14,6 +14,45 @@ const AdminLogin = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Temporary function to create the initial admin user
+  const createInitialAdmin = async () => {
+    try {
+      setIsLoading(true);
+      
+      // First, sign up the user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: "quemile@gmail.com",
+        password: "144245",
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin/login`
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (signUpData.user) {
+        // Now make them admin
+        const { data: adminResult, error: adminError } = await supabase
+          .rpc("make_user_admin_by_email", { user_email: "quemile@gmail.com" });
+
+        if (adminError) throw adminError;
+
+        toast({
+          title: "Admin user created",
+          description: "Admin user created successfully. You can now log in.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Failed to create admin",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -91,6 +130,20 @@ const AdminLogin = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+          
+          <div className="mt-4 pt-4 border-t border-border">
+            <p className="text-sm text-muted-foreground text-center mb-2">
+              Initial setup only:
+            </p>
+            <Button 
+              onClick={createInitialAdmin}
+              variant="outline"
+              className="w-full"
+              disabled={isLoading}
+            >
+              Create Initial Admin User
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
