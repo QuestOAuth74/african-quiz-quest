@@ -61,25 +61,32 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
             return (
               <Card 
                 key={`${category.id}-${points}`}
-                className={`aspect-square transition-all duration-300 animate-scale-in ${
+                className={`aspect-square transition-all duration-500 animate-scale-in ${
                   isAnswered 
-                    ? 'jeopardy-card opacity-30 cursor-not-allowed' 
+                    ? 'bg-theme-brown-dark/50 border-theme-brown opacity-40 cursor-not-allowed' 
                     : 'jeopardy-button hover:scale-105 cursor-pointer'
                 }`}
                 style={{ animationDelay: `${(pointIndex * colCount + catIndex) * 0.05 + 0.5}s` }}
               >
-                <CardContent className="p-0 h-full">
+                <CardContent className="p-0 h-full relative">
+                  {/* Answered overlay */}
+                  {isAnswered && (
+                    <div className="absolute inset-0 bg-theme-brown-dark/80 flex items-center justify-center z-10 rounded-lg">
+                      <div className="text-4xl text-theme-brown-light/60">✓</div>
+                    </div>
+                  )}
+                  
                   <Button
                     variant="ghost"
-                    className={`w-full h-full transition-all duration-300 font-orbitron font-black text-lg md:text-xl border-0 bg-transparent ${
+                    className={`w-full h-full transition-all duration-300 font-orbitron font-black text-lg md:text-xl border-0 bg-transparent relative ${
                       isAnswered 
-                        ? 'text-transparent cursor-not-allowed' 
+                        ? 'text-theme-brown-light/30 cursor-not-allowed pointer-events-none' 
                         : 'text-jeopardy-gold hover:text-jeopardy-gold-light hover:scale-110 jeopardy-text-glow hover:bg-transparent'
                     }`}
                     onClick={() => question && !isAnswered && onQuestionSelect(category.id, question.id)}
                     disabled={!isGameActive || isAnswered || !question}
                   >
-                    {isAnswered ? '' : `$${points.toLocaleString()}`}
+                    {`$${points.toLocaleString()}`}
                   </Button>
                 </CardContent>
               </Card>
