@@ -42,29 +42,28 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
         </div>
       </div>
 
-      {/* Welcome Message with Badges for Authenticated Users - Positioned below banner */}
-      {isAuthenticated && user && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="p-4 bg-background/90 backdrop-blur-md rounded-lg border border-theme-yellow/30 shadow-lg max-w-md">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Trophy className="h-4 w-4 text-theme-yellow" />
-              <h3 className="text-lg font-semibold text-theme-yellow">
-                Welcome back, Champion!
-              </h3>
-            </div>
-            <div className="flex justify-center gap-1 mb-2">
-              <UserBadges userId={user.id} limit={6} showTooltip={true} size="sm" />
-            </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Keep playing to unlock more achievements!
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Content Section Below Banner */}
       <div className="bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown p-8">
         <div className="max-w-5xl mx-auto">
+          
+          {/* Welcome Message with Badges for Authenticated Users - Below banner */}
+          {isAuthenticated && user && (
+            <div className="mb-8 p-6 bg-background/80 backdrop-blur-sm rounded-lg border border-theme-yellow/20 max-w-xl mx-auto">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Trophy className="h-5 w-5 text-theme-yellow" />
+                <h3 className="text-xl font-semibold text-theme-yellow">
+                  Welcome back, Champion!
+                </h3>
+              </div>
+              <div className="flex justify-center gap-2 mb-2">
+                <UserBadges userId={user.id} limit={6} showTooltip={true} />
+              </div>
+              <p className="text-sm text-muted-foreground text-center">
+                Keep playing to unlock more achievements!
+              </p>
+            </div>
+          )}
+
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-6">
               <Sparkles className="text-theme-yellow animate-pulse" size={32} />
