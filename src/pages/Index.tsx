@@ -43,6 +43,11 @@ const Index = () => {
     { id: "player1", name: "Player 1", score: 0, isActive: true },
     { id: "computer", name: "Computer", score: 0, isActive: false }
   ]);
+
+  // Add logging to track player state changes
+  useEffect(() => {
+    console.log('Players state changed:', players.map(p => ({ name: p.name, score: p.score, isActive: p.isActive })));
+  }, [players]);
   const [categories, setCategories] = useState([]);
   const [gameConfig, setGameConfig] = useState({ categories: [], rowCount: 5 });
   const [questionsData, setQuestionsData] = useState<{[key: string]: Question}>({});
@@ -340,13 +345,25 @@ const Index = () => {
     
     // Update player score
     if (pointChange !== 0) {
-      console.log('Updating player score. Point change:', pointChange, 'Active player:', players.find(p => p.isActive)?.name);
+      console.log('*** SCORE UPDATE ***');
+      console.log('Point change:', pointChange);
+      console.log('Active player before update:', players.find(p => p.isActive)?.name);
+      console.log('All players before update:', players.map(p => ({ name: p.name, score: p.score })));
     }
-    setPlayers(prev => prev.map(player => 
-      player.isActive 
-        ? { ...player, score: Math.max(0, player.score + pointChange) } // Prevent negative scores
-        : player
-    ));
+    
+    setPlayers(prev => {
+      const updated = prev.map(player => 
+        player.isActive 
+          ? { ...player, score: Math.max(0, player.score + pointChange) } // Prevent negative scores
+          : player
+      );
+      
+      if (pointChange !== 0) {
+        console.log('All players after update:', updated.map(p => ({ name: p.name, score: p.score })));
+      }
+      
+      return updated;
+    });
     
     // Mark question as answered
     setCategories(prev => prev.map(cat => ({
