@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, ArrowLeft, User, Mail, Lock } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -143,6 +144,35 @@ const Auth = () => {
     }
   };
 
+  const handleGoogleAuth = async () => {
+    setIsLoading(true);
+    
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Google Sign In Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 flex items-center justify-center p-4">
       {/* Animated Background Elements */}
@@ -258,6 +288,26 @@ const Auth = () => {
                     {isLoading ? "Signing In..." : "Sign In"}
                   </Button>
                 </form>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border/50" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                  </div>
+                </div>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isLoading}
+                  onClick={handleGoogleAuth}
+                  className="w-full h-12 rounded-xl bg-background/50 border-border/50 hover:bg-background/80 font-semibold transition-all duration-200 hover:scale-[1.02]"
+                >
+                  <FcGoogle className="w-5 h-5 mr-2" />
+                  Sign in with Google
+                </Button>
               </TabsContent>
               
               <TabsContent value="signup" className="space-y-6">
@@ -355,6 +405,26 @@ const Auth = () => {
                     {isLoading ? "Creating Account..." : "Create Account"}
                   </Button>
                 </form>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border/50" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                  </div>
+                </div>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isLoading}
+                  onClick={handleGoogleAuth}
+                  className="w-full h-12 rounded-xl bg-background/50 border-border/50 hover:bg-background/80 font-semibold transition-all duration-200 hover:scale-[1.02]"
+                >
+                  <FcGoogle className="w-5 h-5 mr-2" />
+                  Sign up with Google
+                </Button>
               </TabsContent>
             </Tabs>
           </CardContent>
