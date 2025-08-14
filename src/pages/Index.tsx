@@ -270,6 +270,39 @@ const Index = () => {
     }
   };
 
+  const handleAISelectQuestion = () => {
+    console.log('AI selecting its own question...');
+    
+    // Get all available (unanswered) questions
+    const availableQuestions: Array<{categoryId: string, questionId: string, points: number}> = [];
+    
+    categories.forEach(category => {
+      category.questions.forEach(question => {
+        if (!question.isAnswered && question.hasQuestion) {
+          availableQuestions.push({
+            categoryId: category.id,
+            questionId: question.id,
+            points: question.points
+          });
+        }
+      });
+    });
+    
+    if (availableQuestions.length === 0) {
+      console.log('No available questions for AI to select');
+      return;
+    }
+    
+    // Randomly select a question
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    const selectedQuestion = availableQuestions[randomIndex];
+    
+    console.log('AI selected question:', selectedQuestion);
+    
+    // Trigger question selection
+    handleQuestionSelect(selectedQuestion.categoryId, selectedQuestion.questionId);
+  };
+
   const handleAITurn = (question: Question) => {
     console.log('AI Turn triggered for question:', question.text, 'Points:', question.points);
     console.log('AI turn in progress flag:', aiTurnInProgress);
@@ -415,16 +448,28 @@ const Index = () => {
         isActive: !player.isActive
       })));
       
-      // Check if the new active player is AI and there's a selected question
+      // Check if the new active player is AI and there's no question modal open
       const newActivePlayers = players.map(player => ({
         ...player,
         isActive: !player.isActive
       }));
       const newActivePlayer = newActivePlayers.find(p => p.isActive);
       
-      // If AI becomes active and there's still a question modal open, AI should answer
-      if (newActivePlayer?.name === "Computer" && selectedQuestion && isQuestionModalOpen && !aiTurnInProgress) {
-        console.log('AI becoming active after player switch, triggering AI turn');
+      if (newActivePlayer?.name === "Computer" && !isQuestionModalOpen && !aiTurnInProgress) {
+        console.log('AI becomes active, selecting its own question');
+        setAiTurnInProgress(true);
+        setTimeout(() => {
+          // Double-check AI is still active and no modal is open
+          const stillActivePlayer = players.find(p => !p.isActive)?.name; // Will be the new active player
+          if (stillActivePlayer === "Computer" && !isQuestionModalOpen) {
+            handleAISelectQuestion();
+          } else {
+            console.log('AI question selection cancelled - conditions changed');
+            setAiTurnInProgress(false);
+          }
+        }, 1500); // Give a bit of time for the UI to update
+      } else if (newActivePlayer?.name === "Computer" && selectedQuestion && isQuestionModalOpen && !aiTurnInProgress) {
+        console.log('AI becoming active with existing question, triggering AI turn');
         setAiTurnInProgress(true);
         setTimeout(() => {
           // Double-check conditions are still valid
