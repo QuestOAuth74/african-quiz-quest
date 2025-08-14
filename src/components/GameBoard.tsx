@@ -42,11 +42,11 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
         {categories.map((category, index) => (
           <Card 
             key={category.id} 
-            className="jeopardy-gold border-none animate-fade-in"
+            className="bg-theme-brown-dark border-none animate-fade-in"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <CardHeader className="p-3">
-              <CardTitle className="text-center text-xs md:text-sm font-orbitron font-black uppercase tracking-wider text-jeopardy-blue-dark leading-tight">
+              <CardTitle className="text-center text-xs md:text-sm font-orbitron font-black uppercase tracking-wider text-white leading-tight">
                 {category.name}
               </CardTitle>
             </CardHeader>
