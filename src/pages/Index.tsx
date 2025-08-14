@@ -292,15 +292,6 @@ const Index = () => {
   if (!gameMode) {
     return (
       <div className="min-h-screen overflow-hidden relative">
-        {/* Admin Access Button */}
-        <div className="absolute top-4 right-4 z-50">
-          <Link to="/admin/login">
-            <Button variant="ghost" size="sm" className="text-theme-yellow hover:text-theme-yellow-light hover:bg-theme-yellow/10 border border-theme-yellow/20">
-              <Settings className="w-4 h-4 mr-2" />
-              Admin
-            </Button>
-          </Link>
-        </div>
 
         {/* User Authentication Section */}
         <div className="container mx-auto px-4 pt-20 pb-8">
@@ -327,15 +318,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen overflow-hidden relative">
-      {/* Admin Access Button */}
-      <div className="absolute top-4 right-4 z-50">
-        <Link to="/admin/login">
-          <Button variant="ghost" size="sm" className="text-theme-yellow hover:text-theme-yellow-light hover:bg-theme-yellow/10 border border-theme-yellow/20">
-            <Settings className="w-4 h-4 mr-2" />
-            Admin
-          </Button>
-        </Link>
-      </div>
 
       <GameHeader 
         players={players}

@@ -145,13 +145,6 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
           </PopoverContent>
         </Popover>
 
-        {/* Admin Access */}
-        <Link to="/admin/login">
-          <Button variant="ghost" size="sm" className="text-white hover:text-theme-yellow-light hover:bg-white/10 border border-white/20">
-            <Settings className="w-4 h-4 mr-2" />
-            Admin
-          </Button>
-        </Link>
       </div>
       
       {/* Full Height Banner Image */}
