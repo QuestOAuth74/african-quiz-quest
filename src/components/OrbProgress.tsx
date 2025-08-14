@@ -195,7 +195,7 @@ export const OrbProgress = ({ userId }: OrbProgressProps) => {
           <div className="font-medium text-foreground mb-2">Earn more orbs:</div>
           <div>• 10 forum posts = 1 orb</div>
           <div>• 20 forum replies = 1 orb</div>
-          <div>• 5,000 quiz points = 10 orbs</div>
+          <div>• 5,000 quiz points = 5 orbs</div>
         </div>
       </CardContent>
     </Card>
