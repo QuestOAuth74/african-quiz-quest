@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePlayerLobby } from '@/hooks/usePlayerLobby';
 import { useAuth } from '@/hooks/useAuth';
+import { useGameRoom } from '@/hooks/useGameRoom';
 import { toast } from 'sonner';
 
 interface LiveLobbyProps {
@@ -27,8 +28,11 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
     enterWaitingLobby,
     leaveWaitingLobby,
     sendMatchRequest,
-    respondToMatchRequest
+    respondToMatchRequest,
+    updatePlayerStatus
   } = usePlayerLobby();
+  
+  const { createRoom, loading: roomLoading } = useGameRoom();
 
   // Debug logging
   console.log('LiveLobby Debug:', {
@@ -59,21 +63,60 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
   };
 
   const handleMatchResponse = async (requestId: string, accept: boolean) => {
-    const success = await respondToMatchRequest(requestId, accept);
-    if (success && accept) {
-      // Simulate room creation and match found
-      setTimeout(() => {
-        const mockRoomId = `room_${Date.now()}`;
-        const mockPlayers = [
-          { id: user?.id, name: user?.email?.split('@')[0] || 'You', score: 0 }
-        ];
-        onMatchFound(mockRoomId, mockPlayers);
-      }, 1000);
+    if (!accept) {
+      await respondToMatchRequest(requestId, false);
+      toast.info('Match request declined');
+      return;
+    }
+
+    try {
+      // Accept the match request first
+      const success = await respondToMatchRequest(requestId, true);
+      if (!success) {
+        toast.error('Failed to accept match request');
+        return;
+      }
+
+      // Create a real game room
+      const room = await createRoom(gameConfig);
+      if (!room) {
+        toast.error('Failed to create game room');
+        return;
+      }
+
+      // Update both players' status to 'in_game'
+      await updatePlayerStatus('in_game');
+
+      // Find the requester to get their info
+      const request = matchmakingRequests.find(req => req.id === requestId);
+      const requester = onlinePlayers.find(p => p.user_id === request?.requester_id);
+
+      // Create players array for the game
+      const players = [
+        { 
+          id: user?.id, 
+          name: user?.email?.split('@')[0] || 'You', 
+          score: 0,
+          user_id: user?.id 
+        },
+        { 
+          id: request?.requester_id, 
+          name: requester?.display_name || 'Player', 
+          score: 0,
+          user_id: request?.requester_id 
+        }
+      ];
+
+      toast.success('Match accepted! Joining game room...');
+      onMatchFound(room.id, players);
+    } catch (error) {
+      console.error('Error handling match response:', error);
+      toast.error('Failed to start game. Please try again.');
     }
   };
 
   const getPlayerDisplayName = (player: any) => {
-    return player.display_name || player.email?.split('@')[0] || 'Anonymous';
+    return player.display_name || 'Anonymous';
   };
 
   const getStatusColor = (status: string) => {
