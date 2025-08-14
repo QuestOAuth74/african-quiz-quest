@@ -38,6 +38,63 @@ export const useGameRoom = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Find active game for current user
+  const findActiveGame = useCallback(async () => {
+    if (!user) return null;
+
+    try {
+      const { data: playerData, error: playerError } = await supabase
+        .from('game_room_players')
+        .select(`
+          room_id,
+          game_rooms (
+            id,
+            room_code,
+            status,
+            current_player_count,
+            max_players,
+            game_config
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .not('game_rooms.status', 'eq', 'finished')
+        .order('joined_at', { ascending: false })
+        .limit(1);
+
+      if (playerError) throw playerError;
+
+      if (playerData && playerData.length > 0 && playerData[0].game_rooms) {
+        return playerData[0].game_rooms as any;
+      }
+
+      return null;
+    } catch (err: any) {
+      console.error('Failed to find active game:', err);
+      return null;
+    }
+  }, [user]);
+
+  // Add player to existing room (for match acceptance)
+  const addPlayerToRoom = useCallback(async (roomId: string, playerId: string, playerName: string) => {
+    try {
+      const { error } = await supabase
+        .from('game_room_players')
+        .insert({
+          room_id: roomId,
+          user_id: playerId,
+          player_name: playerName,
+          is_host: false
+        });
+
+      if (error) throw error;
+      return true;
+    } catch (err: any) {
+      console.error('Failed to add player to room:', err);
+      return false;
+    }
+  }, []);
+
   // Create a new game room
   const createRoom = useCallback(async (gameConfig: { categories: string[]; rowCount: number }) => {
     if (!user) {
@@ -287,6 +344,8 @@ export const useGameRoom = () => {
     joinRoom,
     leaveRoom,
     startGame,
+    findActiveGame,
+    addPlayerToRoom,
     isHost: currentRoom?.host_user_id === user?.id,
     canStart: currentRoom?.status === 'waiting' && players.length >= 2
   };

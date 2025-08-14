@@ -32,7 +32,8 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
     updatePlayerStatus
   } = usePlayerLobby();
   
-  const { createRoom, loading: roomLoading } = useGameRoom();
+  const { createRoom, addPlayerToRoom, findActiveGame, loading: roomLoading } = useGameRoom();
+  const [activeGame, setActiveGame] = useState<any>(null);
 
   // Debug logging
   console.log('LiveLobby Debug:', {
@@ -84,12 +85,26 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         return;
       }
 
-      // Update both players' status to 'in_game'
-      await updatePlayerStatus('in_game');
-
-      // Find the requester to get their info
+      // Find the requester to add them to the room
       const request = matchmakingRequests.find(req => req.id === requestId);
       const requester = onlinePlayers.find(p => p.user_id === request?.requester_id);
+
+      if (request?.requester_id && requester) {
+        // Add the requester to the room
+        const requesterAdded = await addPlayerToRoom(
+          room.id, 
+          request.requester_id, 
+          requester.display_name || 'Player'
+        );
+
+        if (!requesterAdded) {
+          toast.error('Failed to add requester to room');
+          return;
+        }
+      }
+
+      // Update both players' status to 'in_game'
+      await updatePlayerStatus('in_game');
 
       // Create players array for the game
       const players = [
@@ -114,6 +129,33 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
       toast.error('Failed to start game. Please try again.');
     }
   };
+
+  const handleRejoinGame = () => {
+    if (activeGame) {
+      // Create minimal players array for rejoining
+      const players = [
+        { 
+          id: user?.id, 
+          name: 'You', 
+          score: 0,
+          user_id: user?.id 
+        }
+      ];
+      onMatchFound(activeGame.id, players);
+    }
+  };
+
+  // Check for active games on component mount
+  useEffect(() => {
+    const checkActiveGame = async () => {
+      const game = await findActiveGame();
+      setActiveGame(game);
+    };
+
+    if (user) {
+      checkActiveGame();
+    }
+  }, [user, findActiveGame]);
 
   const getPlayerDisplayName = (player: any) => {
     return player.display_name || 'Anonymous';
@@ -159,13 +201,27 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
             </div>
           </div>
 
-          {/* Status indicator */}
+          {/* Status indicator and controls */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full animate-pulse ${getStatusColor(currentStatus)}`} />
               <span className="text-white capitalize">{currentStatus}</span>
             </div>
-            {currentStatus === 'waiting' ? (
+            
+            {/* Active game indicator */}
+            {activeGame && (
+              <Button
+                onClick={handleRejoinGame}
+                className="bg-green-600 hover:bg-green-700"
+                size="sm"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                Rejoin Game ({activeGame.room_code})
+              </Button>
+            )}
+            
+            {/* Queue controls */}
+            {!activeGame && (currentStatus === 'waiting' ? (
               <Button
                 onClick={leaveWaitingLobby}
                 variant="outline"
@@ -182,7 +238,7 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
               >
                 Join Queue
               </Button>
-            )}
+            ))}
           </div>
         </div>
 
