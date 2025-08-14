@@ -25,22 +25,16 @@ serve(async (req) => {
       );
     }
 
-    // Create admin client with service role
-    const supabaseAdmin = createClient(
+    // Create regular client for user authentication
+    const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
     console.log('Attempting admin login for:', email);
 
-    // Sign in with email and password using admin client
-    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
+    // Sign in with email and password using regular client
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -69,7 +63,18 @@ serve(async (req) => {
 
     console.log('User authenticated successfully:', authData.user.id);
 
-    // Check if user is admin
+    // Check if user is admin using admin client
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('is_admin, email')
