@@ -20,32 +20,32 @@ const ForumHeader = () => {
     {
       id: '1',
       title: 'Welcome to Baobab Talks',
-      description: 'Join the conversation with fellow trivia enthusiasts and share your knowledge',
-      badge: 'Community Hub',
+      description: 'Explore the rich tapestry of African history and share knowledge about our heritage',
+      badge: 'African Heritage',
       icon: <MessageCircle className="h-6 w-6" />,
       gradient: 'bg-gradient-to-r from-primary/20 to-accent/20'
     },
     {
       id: '2',
-      title: 'Share Your Strategies',
-      description: 'Discover winning tactics and share your own game-changing approaches',
-      badge: 'Strategy Zone',
+      title: 'Ancient Civilizations',
+      description: 'Discover the great kingdoms of Africa - from Kush to Zimbabwe, Mali to Axum',
+      badge: 'Historical Empires',
       icon: <TrendingUp className="h-6 w-6" />,
       gradient: 'bg-gradient-to-r from-accent/20 to-secondary/20'
     },
     {
       id: '3',
-      title: 'Growing Community',
-      description: 'Connect with players from around the world and build lasting friendships',
-      badge: 'Global Network',
+      title: 'Cultural Exchange',
+      description: 'Connect with fellow history enthusiasts and share stories from across the continent',
+      badge: 'Community',
       icon: <Users className="h-6 w-6" />,
       gradient: 'bg-gradient-to-r from-secondary/20 to-primary/20'
     },
     {
       id: '4',
-      title: 'Latest Features',
-      description: 'Explore new question categories and enhanced gameplay features',
-      badge: 'What\'s New',
+      title: 'Preserving Our Stories',
+      description: 'Help document and preserve African narratives for future generations',
+      badge: 'Legacy Building',
       icon: <Sparkles className="h-6 w-6" />,
       gradient: 'bg-gradient-to-r from-primary/30 to-accent/30'
     }
@@ -135,26 +135,6 @@ const ForumHeader = () => {
                   />
                 ))}
               </div>
-            </div>
-          </div>
-
-          {/* Stats Section */}
-          <div className="flex items-center gap-8 mt-8 pt-8 border-t border-border/50">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-foreground">1,247</div>
-              <div className="text-sm text-muted-foreground">Active Members</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-foreground">3,891</div>
-              <div className="text-sm text-muted-foreground">Discussions</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-foreground">12,456</div>
-              <div className="text-sm text-muted-foreground">Messages</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-foreground">24/7</div>
-              <div className="text-sm text-muted-foreground">Community</div>
             </div>
           </div>
         </CardContent>
