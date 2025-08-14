@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Brain } from "lucide-react";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 interface PlayerTimerProps {
   isActive: boolean;
@@ -11,6 +12,7 @@ interface PlayerTimerProps {
 export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProps) => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [isVisible, setIsVisible] = useState(false);
+  const soundEffects = useSoundEffects();
 
   useEffect(() => {
     if (isActive && playerName !== "Computer") {
@@ -25,6 +27,12 @@ export const PlayerTimer = ({ isActive, playerName, onTimeout }: PlayerTimerProp
             onTimeout?.();
             return 0;
           }
+          
+          // Play a gentle category selection sound every 10 seconds (less intrusive)
+          if (prev % 10 === 0) {
+            soundEffects.playCategorySelect();
+          }
+          
           return prev - 1;
         });
       }, 1000);
