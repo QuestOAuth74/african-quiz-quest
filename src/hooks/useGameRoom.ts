@@ -237,6 +237,43 @@ export const useGameRoom = () => {
     }
   }, [currentRoom, user]);
 
+  // Delete room (host only, when room is inactive)
+  const deleteRoom = useCallback(async () => {
+    if (!currentRoom || !user || currentRoom.host_user_id !== user.id) {
+      toast.error('Only the host can delete the room');
+      return false;
+    }
+
+    if (currentRoom.status === 'playing') {
+      toast.error('Cannot delete an active game');
+      return false;
+    }
+
+    try {
+      // First remove all players
+      await supabase
+        .from('game_room_players')
+        .delete()
+        .eq('room_id', currentRoom.id);
+
+      // Then delete the room
+      const { error } = await supabase
+        .from('game_rooms')
+        .delete()
+        .eq('id', currentRoom.id);
+
+      if (error) throw error;
+
+      setCurrentRoom(null);
+      setPlayers([]);
+      toast.success('Room deleted successfully');
+      return true;
+    } catch (err: any) {
+      toast.error('Failed to delete room');
+      return false;
+    }
+  }, [currentRoom, user]);
+
   // Start the game (host only)
   const startGame = useCallback(async () => {
     if (!currentRoom || !user || currentRoom.host_user_id !== user.id) {
@@ -343,10 +380,12 @@ export const useGameRoom = () => {
     createRoom,
     joinRoom,
     leaveRoom,
+    deleteRoom,
     startGame,
     findActiveGame,
     addPlayerToRoom,
     isHost: currentRoom?.host_user_id === user?.id,
-    canStart: currentRoom?.status === 'waiting' && players.length >= 2
+    canStart: currentRoom?.status === 'waiting' && players.length >= 2,
+    canDelete: currentRoom?.host_user_id === user?.id && currentRoom?.status !== 'playing'
   };
 };

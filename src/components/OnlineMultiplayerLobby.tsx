@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Users, Copy, Crown, Play, Zap } from 'lucide-react';
+import { ArrowLeft, Users, Copy, Crown, Play, Zap, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,9 +32,11 @@ export const OnlineMultiplayerLobby = ({
     createRoom,
     joinRoom,
     leaveRoom,
+    deleteRoom,
     startGame,
     isHost,
-    canStart
+    canStart,
+    canDelete
   } = useGameRoom();
 
   const handleCreateRoom = async () => {
@@ -90,6 +92,13 @@ export const OnlineMultiplayerLobby = ({
   const handleLeaveRoom = async () => {
     await leaveRoom();
     setMode('menu');
+  };
+
+  const handleDeleteRoom = async () => {
+    const success = await deleteRoom();
+    if (success) {
+      setMode('menu');
+    }
   };
 
   if (mode === 'waiting' && currentRoom) {
@@ -185,8 +194,17 @@ export const OnlineMultiplayerLobby = ({
                   variant="outline"
                   className="flex-1 text-white border-white/20"
                 >
-                  Leave Room
+                  {isHost ? 'Exit Room' : 'Leave Room'}
                 </Button>
+                {canDelete && (
+                  <Button
+                    onClick={handleDeleteRoom}
+                    variant="destructive"
+                    className="text-white"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
                 <Button
                   onClick={onBack}
                   variant="outline"
