@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import GameCompletionModal from "@/components/GameCompletionModal";
+import { PlayerTimer } from "@/components/PlayerTimer";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -375,6 +376,14 @@ const Index = () => {
     }
   };
 
+  const handlePlayerTimeout = () => {
+    console.log('Player timed out, switching turns');
+    setPlayers(prev => prev.map(player => ({
+      ...player,
+      isActive: !player.isActive
+    })));
+  };
+
   const handleAnswer = async (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
     let isCorrect = false;
     let pointChange = 0;
@@ -661,6 +670,14 @@ const Index = () => {
           onNewGame={handleNewGame}
         />
       </div>
+      
+      {/* Player Timer - only show when human player is active and no question selected */}
+      <PlayerTimer 
+        isActive={players.find(p => p.isActive)?.name !== "Computer" && !selectedQuestion && !isQuestionModalOpen}
+        playerName={players.find(p => p.isActive)?.name || ""}
+        onTimeout={handlePlayerTimeout}
+      />
+      
       <GameBoard 
         categories={categories}
         onQuestionSelect={handleQuestionSelect}
