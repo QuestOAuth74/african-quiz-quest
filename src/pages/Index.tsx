@@ -17,6 +17,7 @@ import { AIThinkingIndicator } from "@/components/AIThinkingIndicator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import WelcomeModal from "@/components/WelcomeModal";
+import { OnlineMultiplayerLobby } from "@/components/OnlineMultiplayerLobby";
 
 interface Question {
   id: string;
@@ -141,7 +142,7 @@ const Index = () => {
 
   const [playerCount, setPlayerCount] = useState<number>(2);
 
-  const handleModeSelect = (mode: 'single' | 'multiplayer', selectedPlayerCount?: number) => {
+  const handleModeSelect = (mode: 'single' | 'multiplayer' | 'online-multiplayer', selectedPlayerCount?: number) => {
     setGameMode(mode);
     setGameConfigured(false);
     if (mode === 'multiplayer' && selectedPlayerCount) {
@@ -673,6 +674,32 @@ const Index = () => {
   }
 
   if (!gameConfigured) {
+    // Handle online multiplayer mode
+    if (gameMode === 'online-multiplayer') {
+      return (
+        <div className="min-h-screen overflow-hidden relative">
+          {/* Top Navigation */}
+          <TopNavigation />
+          
+          {/* Global Audio Controls */}
+          <div className="fixed top-4 right-4 z-50">
+            <AudioControls />
+          </div>
+          <div className="pt-16">
+            <OnlineMultiplayerLobby
+              onBack={handleBackToModeSelection}
+              onGameStart={(roomId, players) => {
+                setOnlineGameRoomId(roomId);
+                setPlayers(players);
+                setGameConfigured(true);
+              }}
+              gameConfig={{ categories: [], rowCount: 5 }}
+            />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen overflow-hidden relative">
         {/* Top Navigation */}
