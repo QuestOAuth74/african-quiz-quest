@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, CheckCircle, XCircle } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Clock, CheckCircle, XCircle, SkipForward } from "lucide-react";
 
 interface QuestionModalProps {
   isOpen: boolean;
@@ -18,7 +19,7 @@ interface QuestionModalProps {
     historicalContext: string;
     imageUrl?: string;
   } | null;
-  onAnswer: (selectedAnswerIndex: number) => void;
+  onAnswer: (selectedAnswerIndex: number | 'pass' | 'timeout') => void;
   timeLimit?: number;
 }
 
@@ -45,7 +46,11 @@ export function QuestionModal({
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          setShowAnswer(true);
+          if (!hasAnswered) {
+            setShowAnswer(true);
+            setHasAnswered(true);
+            onAnswer('timeout');
+          }
           return 0;
         }
         return prev - 1;
@@ -60,6 +65,12 @@ export function QuestionModal({
     setHasAnswered(true);
     setShowAnswer(true);
     onAnswer(answerIndex);
+  };
+
+  const handlePass = () => {
+    setHasAnswered(true);
+    setShowAnswer(true);
+    onAnswer('pass');
   };
 
   const handleClose = () => {
@@ -127,41 +138,67 @@ export function QuestionModal({
 
           {/* Answer Options */}
           {!showAnswer && !hasAnswered && timeLeft > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
-              {question.options.map((option, index) => (
+            <div className="space-y-4 animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {question.options.map((option, index) => (
+                  <Button
+                    key={index}
+                    onClick={() => handleAnswer(index)}
+                    variant="outline"
+                    className="p-6 h-auto text-left jeopardy-button font-exo text-base hover:scale-105 transition-all duration-300 border-jeopardy-gold/50 text-jeopardy-gold hover:text-jeopardy-gold-light"
+                  >
+                    <span className="font-orbitron font-bold mr-3 text-jeopardy-gold-light">
+                      {String.fromCharCode(65 + index)}.
+                    </span>
+                    {option}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex justify-center">
                 <Button
-                  key={index}
-                  onClick={() => handleAnswer(index)}
+                  onClick={handlePass}
                   variant="outline"
-                  className="p-6 h-auto text-left jeopardy-button font-exo text-base hover:scale-105 transition-all duration-300 border-jeopardy-gold/50 text-jeopardy-gold hover:text-jeopardy-gold-light"
+                  className="px-8 py-4 jeopardy-button font-orbitron font-bold text-lg hover:scale-105 transition-all duration-300 border-orange-500/50 text-orange-400 hover:text-orange-300"
+                  size="lg"
                 >
-                  <span className="font-orbitron font-bold mr-3 text-jeopardy-gold-light">
-                    {String.fromCharCode(65 + index)}.
-                  </span>
-                  {option}
+                  <SkipForward className="mr-2" size={20} />
+                  PASS
                 </Button>
-              ))}
+              </div>
             </div>
           )}
 
           {/* Show Results and Explanation */}
           {showAnswer && (
-            <div className="space-y-6 animate-fade-in">
+            <ScrollArea className="max-h-96 w-full">
+              <div className="space-y-6 animate-fade-in pr-4">
               {/* Results */}
-              <Card className={`border-none ${selectedAnswerIndex === question.correctAnswerIndex ? 'jeopardy-gold' : 'bg-red-900/20 border-red-500/50'}`}>
+              <Card className={`border-none ${
+                selectedAnswerIndex === question.correctAnswerIndex 
+                  ? 'jeopardy-gold' 
+                  : selectedAnswerIndex === null 
+                    ? 'bg-orange-900/20 border-orange-500/50'
+                    : 'bg-red-900/20 border-red-500/50'
+              }`}>
                 <CardContent className="p-6">
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-3 mb-4">
                       {selectedAnswerIndex === question.correctAnswerIndex ? (
                         <CheckCircle className="text-jeopardy-blue-dark" size={24} />
+                      ) : selectedAnswerIndex === null ? (
+                        <SkipForward className="text-orange-600" size={24} />
                       ) : (
                         <XCircle className="text-red-600" size={24} />
                       )}
                       <p className="text-lg font-orbitron font-bold text-jeopardy-blue-dark uppercase tracking-wider">
-                        {selectedAnswerIndex === question.correctAnswerIndex ? 'Correct!' : 'Incorrect'}
+                        {selectedAnswerIndex === question.correctAnswerIndex 
+                          ? 'Correct!' 
+                          : selectedAnswerIndex === null 
+                            ? 'Passed' 
+                            : 'Incorrect'}
                       </p>
                     </div>
-                    {selectedAnswerIndex !== null && (
+                    {selectedAnswerIndex !== null && typeof selectedAnswerIndex === 'number' && (
                       <p className="text-base mb-3 text-jeopardy-blue-dark">
                         You selected: <strong>{question.options[selectedAnswerIndex]}</strong>
                       </p>
@@ -193,6 +230,7 @@ export function QuestionModal({
                 </CardContent>
               </Card>
             </div>
+            </ScrollArea>
           )}
 
           {/* Close Button */}

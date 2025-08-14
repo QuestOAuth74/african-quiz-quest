@@ -140,16 +140,22 @@ const Index = () => {
     setIsQuestionModalOpen(true);
   };
 
-  const handleAnswer = (selectedAnswerIndex: number) => {
-    const isCorrect = selectedAnswerIndex === selectedQuestion?.correctAnswerIndex;
+  const handleAnswer = (selectedAnswerIndex: number | 'pass' | 'timeout') => {
+    let isCorrect = false;
+    let pointChange = 0;
     
-    if (isCorrect) {
-      setPlayers(prev => prev.map(player => 
-        player.isActive 
-          ? { ...player, score: player.score + selectedQuestion.points }
-          : player
-      ));
+    if (typeof selectedAnswerIndex === 'number') {
+      isCorrect = selectedAnswerIndex === selectedQuestion?.correctAnswerIndex;
+      pointChange = isCorrect ? selectedQuestion.points : -selectedQuestion.points;
     }
+    // For 'pass' and 'timeout', no points are gained or lost
+    
+    // Update player score
+    setPlayers(prev => prev.map(player => 
+      player.isActive 
+        ? { ...player, score: Math.max(0, player.score + pointChange) } // Prevent negative scores
+        : player
+    ));
     
     // Mark question as answered
     setCategories(prev => prev.map(cat => ({
