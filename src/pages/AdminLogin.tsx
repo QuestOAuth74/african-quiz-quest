@@ -91,11 +91,6 @@ const AdminLogin = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-          <div className="mt-4 text-center">
-            <Link to="/admin/signup" className="text-sm text-muted-foreground hover:underline">
-              Need to create an admin account? Sign up here
-            </Link>
-          </div>
         </CardContent>
       </Card>
     </div>
