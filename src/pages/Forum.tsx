@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { MessageCircle, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
-import { TopNavigation } from '@/components/TopNavigation';
+import TopNavigation from '@/components/TopNavigation';
 
 interface Category {
   id: string;

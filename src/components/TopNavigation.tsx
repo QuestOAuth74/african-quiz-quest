@@ -1,7 +1,7 @@
 import { ExternalLink, Youtube, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function TopNavigation() {
+const TopNavigation = () => {
   return (
     <nav className="w-full bg-theme-brown-dark/95 backdrop-blur-sm border-b border-theme-yellow/20 py-3 px-4 fixed top-0 z-40">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -61,4 +61,6 @@ export function TopNavigation() {
       </div>
     </nav>
   );
-}
+};
+
+export default TopNavigation;

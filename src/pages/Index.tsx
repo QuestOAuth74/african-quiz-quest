@@ -6,7 +6,7 @@ import { GameHeader } from "@/components/GameHeader";
 import { GameBoard } from "@/components/GameBoard";
 import QuestionModal from "@/components/QuestionModal";
 import UserAuth from "@/components/UserAuth";
-import { TopNavigation } from "@/components/TopNavigation";
+import TopNavigation from "@/components/TopNavigation";
 import { AudioControls } from "@/components/AudioControls";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
