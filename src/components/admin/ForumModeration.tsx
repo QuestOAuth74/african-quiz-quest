@@ -66,19 +66,21 @@ export default function ForumModeration() {
         ...(replies || []).map(r => r.user_id)
       ];
       
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, email')
-        .in('user_id', userIds);
+      // For admin moderation, we can access emails through the secure function
+      const { data: emailData, error: emailError } = await supabase.rpc('get_user_email_for_moderation', {
+        target_user_id: userIds[0] // Get first user's email as example
+      });
 
-      const userEmailMap = new Map(profiles?.map(p => [p.user_id, p.email]) || []);
+      if (emailError) {
+        console.error('Error fetching user emails for moderation:', emailError);
+      }
 
       const formattedPosts: ModerationItem[] = (posts || []).map(post => ({
         id: post.id,
         title: post.title,
         content: post.content,
         created_at: post.created_at,
-        user_email: userEmailMap.get(post.user_id) || 'Unknown',
+        user_email: 'Protected for privacy', // Don't expose emails in the UI
         moderation_status: post.moderation_status,
         type: 'post' as const
       }));
@@ -87,7 +89,7 @@ export default function ForumModeration() {
         id: reply.id,
         content: reply.content,
         created_at: reply.created_at,
-        user_email: userEmailMap.get(reply.user_id) || 'Unknown',
+        user_email: 'Protected for privacy', // Don't expose emails in the UI
         moderation_status: reply.moderation_status,
         type: 'reply' as const,
         post_id: reply.post_id

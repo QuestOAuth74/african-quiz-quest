@@ -18,7 +18,6 @@ interface PostPreviewProps {
     };
     profiles: {
       display_name: string | null;
-      email: string;
     };
   };
   replyCount: number;
@@ -54,7 +53,6 @@ const PostPreview = ({
           <div className="flex items-center gap-3 flex-1">
             <UserAvatar 
               displayName={post.profiles?.display_name}
-              email={post.profiles?.email}
               size="md"
             />
             <div className="flex flex-col flex-1">

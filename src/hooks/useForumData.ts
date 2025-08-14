@@ -22,7 +22,6 @@ interface Post {
   };
   profiles: {
     display_name: string | null;
-    email: string;
   };
 }
 
@@ -34,7 +33,6 @@ interface Reply {
   created_at: string;
   profiles: {
     display_name: string | null;
-    email: string;
   };
 }
 
@@ -74,7 +72,7 @@ export const useForumData = (user: any, filters: ForumFilters) => {
       .select(`
         *,
         forum_categories!fk_forum_posts_category_id(name),
-        profiles!fk_forum_posts_user_id(display_name, email)
+        profiles!fk_forum_posts_user_id(display_name)
       `)
       .eq('moderation_status', 'approved');
 
@@ -179,7 +177,7 @@ export const useForumData = (user: any, filters: ForumFilters) => {
       .from('forum_post_replies')
       .select(`
         *,
-        profiles!fk_forum_post_replies_user_id(display_name, email)
+        profiles!fk_forum_post_replies_user_id(display_name)
       `)
       .eq('post_id', postId)
       .eq('moderation_status', 'approved')

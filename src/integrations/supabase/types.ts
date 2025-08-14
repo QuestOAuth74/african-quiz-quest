@@ -795,7 +795,6 @@ export type Database = {
       online_players: {
         Row: {
           display_name: string | null
-          email: string | null
           is_online: boolean | null
           last_seen: string | null
           player_status: string | null
@@ -803,7 +802,6 @@ export type Database = {
         }
         Insert: {
           display_name?: string | null
-          email?: string | null
           is_online?: never
           last_seen?: string | null
           player_status?: string | null
@@ -811,7 +809,6 @@ export type Database = {
         }
         Update: {
           display_name?: string | null
-          email?: string | null
           is_online?: never
           last_seen?: string | null
           player_status?: string | null

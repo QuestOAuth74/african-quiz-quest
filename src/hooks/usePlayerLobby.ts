@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 
 interface OnlinePlayer {
   user_id: string;
-  email: string;
   display_name: string | null;
   player_status: 'online' | 'waiting' | 'in_game';
   last_seen: string;

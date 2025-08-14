@@ -41,7 +41,6 @@ interface Post {
   };
   profiles: {
     display_name: string | null;
-    email: string;
   };
 }
 
@@ -53,7 +52,6 @@ interface Reply {
   created_at: string;
   profiles: {
     display_name: string | null;
-    email: string;
   };
 }
 
@@ -576,7 +574,6 @@ const Forum = () => {
                       <div className="relative">
                         <UserAvatar 
                           displayName={post.profiles?.display_name}
-                          email={post.profiles?.email}
                           size="lg"
                         />
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
@@ -673,7 +670,6 @@ const Forum = () => {
                         <div className="flex gap-3 p-4 bg-muted/30 rounded-2xl border border-border/30">
                           <UserAvatar 
                             displayName={user?.email}
-                            email={user?.email || ''}
                             size="sm"
                           />
                           <div className="flex-1 flex gap-2">
@@ -710,7 +706,6 @@ const Forum = () => {
                           <div key={reply.id} className="flex gap-3 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
                             <UserAvatar 
                               displayName={reply.profiles?.display_name}
-                              email={reply.profiles?.email}
                               size="sm"
                             />
                             <div className="flex-1">
