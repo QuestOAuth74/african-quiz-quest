@@ -1,11 +1,11 @@
 import { useState } from 'react';
-// Remove framer-motion import since it's not available
-import { ArrowLeft, Users, Copy, Crown, Play } from 'lucide-react';
+import { ArrowLeft, Users, Copy, Crown, Play, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useGameRoom } from '@/hooks/useGameRoom';
+import { LiveLobby } from './LiveLobby';
 import { toast } from 'sonner';
 
 interface OnlineMultiplayerLobbyProps {
@@ -23,7 +23,7 @@ export const OnlineMultiplayerLobby = ({
   gameConfig 
 }: OnlineMultiplayerLobbyProps) => {
   const [joinCode, setJoinCode] = useState('');
-  const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'waiting'>('menu');
+  const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'waiting' | 'live-lobby'>('menu');
   
   const {
     currentRoom,
@@ -72,6 +72,20 @@ export const OnlineMultiplayerLobby = ({
       onGameStart(currentRoom.id, players);
     }
   };
+
+  const handleEnterLiveLobby = () => {
+    setMode('live-lobby');
+  };
+
+  if (mode === 'live-lobby') {
+    return (
+      <LiveLobby
+        onBack={() => setMode('menu')}
+        onMatchFound={onGameStart}
+        gameConfig={gameConfig}
+      />
+    );
+  }
 
   const handleLeaveRoom = async () => {
     await leaveRoom();
@@ -202,11 +216,22 @@ export const OnlineMultiplayerLobby = ({
             {mode === 'menu' && (
               <>
                 <Button
+                  onClick={handleEnterLiveLobby}
+                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 mb-4"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  Enter Live Lobby
+                </Button>
+                <div className="text-center text-white/70 text-sm mb-4">Quick match with waiting players</div>
+                
+                <div className="text-center text-white/50 mb-4">or</div>
+                
+                <Button
                   onClick={handleCreateRoom}
                   disabled={loading}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  className="w-full bg-primary hover:bg-primary/90 mb-4"
                 >
-                  Create Room
+                  Create Private Room
                 </Button>
                 <div className="text-center text-white/70">or</div>
                 <div className="space-y-2">
