@@ -523,8 +523,23 @@ const Index = () => {
       }, 3500); // Wait a bit longer than the player switch delay
     }
 
-    // Manual turn switching only - no automatic turn switching
-    console.log('Answer processed. Modal will remain open until player manually continues or switches turns.');
+    // Immediately switch turns after answer (no timer)
+    if (typeof selectedAnswerIndex === 'number') {
+      console.log('Answer processed, switching turns immediately');
+      setPlayers(prev => {
+        const newPlayers = prev.map(player => ({
+          ...player,
+          isActive: !player.isActive
+        }));
+        console.log('New active player:', newPlayers.find(p => p.isActive)?.name);
+        return newPlayers;
+      });
+      
+      // Close modal and clear question selection for the next player
+      setIsQuestionModalOpen(false);
+      setSelectedQuestion(null);
+      setSelectedQuestionGridId(null);
+    }
   };
 
   const handleGameComplete = async () => {
