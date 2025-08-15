@@ -13,6 +13,7 @@ import QuizAdminOverlay from "@/components/admin/QuizAdminOverlay";
 import { useRealtimeQuestions } from "@/hooks/useRealtimeQuestions";
 import QuestionRating from "@/components/QuestionRating";
 import MotivationalPopup from "@/components/MotivationalPopup";
+import confetti from "canvas-confetti";
 
 interface Question {
   id: string;
@@ -236,6 +237,9 @@ const Quiz = () => {
     if (!user) return;
 
     try {
+      // Trigger confetti celebration
+      triggerConfetti();
+
       // Save quiz results
       const { error } = await supabase
         .from('user_games')
@@ -280,6 +284,43 @@ const Quiz = () => {
     const question = questions[currentQuestionIndex];
     if (!question) return null;
     return categories.find(c => c.id === question.category_id);
+  };
+
+  const triggerConfetti = () => {
+    // Initial burst
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    // Additional bursts with delay
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 }
+      });
+    }, 250);
+
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 }
+      });
+    }, 400);
+
+    // Final burst from the top
+    setTimeout(() => {
+      confetti({
+        particleCount: 80,
+        spread: 100,
+        origin: { y: 0.3 }
+      });
+    }, 600);
   };
 
   // Get current question with potential realtime updates
