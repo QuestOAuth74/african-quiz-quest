@@ -13,6 +13,7 @@ import QuizAdminOverlay from "@/components/admin/QuizAdminOverlay";
 import { useRealtimeQuestions } from "@/hooks/useRealtimeQuestions";
 import QuestionRating from "@/components/QuestionRating";
 import MotivationalPopup from "@/components/MotivationalPopup";
+import QuizCompletionModal from "@/components/QuizCompletionModal";
 import confetti from "canvas-confetti";
 
 interface Question {
@@ -57,6 +58,7 @@ const Quiz = () => {
   }[]>([]);
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
   const [hasShownMotivation, setHasShownMotivation] = useState(false);
+  const [showQuizCompletionModal, setShowQuizCompletionModal] = useState(false);
 
   // Get all question IDs for realtime subscription
   const questionIds = questions.map(q => q.id);
@@ -237,9 +239,6 @@ const Quiz = () => {
     if (!user) return;
 
     try {
-      // Trigger confetti celebration
-      triggerConfetti();
-
       // Save quiz results
       const { error } = await supabase
         .from('user_games')
@@ -257,19 +256,8 @@ const Quiz = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Quiz Complete!",
-        description: `You scored ${score} points out of ${questions.reduce((sum, q) => sum + q.points, 0)} possible points.`,
-      });
-
-      // Reset quiz
-      setCurrentQuestionIndex(0);
-      setScore(0);
-      setAnsweredQuestions([]);
-      setSelectedAnswer(null);
-      setShowResult(false);
-      setHasShownMotivation(false);
-      loadQuizData();
+      // Show completion modal instead of immediately resetting
+      setShowQuizCompletionModal(true);
     } catch (error) {
       console.error('Error saving quiz results:', error);
       toast({
@@ -277,7 +265,26 @@ const Quiz = () => {
         description: "Failed to save quiz results.",
         variant: "destructive",
       });
+      // Even if save fails, show completion modal
+      setShowQuizCompletionModal(true);
     }
+  };
+
+  const handleNewQuiz = () => {
+    setShowQuizCompletionModal(false);
+    // Reset quiz state
+    setCurrentQuestionIndex(0);
+    setScore(0);
+    setAnsweredQuestions([]);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setHasShownMotivation(false);
+    loadQuizData();
+  };
+
+  const handleBackToHome = () => {
+    setShowQuizCompletionModal(false);
+    navigate('/');
   };
 
   const getCurrentCategory = () => {
@@ -595,6 +602,21 @@ const Quiz = () => {
       <MotivationalPopup 
         isOpen={showMotivationalPopup}
         onClose={() => setShowMotivationalPopup(false)}
+      />
+
+      {/* Quiz Completion Modal */}
+      <QuizCompletionModal
+        isOpen={showQuizCompletionModal}
+        onClose={() => setShowQuizCompletionModal(false)}
+        onNewQuiz={handleNewQuiz}
+        onBackToHome={handleBackToHome}
+        finalScore={score}
+        totalPossiblePoints={questions.reduce((sum, q) => sum + q.points, 0)}
+        questionsAnswered={questions.length}
+        questionsCorrect={answeredQuestions.filter(q => q.correct).length}
+        answeredQuestions={answeredQuestions}
+        questions={questions}
+        categories={categories}
       />
     </div>
   );
