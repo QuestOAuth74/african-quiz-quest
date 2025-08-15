@@ -79,9 +79,18 @@ const QuestionModal = ({
 
     if (!isOpen || !question || hasAnswered) return;
     
-    // Start countdown music
-    gameAudio.playCountdown();
+    // Only start countdown for AI players, not human players in multiplayer
+    const isAIPlayer = currentPlayer === "Computer";
+    const isMultiplayer = gameMode === 'multiplayer' || gameMode === 'online-multiplayer';
     
+    if (isMultiplayer && !isAIPlayer) {
+      return; // Don't run timer for human players in multiplayer
+    }
+    
+    // Start countdown music only for AI players
+    if (isAIPlayer) {
+      gameAudio.playCountdown();
+    }
     
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -92,7 +101,9 @@ const QuestionModal = ({
             onAnswer('timeout');
           }
           // Stop countdown music when time runs out
-          gameAudio.stopCountdown();
+          if (isAIPlayer) {
+            gameAudio.stopCountdown();
+          }
           return 0;
         }
         return prev - 1;
@@ -100,7 +111,7 @@ const QuestionModal = ({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isOpen, question, timeLimit, hasAnswered, showTeacherMode]);
+  }, [isOpen, question, timeLimit, hasAnswered, showTeacherMode, currentPlayer, gameMode]);
 
   // Review period timer - 30 seconds after answer is revealed
   useEffect(() => {
@@ -417,8 +428,13 @@ const QuestionModal = ({
           
           <ScrollArea className="flex-1 max-h-[70vh]">
             <div className="space-y-6 pr-4">
-              {/* Timer */}
-              {!showAnswer && !hasAnswered && (
+              {/* Timer - only show for AI players in multiplayer */}
+              {!showAnswer && !hasAnswered && (() => {
+                const isAIPlayer = currentPlayer === "Computer";
+                const isMultiplayer = gameMode === 'multiplayer' || gameMode === 'online-multiplayer';
+                const shouldShowTimer = !isMultiplayer || isAIPlayer;
+                
+                return shouldShowTimer && (
                   <div className="space-y-3">
                     <div className="w-full bg-theme-brown-dark rounded-full h-3 border border-theme-yellow/30">
                       <div 
@@ -433,7 +449,8 @@ const QuestionModal = ({
                       </span>
                     </div>
                   </div>
-              )}
+                );
+              })()}
 
               {/* Question */}
               <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
