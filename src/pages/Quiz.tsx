@@ -12,6 +12,7 @@ import TopNavigation from "@/components/TopNavigation";
 import QuizAdminOverlay from "@/components/admin/QuizAdminOverlay";
 import { useRealtimeQuestions } from "@/hooks/useRealtimeQuestions";
 import QuestionRating from "@/components/QuestionRating";
+import MotivationalPopup from "@/components/MotivationalPopup";
 
 interface Question {
   id: string;
@@ -53,6 +54,8 @@ const Quiz = () => {
     correct: boolean;
     selectedOption: string;
   }[]>([]);
+  const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
+  const [hasShownMotivation, setHasShownMotivation] = useState(false);
 
   // Get all question IDs for realtime subscription
   const questionIds = questions.map(q => q.id);
@@ -201,11 +204,21 @@ const Quiz = () => {
     }
 
     // Track answered question
-    setAnsweredQuestions(prev => [...prev, {
+    const newAnsweredQuestions = [...answeredQuestions, {
       questionId: questions[currentQuestionIndex].id,
       correct: isCorrect,
       selectedOption: selectedAnswer
-    }]);
+    }];
+    setAnsweredQuestions(newAnsweredQuestions);
+
+    // Show motivational popup once during the quiz (around halfway point)
+    const halfwayPoint = Math.floor(questions.length / 2);
+    if (!hasShownMotivation && newAnsweredQuestions.length === halfwayPoint && newAnsweredQuestions.length > 2) {
+      setTimeout(() => {
+        setShowMotivationalPopup(true);
+        setHasShownMotivation(true);
+      }, 1500); // Show after a brief delay to let result sink in
+    }
   };
 
   const handleNextQuestion = () => {
@@ -251,6 +264,7 @@ const Quiz = () => {
       setAnsweredQuestions([]);
       setSelectedAnswer(null);
       setShowResult(false);
+      setHasShownMotivation(false);
       loadQuizData();
     } catch (error) {
       console.error('Error saving quiz results:', error);
@@ -535,6 +549,12 @@ const Quiz = () => {
           </div>
         )}
       </div>
+
+      {/* Motivational Popup */}
+      <MotivationalPopup 
+        isOpen={showMotivationalPopup}
+        onClose={() => setShowMotivationalPopup(false)}
+      />
     </div>
   );
 };
