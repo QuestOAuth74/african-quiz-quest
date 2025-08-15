@@ -123,6 +123,7 @@ const QuestionModal = ({
         setReviewTimeLeft((prev) => {
           if (prev <= 1) {
             setIsReviewPeriodActive(false);
+            handleClose(); // Auto-close when review time expires
             return 0;
           }
           return prev - 1;
@@ -131,16 +132,22 @@ const QuestionModal = ({
 
       return () => clearInterval(reviewTimer);
     }
+    
+    // If paused, stop the review period
+    if (isPaused) {
+      setIsReviewPeriodActive(false);
+    }
   }, [showAnswer, showTeacherMode, isPaused]);
 
   const handleKeepReviewing = () => {
     setIsPaused(true);
     setIsReviewPeriodActive(false);
+    // Stop any timers immediately when pausing
   };
 
   const handleContinueAfterPause = () => {
     setIsPaused(false);
-    handleClose();
+    // Don't auto-close, let user decide when to continue
   };
 
   const handleOptionSelect = (optionId: string) => {
@@ -634,12 +641,17 @@ const QuestionModal = ({
                         </div>
                       </div>
                     ) : isPaused ? (
-                      /* When user chose to keep reviewing */
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground mb-3">Take your time to review the answer</p>
+                      /* When user chose to keep reviewing - truly paused */
+                      <div className="space-y-4">
+                        <div className="bg-blue-900/20 rounded-lg p-4 border border-blue-500/50">
+                          <p className="text-blue-400 font-orbitron font-bold text-lg mb-2 flex items-center justify-center gap-2">
+                            ⏸️ GAME PAUSED
+                          </p>
+                          <p className="text-sm text-blue-300 text-center">Take your time to review the answer and explanation</p>
+                        </div>
                         <Button 
-                          onClick={handleContinueAfterPause}
-                          className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300"
+                          onClick={handleClose}
+                          className="px-8 py-4 jeopardy-button font-orbitron font-bold text-lg hover:scale-105 transition-all duration-300"
                         >
                           CONTINUE GAME
                         </Button>
