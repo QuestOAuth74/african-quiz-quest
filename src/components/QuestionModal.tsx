@@ -344,46 +344,74 @@ const QuestionModal = ({
                 </CardContent>
               </Card>
 
-              {/* Answer Options */}
+              {/* Answer Options or Computer Turn Message */}
               {!showAnswer && !hasAnswered && (
                 <div className="space-y-4 animate-fade-in">
-                  <div className="space-y-3">
-                    {question.options?.map((option, index) => (
-                      <Button
-                        key={`game-option-${option.id}`}
-                        onClick={() => handleOptionSelect(option.id)}
-                        variant={selectedOption === option.id ? "default" : "outline"}
-                        className={`w-full p-4 h-auto text-left justify-start transition-all duration-300 ${
-                          selectedOption === option.id 
-                            ? "jeopardy-gold border-theme-yellow" 
-                            : "jeopardy-button border-theme-yellow/50 hover:border-theme-yellow"
-                        }`}
-                      >
-                        <span className="font-orbitron font-bold mr-3 text-theme-yellow-light">
-                          {String.fromCharCode(65 + index)}.
-                        </span>
-                        <span className="flex-1">{option.text}</span>
-                      </Button>
-                    ))}
-                  </div>
-                  
-                  <div className="flex gap-3 justify-center mt-6">
-                    <Button
-                      onClick={handleSkip}
-                      variant="outline"
-                      className="jeopardy-button border-orange-500/50 text-orange-400 hover:text-orange-300"
-                    >
-                      <SkipForward className="mr-2" size={16} />
-                      Skip
-                    </Button>
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={!selectedOption}
-                      className="jeopardy-button px-8"
-                    >
-                      Submit Answer
-                    </Button>
-                  </div>
+                  {isAIPlayer ? (
+                    <Card className="jeopardy-card border-blue-500/50 bg-gradient-to-br from-blue-900/20 to-purple-900/20">
+                      <CardContent className="p-6 text-center">
+                        <div className="flex items-center justify-center gap-3 mb-4">
+                          <Bot className="h-8 w-8 text-blue-400 animate-pulse" />
+                          <h3 className="text-xl font-bold text-blue-400">Computer's Turn</h3>
+                          <Bot className="h-8 w-8 text-purple-400 animate-pulse" />
+                        </div>
+                        <p className="text-muted-foreground mb-4">
+                          The computer has selected this question. Click below to see the computer's answer.
+                        </p>
+                        <Button 
+                          onClick={() => {
+                            setHasAnswered(true);
+                            setShowAnswer(true);
+                            setSelectedAnswerIndex(question.correctAnswerIndex);
+                            onAnswer(question.correctAnswerIndex);
+                          }}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2"
+                        >
+                          See Computer's Answer
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <>
+                      <div className="space-y-3">
+                        {question.options?.map((option, index) => (
+                          <Button
+                            key={`game-option-${option.id}`}
+                            onClick={() => handleOptionSelect(option.id)}
+                            variant={selectedOption === option.id ? "default" : "outline"}
+                            className={`w-full p-4 h-auto text-left justify-start transition-all duration-300 ${
+                              selectedOption === option.id 
+                                ? "jeopardy-gold border-theme-yellow" 
+                                : "jeopardy-button border-theme-yellow/50 hover:border-theme-yellow"
+                            }`}
+                          >
+                            <span className="font-orbitron font-bold mr-3 text-theme-yellow-light">
+                              {String.fromCharCode(65 + index)}.
+                            </span>
+                            <span className="flex-1">{option.text}</span>
+                          </Button>
+                        ))}
+                      </div>
+                      
+                      <div className="flex gap-3 justify-center mt-6">
+                        <Button
+                          onClick={handleSkip}
+                          variant="outline"
+                          className="jeopardy-button border-orange-500/50 text-orange-400 hover:text-orange-300"
+                        >
+                          <SkipForward className="mr-2" size={16} />
+                          Skip
+                        </Button>
+                        <Button
+                          onClick={handleSubmit}
+                          disabled={!selectedOption}
+                          className="jeopardy-button px-8"
+                        >
+                          Submit Answer
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 

@@ -146,15 +146,13 @@ const Index = () => {
         return () => clearTimeout(timer);
       }
       
-      // AI answers the question when modal is open and question is selected
+      // AI has selected the question, now waiting for user to click to see answer
       if (selectedQuestion && isQuestionModalOpen && (!aiCooldownUntil || now >= aiCooldownUntil)) {
-        console.log('AI turn: answering selected question');
+        console.log('AI turn: question selected, waiting for user to see answer');
         setAiIsSelectingQuestion(false);
-        setAiIsThinking(true);
-        const timer = setTimeout(() => {
-          handleAITurn(selectedQuestion);
-        }, 2000);
-        return () => clearTimeout(timer);
+        // Don't set aiIsThinking to true - the AI is not actively thinking anymore
+        // The user will click a button to see the AI's answer
+        handleAITurn(selectedQuestion);
       }
     }
   }, [players, selectedQuestion, isQuestionModalOpen, gameConfigured, aiCooldownUntil]);
@@ -406,6 +404,15 @@ const Index = () => {
   };
 
   const handleAITurn = (question: Question) => {
+    console.log('AI turn - question selected:', question.text, 'Points:', question.points);
+    
+    // AI has selected the question, but doesn't auto-answer
+    // The user will see the question and click to see the AI's answer
+    setAiIsThinking(false); // AI finished selecting question
+    console.log('AI waiting for user to see answer...');
+  };
+
+  const handleAIAnswer = (question: Question) => {
     console.log('AI answering question:', question.text, 'Points:', question.points);
     
     const correctAnswerIndex = question.correctAnswerIndex;
@@ -415,13 +422,11 @@ const Index = () => {
       // Set AI cooldown for 60 seconds after answering
       const cooldownEnd = Date.now() + 60000; // 60 seconds
       setAiCooldownUntil(cooldownEnd);
-      setAiIsThinking(false); // AI finished thinking
       console.log('AI cooldown set for 60 seconds');
       
       handleAnswer(correctAnswerIndex);
     } else {
       console.log('No correct answer index found for AI');
-      setAiIsThinking(false);
     }
   };
 
@@ -622,6 +627,15 @@ const Index = () => {
   };
 
   const handleCloseModal = () => {
+    const activePlayer = players.find(p => p.isActive);
+    
+    // If it's the computer's turn and they haven't answered yet, auto-answer correctly
+    if (activePlayer?.name === "Computer" && selectedQuestion) {
+      console.log('Computer auto-answering before closing modal');
+      handleAIAnswer(selectedQuestion);
+      return; // Let the handleAnswer logic close the modal and switch turns
+    }
+    
     setIsQuestionModalOpen(false);
     setSelectedQuestion(null);
     setShowTeacherMode(false);
