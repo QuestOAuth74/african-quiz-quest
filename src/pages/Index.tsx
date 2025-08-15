@@ -545,10 +545,21 @@ const Index = () => {
       }, 3500); // Wait a bit longer than the player switch delay
     }
 
-    // If it's the computer's turn, automatically switch turns after processing the answer
+    // Automatically switch turns after processing the answer
     const activePlayer = players.find(p => p.isActive);
     if (activePlayer?.name === "Computer") {
       console.log('Computer answered, switching turns immediately');
+      setPlayers(prev => {
+        const newPlayers = prev.map(player => ({
+          ...player,
+          isActive: !player.isActive
+        }));
+        console.log('Switched to next player:', newPlayers.find(p => p.isActive)?.name);
+        return newPlayers;
+      });
+    } else if (activePlayer?.name !== "Computer") {
+      // Human player answered, switch turn to computer
+      console.log('Human answered, switching turns to computer');
       setPlayers(prev => {
         const newPlayers = prev.map(player => ({
           ...player,
