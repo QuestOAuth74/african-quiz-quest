@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Quiz from "./pages/Quiz";
 import QuizSetup from "./pages/QuizSetup";
 import Footer from "./components/Footer";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -28,10 +29,10 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
-            <Route path="/forum" element={<Forum />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/quiz-setup" element={<QuizSetup />} />
+            <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
+            <Route path="/quiz-setup" element={<ProtectedRoute><QuizSetup /></ProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             {/* Catch-all route must be last */}

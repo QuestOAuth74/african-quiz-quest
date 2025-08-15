@@ -2,10 +2,38 @@ import { useState } from "react";
 import { ExternalLink, Youtube, Globe, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const TopNavigation = () => {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleProtectedNavigation = (path: string, featureName: string) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: `Please sign in to access ${featureName}.`,
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
+    navigate(path);
+  };
+
+  const handleSignOut = async () => {
+    setOpen(false);
+    await signOut();
+    toast({
+      title: "Signed Out",
+      description: "You have been successfully signed out.",
+    });
+    navigate('/');
+  };
   return (
     <nav className="w-full bg-theme-brown-dark/95 backdrop-blur-sm border-b border-theme-yellow/20 py-2 sm:py-3 px-3 sm:px-4 fixed top-0 z-40">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -18,37 +46,53 @@ const TopNavigation = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-3">
           <Button
-            asChild
             variant="ghost"
             size="sm"
             className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
+            onClick={() => handleProtectedNavigation('/quiz-setup', 'Start Quiz')}
           >
-            <Link to="/quiz-setup">
-              Start Quiz
-            </Link>
+            Start Quiz
           </Button>
           
           <Button
-            asChild
             variant="ghost"
             size="sm"
             className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
+            onClick={() => handleProtectedNavigation('/forum', 'Baobab Talks')}
           >
-            <Link to="/forum">
-              Baobab Talks
-            </Link>
+            Baobab Talks
           </Button>
           
           <Button
-            asChild
             variant="ghost"
             size="sm"
             className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
+            onClick={() => handleProtectedNavigation('/profile', 'Profile')}
           >
-            <Link to="/profile">
-              Profile
-            </Link>
+            Profile
           </Button>
+          
+          {/* Auth Button */}
+          {isAuthenticated ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
+              onClick={handleSignOut}
+            >
+              Sign Out
+            </Button>
+          ) : (
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
+            >
+              <Link to="/auth">Sign In</Link>
+            </Button>
+          )}
+          
           <Button
             asChild
             variant="ghost"
@@ -120,29 +164,35 @@ const TopNavigation = () => {
                     <span>Home</span>
                   </Link>
                   
-                  <Link
-                    to="/quiz-setup"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      handleProtectedNavigation('/quiz-setup', 'Start Quiz');
+                    }}
+                    className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10 w-full text-left"
                   >
                     <span>Start Quiz</span>
-                  </Link>
+                  </button>
                   
-                  <Link
-                    to="/forum"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      handleProtectedNavigation('/forum', 'Baobab Talks');
+                    }}
+                    className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10 w-full text-left"
                   >
                     <span>Baobab Talks</span>
-                  </Link>
+                  </button>
                   
-                  <Link
-                    to="/profile"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      handleProtectedNavigation('/profile', 'Profile');
+                    }}
+                    className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10 w-full text-left"
                   >
                     <span>Profile</span>
-                  </Link>
+                  </button>
                   
                   <Link
                     to="/leaderboard"
@@ -183,13 +233,22 @@ const TopNavigation = () => {
 
                 {/* Auth Link at Bottom */}
                 <div className="mt-auto pt-6 border-t border-theme-yellow/20">
-                  <Link
-                    to="/auth"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center justify-center gap-2 text-theme-brown-dark bg-theme-yellow hover:bg-theme-yellow/90 transition-colors p-3 rounded-md font-medium"
-                  >
-                    <span>Sign In / Sign Up</span>
-                  </Link>
+                  {isAuthenticated ? (
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center justify-center gap-2 text-theme-brown-dark bg-theme-yellow hover:bg-theme-yellow/90 transition-colors p-3 rounded-md font-medium w-full"
+                    >
+                      <span>Sign Out</span>
+                    </button>
+                  ) : (
+                    <Link
+                      to="/auth"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-center gap-2 text-theme-brown-dark bg-theme-yellow hover:bg-theme-yellow/90 transition-colors p-3 rounded-md font-medium"
+                    >
+                      <span>Sign In / Sign Up</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </SheetContent>
