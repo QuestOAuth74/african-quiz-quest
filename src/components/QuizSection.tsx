@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Clock, Award, Users, Brain, Target, Star, Sparkles } from "lucide-react";
+import { BookOpen, Clock, Award, Users, Brain, Target, Star, Sparkles, Gift } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import blackAfricaBook from "@/assets/black-africa-book.png";
 
 export const QuizSection = () => {
   const navigate = useNavigate();
@@ -154,6 +155,35 @@ export const QuizSection = () => {
                 <span>Personal progress analytics</span>
               </li>
             </ul>
+          </div>
+        </div>
+
+        {/* Book Reward Section */}
+        <div className="mb-12">
+          <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto p-6 bg-gradient-to-r from-theme-yellow/10 via-theme-yellow-light/10 to-theme-yellow-dark/10 rounded-2xl border border-theme-yellow/30 backdrop-blur-sm jeopardy-card">
+            <div className="order-2 md:order-1">
+              <h3 className="text-3xl font-bold text-theme-yellow mb-4 flex items-center gap-2">
+                <Gift className="w-8 h-8" />
+                FREE BOOK REWARD
+              </h3>
+              <h4 className="text-xl font-semibold text-theme-yellow-light mb-3">
+                Black Africa - An Illustrated History
+              </h4>
+              <p className="text-card-foreground mb-4 text-lg">
+                Earn <span className="text-theme-yellow font-bold">100 orbs</span> through gameplay and receive your free digital copy of this comprehensive historical text!
+              </p>
+              <div className="flex items-center gap-2 text-theme-yellow-light">
+                <Star className="w-5 h-5" />
+                <span className="text-sm">Complete quizzes, participate in forums, and engage with the community to collect orbs</span>
+              </div>
+            </div>
+            <div className="order-1 md:order-2 flex justify-center">
+              <img 
+                src={blackAfricaBook} 
+                alt="Black Africa - An Illustrated History book cover"
+                className="max-w-full h-auto max-h-64 object-contain rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
+              />
+            </div>
           </div>
         </div>
 
