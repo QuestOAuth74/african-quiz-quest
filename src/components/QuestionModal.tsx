@@ -8,6 +8,7 @@ import { CheckCircle, XCircle, SkipForward, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useGameAudio } from "@/hooks/useGameAudio";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Question {
   id: string;
@@ -44,6 +45,7 @@ const QuestionModal = ({
 }: QuestionModalProps) => {
   const soundEffects = useSoundEffects();
   const gameAudio = useGameAudio();
+  const isMobile = useIsMobile();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showTeacherMode, setShowTeacherMode] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -124,7 +126,7 @@ const QuestionModal = ({
     
     return (
       <Dialog open={isOpen} onOpenChange={handleTeacherModeClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] jeopardy-card">
+        <DialogContent className={`max-w-4xl ${isMobile ? 'max-h-[75vh]' : 'max-h-[90vh]'} jeopardy-card ${isMobile ? 'pb-safe' : ''}`}>
           <DialogHeader>
             <DialogTitle className="text-center text-2xl gradient-text">
               🎓 Teacher Mode - Answer Revealed
@@ -134,7 +136,7 @@ const QuestionModal = ({
             </DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className="max-h-[70vh] pr-4">
+          <ScrollArea className={`${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'} pr-4`}>
             <div className="space-y-6">
               {/* Question Display */}
               <Card className="jeopardy-card border-theme-yellow/30">
@@ -255,10 +257,13 @@ const QuestionModal = ({
 
   // Dynamic styling based on player type
   const getModalClasses = () => {
+    const heightClass = isMobile ? 'max-h-[75vh]' : 'max-h-[85vh]';
+    const mobileClass = isMobile ? 'pb-safe' : '';
+    
     if (isAIPlayer) {
-      return "max-w-4xl max-h-[85vh] jeopardy-card border-blue-500/50 bg-gradient-to-br from-blue-900/20 to-purple-900/20";
+      return `max-w-4xl ${heightClass} jeopardy-card border-blue-500/50 bg-gradient-to-br from-blue-900/20 to-purple-900/20 ${mobileClass}`;
     }
-    return "max-w-4xl max-h-[85vh] jeopardy-card border-theme-yellow/30";
+    return `max-w-4xl ${heightClass} jeopardy-card border-theme-yellow/30 ${mobileClass}`;
   };
 
   const getHeaderClasses = () => {
@@ -324,7 +329,7 @@ const QuestionModal = ({
             )}
           </DialogHeader>
           
-          <ScrollArea className="flex-1 max-h-[70vh]">
+          <ScrollArea className={`flex-1 ${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'}`}>
             <div className="space-y-6 pr-4">
               {/* Question */}
               <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
@@ -501,7 +506,7 @@ const QuestionModal = ({
                   )}
 
                    {/* Continue Button */}
-                   <div className="text-center pt-2">
+                   <div className={`text-center ${isMobile ? 'pt-2 pb-2' : 'pt-2'}`}>
                      <Button 
                        onClick={handleClose}
                        className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300"
