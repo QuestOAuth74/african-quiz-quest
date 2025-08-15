@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Gem, Download, MessageSquare, MessageCircle, Trophy, Sparkles, Crown, Star } from 'lucide-react';
+import { Download, MessageSquare, MessageCircle, Trophy, Sparkles, Crown, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 
