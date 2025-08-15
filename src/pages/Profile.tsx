@@ -36,6 +36,15 @@ const Profile = () => {
     }
   }, [user]);
 
+  // Check if stats should be refreshed when returning from quiz
+  useEffect(() => {
+    const shouldRefresh = localStorage.getItem('refreshProfileStats');
+    if (shouldRefresh === 'true' && user) {
+      localStorage.removeItem('refreshProfileStats');
+      fetchUserStats();
+    }
+  }, [user]);
+
   const fetchProfile = async () => {
     if (!user) return;
 

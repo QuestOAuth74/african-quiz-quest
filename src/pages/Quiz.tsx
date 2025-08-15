@@ -240,7 +240,7 @@ const Quiz = () => {
 
     try {
       // Save quiz results
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('user_games')
         .insert({
           user_id: user.id,
@@ -252,20 +252,29 @@ const Quiz = () => {
             categories.find(c => c.id === q.category_id)?.name || 'Unknown'
           ))],
           game_duration_seconds: null
-        });
+        })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error saving quiz results:', error);
+        throw error;
+      }
 
-      // Show completion modal instead of immediately resetting
+      console.log('Quiz results saved successfully:', data);
+      
+      // Mark that stats should be refreshed on profile page
+      localStorage.setItem('refreshProfileStats', 'true');
+      
+      // Show completion modal
       setShowQuizCompletionModal(true);
     } catch (error) {
       console.error('Error saving quiz results:', error);
       toast({
         title: "Error",
-        description: "Failed to save quiz results.",
+        description: "Failed to save quiz results. Please try again.",
         variant: "destructive",
       });
-      // Even if save fails, show completion modal
+      // Show completion modal even if save fails
       setShowQuizCompletionModal(true);
     }
   };
