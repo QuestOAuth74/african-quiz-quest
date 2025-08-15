@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Download, MessageSquare, MessageCircle, Trophy, Sparkles, Crown, Star } from 'lucide-react';
+import { OrbIcon } from './OrbIcon';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 
@@ -170,7 +171,7 @@ export const OrbProgress = ({ userId }: OrbProgressProps) => {
       <CardHeader className="relative pb-3">
         <CardTitle className="flex items-center gap-3 text-lg font-bold">
           <div className="p-2 bg-gradient-to-br from-amber-500/20 to-purple-500/20 rounded-xl">
-            <Gem className="h-5 w-5 text-amber-500" />
+            <OrbIcon className="text-amber-500" size={20} />
           </div>
           <span className="bg-gradient-to-r from-amber-500 to-purple-500 bg-clip-text text-transparent">
             Orb Collection
@@ -182,7 +183,7 @@ export const OrbProgress = ({ userId }: OrbProgressProps) => {
         {/* Total Orbs Display */}
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Gem className="h-6 w-6 text-amber-500" />
+            <OrbIcon className="text-amber-500" size={24} />
             <span className="text-3xl font-black bg-gradient-to-r from-amber-500 to-purple-500 bg-clip-text text-transparent">
               {orbData.total_orbs}
             </span>
@@ -291,8 +292,8 @@ export const OrbProgress = ({ userId }: OrbProgressProps) => {
         {/* How to earn more orbs */}
         <div className="text-xs text-muted-foreground space-y-1 bg-background/30 p-3 rounded-lg border border-border/30">
           <div className="font-medium text-foreground mb-2">Earn more orbs:</div>
-          <div>• 10 forum posts = 1 orb</div>
-          <div>• 20 forum replies = 1 orb</div>
+          <div>• 10 forum posts = 5 orbs</div>
+          <div>• 20 forum replies = 7 orbs</div>
           <div>• 5,000 quiz points = 5 orbs</div>
         </div>
       </CardContent>
