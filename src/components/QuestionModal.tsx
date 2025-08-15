@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle, XCircle, SkipForward, Bot } from "lucide-react";
+import { CheckCircle, XCircle, SkipForward, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useGameAudio } from "@/hooks/useGameAudio";
@@ -32,7 +32,6 @@ interface QuestionModalProps {
   onAnswer: (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => void;
   currentPlayer?: string;
   gameMode?: 'single' | 'multiplayer' | 'online-multiplayer';
-  timeLimit?: number;
 }
 
 const QuestionModal = ({ 
@@ -41,117 +40,27 @@ const QuestionModal = ({
   onClose, 
   onAnswer, 
   currentPlayer, 
-  gameMode,
-  timeLimit = 30 
+  gameMode
 }: QuestionModalProps) => {
   const soundEffects = useSoundEffects();
   const gameAudio = useGameAudio();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [showTeacherMode, setShowTeacherMode] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
-  const [reviewTimeLeft, setReviewTimeLeft] = useState(30);
-  const [isReviewPeriodActive, setIsReviewPeriodActive] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen && question) {
       setSelectedOption(null);
-      setTimeLeft(timeLimit);
       setShowTeacherMode(false);
       setShowAnswer(false);
       setHasAnswered(false);
       setSelectedAnswerIndex(null);
-      setReviewTimeLeft(30);
-      setIsReviewPeriodActive(false);
-      setIsPaused(false);
     }
-  }, [isOpen, question, timeLimit]);
-
-  useEffect(() => {
-    if (showTeacherMode) {
-      return; // Don't run timer in teacher mode
-    }
-
-    if (!isOpen || !question || hasAnswered) return;
-    
-    // Only start countdown for AI players, not human players in multiplayer
-    const isAIPlayer = currentPlayer === "Computer";
-    const isMultiplayer = gameMode === 'multiplayer' || gameMode === 'online-multiplayer';
-    
-    if (isMultiplayer && !isAIPlayer) {
-      return; // Don't run timer for human players in multiplayer
-    }
-    
-    // Start countdown music only for AI players
-    if (isAIPlayer) {
-      gameAudio.playCountdown();
-    }
-    
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (!hasAnswered) {
-            setShowAnswer(true);
-            setHasAnswered(true);
-            onAnswer('timeout');
-          }
-          // Stop countdown music when time runs out
-          if (isAIPlayer) {
-            gameAudio.stopCountdown();
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isOpen, question, timeLimit, hasAnswered, showTeacherMode, currentPlayer, gameMode]);
-
-  // Review period timer - 30 seconds after answer is revealed
-  useEffect(() => {
-    if (showAnswer && !showTeacherMode && !isPaused) {
-      setIsReviewPeriodActive(true);
-      setReviewTimeLeft(30);
-      
-      const reviewTimer = setInterval(() => {
-        setReviewTimeLeft((prev) => {
-          if (prev <= 1) {
-            setIsReviewPeriodActive(false);
-            // Only auto-close if not paused
-            if (!isPaused) {
-              handleClose();
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(reviewTimer);
-    }
-    
-    // If paused, stop the review period completely
-    if (isPaused) {
-      setIsReviewPeriodActive(false);
-    }
-  }, [showAnswer, showTeacherMode, isPaused]);
-
-  const handleKeepReviewing = () => {
-    setIsPaused(true);
-    setIsReviewPeriodActive(false);
-    // Stop any timers immediately when pausing
-  };
-
-  const handleContinueAfterPause = () => {
-    setIsPaused(false);
-    // Don't auto-close, let user decide when to continue
-  };
+  }, [isOpen, question]);
 
   const handleOptionSelect = (optionId: string) => {
     soundEffects.playButtonClick();
@@ -161,7 +70,6 @@ const QuestionModal = ({
   const handleSkip = () => {
     soundEffects.playButtonClick();
     setHasAnswered(true);
-    gameAudio.stopCountdown();
     onAnswer('skip');
   };
 
@@ -172,7 +80,6 @@ const QuestionModal = ({
       setSelectedAnswerIndex(answerIndex);
       setHasAnswered(true);
       setShowAnswer(true);
-      gameAudio.stopCountdown();
       
       // Play correct/wrong answer sound
       const selectedOptionObj = question.options?.find(opt => opt.id === selectedOption);
@@ -190,7 +97,6 @@ const QuestionModal = ({
   const handlePass = () => {
     setHasAnswered(true);
     setShowAnswer(true);
-    gameAudio.stopCountdown();
     onAnswer('pass');
   };
 
@@ -345,8 +251,6 @@ const QuestionModal = ({
   }
 
   // Regular Game Mode View
-  const timeProgress = (timeLeft / timeLimit) * 100;
-  const isTimeRunningOut = timeLeft <= 10;
   const isAIPlayer = currentPlayer === "Computer";
 
   // Dynamic styling based on player type
@@ -376,22 +280,6 @@ const QuestionModal = ({
       return "text-blue-400 font-medium";
     }
     return "text-theme-yellow font-medium";
-  };
-
-  const getTimerClasses = () => {
-    if (isTimeRunningOut) {
-      return 'bg-gradient-to-r from-red-500 to-red-600 animate-pulse';
-    }
-    if (isAIPlayer) {
-      return 'bg-gradient-to-r from-blue-400 to-purple-400';
-    }
-    return 'bg-gradient-to-r from-theme-yellow to-theme-yellow-light';
-  };
-
-  const getClockColor = () => {
-    if (isTimeRunningOut) return 'text-red-400 animate-pulse';
-    if (isAIPlayer) return 'text-blue-400';
-    return 'text-theme-yellow';
   };
 
   return (
@@ -438,30 +326,6 @@ const QuestionModal = ({
           
           <ScrollArea className="flex-1 max-h-[70vh]">
             <div className="space-y-6 pr-4">
-              {/* Timer - only show for AI players in multiplayer */}
-              {!showAnswer && !hasAnswered && (() => {
-                const isAIPlayer = currentPlayer === "Computer";
-                const isMultiplayer = gameMode === 'multiplayer' || gameMode === 'online-multiplayer';
-                const shouldShowTimer = !isMultiplayer || isAIPlayer;
-                
-                return shouldShowTimer && (
-                  <div className="space-y-3">
-                    <div className="w-full bg-theme-brown-dark rounded-full h-3 border border-theme-yellow/30">
-                      <div 
-                        className={`h-3 rounded-full transition-all duration-1000 ${getTimerClasses()}`}
-                        style={{ width: `${timeProgress}%` }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-center gap-2">
-                      <Clock size={16} className={getClockColor()} />
-                      <span className={`font-orbitron font-bold ${getClockColor()}`}>
-                        {timeLeft}s
-                      </span>
-                    </div>
-                  </div>
-                );
-              })()}
-
               {/* Question */}
               <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
                 <CardContent className="p-4">
@@ -481,7 +345,7 @@ const QuestionModal = ({
               </Card>
 
               {/* Answer Options */}
-              {!showAnswer && !hasAnswered && timeLeft > 0 && (
+              {!showAnswer && !hasAnswered && (
                 <div className="space-y-4 animate-fade-in">
                   <div className="space-y-3">
                     {question.options?.map((option, index) => (
@@ -608,67 +472,15 @@ const QuestionModal = ({
                     </Card>
                   )}
 
-                  {/* Review Controls */}
-                  <div className="text-center pt-2">
-                  {isReviewPeriodActive ? (
-                      /* During mandatory 30-second review */
-                      <div className="space-y-4">
-                        <div className="bg-theme-brown-dark/50 rounded-lg p-4 border border-theme-yellow/30">
-                          <div className="flex items-center justify-center gap-2 mb-3">
-                            <Clock className="h-5 w-5 text-theme-yellow animate-pulse" />
-                            <p className="text-theme-yellow font-orbitron font-bold text-lg">
-                              Auto-continue in {reviewTimeLeft}s
-                            </p>
-                          </div>
-                          <div className="w-full bg-theme-brown-dark rounded-full h-2 border border-theme-yellow/30">
-                            <div 
-                              className="h-2 rounded-full bg-gradient-to-r from-theme-yellow to-theme-yellow-light transition-all duration-1000"
-                              style={{ width: `${(reviewTimeLeft / 30) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex gap-3 justify-center">
-                          <Button 
-                            onClick={handleKeepReviewing}
-                            className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base bg-blue-600 hover:bg-blue-700 border-blue-500"
-                          >
-                            ⏸️ PAUSE TO REVIEW
-                          </Button>
-                          <Button 
-                            onClick={handleClose}
-                            variant="outline"
-                            className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base border-theme-yellow/50 hover:border-theme-yellow"
-                          >
-                            CONTINUE NOW
-                          </Button>
-                        </div>
-                      </div>
-                    ) : isPaused ? (
-                      /* When user chose to keep reviewing - truly paused */
-                      <div className="space-y-4">
-                        <div className="bg-blue-900/20 rounded-lg p-4 border border-blue-500/50">
-                          <p className="text-blue-400 font-orbitron font-bold text-lg mb-2 flex items-center justify-center gap-2">
-                            ⏸️ GAME PAUSED
-                          </p>
-                          <p className="text-sm text-blue-300 text-center">Take your time to review the answer and explanation</p>
-                        </div>
-                        <Button 
-                          onClick={handleClose}
-                          className="px-8 py-4 jeopardy-button font-orbitron font-bold text-lg hover:scale-105 transition-all duration-300"
-                        >
-                          CONTINUE GAME
-                        </Button>
-                      </div>
-                    ) : (
-                      /* After 30 seconds, normal continue */
-                      <Button 
-                        onClick={handleClose}
-                        className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300"
-                      >
-                        CONTINUE GAME
-                      </Button>
-                    )}
-                  </div>
+                   {/* Continue Button */}
+                   <div className="text-center pt-2">
+                     <Button 
+                       onClick={handleClose}
+                       className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300"
+                     >
+                       CONTINUE GAME
+                     </Button>
+                   </div>
                 </div>
               )}
             </div>
