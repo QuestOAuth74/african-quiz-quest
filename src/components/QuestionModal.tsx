@@ -52,7 +52,7 @@ const QuestionModal = ({
   const [showAnswer, setShowAnswer] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
-  const [reviewTimeLeft, setReviewTimeLeft] = useState(15);
+  const [reviewTimeLeft, setReviewTimeLeft] = useState(30);
   const [isReviewPeriodActive, setIsReviewPeriodActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -66,7 +66,7 @@ const QuestionModal = ({
       setShowAnswer(false);
       setHasAnswered(false);
       setSelectedAnswerIndex(null);
-      setReviewTimeLeft(15);
+      setReviewTimeLeft(30);
       setIsReviewPeriodActive(false);
       setIsPaused(false);
     }
@@ -102,11 +102,11 @@ const QuestionModal = ({
     return () => clearInterval(timer);
   }, [isOpen, question, timeLimit, hasAnswered, showTeacherMode]);
 
-  // Review period timer - 15 seconds after answer is revealed
+  // Review period timer - 30 seconds after answer is revealed
   useEffect(() => {
     if (showAnswer && !showTeacherMode && !isPaused) {
       setIsReviewPeriodActive(true);
-      setReviewTimeLeft(15);
+      setReviewTimeLeft(30);
       
       const reviewTimer = setInterval(() => {
         setReviewTimeLeft((prev) => {
@@ -583,24 +583,38 @@ const QuestionModal = ({
 
                   {/* Review Controls */}
                   <div className="text-center pt-2">
-                    {isReviewPeriodActive ? (
-                      /* During mandatory 15-second review */
-                      <div className="space-y-3">
-                        <Button 
-                          onClick={handleClose}
-                          disabled={true}
-                          className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <Clock className="mr-2 h-4 w-4 animate-spin" />
-                          CONTINUE IN {reviewTimeLeft}s
-                        </Button>
-                        <Button 
-                          onClick={handleKeepReviewing}
-                          variant="outline"
-                          className="px-4 py-2 text-sm jeopardy-button border-blue-500/50 text-blue-400 hover:text-blue-300"
-                        >
-                          Keep Reviewing
-                        </Button>
+                  {isReviewPeriodActive ? (
+                      /* During mandatory 30-second review */
+                      <div className="space-y-4">
+                        <div className="bg-theme-brown-dark/50 rounded-lg p-4 border border-theme-yellow/30">
+                          <div className="flex items-center justify-center gap-2 mb-3">
+                            <Clock className="h-5 w-5 text-theme-yellow animate-pulse" />
+                            <p className="text-theme-yellow font-orbitron font-bold text-lg">
+                              Auto-continue in {reviewTimeLeft}s
+                            </p>
+                          </div>
+                          <div className="w-full bg-theme-brown-dark rounded-full h-2 border border-theme-yellow/30">
+                            <div 
+                              className="h-2 rounded-full bg-gradient-to-r from-theme-yellow to-theme-yellow-light transition-all duration-1000"
+                              style={{ width: `${(reviewTimeLeft / 30) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-3 justify-center">
+                          <Button 
+                            onClick={handleKeepReviewing}
+                            className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base bg-blue-600 hover:bg-blue-700 border-blue-500"
+                          >
+                            ⏸️ PAUSE TO REVIEW
+                          </Button>
+                          <Button 
+                            onClick={handleClose}
+                            variant="outline"
+                            className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base border-theme-yellow/50 hover:border-theme-yellow"
+                          >
+                            CONTINUE NOW
+                          </Button>
+                        </div>
                       </div>
                     ) : isPaused ? (
                       /* When user chose to keep reviewing */
@@ -614,7 +628,7 @@ const QuestionModal = ({
                         </Button>
                       </div>
                     ) : (
-                      /* After 15 seconds, normal continue */
+                      /* After 30 seconds, normal continue */
                       <Button 
                         onClick={handleClose}
                         className="px-6 py-3 jeopardy-button font-orbitron font-bold text-base hover:scale-105 transition-all duration-300"
