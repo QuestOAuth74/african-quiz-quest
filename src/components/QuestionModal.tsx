@@ -123,7 +123,10 @@ const QuestionModal = ({
         setReviewTimeLeft((prev) => {
           if (prev <= 1) {
             setIsReviewPeriodActive(false);
-            handleClose(); // Auto-close when review time expires
+            // Only auto-close if not paused
+            if (!isPaused) {
+              handleClose();
+            }
             return 0;
           }
           return prev - 1;
@@ -133,7 +136,7 @@ const QuestionModal = ({
       return () => clearInterval(reviewTimer);
     }
     
-    // If paused, stop the review period
+    // If paused, stop the review period completely
     if (isPaused) {
       setIsReviewPeriodActive(false);
     }
