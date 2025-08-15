@@ -73,17 +73,34 @@ const Index = () => {
   const [aiIsSelectingQuestion, setAiIsSelectingQuestion] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
-  // Check if user has seen the welcome modal before
+  // Helper functions for welcome modal timing
+  const shouldShowWelcomeModal = (): boolean => {
+    const lastSeenTimestamp = localStorage.getItem('welcomeModalLastSeen');
+    if (!lastSeenTimestamp) {
+      return true; // First visit
+    }
+    
+    const lastSeen = parseInt(lastSeenTimestamp, 10);
+    const now = Date.now();
+    const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+    return (now - lastSeen) >= twentyFourHours;
+  };
+
+  const markWelcomeModalSeen = () => {
+    localStorage.setItem('welcomeModalLastSeen', Date.now().toString());
+  };
+
+  // Check if user should see the welcome modal (first visit or 24+ hours since last viewing)
   useEffect(() => {
-    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
-    if (!hasSeenWelcome) {
+    if (shouldShowWelcomeModal()) {
       setShowWelcomeModal(true);
     }
   }, []);
 
   const handleCloseWelcome = () => {
     setShowWelcomeModal(false);
-    localStorage.setItem('hasSeenWelcome', 'true');
+    markWelcomeModalSeen();
   };
 
   // Redirect to auth if not authenticated and trying to access admin
