@@ -545,6 +545,20 @@ const Index = () => {
       }, 3500); // Wait a bit longer than the player switch delay
     }
 
+    // If it's the computer's turn, automatically switch turns after processing the answer
+    const activePlayer = players.find(p => p.isActive);
+    if (activePlayer?.name === "Computer") {
+      console.log('Computer answered, switching turns immediately');
+      setPlayers(prev => {
+        const newPlayers = prev.map(player => ({
+          ...player,
+          isActive: !player.isActive
+        }));
+        console.log('Switched to next player:', newPlayers.find(p => p.isActive)?.name);
+        return newPlayers;
+      });
+    }
+
     // Keep modal open for user to read explanation
     console.log('Answer processed. Modal remains open for user to read explanation.');
   };
@@ -627,30 +641,15 @@ const Index = () => {
   };
 
   const handleCloseModal = () => {
-    const activePlayer = players.find(p => p.isActive);
-    
-    // If it's the computer's turn and they haven't answered yet, auto-answer correctly
-    if (activePlayer?.name === "Computer" && selectedQuestion) {
-      console.log('Computer auto-answering before closing modal');
-      handleAIAnswer(selectedQuestion);
-      return; // Let the handleAnswer logic close the modal and switch turns
-    }
-    
     setIsQuestionModalOpen(false);
     setSelectedQuestion(null);
     setShowTeacherMode(false);
     setSkipCount(0);
-    
-    // Switch turns when modal is manually closed after answering
-    setPlayers(prev => {
-      const newPlayers = prev.map(player => ({
-        ...player,
-        isActive: !player.isActive
-      }));
-      console.log('Modal closed, switching to next player:', newPlayers.find(p => p.isActive)?.name);
-      return newPlayers;
-    });
     setSelectedQuestionGridId(null);
+    
+    // Turn switching is now handled in handleAnswer for computer turns
+    // For human players, turns switch when they select their next question
+    console.log('Modal closed');
   };
 
   if (!gameMode) {
