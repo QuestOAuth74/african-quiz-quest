@@ -6,6 +6,7 @@ import { Users, Bot, Sparkles, ArrowLeft, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { UserBadges } from "./UserBadges";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface GameModeSelectorProps {
   onSelectMode: (mode: 'single' | 'multiplayer' | 'online-multiplayer', playerCount?: number) => void;
@@ -14,6 +15,7 @@ interface GameModeSelectorProps {
 export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
   const { user, isAuthenticated } = useAuth();
   const [showPlayerSelect, setShowPlayerSelect] = useState(false);
+  const isMobile = useIsMobile();
   
   const handleModeSelect = (mode: 'single' | 'multiplayer' | 'online-multiplayer') => {
     if (mode === 'multiplayer') {
@@ -33,12 +35,12 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
     >
       
       {/* Full Height Banner Image with Glowing Gold Band */}
-      <div className="w-full h-[50vh] sm:h-[60vh] md:h-screen p-2">
+      <div className={`w-full p-2 ${isMobile ? 'h-[40vh]' : 'h-[50vh] sm:h-[60vh] md:h-screen'}`}>
         <div className="w-full h-full relative rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,215,0,0.3),0_0_60px_rgba(255,215,0,0.2),0_0_90px_rgba(255,215,0,0.1)] bg-gradient-to-r from-yellow-400/20 via-yellow-500/30 to-yellow-400/20 p-1">
           <img 
             src="https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/jeopardy%20game%20banner.png"
             alt="African History Jeopardy Game Banner"
-            className="w-full h-full object-cover rounded-xl"
+            className={`w-full h-full rounded-xl ${isMobile ? 'object-contain' : 'object-cover'}`}
           />
         </div>
       </div>
