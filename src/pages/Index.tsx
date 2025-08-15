@@ -523,30 +523,8 @@ const Index = () => {
       }, 3500); // Wait a bit longer than the player switch delay
     }
 
-    // Switch active player after a delay to allow viewing the explanation
-    // Wait 15 seconds for review period for all players
-    const currentActivePlayer = players.find(p => p.isActive);
-    const isAIAnswering = currentActivePlayer?.name === "Computer";
-    const delayTime = 15000; // 15 seconds for all players to allow review
-    
-    console.log(`${isAIAnswering ? 'AI' : 'Human'} answered, waiting ${delayTime/1000} seconds before switching turns`);
-    
-    setTimeout(() => {
-      console.log('Switching turns after answer');
-      setPlayers(prev => {
-        const newPlayers = prev.map(player => ({
-          ...player,
-          isActive: !player.isActive
-        }));
-        console.log('New active player:', newPlayers.find(p => p.isActive)?.name);
-        return newPlayers;
-      });
-      
-      // Close modal and clear question selection for the next player
-      setIsQuestionModalOpen(false);
-      setSelectedQuestion(null);
-      setSelectedQuestionGridId(null);
-    }, delayTime);
+    // Manual turn switching only - no automatic turn switching
+    console.log('Answer processed. Modal will remain open until player manually continues or switches turns.');
   };
 
   const handleGameComplete = async () => {
