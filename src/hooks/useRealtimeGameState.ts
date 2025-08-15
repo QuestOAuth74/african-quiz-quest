@@ -9,32 +9,168 @@ interface GameState {
   players: any[];
   gameStatus: 'waiting' | 'playing' | 'finished';
   scores: Record<string, number>;
+  answeredQuestions: string[];
 }
 
 export const useRealtimeGameState = (roomId: string | null) => {
   const { user } = useAuth();
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [loading, setLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+
+  // Initialize game state when room is loaded
+  useEffect(() => {
+    if (!roomId || !user) return;
+    
+    const initializeGameState = async () => {
+      setLoading(true);
+      try {
+        // Fetch current room data
+        const { data: roomData } = await supabase
+          .from('game_rooms')
+          .select('*')
+          .eq('id', roomId)
+          .single();
+
+        // Fetch players
+        const { data: playersData } = await supabase
+          .from('game_room_players')
+          .select('*')
+          .eq('room_id', roomId);
+
+        // Fetch answered questions
+        const { data: answeredQuestionsData } = await supabase
+          .from('game_room_questions')
+          .select('question_id')
+          .eq('room_id', roomId)
+          .eq('is_answered', true);
+
+        if (roomData && playersData) {
+          const scores = playersData.reduce((acc, player) => {
+            acc[player.user_id] = player.score || 0;
+            return acc;
+          }, {} as Record<string, number>);
+
+          const answeredQuestions = answeredQuestionsData?.map(q => q.question_id) || [];
+
+          setGameState({
+            currentTurn: roomData.current_turn_user_id || playersData[0]?.user_id || '',
+            currentQuestion: null,
+            players: playersData,
+            gameStatus: roomData.status as 'waiting' | 'playing' | 'finished',
+            scores,
+            answeredQuestions
+          });
+        }
+      } catch (error) {
+        console.error('Failed to initialize game state:', error);
+        toast.error('Failed to load game state');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeGameState();
+  }, [roomId, user]);
 
   // Subscribe to real-time game state changes
   useEffect(() => {
     if (!roomId) return;
 
+    setConnectionStatus('connecting');
+
     const gameChannel = supabase
       .channel(`game-state-${roomId}`)
       .on('broadcast', { event: 'game_update' }, (payload) => {
+        console.log('Game state update received:', payload);
         setGameState(payload.payload);
       })
       .on('broadcast', { event: 'question_selected' }, (payload) => {
+        console.log('Question selected:', payload);
         toast.info(`${payload.playerName} selected a question`);
       })
       .on('broadcast', { event: 'answer_submitted' }, (payload) => {
-        toast.info(`${payload.playerName} answered the question`);
+        console.log('Answer submitted:', payload);
+        toast.info(`${payload.playerName} ${payload.isCorrect ? 'answered correctly' : 'answered incorrectly'}`);
+        
+        // Update local game state with new score
+        setGameState(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            scores: {
+              ...prev.scores,
+              [payload.userId]: (prev.scores[payload.userId] || 0) + payload.points
+            },
+            answeredQuestions: [...prev.answeredQuestions, payload.questionId]
+          };
+        });
       })
-      .subscribe();
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'game_rooms',
+        filter: `id=eq.${roomId}`
+      }, (payload) => {
+        console.log('Room updated:', payload);
+        setGameState(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            gameStatus: payload.new.status,
+            currentTurn: payload.new.current_turn_user_id || prev.currentTurn
+          };
+        });
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'game_room_players',
+        filter: `room_id=eq.${roomId}`
+      }, (payload) => {
+        console.log('Player updated:', payload);
+        setGameState(prev => {
+          if (!prev) return prev;
+          const updatedPlayers = prev.players.map(player => 
+            player.user_id === payload.new.user_id 
+              ? { ...player, score: payload.new.score }
+              : player
+          );
+          const updatedScores = { ...prev.scores };
+          updatedScores[payload.new.user_id] = payload.new.score;
+          
+          return {
+            ...prev,
+            players: updatedPlayers,
+            scores: updatedScores
+          };
+        });
+      })
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'game_room_questions',
+        filter: `room_id=eq.${roomId}`
+      }, (payload) => {
+        console.log('Question answered:', payload);
+        if (payload.new.is_answered) {
+          setGameState(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              answeredQuestions: [...prev.answeredQuestions, payload.new.question_id]
+            };
+          });
+        }
+      })
+      .subscribe((status) => {
+        console.log('Channel subscription status:', status);
+        setConnectionStatus(status === 'SUBSCRIBED' ? 'connected' : 'disconnected');
+      });
 
     return () => {
       supabase.removeChannel(gameChannel);
+      setConnectionStatus('disconnected');
     };
   }, [roomId]);
 
@@ -42,13 +178,14 @@ export const useRealtimeGameState = (roomId: string | null) => {
   const broadcastGameUpdate = useCallback(async (newGameState: GameState) => {
     if (!roomId) return;
 
-    await supabase
-      .channel(`game-state-${roomId}`)
-      .send({
-        type: 'broadcast',
-        event: 'game_update',
-        payload: newGameState
-      });
+    console.log('Broadcasting game state update:', newGameState);
+    
+    const channel = supabase.channel(`game-state-${roomId}`);
+    await channel.send({
+      type: 'broadcast',
+      event: 'game_update',
+      payload: newGameState
+    });
 
     setGameState(newGameState);
   }, [roomId]);
@@ -71,18 +208,17 @@ export const useRealtimeGameState = (roomId: string | null) => {
       if (error) throw error;
 
       // Broadcast to other players
-      await supabase
-        .channel(`game-state-${roomId}`)
-        .send({
-          type: 'broadcast',
-          event: 'question_selected',
-          payload: {
-            questionId,
-            categoryId,
-            points,
-            playerName: user.email?.split('@')[0] || 'Player'
-          }
-        });
+      const channel = supabase.channel(`game-state-${roomId}`);
+      await channel.send({
+        type: 'broadcast',
+        event: 'question_selected',
+        payload: {
+          questionId,
+          categoryId,
+          points,
+          playerName: user.email?.split('@')[0] || 'Player'
+        }
+      });
 
       return true;
     } catch (err: any) {
@@ -130,18 +266,18 @@ export const useRealtimeGameState = (roomId: string | null) => {
       if (playerError) throw playerError;
 
       // Broadcast answer result
-      await supabase
-        .channel(`game-state-${roomId}`)
-        .send({
-          type: 'broadcast',
-          event: 'answer_submitted',
-          payload: {
-            questionId,
-            isCorrect,
-            points: scoreChange,
-            playerName: user.email?.split('@')[0] || 'Player'
-          }
-        });
+      const channel = supabase.channel(`game-state-${roomId}`);
+      await channel.send({
+        type: 'broadcast',
+        event: 'answer_submitted',
+        payload: {
+          questionId,
+          isCorrect,
+          points: scoreChange,
+          playerName: user.email?.split('@')[0] || 'Player',
+          userId: user.id
+        }
+      });
 
       return true;
     } catch (err: any) {
@@ -173,6 +309,8 @@ export const useRealtimeGameState = (roomId: string | null) => {
     submitAnswer,
     nextTurn,
     broadcastGameUpdate,
-    isMyTurn: gameState?.currentTurn === user?.id
+    isMyTurn: gameState?.currentTurn === user?.id,
+    connectionStatus,
+    answeredQuestions: gameState?.answeredQuestions || []
   };
 };

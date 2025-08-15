@@ -291,17 +291,21 @@ export const useGameRoom = () => {
     }
 
     try {
+      // Initialize first turn with host or first player
+      const firstPlayer = players.find(p => p.is_host) || players[0];
+      
       const { error } = await supabase
         .from('game_rooms')
         .update({ 
-          status: 'playing',
+          status: 'playing', 
           started_at: new Date().toISOString(),
-          current_turn_user_id: players[0]?.user_id
+          current_turn_user_id: firstPlayer?.user_id
         })
         .eq('id', currentRoom.id);
 
       if (error) throw error;
 
+      console.log('Game started with first turn:', firstPlayer?.player_name);
       toast.success('Game started!');
       return true;
     } catch (err: any) {

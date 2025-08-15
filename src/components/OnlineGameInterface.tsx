@@ -7,6 +7,7 @@ import { GameBoard } from './GameBoard';
 import QuestionModal from './QuestionModal';
 import { useGameRoom } from '@/hooks/useGameRoom';
 import { useRealtimeGameState } from '@/hooks/useRealtimeGameState';
+import { useRealtimeBoardState } from '@/hooks/useRealtimeBoardState';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -19,13 +20,31 @@ interface OnlineGameInterfaceProps {
 export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps) => {
   const { user } = useAuth();
   const { currentRoom, players } = useGameRoom();
-  const { gameState, selectQuestion, submitAnswer, isMyTurn } = useRealtimeGameState(roomId);
+  const { 
+    gameState, 
+    selectQuestion, 
+    submitAnswer, 
+    isMyTurn, 
+    answeredQuestions: realtimeAnsweredQuestions,
+    connectionStatus 
+  } = useRealtimeGameState(roomId);
+  
+  const { boardState } = useRealtimeBoardState(roomId);
   
   const [categories, setCategories] = useState<any[]>([]);
   const [questionsData, setQuestionsData] = useState<any[]>([]);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<string>>(new Set());
+
+  // Sync local answered questions with real-time data from both sources
+  useEffect(() => {
+    const combinedAnswered = [
+      ...realtimeAnsweredQuestions,
+      ...boardState.answeredQuestions
+    ];
+    setAnsweredQuestions(new Set(combinedAnswered));
+  }, [realtimeAnsweredQuestions, boardState.answeredQuestions]);
 
   // Load questions based on room configuration
   useEffect(() => {
@@ -132,7 +151,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
 
     const success = await submitAnswer(selectedQuestion.id, isCorrect, selectedQuestion.points);
     if (success) {
-      setAnsweredQuestions(prev => new Set([...prev, selectedQuestion.id]));
+      // The answered questions will be updated via real-time listeners
       setIsQuestionModalOpen(false);
       setSelectedQuestion(null);
       
@@ -179,16 +198,25 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
             </Button>
             <div className="text-white">
               <h1 className="text-xl font-bold">Room: {currentRoom?.room_code}</h1>
-              {isMyTurn ? (
-                <p className="text-green-400 flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Your turn - Select a question
-                </p>
-              ) : (
-                <p className="text-yellow-400">
-                  Waiting for other players...
-                </p>
-              )}
+              <div className="flex items-center gap-4">
+                {isMyTurn ? (
+                  <p className="text-green-400 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Your turn - Select a question
+                  </p>
+                ) : (
+                  <p className="text-yellow-400">
+                    Waiting for other players...
+                  </p>
+                )}
+                <div className="flex items-center gap-2 text-xs">
+                  <div className={`w-2 h-2 rounded-full ${
+                    connectionStatus === 'connected' ? 'bg-green-400' : 
+                    connectionStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'
+                  }`} />
+                  <span className="text-gray-300">{connectionStatus}</span>
+                </div>
+              </div>
             </div>
           </div>
           
