@@ -37,6 +37,11 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<string>>(new Set());
+  const [pendingAnswer, setPendingAnswer] = useState<{
+    isCorrect: boolean;
+    points: number;
+    questionId: string;
+  } | null>(null);
 
   // Sync local answered questions with real-time data from both sources
   useEffect(() => {
@@ -140,7 +145,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     }
   };
 
-  // Handle answer submission
+  // Handle answer submission - store answer temporarily, don't submit yet
   const handleAnswer = async (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
     if (!selectedQuestion) return;
 
@@ -150,26 +155,42 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
       isCorrect = selectedOption?.option_type === 'correct';
     }
 
-    const success = await submitAnswer(selectedQuestion.id, isCorrect, selectedQuestion.points);
-    if (success) {
-      // Don't close modal immediately - let the user review the answer
-      // The modal will handle its own closing and then call handleModalClose
-      
-      if (isCorrect) {
-        toast.success('Correct answer!');
-      } else {
-        toast.error('Incorrect answer');
-      }
+    // Store the answer temporarily - don't submit to database yet
+    setPendingAnswer({
+      isCorrect,
+      points: selectedQuestion.points,
+      questionId: selectedQuestion.id
+    });
+
+    // Show immediate feedback but don't progress the game
+    if (isCorrect) {
+      toast.success('Correct answer!');
+    } else {
+      toast.error('Incorrect answer');
     }
   };
 
   const handleModalClose = async () => {
+    // Submit the answer now that user is done reviewing
+    if (pendingAnswer) {
+      const success = await submitAnswer(
+        pendingAnswer.questionId, 
+        pendingAnswer.isCorrect, 
+        pendingAnswer.points
+      );
+      
+      if (success) {
+        // Progress to next turn after successful submission
+        await nextTurn();
+      }
+      
+      // Clear pending answer
+      setPendingAnswer(null);
+    }
+    
     // Close modal and clear selection
     setIsQuestionModalOpen(false);
     setSelectedQuestion(null);
-    
-    // Progress to next turn after user finishes reviewing
-    await nextTurn();
   };
 
   // Generate game board data
