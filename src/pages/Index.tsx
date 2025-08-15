@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import WelcomeModal from "@/components/WelcomeModal";
 import { OnlineMultiplayerLobby } from "@/components/OnlineMultiplayerLobby";
 import { OnlineGameInterface } from "@/components/OnlineGameInterface";
+import { QuizSection } from "@/components/QuizSection";
 
 interface Question {
   id: string;
@@ -663,6 +664,9 @@ const Index = () => {
 
         {/* Game Mode Selector */}
         <GameModeSelector onSelectMode={handleModeSelect} />
+
+        {/* Quiz Section - African History Focus */}
+        <QuizSection />
 
         {/* User Authentication Section */}
         <div className="container mx-auto px-4 py-8">
