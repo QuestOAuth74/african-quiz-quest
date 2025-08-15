@@ -283,6 +283,41 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Upcoming Features Section */}
+            <Card className="border-border/50 shadow-xl bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-transparent to-accent/3 pointer-events-none" />
+              <CardHeader className="relative">
+                <CardTitle className="flex items-center gap-4 text-2xl font-bold text-foreground">
+                  <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl shadow-lg">
+                    <svg className="h-7 w-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  Upcoming Features
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="relative">
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-background/30 to-background/20 border border-border/20 hover:border-primary/30 transition-colors">
+                    <h4 className="font-semibold text-foreground mb-2">Learn Kemetic Hieroglyphs</h4>
+                    <p className="text-sm text-muted-foreground">Discover the ancient writing system of Egypt</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-background/30 to-background/20 border border-border/20 hover:border-primary/30 transition-colors">
+                    <h4 className="font-semibold text-foreground mb-2">Neocolonialism Letter</h4>
+                    <p className="text-sm text-muted-foreground">Explore modern African political dynamics</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-background/30 to-background/20 border border-border/20 hover:border-primary/30 transition-colors">
+                    <h4 className="font-semibold text-foreground mb-2">African Renaissance</h4>
+                    <p className="text-sm text-muted-foreground">Learn about Africa's cultural and intellectual revival</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-background/30 to-background/20 border border-border/20 hover:border-primary/30 transition-colors">
+                    <h4 className="font-semibold text-foreground mb-2">Authentic Artwork</h4>
+                    <p className="text-sm text-muted-foreground">Experience traditional African art and crafts</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Modern Sidebar */}
