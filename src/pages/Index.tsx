@@ -523,23 +523,8 @@ const Index = () => {
       }, 3500); // Wait a bit longer than the player switch delay
     }
 
-    // Immediately switch turns after answer (no timer)
-    if (typeof selectedAnswerIndex === 'number') {
-      console.log('Answer processed, switching turns immediately');
-      setPlayers(prev => {
-        const newPlayers = prev.map(player => ({
-          ...player,
-          isActive: !player.isActive
-        }));
-        console.log('New active player:', newPlayers.find(p => p.isActive)?.name);
-        return newPlayers;
-      });
-      
-      // Close modal and clear question selection for the next player
-      setIsQuestionModalOpen(false);
-      setSelectedQuestion(null);
-      setSelectedQuestionGridId(null);
-    }
+    // Keep modal open for user to read explanation
+    console.log('Answer processed. Modal remains open for user to read explanation.');
   };
 
   const handleGameComplete = async () => {
@@ -624,6 +609,17 @@ const Index = () => {
     setSelectedQuestion(null);
     setShowTeacherMode(false);
     setSkipCount(0);
+    
+    // Switch turns when modal is manually closed after answering
+    setPlayers(prev => {
+      const newPlayers = prev.map(player => ({
+        ...player,
+        isActive: !player.isActive
+      }));
+      console.log('Modal closed, switching to next player:', newPlayers.find(p => p.isActive)?.name);
+      return newPlayers;
+    });
+    setSelectedQuestionGridId(null);
   };
 
   if (!gameMode) {
