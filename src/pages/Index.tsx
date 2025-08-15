@@ -72,6 +72,7 @@ const Index = () => {
   const [aiIsThinking, setAiIsThinking] = useState(false);
   const [aiIsSelectingQuestion, setAiIsSelectingQuestion] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [answeringPlayer, setAnsweringPlayer] = useState<string | null>(null);
 
   // Helper functions for welcome modal timing
   const shouldShowWelcomeModal = (): boolean => {
@@ -432,6 +433,12 @@ const Index = () => {
 
 
   const handleAnswer = async (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
+    // Store the player who is answering before any logic changes
+    const currentActivePlayer = players.find(p => p.isActive);
+    if (currentActivePlayer) {
+      setAnsweringPlayer(currentActivePlayer.name);
+    }
+    
     let isCorrect = false;
     let pointChange = 0;
     
@@ -657,6 +664,7 @@ const Index = () => {
     setShowTeacherMode(false);
     setSkipCount(0);
     setSelectedQuestionGridId(null);
+    setAnsweringPlayer(null); // Clear the answering player
     
     // Turn switching is now handled in handleAnswer for computer turns
     // For human players, turns switch when they select their next question
@@ -810,7 +818,7 @@ const Index = () => {
         onClose={handleCloseModal}
         question={selectedQuestion}
         onAnswer={handleAnswer}
-        currentPlayer={players.find(p => p.isActive)?.name}
+        currentPlayer={answeringPlayer || players.find(p => p.isActive)?.name}
         gameMode={gameMode}
       />
       
