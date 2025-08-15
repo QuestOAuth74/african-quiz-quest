@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, MessageCircle, TrendingUp, Users, Sparkles } from 'lucide-react';
+import baobabHeaderImage from '@/assets/baobab-talks-header.png';
 
 interface HeaderSlide {
   id: string;
@@ -70,36 +71,38 @@ const ForumHeader = () => {
   const currentSlideData = slides[currentSlide];
 
   return (
-    <div className="relative overflow-hidden mb-12">
-      {/* Modern Background */}
+    <div className="relative overflow-hidden mb-12 h-[500px]">
+      {/* Background Image */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.1),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_30%,hsl(var(--accent)/0.05)_50%,transparent_70%)]" />
+        <img 
+          src={baobabHeaderImage} 
+          alt="Baobab Talks Header" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/40" />
       </div>
       
-      {/* Modern Content Container */}
-      <div className="relative">
-        <Card className={`border-none shadow-2xl ${currentSlideData.gradient} transition-all duration-700 ease-in-out backdrop-blur-lg overflow-hidden`}>
-          <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-background/60 to-background/40" />
-          <CardContent className="relative px-8 lg:px-12 py-16">
+      {/* Overlay Content Container */}
+      <div className="relative h-full flex items-center">
+        <div className="w-full">
+          <div className="px-8 lg:px-12 py-16">
             {/* Modern Hero Content */}
             <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
               <div className="flex-1 text-center lg:text-left animate-fade-in">
                 <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
-                  <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl backdrop-blur-sm border border-border/50">
-                    {currentSlideData.icon}
+                  <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30">
+                    <div className="text-white">{currentSlideData.icon}</div>
                   </div>
-                  <Badge variant="secondary" className="px-4 py-2 text-sm font-semibold rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-border/30">
+                  <Badge variant="secondary" className="px-4 py-2 text-sm font-semibold rounded-full bg-white/20 text-white border border-white/30">
                     {currentSlideData.badge}
                   </Badge>
                 </div>
                 
-                <h1 className="text-4xl lg:text-6xl font-black text-foreground mb-6 tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                <h1 className="text-4xl lg:text-6xl font-black text-white mb-6 tracking-tight">
                   {currentSlideData.title}
                 </h1>
                 
-                <p className="text-lg lg:text-xl text-muted-foreground max-w-3xl leading-relaxed mx-auto lg:mx-0">
+                <p className="text-lg lg:text-xl text-white/90 max-w-3xl leading-relaxed mx-auto lg:mx-0">
                   {currentSlideData.description}
                 </p>
               </div>
@@ -111,7 +114,7 @@ const ForumHeader = () => {
                     variant="ghost"
                     size="icon"
                     onClick={prevSlide}
-                    className="h-12 w-12 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-background/80 hover:scale-110 transition-all duration-200 shadow-lg"
+                    className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 hover:scale-110 transition-all duration-200 shadow-lg text-white"
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </Button>
@@ -119,7 +122,7 @@ const ForumHeader = () => {
                     variant="ghost"
                     size="icon"
                     onClick={nextSlide}
-                    className="h-12 w-12 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-background/80 hover:scale-110 transition-all duration-200 shadow-lg"
+                    className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 hover:scale-110 transition-all duration-200 shadow-lg text-white"
                   >
                     <ChevronRight className="h-5 w-5" />
                   </Button>
@@ -133,8 +136,8 @@ const ForumHeader = () => {
                       onClick={() => setCurrentSlide(index)}
                       className={`h-3 rounded-full transition-all duration-500 ${
                         index === currentSlide 
-                          ? 'bg-primary w-8 shadow-lg shadow-primary/30' 
-                          : 'bg-muted-foreground/40 w-3 hover:bg-muted-foreground/60 hover:w-6'
+                          ? 'bg-white w-8 shadow-lg shadow-white/30' 
+                          : 'bg-white/40 w-3 hover:bg-white/60 hover:w-6'
                       }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
@@ -142,8 +145,8 @@ const ForumHeader = () => {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
