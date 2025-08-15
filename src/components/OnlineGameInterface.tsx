@@ -24,6 +24,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     gameState, 
     selectQuestion, 
     submitAnswer, 
+    nextTurn,
     isMyTurn, 
     answeredQuestions: realtimeAnsweredQuestions,
     connectionStatus 
@@ -151,9 +152,8 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
 
     const success = await submitAnswer(selectedQuestion.id, isCorrect, selectedQuestion.points);
     if (success) {
-      // The answered questions will be updated via real-time listeners
-      setIsQuestionModalOpen(false);
-      setSelectedQuestion(null);
+      // Don't close modal immediately - let the user review the answer
+      // The modal will handle its own closing and then call handleModalClose
       
       if (isCorrect) {
         toast.success('Correct answer!');
@@ -161,6 +161,15 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
         toast.error('Incorrect answer');
       }
     }
+  };
+
+  const handleModalClose = async () => {
+    // Close modal and clear selection
+    setIsQuestionModalOpen(false);
+    setSelectedQuestion(null);
+    
+    // Progress to next turn after user finishes reviewing
+    await nextTurn();
   };
 
   // Generate game board data
@@ -255,7 +264,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
       {/* Question Modal */}
       <QuestionModal
         isOpen={isQuestionModalOpen}
-        onClose={() => setIsQuestionModalOpen(false)}
+        onClose={handleModalClose}
         question={selectedQuestion}
         onAnswer={handleAnswer}
         currentPlayer="You"
