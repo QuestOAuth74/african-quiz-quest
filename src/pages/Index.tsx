@@ -527,7 +527,7 @@ const Index = () => {
     // Wait 15 seconds for review period for all players
     const currentActivePlayer = players.find(p => p.isActive);
     const isAIAnswering = currentActivePlayer?.name === "Computer";
-    const delayTime = 120000; // 120 seconds for all players to allow review
+    const delayTime = 15000; // 15 seconds for all players to allow review
     
     console.log(`${isAIAnswering ? 'AI' : 'Human'} answered, waiting ${delayTime/1000} seconds before switching turns`);
     
