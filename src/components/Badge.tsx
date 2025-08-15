@@ -12,12 +12,12 @@ interface BadgeProps {
 }
 
 const colorVariants = {
-  green: 'bg-green-100 text-green-800 border-green-200',
-  blue: 'bg-blue-100 text-blue-800 border-blue-200',
-  purple: 'bg-purple-100 text-purple-800 border-purple-200',
-  gold: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-  yellow: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  orange: 'bg-orange-100 text-orange-800 border-orange-200',
+  green: 'bg-green-600 text-white border-green-500',
+  blue: 'bg-blue-600 text-white border-blue-500',
+  purple: 'bg-purple-600 text-white border-purple-500',
+  gold: 'bg-yellow-500 text-primary-foreground border-yellow-400',
+  yellow: 'bg-yellow-500 text-primary-foreground border-yellow-400',
+  orange: 'bg-orange-600 text-white border-orange-500',
   rainbow: 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-purple-300'
 };
 
