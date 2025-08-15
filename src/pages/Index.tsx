@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Settings, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import GameCompletionModal from "@/components/GameCompletionModal";
-import { PlayerTimer } from "@/components/PlayerTimer";
+
 import { AIThinkingIndicator } from "@/components/AIThinkingIndicator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -408,21 +408,6 @@ const Index = () => {
     }
   };
 
-  const handlePlayerTimeout = () => {
-    console.log('Player timed out, switching turns');
-    setPlayers(prev => prev.map(player => ({
-      ...player,
-      isActive: !player.isActive
-    })));
-  };
-
-  const handleSkipTurn = () => {
-    console.log('Skip turn requested, switching to next player');
-    setPlayers(prev => prev.map(player => ({
-      ...player,
-      isActive: !player.isActive
-    })));
-  };
 
   const handleAnswer = async (selectedAnswerIndex: number | 'pass' | 'timeout' | 'skip') => {
     let isCorrect = false;
@@ -779,13 +764,6 @@ const Index = () => {
             isAnswering={aiIsThinking && !aiIsSelectingQuestion}
           />
           
-          {/* Show human player timer when human is active and no question selected */}
-          <PlayerTimer 
-            isActive={players.find(p => p.isActive)?.name !== "Computer" && !selectedQuestion && !isQuestionModalOpen}
-            playerName={players.find(p => p.isActive)?.name || ""}
-            onTimeout={handlePlayerTimeout}
-            onSkipTurn={handleSkipTurn}
-          />
         </div>
       </div>
       
