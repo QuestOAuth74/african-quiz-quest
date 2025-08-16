@@ -414,17 +414,19 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
             <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10 w-full max-w-4xl">
               <h3 className="text-white font-semibold mb-3 text-center text-sm sm:text-base">Live Scores</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2 sm:gap-3 justify-center">
-                {(players.length > 0 ? players : contextPlayers).map((player) => {
-                  // Use live scores from gameState, fallback to player.score
-                  const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
-                  const isCurrentTurn = gameState?.currentTurn === player.user_id;
-                  
-                  console.log(`🎯 Player ${player.player_name} score:`, {
-                    gameStateScore: gameState?.scores?.[player.user_id],
-                    playerScore: player.score,
-                    finalScore: currentScore,
-                    isCurrentTurn
-                  });
+                 {(players.length > 0 ? players : contextPlayers).map((player) => {
+                   // Use live scores from gameState, fallback to player.score
+                   const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
+                   const isCurrentTurn = gameState?.currentTurn === player.user_id;
+                   
+                   console.log(`🎯 Player ${player.player_name} score:`, {
+                     gameStateScore: gameState?.scores?.[player.user_id],
+                     playerScore: player.score,
+                     finalScore: currentScore,
+                     isCurrentTurn,
+                     gameStateTurn: gameState?.currentTurn,
+                     playerUserId: player.user_id
+                   });
                   
                   return (
                     <Card 

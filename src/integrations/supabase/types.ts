@@ -857,6 +857,10 @@ export type Database = {
       }
     }
     Functions: {
+      advance_room_turn: {
+        Args: { p_room_id: string }
+        Returns: string
+      }
       calculate_user_orbs: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -881,6 +885,10 @@ export type Database = {
           last_seen: string
           user_id: string
         }[]
+      }
+      fix_room_player_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       generate_room_code: {
         Args: Record<PropertyKey, never>

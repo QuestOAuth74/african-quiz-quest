@@ -320,36 +320,32 @@ export const useRealtimeGameState = (roomId: string | null) => {
     }
   }, [roomId, user, gameChannel]);
 
-  // Get next turn player
+  // Get next turn player using secure database function
   const nextTurn = useCallback(async () => {
-    if (!roomId || !gameState) return;
+    if (!roomId) return;
 
-    console.log('[RealtimeGameState] Moving to next turn');
+    console.log('[RealtimeGameState] Moving to next turn using secure function');
     
-    const currentPlayerIndex = gameState.players.findIndex(p => p.user_id === gameState.currentTurn);
-    const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.players.length;
-    const nextPlayer = gameState.players[nextPlayerIndex];
-
     try {
-      // Update the database with the new turn
-      const { error } = await supabase
-        .from('game_rooms')
-        .update({ current_turn_user_id: nextPlayer.user_id })
-        .eq('id', roomId);
+      // Use the secure database function to advance turn
+      const { data: nextUserId, error } = await supabase
+        .rpc('advance_room_turn', { p_room_id: roomId });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[RealtimeGameState] Failed to advance turn:', error);
+        toast.error('Failed to advance turn');
+        return;
+      }
 
-      const updatedState = {
-        ...gameState,
-        currentTurn: nextPlayer.user_id
-      };
-
-      await broadcastGameUpdate(updatedState);
+      console.log('[RealtimeGameState] Turn advanced to user:', nextUserId);
+      
+      // The database update will trigger the real-time subscription
+      // which will automatically update the local state
     } catch (error) {
       console.error('[RealtimeGameState] Failed to update turn:', error);
       toast.error('Failed to update turn');
     }
-  }, [roomId, gameState, broadcastGameUpdate]);
+  }, [roomId]);
 
   return {
     gameState,
