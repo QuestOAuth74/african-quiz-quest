@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Bot, Sparkles, ArrowLeft, Trophy } from "lucide-react";
+import { Users, Bot, Sparkles, ArrowLeft, Trophy, Puzzle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { UserBadges } from "./UserBadges";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ParallaxBanner } from "./ParallaxBanner";
@@ -16,7 +17,24 @@ interface GameModeSelectorProps {
 export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
   const { user, isAuthenticated } = useAuth();
   const [showPlayerSelect, setShowPlayerSelect] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (user) {
+      checkAdminStatus();
+    }
+  }, [user]);
+
+  const checkAdminStatus = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase.rpc('is_admin', { user_uuid: user.id });
+      setIsAdmin(!!data);
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  };
   
   const handleModeSelect = (mode: 'single' | 'multiplayer' | 'online-multiplayer') => {
     if (mode === 'multiplayer') {
@@ -107,7 +125,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className={`grid grid-cols-1 ${isAdmin ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3'} gap-4 sm:gap-6`}>
             <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
@@ -178,6 +196,35 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Admin-only Crossword Mode */}
+            {isAdmin && (
+              <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20" style={{ animationDelay: '0.3s' }}>
+                <CardHeader className="text-center pb-4">
+                  <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl w-fit shadow-lg relative">
+                    <Puzzle size={40} className="text-white" />
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-400 rounded-full animate-pulse" />
+                  </div>
+                  <CardTitle className="text-2xl font-bold text-theme-yellow flex items-center justify-center gap-2">
+                    CROSSWORD PUZZLE
+                    <Badge variant="secondary" className="text-xs bg-purple-600 text-white">ADMIN</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center px-6 pb-6">
+                  <p className="text-card-foreground mb-6 text-base leading-relaxed">
+                    Interactive crossword puzzles featuring African history questions and clues.
+                  </p>
+                  <Link to="/crossword">
+                    <Button 
+                      className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold text-base py-4 hover:scale-105 transition-all duration-300"
+                      size="lg"
+                    >
+                      PLAY CROSSWORD
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
           </div>
           
           <div className="text-center mt-6 sm:mt-8 px-4">

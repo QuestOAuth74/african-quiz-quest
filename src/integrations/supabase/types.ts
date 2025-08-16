@@ -229,6 +229,111 @@ export type Database = {
         }
         Relationships: []
       }
+      crossword_puzzles: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          difficulty: number
+          grid_data: Json
+          id: string
+          is_active: boolean
+          title: string
+          updated_at: string
+          words_data: Json
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string | null
+          difficulty?: number
+          grid_data: Json
+          id?: string
+          is_active?: boolean
+          title: string
+          updated_at?: string
+          words_data: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          difficulty?: number
+          grid_data?: Json
+          id?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+          words_data?: Json
+        }
+        Relationships: []
+      }
+      crossword_words: {
+        Row: {
+          category: string
+          clue: string
+          created_at: string
+          difficulty: number
+          id: string
+          is_active: boolean
+          length: number | null
+          updated_at: string
+          word: string
+        }
+        Insert: {
+          category: string
+          clue: string
+          created_at?: string
+          difficulty?: number
+          id?: string
+          is_active?: boolean
+          length?: number | null
+          updated_at?: string
+          word: string
+        }
+        Update: {
+          category?: string
+          clue?: string
+          created_at?: string
+          difficulty?: number
+          id?: string
+          is_active?: boolean
+          length?: number | null
+          updated_at?: string
+          word?: string
+        }
+        Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          created_at: string
+          enabled_for_admins: boolean
+          enabled_for_public: boolean
+          feature_name: string
+          id: string
+          rollout_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled_for_admins?: boolean
+          enabled_for_public?: boolean
+          feature_name: string
+          id?: string
+          rollout_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled_for_admins?: boolean
+          enabled_for_public?: boolean
+          feature_name?: string
+          id?: string
+          rollout_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       forum_categories: {
         Row: {
           created_at: string
