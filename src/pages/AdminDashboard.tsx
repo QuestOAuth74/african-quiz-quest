@@ -12,7 +12,8 @@ import QuestionManager from "@/components/admin/QuestionManager";
 import ForumModeration from "@/components/admin/ForumModeration";
 import FlaggedQuestionsManager from "@/components/admin/FlaggedQuestionsManager";
 import UserManager from "@/components/admin/UserManager";
-import { LogOut, Users, FileQuestion, FolderOpen, Upload, AlertTriangle, UserCheck, Activity } from "lucide-react";
+import { SecurityMonitor } from "@/components/admin/SecurityMonitor";
+import { LogOut, Users, FileQuestion, FolderOpen, Upload, AlertTriangle, UserCheck, Activity, Shield } from "lucide-react";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
@@ -184,7 +185,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="questions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-card">
+          <TabsList className="grid w-full grid-cols-8 bg-card">
             <TabsTrigger value="questions" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Questions
             </TabsTrigger>
@@ -208,6 +209,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="users" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               <Users className="h-4 w-4 mr-2" />
               Users
+            </TabsTrigger>
+            <TabsTrigger value="security" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              <Shield className="h-4 w-4 mr-2" />
+              Security
             </TabsTrigger>
           </TabsList>
           
@@ -237,6 +242,10 @@ const AdminDashboard = () => {
           
           <TabsContent value="users">
             <UserManager />
+          </TabsContent>
+          
+          <TabsContent value="security">
+            <SecurityMonitor />
           </TabsContent>
         </Tabs>
       </div>

@@ -9,6 +9,7 @@ import { Plus, Trash2, Edit, Eye } from "lucide-react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import QuestionForm from "./QuestionForm";
 import QuestionPreview from "./QuestionPreview";
+import { ProtectedAdminAction } from "./ProtectedAdminAction";
 
 interface Question {
   id: string;
@@ -77,28 +78,15 @@ const QuestionManager = ({ onStatsUpdate }: QuestionManagerProps) => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this question?")) {
-      return;
-    }
+    const { error } = await supabase
+      .from("questions")
+      .delete()
+      .eq("id", id);
 
-    try {
-      const { error } = await supabase
-        .from("questions")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-      
-      toast({ title: "Question deleted successfully" });
-      loadQuestions();
-      onStatsUpdate();
-    } catch (error: any) {
-      toast({
-        title: "Error deleting question",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+    if (error) throw error;
+    
+    loadQuestions();
+    onStatsUpdate();
   };
 
   const handleEdit = (question: Question) => {
@@ -205,13 +193,18 @@ const QuestionManager = ({ onStatsUpdate }: QuestionManagerProps) => {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button
-                        size="sm"
+                      <ProtectedAdminAction
+                        actionType="question_delete"
+                        resourceType="question"
+                        resourceId={question.id}
+                        onExecute={() => handleDelete(question.id)}
+                        requireConfirmation={true}
+                        confirmationTitle="Delete Question"
+                        confirmationDescription={`Are you sure you want to delete the question: "${question.text.substring(0, 50)}..."? This action cannot be undone.`}
                         variant="destructive"
-                        onClick={() => handleDelete(question.id)}
                       >
                         <Trash2 className="h-4 w-4" />
-                      </Button>
+                      </ProtectedAdminAction>
                     </div>
                   </TableCell>
                 </TableRow>

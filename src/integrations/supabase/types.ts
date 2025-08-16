@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_action_logs: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          request_payload: Json | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          request_payload?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          request_payload?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           color: string
@@ -1056,6 +1092,14 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      check_admin_rate_limit: {
+        Args: {
+          p_action_type: string
+          p_max_actions?: number
+          p_time_window_minutes?: number
+        }
+        Returns: boolean
+      }
       check_and_award_badges: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -1111,6 +1155,18 @@ export type Database = {
         Args: { other_user_id: string }
         Returns: string
       }
+      get_recent_admin_activity: {
+        Args: { p_limit?: number }
+        Returns: {
+          action_type: string
+          created_at: string
+          display_name: string
+          id: string
+          resource_id: string
+          resource_type: string
+          user_id: string
+        }[]
+      }
       get_single_player_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1140,6 +1196,15 @@ export type Database = {
       is_admin: {
         Args: Record<PropertyKey, never> | { user_uuid?: string }
         Returns: boolean
+      }
+      log_admin_action: {
+        Args: {
+          p_action_type: string
+          p_request_payload?: Json
+          p_resource_id?: string
+          p_resource_type: string
+        }
+        Returns: string
       }
       make_user_admin: {
         Args: { user_email: string }
