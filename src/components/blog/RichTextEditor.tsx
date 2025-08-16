@@ -84,10 +84,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       content = content.replace(regex, '<strong>$1</strong>');
     });
     
-    // Auto-format paragraphs (double line breaks)
-    content = content.replace(/\n\n/g, '</p><p>');
-    content = `<p>${content}</p>`;
-    
     editorRef.current.innerHTML = content;
     updateContent();
   };
