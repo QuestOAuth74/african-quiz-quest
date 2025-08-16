@@ -70,20 +70,25 @@ const WheelPlay = () => {
     if (!gameSession) return;
 
     const newPlayer = gameSession.current_player === 1 ? 2 : 1;
-    const updatedSession = { ...gameSession, current_player: newPlayer };
     
-    await supabase
-      .from('wheel_game_sessions')
-      .update({ current_player: newPlayer })
-      .eq('id', gameSession.id);
-    
-    setGameSession(updatedSession);
-    setGameState(prev => ({ 
-      ...prev, 
-      currentPlayerTurn: newPlayer,
-      gamePhase: 'spinning',
-      wheelValue: 0
-    }));
+    try {
+      await supabase
+        .from('wheel_game_sessions')
+        .update({ current_player: newPlayer })
+        .eq('id', gameSession.id);
+      
+      const updatedSession = { ...gameSession, current_player: newPlayer };
+      setGameSession(updatedSession);
+      
+      setGameState(prev => ({ 
+        ...prev, 
+        currentPlayerTurn: newPlayer,
+        gamePhase: 'spinning',
+        wheelValue: 0
+      }));
+    } catch (error) {
+      console.error('Error switching turns:', error);
+    }
   };
 
   const handleSpin = async (value: number | string) => {
@@ -115,7 +120,7 @@ const WheelPlay = () => {
           variant: "destructive"
         });
         
-        // Player loses all round score
+        // Player loses all round score and switch turns
         const updatedSession = {
           ...gameSession,
           [gameSession.current_player === 1 ? 'player1_round_score' : 'player2_round_score']: 0,
@@ -128,14 +133,41 @@ const WheelPlay = () => {
           .eq('id', gameSession.id);
           
         setGameSession(updatedSession);
-        await switchTurn();
+        
+        // Update local state to reflect turn change
+        setGameState(prev => ({ 
+          ...prev, 
+          currentPlayerTurn: updatedSession.current_player,
+          gamePhase: 'spinning',
+          wheelValue: 0
+        }));
       } else if (value === 'LOSE_TURN') {
         toast({
           title: "Lose a Turn!",
           description: "Your turn is over!",
           variant: "destructive"
         });
-        await switchTurn();
+        
+        // Just switch turns without losing points
+        const updatedSession = {
+          ...gameSession,
+          current_player: gameSession.current_player === 1 ? 2 : 1
+        };
+        
+        await supabase
+          .from('wheel_game_sessions')
+          .update(updatedSession)
+          .eq('id', gameSession.id);
+          
+        setGameSession(updatedSession);
+        
+        // Update local state to reflect turn change
+        setGameState(prev => ({ 
+          ...prev, 
+          currentPlayerTurn: updatedSession.current_player,
+          gamePhase: 'spinning',
+          wheelValue: 0
+        }));
       }
     } catch (error) {
       console.error('Error spinning wheel:', error);
