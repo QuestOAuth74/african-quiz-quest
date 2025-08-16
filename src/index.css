@@ -236,11 +236,120 @@ All colors MUST be HSL.
     }
   }
 
+  @keyframes quiz-image-glow {
+    0% {
+      box-shadow: 
+        0 0 20px hsl(var(--theme-yellow) / 0.4),
+        inset 0 2px 4px hsl(var(--theme-yellow-light) / 0.3),
+        0 8px 32px hsl(var(--theme-yellow) / 0.2);
+    }
+    100% {
+      box-shadow: 
+        0 0 25px hsl(var(--theme-yellow) / 0.6),
+        inset 0 2px 4px hsl(var(--theme-yellow-light) / 0.4),
+        0 10px 40px hsl(var(--theme-yellow) / 0.3);
+    }
+  }
+
+  @keyframes crystal-twinkle {
+    0% {
+      opacity: 0.6;
+      transform: scale(0.8) rotate(0deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1.2) rotate(180deg);
+    }
+  }
+
   .gradient-text {
     background: var(--gradient-yellow);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  /* Quiz Image Frame with Gold Rim and Crystal Effects */
+  .quiz-image-frame {
+    position: relative;
+    display: inline-block;
+    padding: 8px;
+    background: linear-gradient(45deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)), hsl(var(--theme-yellow)));
+    border-radius: 12px;
+    box-shadow: 
+      0 0 20px hsl(var(--theme-yellow) / 0.4),
+      inset 0 2px 4px hsl(var(--theme-yellow-light) / 0.3),
+      0 8px 32px hsl(var(--theme-yellow) / 0.2);
+    animation: quiz-image-glow 3s ease-in-out infinite alternate;
+  }
+
+  .quiz-image-frame::before,
+  .quiz-image-frame::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: hsl(var(--theme-yellow));
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    box-shadow: 0 0 6px hsl(var(--theme-yellow) / 0.8);
+    animation: crystal-twinkle 1.5s ease-in-out infinite alternate;
+  }
+
+  .quiz-image-frame::before {
+    top: -4px;
+    left: -4px;
+    animation-delay: 0s;
+  }
+
+  .quiz-image-frame::after {
+    top: -4px;
+    right: -4px;
+    animation-delay: 0.5s;
+  }
+
+  .quiz-image-frame .quiz-crystal-bottom-left,
+  .quiz-image-frame .quiz-crystal-bottom-right {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: hsl(var(--theme-yellow));
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    box-shadow: 0 0 6px hsl(var(--theme-yellow) / 0.8);
+    animation: crystal-twinkle 1.5s ease-in-out infinite alternate;
+  }
+
+  .quiz-image-frame .quiz-crystal-bottom-left {
+    bottom: -4px;
+    left: -4px;
+    animation-delay: 1s;
+  }
+
+  .quiz-image-frame .quiz-crystal-bottom-right {
+    bottom: -4px;
+    right: -4px;
+    animation-delay: 1.5s;
+  }
+
+  .quiz-image-frame:hover {
+    box-shadow: 
+      0 0 30px hsl(var(--theme-yellow) / 0.6),
+      inset 0 2px 4px hsl(var(--theme-yellow-light) / 0.4),
+      0 12px 40px hsl(var(--theme-yellow) / 0.3);
+    transform: scale(1.02);
+  }
+
+  .quiz-image-frame:hover::before,
+  .quiz-image-frame:hover::after,
+  .quiz-image-frame:hover .quiz-crystal-bottom-left,
+  .quiz-image-frame:hover .quiz-crystal-bottom-right {
+    animation-duration: 0.8s;
+  }
+
+  .quiz-image-content {
+    display: block;
+    border-radius: 8px;
+    overflow: hidden;
+    background: hsl(var(--card));
   }
 }
 

@@ -514,12 +514,16 @@ const Quiz = () => {
           </CardHeader>
           <CardContent>
             {currentQuestion.image_url && (
-              <div className="mb-6">
-                <img
-                  src={currentQuestion.image_url}
-                  alt="Question illustration"
-                  className="w-full max-w-md mx-auto rounded-lg border border-theme-yellow/20"
-                />
+              <div className="mb-6 flex justify-center">
+                <div className="quiz-image-frame">
+                  <div className="quiz-crystal-bottom-left"></div>
+                  <div className="quiz-crystal-bottom-right"></div>
+                  <img
+                    src={currentQuestion.image_url}
+                    alt="Question illustration"
+                    className="quiz-image-content w-full max-w-md"
+                  />
+                </div>
               </div>
             )}
 

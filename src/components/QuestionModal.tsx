@@ -155,12 +155,16 @@ const QuestionModal = ({
                   </h3>
                   
                   {question.imageUrl && (
-                    <div className="mb-4">
-                      <img 
-                        src={question.imageUrl} 
-                        alt="Question image" 
-                        className="w-full max-w-md mx-auto rounded-lg shadow-lg"
-                      />
+                    <div className="mb-4 flex justify-center">
+                      <div className="quiz-image-frame">
+                        <div className="quiz-crystal-bottom-left"></div>
+                        <div className="quiz-crystal-bottom-right"></div>
+                        <img 
+                          src={question.imageUrl} 
+                          alt="Question image" 
+                          className="quiz-image-content w-full max-w-md"
+                        />
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -336,11 +340,15 @@ const QuestionModal = ({
                 <CardContent className="p-4">
                   {question.imageUrl && (
                     <div className="mb-6 flex justify-center">
-                      <img 
-                        src={question.imageUrl} 
-                        alt="Question illustration" 
-                        className="rounded-lg max-w-full h-48 object-cover border-2 border-theme-yellow/30"
-                      />
+                      <div className="quiz-image-frame">
+                        <div className="quiz-crystal-bottom-left"></div>
+                        <div className="quiz-crystal-bottom-right"></div>
+                        <img 
+                          src={question.imageUrl} 
+                          alt="Question illustration" 
+                          className="quiz-image-content max-w-full h-48 object-cover"
+                        />
+                      </div>
                     </div>
                   )}
                   <p className="text-lg md:text-xl text-center font-exo font-medium leading-relaxed text-card-foreground">
