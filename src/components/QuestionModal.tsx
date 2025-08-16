@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useGameAudio } from "@/hooks/useGameAudio";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AnswerTimer } from "@/components/AnswerTimer";
 
 interface Question {
   id: string;
@@ -51,6 +52,7 @@ const QuestionModal = ({
   const [showAnswer, setShowAnswer] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
+  const [isTimerActive, setIsTimerActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
@@ -61,8 +63,11 @@ const QuestionModal = ({
       setShowAnswer(false);
       setHasAnswered(false);
       setSelectedAnswerIndex(null);
+      // Start timer for multiplayer modes when it's not AI turn
+      const shouldStartTimer = (gameMode === 'multiplayer' || gameMode === 'online-multiplayer') && currentPlayer !== "Computer";
+      setIsTimerActive(shouldStartTimer);
     }
-  }, [isOpen, question]);
+  }, [isOpen, question, gameMode, currentPlayer]);
 
   const handleOptionSelect = (optionId: string) => {
     soundEffects.playButtonClick();
@@ -71,12 +76,14 @@ const QuestionModal = ({
 
   const handleSkip = () => {
     soundEffects.playButtonClick();
+    setIsTimerActive(false); // Stop timer on skip
     setHasAnswered(true);
     onAnswer('skip');
   };
 
   const handleSubmit = () => {
     if (selectedOption !== null) {
+      setIsTimerActive(false); // Stop timer on manual submission
       // Find the index of the selected option in the options array
       const answerIndex = question.options?.findIndex(opt => opt.id === selectedOption) ?? -1;
       setSelectedAnswerIndex(answerIndex);
@@ -96,7 +103,21 @@ const QuestionModal = ({
     }
   };
 
+  const handleTimerTimeout = () => {
+    setIsTimerActive(false);
+    setHasAnswered(true);
+    setShowAnswer(true);
+    gameAudio.playWrongAnswer(); // Timeout is considered incorrect
+    toast({
+      title: "Time's up!",
+      description: "No answer selected.",
+      variant: "destructive",
+    });
+    onAnswer('timeout');
+  };
+
   const handlePass = () => {
+    setIsTimerActive(false); // Stop timer on pass
     setHasAnswered(true);
     setShowAnswer(true);
     onAnswer('pass');
@@ -331,6 +352,16 @@ const QuestionModal = ({
           
           <ScrollArea className={`flex-1 ${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'}`}>
             <div className="space-y-6 pr-4">
+              {/* Answer Timer - Only for multiplayer modes and human players */}
+              {!isAIPlayer && (
+                <AnswerTimer 
+                  isActive={isTimerActive}
+                  onTimeout={handleTimerTimeout}
+                  onStop={() => setIsTimerActive(false)}
+                  gameMode={gameMode}
+                />
+              )}
+
               {/* Question */}
               <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
                 <CardContent className="p-4">
