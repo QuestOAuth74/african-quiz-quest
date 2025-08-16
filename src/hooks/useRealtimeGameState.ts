@@ -227,14 +227,14 @@ export const useRealtimeGameState = (roomId: string | null) => {
     try {
       console.log('[RealtimeGameState] Selecting question:', { questionId, categoryId, points });
       
-      // Record question selection in database
+      // Record question selection in database (not answered yet)
       const { error } = await supabase
         .from('game_room_questions')
         .insert({
           room_id: roomId,
           question_id: questionId,
           answered_by: null,
-          is_answered: true
+          is_answered: false
         });
 
       if (error) throw error;

@@ -121,8 +121,8 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
         const allQuestions: any[] = [];
         const rowCount = config.rowCount || 5;
         
-        // Generate the expected point values (DB uses 200-point increments)
-        const expectedPoints = Array.from({ length: rowCount }, (_, index) => (index + 1) * 200);
+        // Generate the expected point values (DB uses 100-point increments matching the board)
+        const expectedPoints = Array.from({ length: rowCount }, (_, index) => (index + 1) * 100);
         
         console.log('🎯 Loading questions for categories:', categoryData.map(c => c.name));
         console.log('🎯 Expected point values:', expectedPoints);
@@ -142,14 +142,24 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
 
             if (questions && questions.length > 0) {
               const question = questions[0];
+              // Find correct answer index for the modal
+              const correctAnswerIndex = question.question_options?.findIndex(
+                (opt: any) => opt.option_type === 'correct'
+              ) ?? -1;
+
               const formattedQuestion = {
                 ...question,
                 category: category.name,
+                correctAnswerIndex,
                 options: question.question_options?.map((opt: any) => ({
                   id: opt.id,
                   text: opt.text,
                   option_type: opt.option_type
-                })) || []
+                })) || [],
+                // Normalize field names for consistency
+                explanation: question.explanation,
+                historicalContext: question.historical_context,
+                imageUrl: question.image_url
               };
               allQuestions.push(formattedQuestion);
             } else {
@@ -269,23 +279,21 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     id: category.id,
     name: category.name,
     questions: Array.from({ length: (currentRoom?.game_config?.rowCount || roomDetails?.game_config?.rowCount || 5) }, (_, index) => {
-      const boardPoints = (index + 1) * 100; // GameBoard expects $100 increments
-      const dbPoints = (index + 1) * 200; // Database stores $200 increments
+      const boardPoints = (index + 1) * 100; // Both board and DB now use $100 increments
       const question = questionsData.find(q => 
-        q.category === category.name && q.points === dbPoints
+        q.category === category.name && q.points === boardPoints
       );
       
       const questionObj = {
         id: question?.id || `${category.id}-${boardPoints}`,
-        points: boardPoints, // Use board points for display
+        points: boardPoints,
         isAnswered: question ? answeredQuestions.has(question.id) : false,
-        hasQuestion: !!question // Explicitly set if question exists
+        hasQuestion: !!question
       };
       
       console.log(`🎲 Question for ${category.name} $${boardPoints}:`, {
         found: !!question,
         questionId: question?.id,
-        dbPoints,
         isAnswered: questionObj.isAnswered
       });
       
@@ -347,20 +355,25 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
           
           {/* Player Scores */}
           <div className="flex gap-4">
-            {players.map((player) => (
-              <Card key={player.id} className="bg-white/10 border-white/20">
-                <CardContent className="p-3">
-                  <div className="flex items-center gap-2 text-white">
-                    {player.is_host && <Crown className="w-4 h-4 text-yellow-400" />}
-                    <span className="font-medium">{player.player_name}</span>
-                    <Badge variant="secondary">{player.score}</Badge>
-                    {gameState?.currentTurn === player.user_id && (
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {players.map((player) => {
+              // Use live scores from gameState, fallback to player.score
+              const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
+              
+              return (
+                <Card key={player.id} className="bg-white/10 border-white/20">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2 text-white">
+                      {player.is_host && <Crown className="w-4 h-4 text-yellow-400" />}
+                      <span className="font-medium">{player.player_name}</span>
+                      <Badge variant="secondary">${currentScore}</Badge>
+                      {gameState?.currentTurn === player.user_id && (
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>
