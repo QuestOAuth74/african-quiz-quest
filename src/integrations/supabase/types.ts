@@ -1231,6 +1231,39 @@ export type Database = {
         }
         Relationships: []
       }
+      wheel_game_challenges: {
+        Row: {
+          challenged_id: string
+          challenger_id: string
+          created_at: string
+          expires_at: string
+          game_config: Json
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          challenged_id: string
+          challenger_id: string
+          created_at?: string
+          expires_at?: string
+          game_config?: Json
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          challenged_id?: string
+          challenger_id?: string
+          created_at?: string
+          expires_at?: string
+          game_config?: Json
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       wheel_game_moves: {
         Row: {
           created_at: string
@@ -1401,6 +1434,10 @@ export type Database = {
         Returns: undefined
       }
       cleanup_expired_requests: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_expired_wheel_challenges: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }

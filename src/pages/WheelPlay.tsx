@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useWheelGameState } from '@/hooks/useWheelGameState';
+import { supabase } from '@/integrations/supabase/client';
 import { WheelComponent } from '@/components/wheel/WheelComponent';
 import { PuzzleBoard } from '@/components/wheel/PuzzleBoard';
 import { GuessInput } from '@/components/wheel/GuessInput';
@@ -9,38 +9,149 @@ import { PlayerScoreboard } from '@/components/wheel/PlayerScoreboard';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { WheelGameSession, GameState } from '@/types/wheel';
 
 const WheelPlay = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    gameSession,
-    gameState,
-    loading,
-    createGameSession,
-    spinWheel,
-    guessLetter,
-    buyVowel,
-    solvePuzzle
-  } = useWheelGameState();
+  const [gameSession, setGameSession] = useState<WheelGameSession | null>(null);
+  const [gameState, setGameState] = useState<GameState>({
+    revealedLetters: [],
+    guessedLetters: [],
+    wheelValue: 0,
+    isSpinning: false,
+    currentPlayerTurn: 1,
+    gamePhase: 'spinning'
+  });
+  const [loading, setLoading] = useState(true);
 
-  const { player1Id, player2Email } = location.state || {};
+  const { gameSessionId } = location.state || {};
 
   useEffect(() => {
-    if (!user || !player1Id || !player2Email) {
+    if (!user || !gameSessionId) {
       navigate('/wheel');
       return;
     }
 
-    // For demo purposes, we'll create a mock second player
-    // In a real implementation, you'd look up the player by email
-    const mockPlayer2Id = 'mock-player-2-id';
-    createGameSession(mockPlayer2Id);
-  }, [user, player1Id, player2Email, navigate, createGameSession]);
+    // Load the existing game session
+    const loadGameSession = async () => {
+      try {
+        const { data: session, error } = await supabase
+          .from('wheel_game_sessions')
+          .select('*')
+          .eq('id', gameSessionId)
+          .single();
 
-  const handleSpin = (value: number | string) => {
-    spinWheel(value);
+        if (error) throw error;
+        if (!session) {
+          navigate('/wheel');
+          return;
+        }
+
+        // Parse game state
+        const sessionGameState = typeof session.game_state === 'string' 
+          ? JSON.parse(session.game_state) 
+          : session.game_state;
+
+        // Set up the game state from the session
+        setGameSession(session);
+        setGameState(prev => ({
+          ...prev,
+          currentPuzzle: sessionGameState?.currentPuzzle,
+          revealedLetters: sessionGameState?.revealedLetters || [],
+          guessedLetters: sessionGameState?.guessedLetters || [],
+          currentPlayerTurn: session.current_player,
+          gamePhase: 'spinning'
+        }));
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading game session:', error);
+        navigate('/wheel');
+      }
+    };
+
+    loadGameSession();
+  }, [user, gameSessionId, navigate]);
+
+  const handleSpin = async (value: number | string) => {
+    if (!gameSession || !user) return;
+
+    try {
+      // Record the spin move
+      await supabase
+        .from('wheel_game_moves')
+        .insert({
+          session_id: gameSession.id,
+          player_id: user.id,
+          move_type: 'spin',
+          move_data: { value },
+          points_earned: 0
+        });
+
+      setGameState(prev => ({
+        ...prev,
+        wheelValue: value,
+        isSpinning: false,
+        gamePhase: value === 'BANKRUPT' || value === 'LOSE_TURN' ? 'round_end' : 'guessing'
+      }));
+
+      if (value === 'BANKRUPT') {
+        // Player loses all round score
+        const updatedSession = {
+          ...gameSession,
+          [gameSession.current_player === 1 ? 'player1_round_score' : 'player2_round_score']: 0,
+          current_player: gameSession.current_player === 1 ? 2 : 1
+        };
+        
+        await supabase
+          .from('wheel_game_sessions')
+          .update(updatedSession)
+          .eq('id', gameSession.id);
+          
+        setGameSession(updatedSession);
+        switchTurn();
+      } else if (value === 'LOSE_TURN') {
+        switchTurn();
+      }
+    } catch (error) {
+      console.error('Error spinning wheel:', error);
+      toast({
+        title: "Error spinning wheel",
+        description: "Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const switchTurn = () => {
+    if (!gameSession) return;
+
+    const newPlayer = gameSession.current_player === 1 ? 2 : 1;
+    const updatedSession = { ...gameSession, current_player: newPlayer };
+    
+    setGameSession(updatedSession);
+    setGameState(prev => ({ 
+      ...prev, 
+      currentPlayerTurn: newPlayer,
+      gamePhase: 'spinning',
+      wheelValue: 0
+    }));
+  };
+
+  const handleGuessLetter = (letter: string) => {
+    // Implement letter guessing logic
+    console.log('Guessing letter:', letter);
+  };
+
+  const handleBuyVowel = (vowel: string) => {
+    // Implement vowel buying logic
+    console.log('Buying vowel:', vowel);
+  };
+
+  const handleSolvePuzzle = (solution: string) => {
+    // Implement puzzle solving logic
+    console.log('Solving puzzle:', solution);
   };
 
   const isCurrentPlayerTurn = () => {
@@ -52,7 +163,7 @@ const WheelPlay = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p>Setting up your game...</p>
+          <p>Loading game...</p>
         </div>
       </div>
     );
@@ -64,7 +175,7 @@ const WheelPlay = () => {
         <div className="text-center space-y-4">
           <p>Failed to load game. Please try again.</p>
           <Button onClick={() => navigate('/wheel')}>
-            Back to Game Setup
+            Back to Lobby
           </Button>
         </div>
       </div>
@@ -102,7 +213,7 @@ const WheelPlay = () => {
             className="flex items-center space-x-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Back to Setup</span>
+            <span>Back to Lobby</span>
           </Button>
           
           <h1 className="text-2xl font-bold text-primary">Wheel of African Destiny</h1>
@@ -139,9 +250,9 @@ const WheelPlay = () => {
           {/* Right Column: Game Controls */}
           <div className="lg:col-span-1">
             <GuessInput
-              onGuessLetter={guessLetter}
-              onBuyVowel={buyVowel}
-              onSolvePuzzle={solvePuzzle}
+              onGuessLetter={handleGuessLetter}
+              onBuyVowel={handleBuyVowel}
+              onSolvePuzzle={handleSolvePuzzle}
               guessedLetters={gameState.guessedLetters}
               currentPlayerScore={currentPlayerScore}
               disabled={!isCurrentPlayerTurn() || gameState.gamePhase !== 'guessing'}

@@ -1,74 +1,106 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
-import { ParallaxBanner } from '@/components/ParallaxBanner';
-import { RotateCcw, Users, Trophy } from 'lucide-react';
+import { useWheelLobby } from '@/hooks/useWheelLobby';
+import { OnlinePlayersList } from '@/components/wheel/OnlinePlayersList';
+import { ChallengesPanel } from '@/components/wheel/ChallengesPanel';
+import { RotateCcw, Users, Trophy, ArrowLeft } from 'lucide-react';
 
 const WheelOfDestiny = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [player2Email, setPlayer2Email] = useState('');
-  const [isCreatingGame, setIsCreatingGame] = useState(false);
+  const {
+    onlinePlayers,
+    incomingChallenges,
+    outgoingChallenges,
+    loading,
+    sendChallenge,
+    acceptChallenge,
+    declineChallenge,
+    cancelChallenge
+  } = useWheelLobby();
 
-  const handleStartGame = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to play the game.",
-        variant: "destructive"
+  const handleAcceptChallenge = async (challengeId: string) => {
+    const gameSession = await acceptChallenge(challengeId);
+    if (gameSession) {
+      navigate('/wheel/play', { 
+        state: { 
+          gameSessionId: gameSession.id
+        }
       });
-      return;
     }
-
-    if (!player2Email.trim()) {
-      toast({
-        title: "Player 2 required",
-        description: "Please enter the email of the second player.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsCreatingGame(true);
-    
-    // For now, navigate to game play with mock data
-    // In a full implementation, you'd create the game session here
-    navigate('/wheel/play', { 
-      state: { 
-        player1Id: user.id,
-        player2Email: player2Email.trim()
-      }
-    });
   };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-primary/10">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-md mx-auto">
+            <Card className="text-center">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-center space-x-2 text-2xl">
+                  <RotateCcw className="h-8 w-8 text-primary" />
+                  <span>Wheel of African Destiny</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  Please log in to join the game lobby
+                </p>
+                <Button onClick={() => navigate('/auth')} className="w-full">
+                  Log In
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-primary/10">
-      <div className="h-64 bg-gradient-to-r from-primary/80 to-secondary/80 flex items-center justify-center">
-        <div className="text-center text-white">
-          <h1 className="text-4xl font-bold mb-2">Wheel of African Destiny</h1>
-          <p className="text-xl">Test your knowledge of African history and culture</p>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-600 to-yellow-600 text-white shadow-lg">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="text-white hover:bg-white/20 flex items-center space-x-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to Home</span>
+            </Button>
+            
+            <div className="text-center">
+              <h1 className="text-3xl font-bold flex items-center space-x-2">
+                <RotateCcw className="h-8 w-8" />
+                <span>Wheel of African Destiny</span>
+              </h1>
+              <p className="text-orange-100 mt-1">Game Lobby</p>
+            </div>
+            
+            <div className="text-right">
+              <p className="font-medium">Welcome, {user.email}</p>
+              <p className="text-sm text-orange-100">Ready to play!</p>
+            </div>
+          </div>
         </div>
       </div>
-      
+
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto space-y-8">
           {/* Game Description */}
           <Card className="text-center">
             <CardHeader>
-              <CardTitle className="flex items-center justify-center space-x-2 text-2xl">
-                <RotateCcw className="h-8 w-8 text-primary" />
-                <span>How to Play</span>
-              </CardTitle>
+              <CardTitle className="text-2xl">How to Play</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-lg text-muted-foreground">
-                Spin the wheel and guess letters to reveal phrases related to African history, 
-                culture, and geography. First player to win 3 rounds takes the crown!
+                Challenge another player to a word puzzle duel! Spin the wheel and guess letters to reveal phrases related to African history, culture, and geography.
               </p>
               
               <div className="grid md:grid-cols-3 gap-4 mt-6">
@@ -90,92 +122,64 @@ const WheelOfDestiny = () => {
                   <Trophy className="h-12 w-12 text-primary mx-auto" />
                   <h3 className="font-semibold">Solve & Win</h3>
                   <p className="text-sm text-muted-foreground">
-                    Be the first to solve the puzzle and earn points
+                    First to win 3 rounds takes the crown
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Game Setup */}
-          <Card className="max-w-md mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left Column: Online Players */}
+            <div>
+              <OnlinePlayersList
+                players={onlinePlayers}
+                onChallenge={sendChallenge}
+                loading={loading}
+              />
+            </div>
+
+            {/* Right Column: Challenges */}
+            <div>
+              <ChallengesPanel
+                incomingChallenges={incomingChallenges}
+                outgoingChallenges={outgoingChallenges}
+                onAccept={handleAcceptChallenge}
+                onDecline={declineChallenge}
+                onCancel={cancelChallenge}
+                loading={loading}
+              />
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <Card>
             <CardHeader>
-              <CardTitle className="text-center">Start New Game</CardTitle>
+              <CardTitle>Game Instructions</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {!user ? (
-                <div className="text-center space-y-4">
-                  <p className="text-muted-foreground">
-                    Please log in to start playing
-                  </p>
-                  <Button onClick={() => navigate('/auth')} className="w-full">
-                    Log In
-                  </Button>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold mb-2">Getting Started:</h4>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li>• Wait for other players to come online</li>
+                    <li>• Send a challenge to any available player</li>
+                    <li>• Accept incoming challenges to start playing</li>
+                    <li>• Challenges expire after 2 minutes</li>
+                  </ul>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <Label>Player 1 (You)</Label>
-                    <Input value={user.email || ''} disabled className="mt-1" />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="player2Email">Player 2 Email</Label>
-                    <Input
-                      id="player2Email"
-                      type="email"
-                      value={player2Email}
-                      onChange={(e) => setPlayer2Email(e.target.value)}
-                      placeholder="Enter second player's email"
-                      className="mt-1"
-                    />
-                  </div>
-                  
-                  <Button 
-                    onClick={handleStartGame}
-                    disabled={isCreatingGame || !player2Email.trim()}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {isCreatingGame ? 'Starting Game...' : 'Start Game'}
-                  </Button>
+                <div>
+                  <h4 className="font-semibold mb-2">Gameplay:</h4>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li>• Take turns spinning the wheel</li>
+                    <li>• Guess consonants to earn points</li>
+                    <li>• Buy vowels for $250 each</li>
+                    <li>• Solve the puzzle to win the round</li>
+                  </ul>
                 </div>
-              )}
+              </div>
             </CardContent>
           </Card>
-
-          {/* Features */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">African Heritage Themes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Historical Figures & Leaders</li>
-                  <li>• Ancient Kingdoms & Civilizations</li>
-                  <li>• Cultural Traditions & Philosophy</li>
-                  <li>• Geographic Features & Landmarks</li>
-                  <li>• Important Events & Battles</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Game Features</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Animated spinning wheel</li>
-                  <li>• Two-player competitive gameplay</li>
-                  <li>• Real-time score tracking</li>
-                  <li>• Educational hints and context</li>
-                  <li>• Best of 3 rounds format</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </div>
