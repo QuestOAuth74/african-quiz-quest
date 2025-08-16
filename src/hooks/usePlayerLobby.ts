@@ -108,13 +108,35 @@ export const usePlayerLobby = () => {
   // Fetch online and waiting players
   const fetchPlayers = useCallback(async () => {
     try {
-      // Fetch all online players
+      // Call the fixed get_online_players function
       const { data: allOnline, error: onlineError } = await supabase
-        .from('online_players')
-        .select('*')
-        .order('last_seen', { ascending: false });
+        .rpc('get_online_players');
 
-      if (onlineError) throw onlineError;
+      if (onlineError) {
+        console.error('Error fetching online players:', onlineError);
+        // Fallback to direct profiles query
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('user_id, display_name, player_status, last_seen')
+          .neq('player_status', 'offline')
+          .gt('last_seen', new Date(Date.now() - 5 * 60 * 1000).toISOString())
+          .order('last_seen', { ascending: false });
+
+        if (profilesError) throw profilesError;
+        
+        const formattedData = profilesData?.map(p => ({
+          ...p,
+          is_online: true
+        })) || [];
+        
+        setOnlinePlayers(formattedData as any);
+        
+        const waiting = formattedData.filter(player => 
+          player.player_status === 'waiting' && player.user_id !== user?.id
+        );
+        setWaitingPlayers(waiting as any);
+        return;
+      }
 
       setOnlinePlayers(allOnline as any || []);
 

@@ -54,22 +54,46 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
 
   // Load questions based on room configuration
   useEffect(() => {
-    if (!currentRoom?.game_config?.categories) return;
-
     const loadQuestions = async () => {
       try {
-        // Get category IDs
-        const { data: categoryData } = await supabase
-          .from('categories')
-          .select('*')
-          .in('name', currentRoom.game_config.categories);
+        let categoryData;
+        
+        // Handle different config formats
+        if (currentRoom?.game_config?.categories) {
+          // Categories specified by name
+          const { data } = await supabase
+            .from('categories')
+            .select('*')
+            .in('name', currentRoom.game_config.categories);
+          categoryData = data;
+        } else if ((currentRoom?.game_config as any)?.selectedCategories) {
+          // Categories specified by ID
+          const { data } = await supabase
+            .from('categories')
+            .select('*')
+            .in('id', (currentRoom.game_config as any).selectedCategories);
+          categoryData = data;
+        } else {
+          // No categories specified, load defaults
+          const { data } = await supabase
+            .from('categories')
+            .select('*')
+            .limit(6);
+          categoryData = data;
+        }
 
-        if (!categoryData) return;
+        if (!categoryData) {
+          console.warn('No categories found');
+          return;
+        }
 
+        console.log('Loaded categories:', categoryData);
         setCategories(categoryData);
 
         // Load questions for each category
         const allQuestions = [];
+        const rowCount = currentRoom?.game_config?.rowCount || 5;
+        
         for (const category of categoryData) {
           const { data: questions } = await supabase
             .from('questions')
@@ -78,7 +102,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
               question_options (*)
             `)
             .eq('category_id', category.id)
-            .limit(currentRoom.game_config.rowCount || 5);
+            .limit(rowCount);
 
           if (questions) {
             const formattedQuestions = questions.map(q => ({
@@ -94,6 +118,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
           }
         }
 
+        console.log('Loaded questions:', allQuestions.length);
         setQuestionsData(allQuestions);
       } catch (error) {
         console.error('Failed to load questions:', error);
@@ -101,7 +126,9 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
       }
     };
 
-    loadQuestions();
+    if (currentRoom) {
+      loadQuestions();
+    }
   }, [currentRoom]);
 
   // Load answered questions

@@ -338,14 +338,16 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
                               </div>
                             </div>
                           </div>
-                          {player.player_status === 'waiting' && player.user_id !== user?.id && (
+                          {player.user_id !== user?.id && player.is_online && (
                             <Button
                               onClick={() => handleChallengePlayer(player)}
                               size="sm"
                               className="bg-green-600 hover:bg-green-700 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3"
                             >
                               <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                              <span className="hidden sm:inline">Challenge</span>
+                              <span className="hidden sm:inline">
+                                {player.player_status === 'waiting' ? 'Challenge' : 'Request Match'}
+                              </span>
                               <span className="sm:hidden">+</span>
                             </Button>
                           )}
