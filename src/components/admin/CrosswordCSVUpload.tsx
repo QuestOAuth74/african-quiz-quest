@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -33,6 +33,22 @@ export const CrosswordCSVUpload = ({ onUploadComplete }: CrosswordCSVUploadProps
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  // Load available categories for validation/template
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('name')
+        .order('name', { ascending: true });
+      if (error) {
+        console.error('Failed to load categories for CSV upload:', error);
+      } else {
+        setAvailableCategories((data || []).map((c: { name: string }) => c.name));
+      }
+    })();
+  }, []);
+
   const csvTemplate = `word,category,difficulty,clue
 MALI,"Ancient History",2,"Ancient West African empire known for its gold trade"
 AXUM,"Ancient History",3,"Ancient Ethiopian kingdom that controlled Red Sea trade"
@@ -46,7 +62,13 @@ SONGHAI,"Medieval Africa",3,"Last of the great West African trading empires"
 CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
 
   const downloadTemplate = () => {
-    const blob = new Blob([csvTemplate], { type: 'text/csv' });
+    const header = 'word,category,difficulty,clue';
+    const examples = ['MALI','AXUM','TIMBUKTU','SUNDIATA','NUBIA'];
+    const cats = availableCategories.length > 0 ? availableCategories : ['Ancient History'];
+    const rows = examples.map((w, idx) => `${w},"${cats[idx % cats.length]}",${(idx % 5) + 1},"Sample clue for ${w}"`);
+    const content = [header, ...rows].join('\n');
+
+    const blob = new Blob([content], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -106,9 +128,9 @@ CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
 
       const word: CSVCrosswordWord = {
         word: values[0].replace(/"/g, '').toUpperCase(),
-        category: values[1].replace(/"/g, ''),
+        category: values[1].replace(/"/g, '').trim(),
         difficulty: parseInt(values[2]) || 1,
-        clue: values[3].replace(/"/g, '')
+        clue: values[3].replace(/"/g, '').trim()
       };
 
       // Validate required fields
@@ -149,6 +171,7 @@ CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
     }
 
     const validCategories = new Set(categories?.map(cat => cat.name) || []);
+    console.log('Valid categories for upload:', Array.from(validCategories));
 
     // Check for duplicate words in the database
     const { data: existingWords } = await supabase
@@ -190,7 +213,12 @@ CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
           });
 
         if (insertError) {
-          result.errors.push(`Row ${i + 2}: Failed to insert word - ${insertError.message}`);
+          console.error('Insert failed for row', i + 2, insertError);
+          const isRLS = /row[- ]level security/i.test(insertError.message) || /violates row-level security/i.test(insertError.message);
+          const helpful = isRLS 
+            ? `${insertError.message} - Your account may be missing the admin role. Ensure your user has the 'admin' role in user_roles.`
+            : insertError.message;
+          result.errors.push(`Row ${i + 2}: Failed to insert word - ${helpful}`);
           result.failed++;
           continue;
         }
@@ -280,7 +308,11 @@ CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
               <strong>Important:</strong> This will upload words using the same categories as the quiz system. 
-              Available categories: Ancient History, Medieval Africa, Nations, NubioKemetic, Scholars.
+              {availableCategories.length > 0 ? (
+                <> Available categories: {availableCategories.join(', ')}.</>
+              ) : (
+                <> Categories will be validated against the database.</>
+              )}
             </AlertDescription>
           </Alert>
 
@@ -387,13 +419,15 @@ CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
             
             <div>
               <h4 className="font-semibold mb-2">Available Categories:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                <li><strong>Ancient History</strong> - Ancient kingdoms, empires, and civilizations</li>
-                <li><strong>Medieval Africa</strong> - Medieval period African history</li>
-                <li><strong>Nations</strong> - Countries and nations</li>
-                <li><strong>NubioKemetic</strong> - Nubian and Kemetic (Egyptian) history</li>
-                <li><strong>Scholars</strong> - African scholars and intellectuals</li>
-              </ul>
+              {availableCategories.length > 0 ? (
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  {availableCategories.map((name) => (
+                    <li key={name}><strong>{name}</strong></li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">No categories found. Please add categories first in the admin.</p>
+              )}
             </div>
 
             <Alert>
