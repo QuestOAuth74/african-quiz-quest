@@ -36,12 +36,19 @@ export const WheelOfDestiny = () => {
   };
 
   const handleModeSelect = async (mode: 'single' | 'challenge' | 'live-multiplayer', difficulty?: 'easy' | 'medium' | 'hard') => {
+    console.log('Mode selected:', mode, 'Difficulty:', difficulty);
+    
     switch (mode) {
       case 'single':
         if (difficulty) {
+          console.log('Creating single player session...');
           const session = await createSinglePlayerSession(difficulty);
+          console.log('Session created:', session);
           if (session) {
+            console.log('Navigating to:', `/wheel/play/${session.id}`);
             navigate(`/wheel/play/${session.id}`);
+          } else {
+            console.error('Failed to create session');
           }
         }
         break;

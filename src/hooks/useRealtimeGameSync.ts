@@ -17,10 +17,11 @@ export const useRealtimeGameSync = (gameSessionId: string | null) => {
   });
   const [loading, setLoading] = useState(true);
 
-  // Load initial game session
   const loadGameSession = useCallback(async () => {
     if (!gameSessionId || !user) return;
 
+    console.log('Loading game session:', gameSessionId, 'for user:', user.id);
+    
     try {
       const { data: session, error } = await supabase
         .from('wheel_game_sessions')
@@ -31,19 +32,44 @@ export const useRealtimeGameSync = (gameSessionId: string | null) => {
       if (error) throw error;
       if (!session) return;
 
+      console.log('Loaded session data:', session);
+
       // Parse game state
       const sessionGameState = typeof session.game_state === 'string' 
         ? JSON.parse(session.game_state) 
         : session.game_state;
 
+      console.log('Session game state:', sessionGameState);
+
+      // If there's a puzzle ID, fetch the full puzzle
+      const puzzleId = session.current_puzzle_id || sessionGameState?.puzzleId;
+      let currentPuzzle = sessionGameState?.currentPuzzle;
+      
+      if (puzzleId && !currentPuzzle) {
+        console.log('Fetching puzzle:', puzzleId);
+        const { data: puzzle, error: puzzleError } = await supabase
+          .from('wheel_puzzles')
+          .select('*')
+          .eq('id', puzzleId)
+          .single();
+          
+        if (!puzzleError && puzzle) {
+          console.log('Loaded puzzle:', puzzle);
+          currentPuzzle = puzzle;
+        } else {
+          console.error('Error loading puzzle:', puzzleError);
+        }
+      }
+
       setGameSession(session);
       setGameState(prev => ({
         ...prev,
-        currentPuzzle: sessionGameState?.currentPuzzle,
+        currentPuzzle,
         revealedLetters: sessionGameState?.revealedLetters || [],
         guessedLetters: sessionGameState?.guessedLetters || [],
         currentPlayerTurn: session.current_player,
-        gamePhase: 'spinning'
+        gamePhase: sessionGameState?.gamePhase || 'spinning',
+        wheelValue: sessionGameState?.wheelValue || 0
       }));
       setLoading(false);
     } catch (error) {

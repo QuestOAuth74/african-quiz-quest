@@ -118,7 +118,15 @@ const WheelPlay = () => {
   const isCurrentPlayerTurn = () => {
     if (!gameSession || !user) return false;
     
-    // Check if current user is player 1 or player 2 and if it's their turn
+    // Check if this is a single player game
+    const isSinglePlayer = gameSession.game_mode === 'single';
+    
+    if (isSinglePlayer) {
+      // In single player, only allow player 1 (human) to take actions during their turn
+      return gameSession.current_player === 1 && gameSession.player1_id === user.id;
+    }
+    
+    // For multiplayer games
     const isPlayer1 = gameSession.player1_id === user.id;
     const isPlayer2 = gameSession.player2_id === user.id;
     
@@ -154,7 +162,7 @@ const WheelPlay = () => {
 
   // Determine player names and current user's role
   const isPlayer1 = user && gameSession.player1_id === user.id;
-  const isPlayer2 = user && gameSession.player2_id === user.id;
+  const isSinglePlayer = gameSession.game_mode === 'single';
   
   const player1 = {
     id: gameSession.player1_id,
@@ -165,8 +173,10 @@ const WheelPlay = () => {
   };
 
   const player2 = {
-    id: gameSession.player2_id,
-    name: isPlayer2 ? 'You' : 'Player 2',
+    id: gameSession.player2_id || 'computer',
+    name: isSinglePlayer 
+      ? (gameSession.computer_player_data?.name || 'Computer') 
+      : (isPlayer1 ? 'Player 2' : 'You'),
     totalScore: gameSession.player2_score,
     roundScore: gameSession.player2_round_score,
     roundsWon: gameSession.rounds_won_player2
