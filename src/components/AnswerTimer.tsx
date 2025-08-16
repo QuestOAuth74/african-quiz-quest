@@ -35,6 +35,7 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
     if (isActive && (gameMode === 'multiplayer' || gameMode === 'online-multiplayer')) {
       setTimeLeft(30);
       setIsVisible(true);
+      console.log('[AnswerTimer] start', { mode: gameMode });
       
       const timer = setInterval(() => {
         setTimeLeft(prev => {
@@ -83,7 +84,7 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
   };
 
   return (
-    <div className="w-full max-w-md mx-auto animate-fade-in mb-4">
+    <div className="w-full max-w-md mx-auto animate-fade-in mb-4 pointer-events-none">
       <div className={`bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-md transition-all duration-300 ${getTimerClasses()}`}>
         <div className="flex items-center justify-center gap-2 mb-2">
           {timeLeft <= 5 ? (

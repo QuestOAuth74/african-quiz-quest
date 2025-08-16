@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -79,19 +79,21 @@ const QuestionModal = ({
       if (shouldStartTimer) {
         safetyTimeoutRef.current = window.setTimeout(() => {
           console.log('[QuestionModal] Safety timeout fired', { qId: question.id });
-          handleTimerTimeout();
+          timerTimeoutRef.current?.();
         }, 30500);
       }
     } else {
       // Modal closed or no question
+      console.log('[QuestionModal] Timer deactivated/cleanup', { isOpen, hasQuestion: !!question });
       setIsTimerActive(false);
       clearSafetyTimeout();
     }
 
     return () => {
+      console.log('[QuestionModal] Cleanup effect');
       clearSafetyTimeout();
     };
-  }, [isOpen, question, gameMode, currentPlayer, handleTimerTimeout]);
+  }, [isOpen, question?.id, gameMode, currentPlayer]);
 
   const handleOptionSelect = (optionId: string) => {
     soundEffects.playButtonClick();
@@ -129,7 +131,7 @@ const QuestionModal = ({
     }
   };
 
-  function handleTimerTimeout() {
+  const handleTimerTimeout = useCallback(() => {
     setIsTimerActive(false);
     clearSafetyTimeout();
     setHasAnswered(true);
@@ -141,7 +143,12 @@ const QuestionModal = ({
       variant: "destructive",
     });
     onAnswer('timeout');
-  }
+  }, [question?.id]);
+
+  const timerTimeoutRef = useRef(handleTimerTimeout);
+  useEffect(() => {
+    timerTimeoutRef.current = handleTimerTimeout;
+  }, [handleTimerTimeout]);
 
   const handlePass = () => {
     setIsTimerActive(false); // Stop timer on pass
@@ -186,7 +193,7 @@ const QuestionModal = ({
             </DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className={`${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'} pr-4`}>
+          <ScrollArea className={`${isMobile ? 'h-[55vh]' : 'h-[70vh]'} pr-4`}>
             <div className="space-y-6">
               {/* Question Display */}
               <Card className="jeopardy-card border-theme-yellow/30">
@@ -396,7 +403,7 @@ const QuestionModal = ({
             </div>
           )}
 
-          <ScrollArea className={`flex-1 ${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'}`}>
+          <ScrollArea className={`${isMobile ? 'h-[55vh]' : 'h-[70vh]'} flex-1`}>
             <div className="space-y-6 pr-4">
 
               {/* Question */}
@@ -468,23 +475,6 @@ const QuestionModal = ({
                         ))}
                       </div>
                       
-                      <div className="flex gap-3 justify-center mt-6">
-                        <Button
-                          onClick={handleSkip}
-                          variant="outline"
-                          className="jeopardy-button border-orange-500/50 text-orange-400 hover:text-orange-300"
-                        >
-                          <SkipForward className="mr-2" size={16} />
-                          Skip
-                        </Button>
-                        <Button
-                          onClick={handleSubmit}
-                          disabled={!selectedOption}
-                          className="jeopardy-button px-8"
-                        >
-                          Submit Answer
-                        </Button>
-                      </div>
                     </>
                   )}
                 </div>
@@ -598,6 +588,29 @@ const QuestionModal = ({
               )}
             </div>
           </ScrollArea>
+
+          {/* Action bar */}
+          {!isAIPlayer && !showAnswer && !hasAnswered && (
+            <div className="px-4 pt-3 pb-3">
+              <div className="flex gap-3 justify-center">
+                <Button
+                  onClick={handleSkip}
+                  variant="outline"
+                  className="jeopardy-button border-orange-500/50 text-orange-400 hover:text-orange-300"
+                >
+                  <SkipForward className="mr-2" size={16} />
+                  Skip
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!selectedOption}
+                  className="jeopardy-button px-8"
+                >
+                  Submit Answer
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>
