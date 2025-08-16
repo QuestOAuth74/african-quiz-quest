@@ -183,7 +183,7 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         return;
       }
 
-      // Create a real game room using the request's game config
+  // Create a real game room using the request's game config
       const roomConfig = request.game_config || gameConfig;
       const room = await createRoom(roomConfig);
       if (!room) {
@@ -206,6 +206,20 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
           toast.error('Failed to add requester to room');
           return;
         }
+      }
+
+      // Immediately start the game as host when both players are present
+      try {
+        await supabase
+          .from('game_rooms')
+          .update({
+            status: 'playing',
+            started_at: new Date().toISOString(),
+            current_turn_user_id: user?.id || null,
+          })
+          .eq('id', room.id);
+      } catch (e) {
+        console.error('Failed to start game automatically:', e);
       }
 
       // Accept the match request
