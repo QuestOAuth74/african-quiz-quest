@@ -49,6 +49,32 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
       <div className="bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown p-4 sm:p-6 md:p-8">
         <div className="max-w-5xl mx-auto">
           
+          {/* Sign Up/Login Message for Non-Authenticated Users */}
+          {!isAuthenticated && (
+            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-r from-theme-yellow/20 via-theme-yellow/30 to-theme-yellow/20 backdrop-blur-sm rounded-lg border-2 border-theme-yellow/50 max-w-2xl mx-auto shadow-lg shadow-theme-yellow/20">
+              <div className="text-center">
+                <h3 className="text-xl sm:text-2xl font-bold text-theme-yellow mb-3">
+                  🎯 Unlock the Full Experience!
+                </h3>
+                <p className="text-sm sm:text-base text-theme-yellow-light mb-4 leading-relaxed">
+                  Sign up or log in to track your progress, compete on leaderboards, and unlock achievements as you master African history!
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link to="/auth">
+                    <Button className="w-full sm:w-auto jeopardy-gold font-semibold px-6 py-2 hover:scale-105 transition-all duration-300">
+                      Sign Up Free
+                    </Button>
+                  </Link>
+                  <Link to="/auth">
+                    <Button variant="outline" className="w-full sm:w-auto jeopardy-button border-theme-yellow/50 text-theme-yellow hover:bg-theme-yellow/10 font-semibold px-6 py-2">
+                      Log In
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Welcome Message with Badges for Authenticated Users - Below banner */}
           {isAuthenticated && user && (
             <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-background/80 backdrop-blur-sm rounded-lg border border-theme-yellow/20 max-w-xl mx-auto">
