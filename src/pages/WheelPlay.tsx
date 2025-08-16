@@ -47,16 +47,29 @@ const WheelPlay = () => {
     if (!gameSession) return;
 
     const newPlayer = gameSession.current_player === 1 ? 2 : 1;
-    const updatedSession = { ...gameSession, current_player: newPlayer };
+    const newGameState = {
+      revealedLetters: gameState.revealedLetters,
+      guessedLetters: gameState.guessedLetters,
+      wheelValue: 0,
+      isSpinning: false,
+      currentPlayerTurn: newPlayer,
+      gamePhase: 'spinning' as const
+    };
+    
+    const updatedSession = { 
+      ...gameSession, 
+      current_player: newPlayer,
+      game_state: newGameState
+    };
     
     await supabase
       .from('wheel_game_sessions')
-      .update({ current_player: newPlayer })
+      .update(updatedSession)
       .eq('id', gameSession.id);
     
     setGameSession(updatedSession);
-    setGameState(prev => ({ 
-      ...prev, 
+    setGameState(prev => ({
+      ...prev,
       currentPlayerTurn: newPlayer,
       gamePhase: 'spinning',
       wheelValue: 0
@@ -78,6 +91,15 @@ const WheelPlay = () => {
           points_earned: 0
         });
 
+      const newGameState = {
+        revealedLetters: gameState.revealedLetters,
+        guessedLetters: gameState.guessedLetters,
+        wheelValue: value,
+        isSpinning: false,
+        currentPlayerTurn: gameState.currentPlayerTurn,
+        gamePhase: value === 'BANKRUPT' || value === 'LOSE_TURN' ? 'spinning' : 'guessing'
+      };
+
       setGameState(prev => ({
         ...prev,
         wheelValue: value,
@@ -92,11 +114,11 @@ const WheelPlay = () => {
           variant: "destructive"
         });
         
-        // Player loses all round score
         const updatedSession = {
           ...gameSession,
           [gameSession.current_player === 1 ? 'player1_round_score' : 'player2_round_score']: 0,
-          current_player: gameSession.current_player === 1 ? 2 : 1
+          current_player: gameSession.current_player === 1 ? 2 : 1,
+          game_state: newGameState
         };
         
         await supabase
@@ -151,11 +173,22 @@ const WheelPlay = () => {
         const letterCount = (gameState.currentPuzzle?.phrase.toUpperCase().match(new RegExp(letter.toUpperCase(), 'g')) || []).length;
         const pointsEarned = (gameState.wheelValue as number) * letterCount;
         
-        // Update scores
+        // Update the new game state without currentPuzzle (it's stored separately)
+        const newGameState = {
+          revealedLetters: newRevealedLetters,
+          guessedLetters: newGuessedLetters,
+          wheelValue: gameState.wheelValue,
+          isSpinning: false,
+          currentPlayerTurn: gameState.currentPlayerTurn,
+          gamePhase: 'spinning' as const // Player gets to spin again
+        };
+        
+        // Update scores and game state in database
         const updatedSession = {
           ...gameSession,
           [gameSession.current_player === 1 ? 'player1_round_score' : 'player2_round_score']: 
-            (gameSession.current_player === 1 ? gameSession.player1_round_score : gameSession.player2_round_score) + pointsEarned
+            (gameSession.current_player === 1 ? gameSession.player1_round_score : gameSession.player2_round_score) + pointsEarned,
+          game_state: newGameState
         };
         
         await supabase
@@ -164,12 +197,11 @@ const WheelPlay = () => {
           .eq('id', gameSession.id);
           
         setGameSession(updatedSession);
-        
         setGameState(prev => ({
           ...prev,
           revealedLetters: newRevealedLetters,
           guessedLetters: newGuessedLetters,
-          gamePhase: 'spinning' // Player gets to spin again
+          gamePhase: 'spinning'
         }));
         
         toast({
@@ -177,7 +209,27 @@ const WheelPlay = () => {
           description: `Good guess! You earned ${pointsEarned} points.`,
         });
       } else {
-        // Letter is wrong - switch turns
+        // Letter is wrong - update game state and switch turns
+        const newGameState = {
+          revealedLetters: gameState.revealedLetters,
+          guessedLetters: newGuessedLetters,
+          wheelValue: gameState.wheelValue,
+          isSpinning: false,
+          currentPlayerTurn: gameState.currentPlayerTurn,
+          gamePhase: gameState.gamePhase
+        };
+        
+        // Update game state in database
+        const updatedSession = {
+          ...gameSession,
+          game_state: newGameState
+        };
+        
+        await supabase
+          .from('wheel_game_sessions')
+          .update(updatedSession)
+          .eq('id', gameSession.id);
+        
         setGameState(prev => ({
           ...prev,
           guessedLetters: newGuessedLetters
