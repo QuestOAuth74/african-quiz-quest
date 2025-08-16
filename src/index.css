@@ -368,3 +368,61 @@ All colors MUST be HSL.
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+/* Crossword-specific styles */
+.crossword-grid {
+  font-family: 'Orbitron', monospace;
+}
+
+.crossword-grid input {
+  font-family: 'Orbitron', monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.crossword-grid input:focus {
+  ring: 2px solid hsl(var(--theme-yellow));
+  ring-offset: 2px;
+}
+
+.crossword-clues {
+  max-height: 600px;
+}
+
+.crossword-clues .scroll-area {
+  height: 100%;
+}
+
+/* Crossword animations */
+@keyframes crossword-reveal {
+  from { 
+    opacity: 0; 
+    transform: scale(0.8);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+}
+
+.crossword-cell-reveal {
+  animation: crossword-reveal 0.3s ease-out;
+}
+
+/* Crossword cell highlighting */
+.crossword-cell-selected {
+  background: hsl(var(--theme-yellow) / 0.2) !important;
+  border-color: hsl(var(--theme-yellow)) !important;
+  box-shadow: 0 0 0 1px hsl(var(--theme-yellow));
+}
+
+.crossword-cell-correct {
+  background: hsl(142 71% 45% / 0.1) !important;
+  color: hsl(142 71% 45%) !important;
+}
+
+.crossword-cell-word-complete {
+  background: hsl(142 71% 45% / 0.2) !important;
+  animation: pulse 1s ease-in-out;
+}
