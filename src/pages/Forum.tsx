@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send, Filter } from 'lucide-react';
+import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
@@ -72,6 +72,10 @@ const Forum = () => {
   const [popularityFilter, setPopularityFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
   
+  // Pagination state
+  const [postsPerPage] = useState(10);
+  const [visiblePostsCount, setVisiblePostsCount] = useState(10);
+  
   // Post creation states
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', content: '', category_id: '' });
@@ -107,6 +111,11 @@ const Forum = () => {
     toggleUpvote
   } = useForumData(user, filters);
 
+  // Reset visible posts count when filters change
+  useEffect(() => {
+    setVisiblePostsCount(10);
+  }, [selectedCategory, searchTerm, sortBy, sortOrder, timeFilter, userFilter, popularityFilter]);
+
   // Calculate active filters count
   const activeFiltersCount = [
     timeFilter !== 'all',
@@ -123,6 +132,14 @@ const Forum = () => {
 
   const handleSortOrderChange = () => {
     setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
+
+  const handleShowMorePosts = () => {
+    setVisiblePostsCount(prev => prev + postsPerPage);
+  };
+
+  const handleShowLessPosts = () => {
+    setVisiblePostsCount(postsPerPage);
   };
 
   const toggleReplies = async (postId: string) => {
@@ -579,23 +596,62 @@ const Forum = () => {
                   </Button>
                 </Card>
               ) : (
-                posts.map((post) => (
-                  <PostWithMessaging
-                    key={post.id}
-                    post={post}
-                    isUpvoted={userUpvotes.has(post.id)}
-                    onUpvote={() => toggleUpvote(post.id)}
-                    onToggleReplies={() => toggleReplies(post.id)}
-                    showReplies={showReplies.has(post.id)}
-                    replies={replies[post.id] || []}
-                    replyContent={replyContent[post.id] || ''}
-                    onReplyContentChange={(content) => setReplyContent(prev => ({ ...prev, [post.id]: content }))}
-                    onSubmitReply={() => submitReply(post.id)}
-                    submittingReply={submittingReply === post.id}
-                    formatDate={formatDate}
-                    isAuthenticated={isAuthenticated}
-                  />
-                ))
+                <>
+                  {posts.slice(0, visiblePostsCount).map((post) => (
+                    <PostWithMessaging
+                      key={post.id}
+                      post={post}
+                      isUpvoted={userUpvotes.has(post.id)}
+                      onUpvote={() => toggleUpvote(post.id)}
+                      onToggleReplies={() => toggleReplies(post.id)}
+                      showReplies={showReplies.has(post.id)}
+                      replies={replies[post.id] || []}
+                      replyContent={replyContent[post.id] || ''}
+                      onReplyContentChange={(content) => setReplyContent(prev => ({ ...prev, [post.id]: content }))}
+                      onSubmitReply={() => submitReply(post.id)}
+                      submittingReply={submittingReply === post.id}
+                      formatDate={formatDate}
+                      isAuthenticated={isAuthenticated}
+                    />
+                  ))}
+                  
+                  {/* Show More/Less Toggle Button */}
+                  {posts.length > postsPerPage && (
+                    <Card className="border-0 shadow-lg bg-background/80 backdrop-blur-xl rounded-3xl overflow-hidden">
+                      <CardContent className="p-6 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                          <div className="text-sm text-muted-foreground">
+                            Showing {Math.min(visiblePostsCount, posts.length)} of {posts.length} posts
+                          </div>
+                          
+                          <div className="flex gap-3">
+                            {visiblePostsCount < posts.length && (
+                              <Button
+                                onClick={handleShowMorePosts}
+                                variant="outline"
+                                className="rounded-full px-6 h-12 font-semibold bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20 hover:bg-primary/20 transition-all duration-300"
+                              >
+                                <ChevronDown className="h-5 w-5 mr-2" />
+                                Show Next {Math.min(postsPerPage, posts.length - visiblePostsCount)} Posts
+                              </Button>
+                            )}
+                            
+                            {visiblePostsCount > postsPerPage && (
+                              <Button
+                                onClick={handleShowLessPosts}
+                                variant="outline"
+                                className="rounded-full px-6 h-12 font-semibold border-muted-foreground/20 hover:bg-muted/20 transition-all duration-300"
+                              >
+                                <ChevronUp className="h-5 w-5 mr-2" />
+                                Show Less
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
               )}
             </div>
           </TabsContent>
