@@ -1,11 +1,13 @@
 import { Shield } from 'lucide-react';
 import { usePageMeta } from '@/hooks/usePageTitle';
+import TopNavigation from '@/components/TopNavigation';
 
 const Privacy = () => {
   usePageMeta("Privacy Policy", "Read our privacy policy to understand how we collect, use, and protect your personal information.");
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <TopNavigation />
+      <div className="container mx-auto px-4 py-12 pt-20 max-w-4xl">
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">

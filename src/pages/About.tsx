@@ -1,11 +1,13 @@
 import { Mail } from 'lucide-react';
 import { usePageMeta } from '@/hooks/usePageTitle';
+import TopNavigation from '@/components/TopNavigation';
 
 const About = () => {
   usePageMeta("About Us", "Learn about Historia Africana's mission to educate and empower through African history and heritage.");
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <TopNavigation />
+      <div className="container mx-auto px-4 py-12 pt-20 max-w-4xl">
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
