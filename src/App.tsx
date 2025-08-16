@@ -44,7 +44,7 @@ const App = () => (
             <Route path="/crossword" element={<ProtectedRoute><Crossword /></ProtectedRoute>} />
             <Route path="/crossword/play/:puzzleId" element={<ProtectedRoute><CrosswordPlay /></ProtectedRoute>} />
             <Route path="/wheel" element={<ProtectedRoute><WheelOfDestiny /></ProtectedRoute>} />
-            <Route path="/wheel/play" element={<ProtectedRoute><WheelPlay /></ProtectedRoute>} />
+            {/* Removed /wheel/play without :sessionId to prevent ambiguous routing */}
             <Route path="/wheel/play/:sessionId" element={<ProtectedRoute><WheelPlay /></ProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

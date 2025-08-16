@@ -13,7 +13,7 @@ import { toast } from '@/hooks/use-toast';
 
 // Wheel game play component for two-player matches
 const WheelPlay = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams<{ sessionId: string }>();
@@ -29,11 +29,18 @@ const WheelPlay = () => {
   } = useRealtimeGameSync(gameSessionId);
 
   useEffect(() => {
-    if (!user || !gameSessionId) {
-      navigate('/wheel');
+    // Wait for auth to resolve before any navigation decisions
+    if (authLoading) return;
+
+    // ProtectedRoute will handle redirecting unauthenticated users to /auth
+    if (!user) return;
+
+    if (!gameSessionId) {
+      console.warn('WheelPlay: Missing gameSessionId, navigating back to /wheel');
+      navigate('/wheel', { replace: true });
       return;
     }
-  }, [user, gameSessionId, navigate]);
+  }, [authLoading, user, gameSessionId, navigate]);
 
   const handleSpin = async (value: number | string) => {
     if (!gameSession || !user) return;
