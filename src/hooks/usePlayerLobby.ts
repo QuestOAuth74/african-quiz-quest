@@ -174,15 +174,40 @@ export const usePlayerLobby = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('matchmaking_requests')
-        .select('*')
-        .or(`requester_id.eq.${user.id},target_id.eq.${user.id}`)
-        .in('status', ['pending', 'accepted'])
-        .order('created_at', { ascending: false });
+      // Fetch both incoming and outgoing requests separately to avoid OR edge-cases
+      const [incomingRes, outgoingRes] = await Promise.all([
+        supabase
+          .from('matchmaking_requests')
+          .select('*')
+          .eq('target_id', user.id)
+          .in('status', ['pending', 'accepted'])
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('matchmaking_requests')
+          .select('*')
+          .eq('requester_id', user.id)
+          .in('status', ['pending', 'accepted'])
+          .order('created_at', { ascending: false }),
+      ]);
 
-      if (error) throw error;
-      setMatchmakingRequests(data as any || []);
+      if (incomingRes.error) throw incomingRes.error;
+      if (outgoingRes.error) throw outgoingRes.error;
+
+      const combined = [
+        ...(incomingRes.data || []),
+        ...(outgoingRes.data || []),
+      ]
+        // remove duplicates by id
+        .reduce((acc: Record<string, any>, curr: any) => {
+          acc[curr.id] = curr;
+          return acc;
+        }, {} as Record<string, any>);
+
+      const result = Object.values(combined).sort((a: any, b: any) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      setMatchmakingRequests(result as any);
     } catch (err: any) {
       console.error('Failed to fetch match requests:', err);
     }
