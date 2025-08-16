@@ -5,6 +5,7 @@ interface ComputerPlayerOptions {
   difficulty: 'easy' | 'medium' | 'hard';
   currentPuzzle: any;
   gameState: GameState;
+  gameMode?: string;
   onSpin: (value: number | string) => void;
   onGuessLetter: (letter: string) => void;
   onBuyVowel: (vowel: string) => void;
@@ -15,6 +16,7 @@ export const useComputerPlayer = ({
   difficulty,
   currentPuzzle,
   gameState,
+  gameMode,
   onSpin,
   onGuessLetter,
   onBuyVowel,
@@ -112,13 +114,13 @@ export const useComputerPlayer = ({
     setIsThinking(false);
   }, [currentPuzzle, gameState, difficulty, onSpin, onGuessLetter, onBuyVowel, onSolvePuzzle, shouldSolvePuzzle, getThinkingTime, getCommonLetters, getUnguessedConsonants, getUnguessedVowels]);
 
-  // Trigger computer move when it's the computer's turn
+  // Trigger computer move when it's the computer's turn (only in single player mode)
   useEffect(() => {
-    if (gameState.currentPlayerTurn === 2 && !isThinking) {
+    if (gameMode === 'single' && gameState.currentPlayerTurn === 2 && !isThinking) {
       const timer = setTimeout(makeComputerMove, 500);
       return () => clearTimeout(timer);
     }
-  }, [gameState.currentPlayerTurn, gameState.gamePhase, isThinking, makeComputerMove]);
+  }, [gameMode, gameState.currentPlayerTurn, gameState.gamePhase, isThinking, makeComputerMove]);
 
   return {
     isThinking,

@@ -460,11 +460,12 @@ const WheelPlay = () => {
     return false;
   };
 
-  // Initialize computer player for single player mode
+  // Initialize computer player (with safety checks for multiplayer games)
   const computerPlayer = useComputerPlayer({
     difficulty: (gameSession?.computer_difficulty as 'easy' | 'medium' | 'hard') || 'medium',
     currentPuzzle: gameState.currentPuzzle,
     gameState,
+    gameMode: gameSession?.game_mode,
     onSpin: handleSpin,
     onGuessLetter: handleGuessLetter,
     onBuyVowel: handleBuyVowel,

@@ -168,6 +168,7 @@ export const useWheelLobby = () => {
           player2_id: challenge.challenged_id,
           current_puzzle_id: puzzle.id,
           status: 'playing',
+          game_mode: 'challenge',
           game_state: {
             currentPuzzle: puzzle,
             revealedLetters: [],
