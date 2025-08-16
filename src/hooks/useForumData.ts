@@ -72,7 +72,8 @@ export const useForumData = (user: any, filters: ForumFilters) => {
       .select(`
         *,
         forum_categories!fk_forum_posts_category_id(name),
-        profiles!fk_forum_posts_user_id(display_name)
+        profiles!fk_forum_posts_user_id(display_name),
+        forum_post_replies!fk_forum_post_replies_post_id(id)
       `)
       .eq('moderation_status', 'approved');
 
