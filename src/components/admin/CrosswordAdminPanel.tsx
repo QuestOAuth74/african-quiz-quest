@@ -12,7 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CrosswordGenerator } from "@/lib/crosswordGenerator";
 import { CrosswordWordData } from "@/types/crossword";
-import { Puzzle, Settings, Plus, Trash2, Eye, Play } from "lucide-react";
+import { Puzzle, Settings, Plus, Trash2, Eye, Play, Upload } from "lucide-react";
+import { CrosswordCSVUpload } from "./CrosswordCSVUpload";
 
 export function CrosswordAdminPanel() {
   const [isPublicEnabled, setIsPublicEnabled] = useState(false);
@@ -263,8 +264,9 @@ export function CrosswordAdminPanel() {
       </Card>
 
       <Tabs defaultValue="words" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="words">Word Database</TabsTrigger>
+          <TabsTrigger value="csv">CSV Import</TabsTrigger>
           <TabsTrigger value="generator">Puzzle Generator</TabsTrigger>
           <TabsTrigger value="puzzles">Generated Puzzles</TabsTrigger>
         </TabsList>
@@ -356,6 +358,10 @@ export function CrosswordAdminPanel() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="csv" className="space-y-4">
+          <CrosswordCSVUpload onUploadComplete={loadData} />
         </TabsContent>
 
         <TabsContent value="generator" className="space-y-4">
