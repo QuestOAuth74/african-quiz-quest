@@ -73,12 +73,6 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
       </div>
 
 
-      {/* Animated Golden Border - Only on Desktop */}
-      {!isMobile && (
-        <div className="absolute inset-0 z-50 pointer-events-none">
-          <div className="w-full h-full border-4 border-yellow-400/50 rounded-lg shadow-[0_0_30px_rgba(255,215,0,0.3),0_0_60px_rgba(255,215,0,0.2),0_0_90px_rgba(255,215,0,0.1)] animate-pulse" />
-        </div>
-      )}
 
       {/* Mobile fallback sparkle effects */}
       {isMobile && (
