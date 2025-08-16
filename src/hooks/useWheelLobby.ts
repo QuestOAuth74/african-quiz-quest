@@ -300,11 +300,8 @@ export const useWheelLobby = () => {
               title: "Game starting!",
               description: "You're being taken to the game room...",
             });
-            navigate('/wheel/play', { 
-              state: { 
-                gameSessionId: session.id
-              }
-            });
+            navigate(`/wheel/play/${session.id}`);
+
           }
         }
       })

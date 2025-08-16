@@ -45,6 +45,7 @@ const App = () => (
             <Route path="/crossword/play/:puzzleId" element={<ProtectedRoute><CrosswordPlay /></ProtectedRoute>} />
             <Route path="/wheel" element={<ProtectedRoute><WheelOfDestiny /></ProtectedRoute>} />
             <Route path="/wheel/play" element={<ProtectedRoute><WheelPlay /></ProtectedRoute>} />
+            <Route path="/wheel/play/:sessionId" element={<ProtectedRoute><WheelPlay /></ProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/blog" element={<Blog />} />

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeGameSync } from '@/hooks/useRealtimeGameSync';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,8 +16,9 @@ const WheelPlay = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const params = useParams<{ sessionId: string }>();
   
-  const { gameSessionId } = location.state || {};
+  const gameSessionId = params.sessionId || (location.state as any)?.gameSessionId || null;
   
   const {
     gameSession,
