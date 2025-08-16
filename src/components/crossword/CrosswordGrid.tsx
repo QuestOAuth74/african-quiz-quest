@@ -46,6 +46,7 @@ export function CrosswordGrid({
   const checkWordCompletion = (word: CrosswordWord, currentGrid: CrosswordCell[][]) => {
     let isComplete = true;
     
+    // First, check if the current word is complete
     for (let i = 0; i < word.length; i++) {
       const cellX = word.direction === 'across' ? word.startX + i : word.startX;
       const cellY = word.direction === 'down' ? word.startY + i : word.startY;
@@ -57,9 +58,66 @@ export function CrosswordGrid({
       }
     }
 
+    // Secondary validation: Check all intersecting words to ensure they remain valid
+    if (isComplete) {
+      isComplete = validateIntersectingWords(word, currentGrid);
+    }
+
     if (isComplete && !word.isCompleted) {
       onWordComplete(word.id);
     }
+  };
+
+  const validateIntersectingWords = (completedWord: CrosswordWord, currentGrid: CrosswordCell[][]): boolean => {
+    // Get all words that intersect with the completed word
+    const intersectingWords = puzzle.words.filter(w => w.id !== completedWord.id && wordsIntersect(completedWord, w));
+    
+    // Check each intersecting word to ensure it's still valid
+    for (const intersectingWord of intersectingWords) {
+      if (!isWordValid(intersectingWord, currentGrid)) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  const wordsIntersect = (word1: CrosswordWord, word2: CrosswordWord): boolean => {
+    // Check if two words intersect
+    if (word1.direction === word2.direction) return false;
+    
+    if (word1.direction === 'across') {
+      // word1 is horizontal, word2 is vertical
+      return (
+        word2.startX >= word1.startX && 
+        word2.startX < word1.startX + word1.length &&
+        word1.startY >= word2.startY && 
+        word1.startY < word2.startY + word2.length
+      );
+    } else {
+      // word1 is vertical, word2 is horizontal
+      return (
+        word1.startX >= word2.startX && 
+        word1.startX < word2.startX + word2.length &&
+        word2.startY >= word1.startY && 
+        word2.startY < word1.startY + word1.length
+      );
+    }
+  };
+
+  const isWordValid = (word: CrosswordWord, currentGrid: CrosswordCell[][]): boolean => {
+    // Check if a word is valid (all filled cells match the expected letters)
+    for (let i = 0; i < word.length; i++) {
+      const cellX = word.direction === 'across' ? word.startX + i : word.startX;
+      const cellY = word.direction === 'down' ? word.startY + i : word.startY;
+      const cell = currentGrid[cellY][cellX];
+      
+      // If cell has user input, it must match the expected letter
+      if (cell.userInput && cell.userInput !== cell.letter) {
+        return false;
+      }
+    }
+    return true;
   };
 
   const advanceToNextCell = (currentX: number, currentY: number, word: CrosswordWord) => {
