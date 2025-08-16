@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeGameSync } from '@/hooks/useRealtimeGameSync';
 import { useComputerPlayer } from '@/hooks/useComputerPlayer';
+import { useWheelSoundEffects } from '@/hooks/useWheelSoundEffects';
 import { supabase } from '@/integrations/supabase/client';
 import { WheelComponent } from '@/components/wheel/WheelComponent';
 import { PuzzleBoard } from '@/components/wheel/PuzzleBoard';
@@ -12,7 +13,7 @@ import { WheelGameCompletionModal } from '@/components/wheel/WheelGameCompletion
 import { WheelChallengeCompletionModal } from '@/components/wheel/WheelChallengeCompletionModal';
 import { ChallengerNameDialog } from '@/components/wheel/ChallengerNameDialog';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 // Wheel game play component for two-player matches
@@ -22,6 +23,7 @@ const WheelPlay = () => {
   const location = useLocation();
   const params = useParams<{ sessionId: string }>();
   const [showNameDialog, setShowNameDialog] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   
   const gameSessionId = params.sessionId || (location.state as any)?.gameSessionId || null;
   
@@ -32,6 +34,9 @@ const WheelPlay = () => {
     setGameState,
     setGameSession
   } = useRealtimeGameSync(gameSessionId);
+
+  // Initialize sound effects
+  const soundEffects = useWheelSoundEffects();
 
   useEffect(() => {
     // Wait for auth to resolve before any navigation decisions
@@ -70,6 +75,9 @@ const WheelPlay = () => {
   const switchTurn = async () => {
     if (!gameSession) return;
 
+    // Play turn change sound
+    if (soundEnabled) soundEffects.playTurnChange();
+
     const newPlayer = gameSession.current_player === 1 ? 2 : 1;
     const newGameState = {
       revealedLetters: gameState.revealedLetters,
@@ -104,6 +112,15 @@ const WheelPlay = () => {
     if (!gameSession || !user) return;
 
     try {
+      // Play wheel spin sound
+      if (soundEnabled) {
+        soundEffects.playWheelSpin();
+        // Play wheel stop sound after a delay
+        setTimeout(() => {
+          soundEffects.playWheelStop();
+        }, 2500);
+      }
+
       // Record the spin move
       await supabase
         .from('wheel_game_moves')
@@ -132,6 +149,8 @@ const WheelPlay = () => {
       }));
 
       if (value === 'BANKRUPT') {
+        if (soundEnabled) soundEffects.playBankrupt();
+        
         toast({
           title: "Bankrupt!",
           description: "You lost all your round points and your turn!",
@@ -153,6 +172,8 @@ const WheelPlay = () => {
         setGameSession(updatedSession);
         await switchTurn();
       } else if (value === 'LOSE_TURN') {
+        if (soundEnabled) soundEffects.playLoseTurn();
+        
         toast({
           title: "Lose a Turn!",
           description: "Your turn is over!",
@@ -192,6 +213,9 @@ const WheelPlay = () => {
       const newGuessedLetters = [...gameState.guessedLetters, letter.toUpperCase()];
       
       if (isCorrect) {
+        // Play correct letter sound
+        if (soundEnabled) soundEffects.playCorrectLetter();
+        
         // Letter is correct - add to revealed letters and award points
         const newRevealedLetters = [...gameState.revealedLetters, letter.toUpperCase()];
         const letterCount = (gameState.currentPuzzle?.phrase.toUpperCase().match(new RegExp(letter.toUpperCase(), 'g')) || []).length;
@@ -233,6 +257,9 @@ const WheelPlay = () => {
           description: `Good guess! You earned ${pointsEarned} points.`,
         });
       } else {
+        // Play wrong letter sound
+        if (soundEnabled) soundEffects.playWrongLetter();
+        
         // Letter is wrong - update game state and switch turns
         const newGameState = {
           revealedLetters: gameState.revealedLetters,
@@ -348,6 +375,9 @@ const WheelPlay = () => {
       }));
 
       if (isCorrect) {
+        // Play vowel purchase sound
+        if (soundEnabled) soundEffects.playVowelPurchase();
+        
         toast({
           title: 'Vowel revealed!',
           description: `${upperVowel} is in the puzzle. You can buy another vowel or solve.`,
@@ -391,6 +421,8 @@ const WheelPlay = () => {
         });
 
       if (isCorrect) {
+        // Play puzzle solve sound
+        if (soundEnabled) soundEffects.playPuzzleSolve();
         // Reveal all letters
         const allLetters = Array.from(new Set((gameState.currentPuzzle?.phrase || '')
           .toUpperCase()
@@ -446,6 +478,9 @@ const WheelPlay = () => {
           description: 'Round complete. Returning to lobby...',
         });
       } else {
+        // Play wrong answer sound
+        if (soundEnabled) soundEffects.playWrongLetter();
+        
         toast({
           title: 'Incorrect solution',
           description: 'That solution is not correct. Turn passes.',
@@ -594,7 +629,19 @@ const WheelPlay = () => {
           </Button>
           
           <h1 className="text-2xl font-bold text-primary">Wheel of African Destiny</h1>
-          <div></div> {/* Spacer for centering */}
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSoundEnabled(!soundEnabled);
+              soundEffects.setVolume(soundEnabled ? 0 : 0.3);
+            }}
+            className="flex items-center space-x-2"
+          >
+            {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            <span className="hidden sm:inline">{soundEnabled ? 'Sound On' : 'Sound Off'}</span>
+          </Button>
         </div>
 
         {/* Always show full game layout */}
