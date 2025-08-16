@@ -28,7 +28,7 @@ export class CrosswordGenerator {
     this.grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(''));
   }
 
-  public generatePuzzle(words: CrosswordWordData[], title: string, category: string, difficulty: number): CrosswordPuzzle | null {
+  public generatePuzzle(words: CrosswordWordData[], maxWords: number, title: string, category: string, difficulty: number): CrosswordPuzzle | null {
     if (words.length === 0) return null;
 
     // Reset state
@@ -48,8 +48,8 @@ export class CrosswordGenerator {
       return null;
     }
 
-    // Try to place remaining words
-    for (let i = 1; i < Math.min(sortedWords.length, 15); i++) {
+    // Try to place remaining words up to maxWords limit
+    for (let i = 1; i < Math.min(sortedWords.length, maxWords); i++) {
       const wordData = sortedWords[i];
       this.findAndPlaceWord(wordData.word, wordData.clue, wordData.category);
     }

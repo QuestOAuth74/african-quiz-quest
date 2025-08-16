@@ -12,6 +12,7 @@ export const crosswordUtils = {
     const generator = new CrosswordGenerator(15);
     return generator.generatePuzzle(
       words,
+      10, // Default word count
       'Test African History Crossword',
       'Mixed',
       3

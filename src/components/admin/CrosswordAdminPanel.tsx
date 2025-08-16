@@ -12,7 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CrosswordGenerator } from "@/lib/crosswordGenerator";
 import { CrosswordWordData } from "@/types/crossword";
-import { Puzzle, Settings, Plus, Trash2, Eye, Play, Upload } from "lucide-react";
+import { Puzzle, Settings, Plus, Trash2, Eye, Play, Upload, Check } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 import { CrosswordCSVUpload } from "./CrosswordCSVUpload";
 
 export function CrosswordAdminPanel() {
@@ -20,7 +22,8 @@ export function CrosswordAdminPanel() {
   const [words, setWords] = useState<CrosswordWordData[]>([]);
   const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
   const [newWord, setNewWord] = useState({ word: '', clue: '', category: '', difficulty: 1 });
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(['all']);
+  const [wordCount, setWordCount] = useState<number>(10);
   const [puzzles, setPuzzles] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -181,9 +184,9 @@ export function CrosswordAdminPanel() {
   };
 
   const generatePuzzle = async () => {
-    const filteredWords = selectedCategory === 'all' 
+    const filteredWords = selectedCategories.includes('all') 
       ? words.filter(w => w.is_active)
-      : words.filter(w => w.is_active && w.category === selectedCategory);
+      : words.filter(w => w.is_active && selectedCategories.includes(w.category));
 
     if (filteredWords.length < 5) {
       toast({
@@ -196,10 +199,12 @@ export function CrosswordAdminPanel() {
 
     try {
       const generator = new CrosswordGenerator(15);
+      const categoryName = selectedCategories.includes('all') ? 'Mixed' : selectedCategories.join(', ');
       const puzzle = generator.generatePuzzle(
-        filteredWords, 
-        `African History Crossword - ${selectedCategory === 'all' ? 'Mixed' : selectedCategory}`,
-        selectedCategory === 'all' ? 'Mixed' : selectedCategory,
+        filteredWords,
+        wordCount,
+        `African History Crossword - ${categoryName}`,
+        categoryName,
         3
       );
 
@@ -238,6 +243,51 @@ export function CrosswordAdminPanel() {
         variant: "destructive"
       });
     }
+  };
+
+  const deletePuzzle = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('crossword_puzzles')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      loadData();
+      toast({
+        title: "Success",
+        description: "Puzzle deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting puzzle:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete puzzle",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const toggleCategory = (categoryName: string) => {
+    if (categoryName === 'all') {
+      setSelectedCategories(['all']);
+    } else {
+      const newCategories = selectedCategories.includes('all') 
+        ? [categoryName]
+        : selectedCategories.includes(categoryName)
+          ? selectedCategories.filter(c => c !== categoryName)
+          : [...selectedCategories.filter(c => c !== 'all'), categoryName];
+      
+      setSelectedCategories(newCategories.length === 0 ? ['all'] : newCategories);
+    }
+  };
+
+  const getAvailableWordsCount = () => {
+    const filteredWords = selectedCategories.includes('all') 
+      ? words.filter(w => w.is_active)
+      : words.filter(w => w.is_active && selectedCategories.includes(w.category));
+    return filteredWords.length;
   };
 
   
@@ -399,22 +449,73 @@ export function CrosswordAdminPanel() {
                 Generate New Puzzle
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div>
-                <Label>Category Filter</Label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map(cat => (
-                      <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-base font-medium">Select Categories</Label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Choose which categories to include in the puzzle
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="all-categories"
+                      checked={selectedCategories.includes('all')}
+                      onCheckedChange={() => toggleCategory('all')}
+                    />
+                    <Label htmlFor="all-categories" className="text-sm font-medium">
+                      All Categories
+                    </Label>
+                  </div>
+                  {categories.map(cat => (
+                    <div key={cat.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`cat-${cat.id}`}
+                        checked={selectedCategories.includes(cat.name)}
+                        onCheckedChange={() => toggleCategory(cat.name)}
+                        disabled={selectedCategories.includes('all')}
+                      />
+                      <Label htmlFor={`cat-${cat.id}`} className="text-sm">
+                        {cat.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <Button onClick={generatePuzzle} className="w-full jeopardy-gold">
+
+              <div>
+                <Label className="text-base font-medium">Number of Words: {wordCount}</Label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Select how many words to include in the puzzle (5-20)
+                </p>
+                <Slider
+                  value={[wordCount]}
+                  onValueChange={(value) => setWordCount(value[0])}
+                  max={20}
+                  min={5}
+                  step={1}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>5 words</span>
+                  <span>20 words</span>
+                </div>
+              </div>
+
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Available Words:</span>
+                  <Badge variant="outline">{getAvailableWordsCount()} words</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  From selected categories
+                </p>
+              </div>
+
+              <Button 
+                onClick={generatePuzzle} 
+                className="w-full jeopardy-gold"
+                disabled={getAvailableWordsCount() < 5}
+              >
                 <Puzzle className="h-4 w-4 mr-2" />
                 Generate Crossword Puzzle
               </Button>
@@ -431,22 +532,41 @@ export function CrosswordAdminPanel() {
               <div className="space-y-2">
                 {puzzles.map((puzzle: any) => (
                   <div key={puzzle.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
+                    <div className="flex-1">
                       <h4 className="font-medium">{puzzle.title}</h4>
                       <p className="text-sm text-muted-foreground">
                         {puzzle.category} • Difficulty: {puzzle.difficulty}
                       </p>
+                      <p className="text-xs text-muted-foreground">
+                        Created: {new Date(puzzle.created_at).toLocaleDateString()}
+                      </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" title="Preview">
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" title="Play">
                         <Play className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => deletePuzzle(puzzle.id)}
+                        className="text-destructive hover:text-destructive"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 ))}
+                {puzzles.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Puzzle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No puzzles generated yet</p>
+                    <p className="text-sm">Use the Puzzle Generator to create your first crossword</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
