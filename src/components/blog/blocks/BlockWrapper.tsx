@@ -13,7 +13,10 @@ import {
   Link,
   File,
   Quote,
-  List
+  List,
+  AlertCircle,
+  Code,
+  Minus
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -49,6 +52,7 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
   className = ""
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const blockTypeIcons = {
     paragraph: Type,
@@ -59,6 +63,9 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
     file: File,
     quote: Quote,
     list: List,
+    callout: AlertCircle,
+    code: Code,
+    divider: Minus,
   };
 
   const blockTypes = [
@@ -70,7 +77,13 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
     { type: 'file' as const, label: 'File' },
     { type: 'quote' as const, label: 'Quote' },
     { type: 'list' as const, label: 'List' },
+    { type: 'callout' as const, label: 'Callout' },
+    { type: 'code' as const, label: 'Code Block' },
+    { type: 'divider' as const, label: 'Divider' },
   ];
+
+  // Keep toolbar visible when either hovered or dropdown is open
+  const showToolbar = isHovered || isDropdownOpen;
 
   return (
     <div
@@ -79,8 +92,8 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Block Toolbar */}
-      {isHovered && (
-        <div className="absolute -top-3 right-2 z-10 bg-background border border-border rounded-md shadow-sm">
+      {showToolbar && (
+        <div className="absolute -top-3 right-2 z-50 bg-background border border-border rounded-md shadow-lg">
           <div className="flex items-center">
             {/* Move Up/Down */}
             {onMoveUp && (
@@ -105,7 +118,7 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
             )}
 
             {/* More Options */}
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={setIsDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -115,7 +128,7 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
                   <MoreVertical className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="bg-background border border-border shadow-lg z-50">
                 <DropdownMenuItem onClick={onDuplicate}>
                   <Copy className="h-4 w-4 mr-2" />
                   Duplicate
