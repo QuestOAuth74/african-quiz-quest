@@ -24,6 +24,7 @@ export function CrosswordAdminPanel() {
   const [newWord, setNewWord] = useState({ word: '', clue: '', category: '', difficulty: 1 });
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['all']);
   const [wordCount, setWordCount] = useState<number>(10);
+  const [customPuzzleName, setCustomPuzzleName] = useState<string>('');
   const [puzzles, setPuzzles] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -184,6 +185,30 @@ export function CrosswordAdminPanel() {
   };
 
   const generatePuzzle = async () => {
+    if (!customPuzzleName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a unique name for your puzzle",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check if puzzle name already exists
+    const { data: existingPuzzles } = await supabase
+      .from('crossword_puzzles')
+      .select('title')
+      .eq('title', customPuzzleName.trim());
+
+    if (existingPuzzles && existingPuzzles.length > 0) {
+      toast({
+        title: "Error",
+        description: "A puzzle with this name already exists. Please choose a unique name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const filteredWords = selectedCategories.includes('all') 
       ? words.filter(w => w.is_active)
       : words.filter(w => w.is_active && selectedCategories.includes(w.category));
@@ -203,7 +228,7 @@ export function CrosswordAdminPanel() {
       const puzzle = generator.generatePuzzle(
         filteredWords,
         wordCount,
-        `African History Crossword - ${categoryName}`,
+        customPuzzleName.trim(), // Use the custom name instead of auto-generated
         categoryName,
         3
       );
@@ -225,15 +250,17 @@ export function CrosswordAdminPanel() {
           category: puzzle.category,
           difficulty: puzzle.difficulty,
           grid_data: puzzle.grid as any,
-          words_data: { words: puzzle.words, clues: puzzle.clues } as any
+          words_data: { words: puzzle.words, clues: puzzle.clues, intersections: puzzle.intersections } as any
         });
 
       if (error) throw error;
 
+      // Reset the custom name field after successful generation
+      setCustomPuzzleName('');
       loadData();
       toast({
         title: "Success",
-        description: "Crossword puzzle generated successfully!",
+        description: `Crossword puzzle "${puzzle.title}" generated successfully!`,
       });
     } catch (error) {
       console.error('Error generating puzzle:', error);
@@ -451,6 +478,19 @@ export function CrosswordAdminPanel() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
+                <Label className="text-base font-medium">Puzzle Name *</Label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Enter a unique name for your crossword puzzle
+                </p>
+                <Input
+                  value={customPuzzleName}
+                  onChange={(e) => setCustomPuzzleName(e.target.value)}
+                  placeholder="e.g., Ancient African Kingdoms Challenge"
+                  className="text-base"
+                />
+              </div>
+              
+              <div>
                 <Label className="text-base font-medium">Select Categories</Label>
                 <p className="text-sm text-muted-foreground mb-3">
                   Choose which categories to include in the puzzle
@@ -514,11 +554,18 @@ export function CrosswordAdminPanel() {
               <Button 
                 onClick={generatePuzzle} 
                 className="w-full jeopardy-gold"
-                disabled={getAvailableWordsCount() < 5}
+                disabled={getAvailableWordsCount() < 5 || !customPuzzleName.trim()}
               >
                 <Puzzle className="h-4 w-4 mr-2" />
                 Generate Crossword Puzzle
               </Button>
+              {(!customPuzzleName.trim() || getAvailableWordsCount() < 5) && (
+                <p className="text-xs text-muted-foreground text-center">
+                  {!customPuzzleName.trim() && "Enter a puzzle name to continue"}
+                  {!customPuzzleName.trim() && getAvailableWordsCount() < 5 && " • "}
+                  {getAvailableWordsCount() < 5 && "Need at least 5 words to generate"}
+                </p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
