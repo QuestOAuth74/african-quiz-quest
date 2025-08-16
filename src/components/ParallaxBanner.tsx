@@ -59,7 +59,7 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
         }}
       >
         {/* Golden Glow Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-yellow-500/30 to-yellow-400/20 z-20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 via-yellow-500/15 to-yellow-400/10 z-20" />
         
         {/* Main Banner Image */}
         <img 
@@ -72,7 +72,7 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
         />
         
         {/* Overlay Gradient for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 z-30" />
       </div>
 
 
