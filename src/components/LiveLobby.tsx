@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useGameRoom } from '@/hooks/useGameRoom';
 import { GameConfigModal } from './GameConfigModal';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LiveLobbyProps {
   onBack: () => void;
@@ -93,6 +94,52 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
       });
     }
   }, [matchmakingRequests, user?.id, onlinePlayers]);
+
+  // Auto-navigate to room when this user is added to any game_room_players
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`lobby-user-room-listener-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'game_room_players',
+          filter: `user_id=eq.${user.id}`,
+        },
+        async (payload) => {
+          try {
+            const roomId = (payload.new as any).room_id as string;
+            // Fetch players for context (optional)
+            const { data: playersData } = await supabase
+              .from('game_room_players')
+              .select('user_id, player_name')
+              .eq('room_id', roomId)
+              .eq('is_active', true)
+              .order('joined_at', { ascending: true });
+
+            const players = (playersData || []).map((p) => ({
+              id: p.user_id,
+              user_id: p.user_id,
+              name: p.player_name || 'Player',
+              score: 0,
+            }));
+
+            toast.success('Match ready! Joining game room...');
+            onMatchFound(roomId, players);
+          } catch (e) {
+            console.error('Failed to auto-join room:', e);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, onMatchFound]);
 
   const handleChallengePlayer = (player: any) => {
     setChallengeTarget(player);
