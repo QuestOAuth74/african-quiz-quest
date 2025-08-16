@@ -28,6 +28,7 @@ export const usePlayerLobby = () => {
   const [matchmakingRequests, setMatchmakingRequests] = useState<MatchmakingRequest[]>([]);
   const [currentStatus, setCurrentStatus] = useState<'offline' | 'online' | 'waiting' | 'in_game'>('offline');
   const [loading, setLoading] = useState(false);
+  const [presenceChannel, setPresenceChannel] = useState<any>(null);
 
   // Update player status
   const updatePlayerStatus = useCallback(async (status: 'offline' | 'online' | 'waiting' | 'in_game') => {
@@ -69,22 +70,44 @@ export const usePlayerLobby = () => {
         .lt('expires_at', new Date().toISOString());
 
       // Try to insert the new request - let database constraint handle duplicates
-      const { error } = await supabase
+      const { data: inserted, error } = await supabase
         .from('matchmaking_requests')
         .insert({
           requester_id: user.id,
           target_id: targetUserId,
           game_config: gameConfig
-        });
+        })
+        .select()
+        .single();
 
       if (error) {
-        if (error.code === '23505') { // Unique constraint violation
+        if ((error as any).code === '23505') { // Unique constraint violation
           toast.info('A request is already pending between you and this player');
         } else {
           toast.error('Failed to send match request');
           console.error('Error sending match request:', error);
         }
         return false;
+      }
+
+      // Proactively notify via broadcast so the target sees it instantly
+      try {
+        const channel = presenceChannel || supabase.channel('lobby-presence');
+        await channel.send({
+          type: 'broadcast',
+          event: 'new_match_request',
+          payload: {
+            request_id: inserted?.id,
+            target_id: targetUserId,
+            requester_id: user.id
+          }
+        });
+        if (!presenceChannel) {
+          // Clean up temporary channel
+          supabase.removeChannel(channel);
+        }
+      } catch (broadcastErr) {
+        console.warn('Broadcast notify failed (will still rely on DB realtime):', broadcastErr);
       }
 
       toast.success('Match request sent!');
@@ -94,7 +117,7 @@ export const usePlayerLobby = () => {
       toast.error('Failed to send match request');
       return false;
     }
-  }, [user]);
+  }, [user, presenceChannel]);
 
   // Respond to matchmaking request
   const respondToMatchRequest = useCallback(async (requestId: string, accept: boolean) => {
@@ -250,7 +273,7 @@ export const usePlayerLobby = () => {
       .subscribe();
 
     // Broadcast presence
-    const presenceChannel = supabase
+    const presence = supabase
       .channel('lobby-presence')
       .on('presence', { event: 'sync' }, () => {
         fetchPlayers();
@@ -261,10 +284,20 @@ export const usePlayerLobby = () => {
       .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
         console.log('Player left lobby:', key, leftPresences);
       })
+      .on('broadcast', { event: 'new_match_request' }, (payload) => {
+        const data = (payload as any)?.payload;
+        console.log('Broadcast: new_match_request', data);
+        if (data?.target_id === user.id) {
+          fetchMatchmakingRequests();
+          toast.success('New challenge received!');
+        }
+      })
       .subscribe();
 
+    setPresenceChannel(presence);
+
     // Track user presence
-    presenceChannel.track({
+    presence.track({
       user_id: user.id,
       email: user.email,
       online_at: new Date().toISOString()
