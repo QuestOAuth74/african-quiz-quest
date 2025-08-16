@@ -3,9 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { LobbyPlayer, WheelGameChallenge } from '@/types/lobby';
 import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export const useWheelLobby = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [onlinePlayers, setOnlinePlayers] = useState<LobbyPlayer[]>([]);
   const [incomingChallenges, setIncomingChallenges] = useState<WheelGameChallenge[]>([]);
   const [outgoingChallenges, setOutgoingChallenges] = useState<WheelGameChallenge[]>([]);
@@ -281,6 +283,30 @@ export const useWheelLobby = () => {
       })
       .subscribe();
 
+    // Subscribe to game session creation (for automatic navigation)
+    const gameSessionChannel = supabase
+      .channel('wheel-game-sessions')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'wheel_game_sessions',
+        filter: `player1_id.eq.${user.id},player2_id.eq.${user.id}`
+      }, (payload) => {
+        // Navigate both players to the game when a session is created
+        if (payload.new) {
+          toast({
+            title: "Game starting!",
+            description: "You're being taken to the game room...",
+          });
+          navigate('/wheel/play', { 
+            state: { 
+              gameSessionId: payload.new.id
+            }
+          });
+        }
+      })
+      .subscribe();
+
     // Initial fetch
     fetchOnlinePlayers();
     fetchChallenges();
@@ -292,8 +318,9 @@ export const useWheelLobby = () => {
       clearInterval(interval);
       supabase.removeChannel(playersChannel);
       supabase.removeChannel(challengesChannel);
+      supabase.removeChannel(gameSessionChannel);
     };
-  }, [user, fetchOnlinePlayers, fetchChallenges]);
+  }, [user, fetchOnlinePlayers, fetchChallenges, navigate]);
 
   return {
     onlinePlayers,

@@ -22,15 +22,11 @@ const WheelOfDestiny = () => {
     cancelChallenge
   } = useWheelLobby();
 
+  // Note: Navigation is now handled automatically by the useWheelLobby hook
+  // when a challenge is accepted and game session is created
   const handleAcceptChallenge = async (challengeId: string) => {
-    const gameSession = await acceptChallenge(challengeId);
-    if (gameSession) {
-      navigate('/wheel/play', { 
-        state: { 
-          gameSessionId: gameSession.id
-        }
-      });
-    }
+    await acceptChallenge(challengeId);
+    // Navigation will happen automatically via real-time subscription
   };
 
   if (!user) {

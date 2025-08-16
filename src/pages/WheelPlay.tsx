@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useRealtimeGameSync } from '@/hooks/useRealtimeGameSync';
 import { supabase } from '@/integrations/supabase/client';
 import { WheelComponent } from '@/components/wheel/WheelComponent';
 import { PuzzleBoard } from '@/components/wheel/PuzzleBoard';
@@ -9,70 +10,28 @@ import { PlayerScoreboard } from '@/components/wheel/PlayerScoreboard';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { WheelGameSession, GameState } from '@/types/wheel';
 
 // Wheel game play component for two-player matches
 const WheelPlay = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [gameSession, setGameSession] = useState<WheelGameSession | null>(null);
-  const [gameState, setGameState] = useState<GameState>({
-    revealedLetters: [],
-    guessedLetters: [],
-    wheelValue: 0,
-    isSpinning: false,
-    currentPlayerTurn: 1,
-    gamePhase: 'spinning'
-  });
-  const [loading, setLoading] = useState(true);
-
+  
   const { gameSessionId } = location.state || {};
+  
+  const {
+    gameSession,
+    gameState,
+    loading,
+    setGameState,
+    setGameSession
+  } = useRealtimeGameSync(gameSessionId);
 
   useEffect(() => {
     if (!user || !gameSessionId) {
       navigate('/wheel');
       return;
     }
-
-    // Load the existing game session
-    const loadGameSession = async () => {
-      try {
-        const { data: session, error } = await supabase
-          .from('wheel_game_sessions')
-          .select('*')
-          .eq('id', gameSessionId)
-          .single();
-
-        if (error) throw error;
-        if (!session) {
-          navigate('/wheel');
-          return;
-        }
-
-        // Parse game state
-        const sessionGameState = typeof session.game_state === 'string' 
-          ? JSON.parse(session.game_state) 
-          : session.game_state;
-
-        // Set up the game state from the session
-        setGameSession(session);
-        setGameState(prev => ({
-          ...prev,
-          currentPuzzle: sessionGameState?.currentPuzzle,
-          revealedLetters: sessionGameState?.revealedLetters || [],
-          guessedLetters: sessionGameState?.guessedLetters || [],
-          currentPlayerTurn: session.current_player,
-          gamePhase: 'spinning'
-        }));
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading game session:', error);
-        navigate('/wheel');
-      }
-    };
-
-    loadGameSession();
   }, [user, gameSessionId, navigate]);
 
   const handleSpin = async (value: number | string) => {
@@ -156,7 +115,16 @@ const WheelPlay = () => {
   };
 
   const isCurrentPlayerTurn = () => {
-    return gameSession && gameSession.current_player === 1; // Assuming user is always player 1
+    if (!gameSession || !user) return false;
+    
+    // Check if current user is player 1 or player 2 and if it's their turn
+    const isPlayer1 = gameSession.player1_id === user.id;
+    const isPlayer2 = gameSession.player2_id === user.id;
+    
+    if (isPlayer1 && gameSession.current_player === 1) return true;
+    if (isPlayer2 && gameSession.current_player === 2) return true;
+    
+    return false;
   };
 
   if (loading) {
@@ -183,9 +151,13 @@ const WheelPlay = () => {
     );
   }
 
+  // Determine player names and current user's role
+  const isPlayer1 = user && gameSession.player1_id === user.id;
+  const isPlayer2 = user && gameSession.player2_id === user.id;
+  
   const player1 = {
     id: gameSession.player1_id,
-    name: 'Player 1',
+    name: isPlayer1 ? 'You' : 'Player 1',
     totalScore: gameSession.player1_score,
     roundScore: gameSession.player1_round_score,
     roundsWon: gameSession.rounds_won_player1
@@ -193,13 +165,14 @@ const WheelPlay = () => {
 
   const player2 = {
     id: gameSession.player2_id,
-    name: 'Player 2',
+    name: isPlayer2 ? 'You' : 'Player 2',
     totalScore: gameSession.player2_score,
     roundScore: gameSession.player2_round_score,
     roundsWon: gameSession.rounds_won_player2
   };
 
-  const currentPlayerScore = gameSession.current_player === 1 
+  // Get current player's score based on who the user is
+  const currentPlayerScore = isPlayer1 
     ? gameSession.player1_round_score 
     : gameSession.player2_round_score;
 
@@ -266,7 +239,7 @@ const WheelPlay = () => {
         {!isCurrentPlayerTurn() && (
           <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-muted p-4 rounded-lg shadow-lg">
             <p className="text-center font-semibold">
-              Waiting for {gameSession.current_player === 1 ? 'Player 1' : 'Player 2'}'s turn...
+              Waiting for {gameSession.current_player === 1 ? player1.name : player2.name}'s turn...
             </p>
           </div>
         )}
