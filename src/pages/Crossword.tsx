@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { CrosswordPuzzle } from '@/types/crossword';
+import { SavedGames } from '@/components/crossword/SavedGames';
 import { 
   Puzzle, 
   Play, 
@@ -343,6 +344,11 @@ export function Crossword() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Saved Games Section */}
+        <div className="mb-8">
+          <SavedGames />
+        </div>
+
         {/* Filters */}
         <Card className="mb-8 shadow-lg">
           <CardHeader>

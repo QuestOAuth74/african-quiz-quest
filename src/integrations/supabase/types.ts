@@ -229,6 +229,53 @@ export type Database = {
         }
         Relationships: []
       }
+      crossword_game_states: {
+        Row: {
+          created_at: string
+          game_state: Json
+          hints_used: number
+          id: string
+          is_completed: boolean
+          puzzle_id: string
+          score: number
+          time_elapsed: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_state: Json
+          hints_used?: number
+          id?: string
+          is_completed?: boolean
+          puzzle_id: string
+          score?: number
+          time_elapsed?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_state?: Json
+          hints_used?: number
+          id?: string
+          is_completed?: boolean
+          puzzle_id?: string
+          score?: number
+          time_elapsed?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crossword_game_states_puzzle_id_fkey"
+            columns: ["puzzle_id"]
+            isOneToOne: false
+            referencedRelation: "crossword_puzzles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crossword_puzzles: {
         Row: {
           category: string

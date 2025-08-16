@@ -66,6 +66,11 @@ export function CrosswordGrid({
     newGrid[y][x] = { ...newGrid[y][x], userInput: upperValue };
     setGrid(newGrid);
 
+    // Update the puzzle grid in the parent component to maintain state
+    if (puzzle.grid) {
+      puzzle.grid[y][x] = { ...puzzle.grid[y][x], userInput: upperValue };
+    }
+
     // Check if any words are complete after this change
     checkAllAffectedWords(x, y, newGrid);
 

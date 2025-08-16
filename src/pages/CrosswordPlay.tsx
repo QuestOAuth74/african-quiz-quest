@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { useCrosswordGameState } from '@/hooks/useCrosswordGameState';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,13 +11,14 @@ import { useToast } from "@/hooks/use-toast";
 import { CrosswordGrid } from '@/components/crossword/CrosswordGrid';
 import { CrosswordClues } from '@/components/crossword/CrosswordClues';
 import { CrosswordPuzzle, CrosswordWord, CrosswordGameState } from '@/types/crossword';
-import { ArrowLeft, Clock, Trophy, Lightbulb, RotateCcw, Home, Pause, Play } from 'lucide-react';
+import { ArrowLeft, Clock, Trophy, Lightbulb, RotateCcw, Home, Pause, Play, Save } from 'lucide-react';
 
 export function CrosswordPlay() {
   const { puzzleId } = useParams<{ puzzleId: string }>();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { saveGameState, loadGameState, isSaving } = useCrosswordGameState(user?.id);
   const [isAdmin, setIsAdmin] = useState(false);
   const [gameState, setGameState] = useState<CrosswordGameState>({
     puzzle: null,
@@ -30,6 +32,7 @@ export function CrosswordPlay() {
   });
   const [loading, setLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   usePageTitle(gameState.puzzle?.title || "Crossword Puzzle");
 
@@ -41,7 +44,7 @@ export function CrosswordPlay() {
       return;
     }
     checkAccess();
-    loadPuzzle();
+    loadPuzzleWithSavedState();
   }, [puzzleId, user]);
 
   useEffect(() => {
@@ -89,9 +92,12 @@ export function CrosswordPlay() {
     }
   };
 
-  const loadPuzzle = async () => {
+  const loadPuzzleWithSavedState = async () => {
+    if (!puzzleId) return;
+    
     console.log('Loading puzzle with ID:', puzzleId);
     try {
+      // Load puzzle data
       const { data: puzzleData, error } = await supabase
         .from('crossword_puzzles')
         .select('*')
@@ -119,7 +125,31 @@ export function CrosswordPlay() {
           startTime: new Date()
         };
 
-        setGameState(prev => ({ ...prev, puzzle }));
+        // Try to load saved state
+        const savedState = await loadGameState(puzzleId);
+        
+        if (savedState) {
+          const restoredGameState = savedState.game_state as unknown as CrosswordGameState;
+          setGameState({
+            ...restoredGameState,
+            puzzle: {
+              ...puzzle,
+              grid: restoredGameState.puzzle?.grid || puzzle.grid,
+              words: restoredGameState.puzzle?.words || puzzle.words,
+              clues: restoredGameState.puzzle?.clues || puzzle.clues
+            },
+            timeElapsed: savedState.time_elapsed,
+            score: savedState.score,
+            hintsUsed: savedState.hints_used
+          });
+          
+          toast({
+            title: "Game Restored",
+            description: "Your saved progress has been loaded",
+          });
+        } else {
+          setGameState(prev => ({ ...prev, puzzle }));
+        }
       } else {
         toast({
           title: "Puzzle Not Found",
@@ -221,14 +251,21 @@ export function CrosswordPlay() {
     // Check if puzzle is complete
     const isCompleted = updatedWords.every(word => word.isCompleted);
     
-    setGameState(prev => ({
-      ...prev,
+    const newGameState = {
+      ...gameState,
       puzzle: updatedPuzzle,
       isCompleted,
-      score: prev.score + 100
-    }));
+      score: gameState.score + 100
+    };
+    
+    setGameState(newGameState);
+    setHasUnsavedChanges(true);
 
     if (isCompleted) {
+      // Auto-save completed puzzle
+      if (puzzleId) {
+        saveGameState(puzzleId, { ...newGameState, isCompleted: true });
+      }
       toast({
         title: "Congratulations! 🎉",
         description: "You've completed the crossword puzzle!",
@@ -254,6 +291,31 @@ export function CrosswordPlay() {
       description: isPaused ? "Timer is now running" : "Timer has been paused",
     });
   };
+
+  const handleSaveGame = useCallback(async () => {
+    if (!puzzleId || !gameState.puzzle || gameState.isCompleted) return;
+    
+    await saveGameState(puzzleId, gameState);
+    setHasUnsavedChanges(false);
+  }, [puzzleId, gameState, saveGameState]);
+
+  // Auto-save every 30 seconds when there are unsaved changes
+  useEffect(() => {
+    if (!hasUnsavedChanges || gameState.isCompleted) return;
+    
+    const autoSaveInterval = setInterval(() => {
+      handleSaveGame();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(autoSaveInterval);
+  }, [hasUnsavedChanges, gameState.isCompleted, handleSaveGame]);
+
+  // Mark changes when game state updates
+  useEffect(() => {
+    if (gameState.puzzle && gameState.timeElapsed > 0) {
+      setHasUnsavedChanges(true);
+    }
+  }, [gameState.puzzle?.grid, gameState.score, gameState.hintsUsed]);
 
   if (!isAuthenticated) {
     return (
@@ -335,6 +397,15 @@ export function CrosswordPlay() {
                 <Lightbulb className="h-4 w-4 text-blue-500" />
                 <span>{gameState.hintsUsed} hints</span>
               </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSaveGame}
+                disabled={isSaving || !hasUnsavedChanges || gameState.isCompleted}
+              >
+                <Save className="h-4 w-4" />
+                {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save' : 'Saved'}
+              </Button>
             </div>
           </div>
         </div>
