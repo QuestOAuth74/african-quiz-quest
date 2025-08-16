@@ -3,9 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ParallaxBanner } from '@/components/ParallaxBanner';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
 import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File } from 'lucide-react';
 import { format } from 'date-fns';
+import baobabHeader from '@/assets/baobab-talks-header.png';
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -296,58 +298,58 @@ export const BlogPost: React.FC = () => {
 
   return (
     <article className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-theme-gold text-theme-dark py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <Link to="/blog" className="inline-flex items-center gap-2 text-theme-dark hover:opacity-80 mb-6">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Blog
-            </Link>
-            
-            <div className="space-y-4">
-              {post.category && (
-                <Badge variant="secondary">{post.category.name}</Badge>
-              )}
+      {/* Hero Banner */}
+      <ParallaxBanner 
+        imageSrc={post.featured_image_url || baobabHeader} 
+        alt={post.title}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-primary/80 flex items-center justify-center">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center text-white">
+              <Link 
+                to="/blog" 
+                className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-8 transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Blog
+              </Link>
               
-              <h1 className="text-3xl md:text-5xl font-bold leading-tight">
-                {post.title}
-              </h1>
-              
-              <div className="flex flex-wrap gap-4 text-sm opacity-90">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {format(new Date(post.published_at || post.created_at), 'MMMM dd, yyyy')}
-                </span>
-                <span>By {post.author?.display_name || 'Historia Africana'}</span>
-                {post.reading_time_minutes && (
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {post.reading_time_minutes} min read
-                  </span>
+              <div className="space-y-6">
+                {post.category && (
+                  <Badge variant="outline" className="border-white/30 text-white bg-white/10">
+                    {post.category.name}
+                  </Badge>
                 )}
-                <span className="flex items-center gap-1">
-                  <Eye className="h-3 w-3" />
-                  {post.view_count + 1} views
-                </span>
+                
+                <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+                  {post.title}
+                </h1>
+                
+                <div className="flex flex-wrap justify-center gap-6 text-sm text-white/90">
+                  <span className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    {format(new Date(post.published_at || post.created_at), 'MMMM dd, yyyy')}
+                  </span>
+                  <span>By {post.author?.display_name || 'Historia Africana'}</span>
+                  {post.reading_time_minutes && (
+                    <span className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      {post.reading_time_minutes} min read
+                    </span>
+                  )}
+                  <span className="flex items-center gap-2">
+                    <Eye className="h-4 w-4" />
+                    {post.view_count + 1} views
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </header>
+      </ParallaxBanner>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          {/* Featured Image */}
-          {post.featured_image_url && (
-            <div className="mb-8">
-              <img
-                src={post.featured_image_url}
-                alt={post.title}
-                className="w-full aspect-video object-cover rounded-lg shadow-lg"
-              />
-            </div>
-          )}
 
           {/* Content */}
           <Card>

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Bold, Italic, Underline, Strikethrough, Code, Type, Palette } from 'lucide-react';
+import { Bold, Italic, Underline, Strikethrough, Code } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RichTextEditorProps {
@@ -72,21 +72,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  const smartFormat = () => {
-    if (!editorRef.current) return;
-    
-    let content = editorRef.current.innerHTML;
-    
-    // Auto-bold common keywords and important phrases
-    const keywords = ['important', 'note', 'warning', 'tip', 'remember', 'key point', 'conclusion', 'summary'];
-    keywords.forEach(keyword => {
-      const regex = new RegExp(`\\b(${keyword})\\b`, 'gi');
-      content = content.replace(regex, '<strong>$1</strong>');
-    });
-    
-    editorRef.current.innerHTML = content;
-    updateContent();
-  };
 
   return (
     <div className="relative">
@@ -136,17 +121,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         </div>
       )}
 
-      {/* Smart Format Button */}
-      <div className="mb-2 flex items-center gap-2">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={smartFormat}
-          className="text-xs"
-        >
-          <Type className="h-3 w-3 mr-1" />
-          Smart Format
-        </Button>
+      {/* Character Count */}
+      <div className="mb-2">
         <span className="text-xs text-muted-foreground">
           {value ? `${value.replace(/<[^>]*>/g, '').length} characters` : '0 characters'}
         </span>

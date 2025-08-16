@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ParallaxBanner } from '@/components/ParallaxBanner';
 import { useBlogData } from '@/hooks/useBlogData';
-import { Search, Clock, Eye, Calendar } from 'lucide-react';
+import { Search, Clock, Eye, Calendar, BookOpen, Users, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
+import baobabHeader from '@/assets/baobab-talks-header.png';
 
 export const Blog: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -75,19 +77,35 @@ export const Blog: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-theme-gold text-theme-dark py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Historia Africana Blog
-            </h1>
-            <p className="text-lg md:text-xl opacity-90">
-              Discover fascinating stories, insights, and knowledge about African history
+      {/* Hero Banner */}
+      <ParallaxBanner imageSrc={baobabHeader} alt="Historia Africana Blog">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 flex items-center justify-center">
+          <div className="text-center text-white px-4">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <BookOpen className="h-12 w-12" />
+              <h1 className="text-5xl md:text-7xl font-bold">Historia Africana</h1>
+            </div>
+            <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto leading-relaxed">
+              Discover the rich tapestry of African history through captivating stories, 
+              scholarly insights, and cultural treasures
             </p>
+            <div className="flex flex-wrap justify-center gap-8 mt-8 text-sm">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                <span>Expert Contributors</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                <span>Weekly Updates</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                <span>In-Depth Research</span>
+              </div>
+            </div>
           </div>
         </div>
-      </header>
+      </ParallaxBanner>
 
       <main className="container mx-auto px-4 py-8">
         {/* Search and Filter */}
