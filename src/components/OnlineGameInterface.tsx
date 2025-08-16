@@ -285,12 +285,25 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
       isCorrect = selectedOption?.option_type === 'correct';
     }
 
-    // Store the answer temporarily - don't submit to database yet
+    // Store the answer temporarily - don't submit yet (except on timeout)
     setPendingAnswer({
       isCorrect,
       points: selectedQuestion.points,
       questionId: selectedQuestion.id
     });
+
+    // If the player timed out, immediately submit and advance turn
+    if (selectedAnswerIndex === 'timeout') {
+      toast.error("Time's up! Turn lost");
+      const success = await submitAnswer(selectedQuestion.id, false, selectedQuestion.points);
+      if (success) {
+        await nextTurn();
+      }
+      setPendingAnswer(null);
+      setIsQuestionModalOpen(false);
+      setSelectedQuestion(null);
+      return;
+    }
 
     // Show immediate feedback but don't progress the game
     if (isCorrect) {
