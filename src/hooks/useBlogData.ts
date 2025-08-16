@@ -128,9 +128,19 @@ export const useBlogData = () => {
 
   const createPost = async (postData: any) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User must be authenticated to create blog posts');
+      }
+
+      const postWithAuthor = {
+        ...postData,
+        author_id: user.id
+      };
+
       const { data, error } = await supabase
         .from('blog_posts')
-        .insert(postData)
+        .insert(postWithAuthor)
         .select()
         .single();
       
