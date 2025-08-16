@@ -367,98 +367,107 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header */}
       <div className="p-4 border-b border-white/20">
-        <div className="flex items-center justify-between max-w-6xl mx-auto">
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={onBack}
-              variant="outline"
-              size="sm"
-              className="text-white border-white/20"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Leave Game
-            </Button>
-            <div className="text-white">
-              <h1 className="text-xl font-bold">Room: {currentRoom?.room_code || roomDetails?.room_code}</h1>
-              <div className="flex items-center gap-4">
-                {isMyTurn ? (
-                  <p className="text-green-400 flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    Your turn - Select a question
-                  </p>
-                ) : (
-                  <p className="text-yellow-400">
-                    Waiting for other players...
-                  </p>
-                )}
-                <div className="flex items-center gap-2 text-xs">
-                  <div className={`w-2 h-2 rounded-full ${
-                    connectionStatus === 'connected' ? 'bg-green-400' : 
-                    connectionStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'
-                  }`} />
-                  <span className="text-gray-300">{connectionStatus}</span>
+        <div className="max-w-6xl mx-auto">
+          {/* Mobile-first layout: stack vertically on mobile, horizontal on larger screens */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            {/* Game Controls */}
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={onBack}
+                variant="outline"
+                size="sm"
+                className="text-white border-white/20"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Leave Game
+              </Button>
+              <div className="text-white">
+                <h1 className="text-lg sm:text-xl font-bold">Room: {currentRoom?.room_code || roomDetails?.room_code}</h1>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  {isMyTurn ? (
+                    <p className="text-green-400 flex items-center gap-2 text-sm">
+                      <Clock className="w-4 h-4" />
+                      Your turn - Select a question
+                    </p>
+                  ) : (
+                    <p className="text-yellow-400 text-sm">
+                      Waiting for other players...
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className={`w-2 h-2 rounded-full ${
+                      connectionStatus === 'connected' ? 'bg-green-400' : 
+                      connectionStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'
+                    }`} />
+                    <span className="text-gray-300">{connectionStatus}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          {/* Player Scores - Make more prominent */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <h3 className="text-white font-semibold mb-3 text-center">Live Scores</h3>
-            <div className="flex flex-wrap gap-3 justify-center">
-              {(players.length > 0 ? players : contextPlayers).map((player) => {
-                // Use live scores from gameState, fallback to player.score
-                const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
-                const isCurrentTurn = gameState?.currentTurn === player.user_id;
-                
-                console.log(`🎯 Player ${player.player_name} score:`, {
-                  gameStateScore: gameState?.scores?.[player.user_id],
-                  playerScore: player.score,
-                  finalScore: currentScore,
-                  isCurrentTurn
-                });
-                
-                return (
-                  <Card 
-                    key={player.id || player.user_id} 
-                    className={`${
-                      isCurrentTurn 
-                        ? 'bg-yellow-500/20 border-yellow-400/50 ring-2 ring-yellow-400/30' 
-                        : 'bg-white/10 border-white/20'
-                    } transition-all duration-300`}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex flex-col items-center gap-2 text-white min-w-[120px]">
-                        <div className="flex items-center gap-2">
-                          {player.is_host && <Crown className="w-4 h-4 text-yellow-400" />}
-                          <span className="font-medium text-sm">{player.player_name}</span>
-                        </div>
-                        <Badge 
-                          variant="secondary" 
-                          className={`text-lg px-3 py-1 font-bold ${
-                            isCurrentTurn ? 'bg-yellow-400 text-black' : 'bg-blue-500 text-white'
-                          }`}
-                        >
-                          ${currentScore.toLocaleString()}
-                        </Badge>
-                        {isCurrentTurn && (
-                          <div className="flex items-center gap-1 text-xs text-yellow-300">
-                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                            Your Turn
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
             
-            {/* Debug info */}
-            {players.length === 0 && contextPlayers.length === 0 && (
-              <div className="text-center text-yellow-400 text-sm mt-2">
-                Loading players...
+            {/* Live Scores - Centered on mobile, right-aligned on desktop */}
+            <div className="w-full lg:w-auto flex justify-center lg:justify-end">
+              <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10 w-full sm:w-auto max-w-2xl">
+                <h3 className="text-white font-semibold mb-3 text-center text-sm sm:text-base">Live Scores</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2 sm:gap-3 justify-center">
+                  {(players.length > 0 ? players : contextPlayers).map((player) => {
+                    // Use live scores from gameState, fallback to player.score
+                    const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
+                    const isCurrentTurn = gameState?.currentTurn === player.user_id;
+                    
+                    console.log(`🎯 Player ${player.player_name} score:`, {
+                      gameStateScore: gameState?.scores?.[player.user_id],
+                      playerScore: player.score,
+                      finalScore: currentScore,
+                      isCurrentTurn
+                    });
+                    
+                    return (
+                      <Card 
+                        key={player.id || player.user_id} 
+                        className={`${
+                          isCurrentTurn 
+                            ? 'bg-yellow-500/20 border-yellow-400/50 ring-2 ring-yellow-400/30' 
+                            : 'bg-white/10 border-white/20'
+                        } transition-all duration-300 w-full sm:w-auto`}
+                      >
+                        <CardContent className="p-3 sm:p-4">
+                          <div className="flex flex-col items-center gap-2 text-white min-w-0 sm:min-w-[100px] lg:min-w-[120px]">
+                            <div className="flex items-center gap-2">
+                              {player.is_host && <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />}
+                              <span className="font-medium text-xs sm:text-sm text-center truncate max-w-[120px]">
+                                {player.player_name}
+                              </span>
+                            </div>
+                            <Badge 
+                              variant="secondary" 
+                              className={`text-sm sm:text-lg px-2 sm:px-3 py-1 font-bold ${
+                                isCurrentTurn ? 'bg-yellow-400 text-black' : 'bg-blue-500 text-white'
+                              }`}
+                            >
+                              ${currentScore.toLocaleString()}
+                            </Badge>
+                            {isCurrentTurn && (
+                              <div className="flex items-center gap-1 text-xs text-yellow-300">
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                Your Turn
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+                
+                {/* Debug info */}
+                {players.length === 0 && contextPlayers.length === 0 && (
+                  <div className="text-center text-yellow-400 text-sm mt-2">
+                    Loading players...
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
