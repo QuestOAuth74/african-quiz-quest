@@ -15,6 +15,7 @@ import Forum from "./pages/Forum";
 import Profile from "./pages/Profile";
 import Quiz from "./pages/Quiz";
 import QuizSetup from "./pages/QuizSetup";
+import { Crossword } from "./pages/Crossword";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Footer from "./components/Footer";
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
             <Route path="/quiz-setup" element={<ProtectedRoute><QuizSetup /></ProtectedRoute>} />
+            <Route path="/crossword" element={<ProtectedRoute><Crossword /></ProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/blog" element={<Blog />} />
