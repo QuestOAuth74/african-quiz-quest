@@ -158,7 +158,7 @@ export function CrosswordGrid({
               {/* Input cell */}
               {!cell.isBlocked ? (
                 <input
-                  ref={el => inputRefs.current[y][x] = el}
+                  ref={el => { if (!inputRefs.current[y]) inputRefs.current[y] = []; inputRefs.current[y][x] = el; }}
                   type="text"
                   maxLength={1}
                   value={cell.userInput}
