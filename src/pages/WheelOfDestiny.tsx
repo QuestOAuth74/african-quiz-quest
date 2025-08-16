@@ -8,7 +8,7 @@ import { useSinglePlayerWheel } from '@/hooks/useSinglePlayerWheel';
 import { OnlinePlayersList } from '@/components/wheel/OnlinePlayersList';
 import { ChallengesPanel } from '@/components/wheel/ChallengesPanel';
 import { GameModeSelector } from '@/components/wheel/GameModeSelector';
-import { TopNavigation } from '@/components/TopNavigation';
+import TopNavigation from '@/components/TopNavigation';
 
 export const WheelOfDestiny = () => {
   const { user } = useAuth();
@@ -97,16 +97,16 @@ export const WheelOfDestiny = () => {
             <div className="grid lg:grid-cols-2 gap-8">
               <OnlinePlayersList 
                 players={onlinePlayers}
-                onChallengePlayer={sendChallenge}
+                onChallenge={sendChallenge}
                 loading={loading}
               />
               
               <ChallengesPanel
                 incomingChallenges={incomingChallenges}
                 outgoingChallenges={outgoingChallenges}
-                onAcceptChallenge={handleAcceptChallenge}
-                onDeclineChallenge={declineChallenge}
-                onCancelChallenge={cancelChallenge}
+                onAccept={handleAcceptChallenge}
+                onDecline={declineChallenge}
+                onCancel={cancelChallenge}
                 loading={loading}
               />
             </div>
@@ -116,3 +116,5 @@ export const WheelOfDestiny = () => {
     </div>
   );
 };
+
+export default WheelOfDestiny;

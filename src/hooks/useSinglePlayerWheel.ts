@@ -36,7 +36,19 @@ export const useSinglePlayerWheel = () => {
 
       const randomPuzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
 
-      // Create game session
+      // Create game session with proper JSON serialization
+      const gameStateForDb = {
+        revealedLetters: [],
+        guessedLetters: [],
+        wheelValue: 0,
+        isSpinning: false,
+        currentPlayerTurn: 1,
+        gamePhase: 'spinning',
+        puzzleId: randomPuzzle.id,
+        puzzlePhrase: randomPuzzle.phrase,
+        puzzleCategory: randomPuzzle.category
+      };
+
       const { data: session, error: sessionError } = await supabase
         .from('wheel_game_sessions')
         .insert({
@@ -50,15 +62,7 @@ export const useSinglePlayerWheel = () => {
             name: `AI ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`,
             difficulty
           },
-          game_state: {
-            currentPuzzle: randomPuzzle,
-            revealedLetters: [],
-            guessedLetters: [],
-            wheelValue: 0,
-            isSpinning: false,
-            currentPlayerTurn: 1,
-            gamePhase: 'spinning'
-          },
+          game_state: gameStateForDb,
           status: 'active'
         })
         .select()
@@ -118,11 +122,20 @@ export const useSinglePlayerWheel = () => {
 
       setGameState(newGameState);
 
+      // Serialize for database
+      const gameStateForDb = {
+        ...newGameState,
+        currentPuzzle: undefined, // Remove complex object
+        puzzleId: gameState.currentPuzzle?.id,
+        puzzlePhrase: gameState.currentPuzzle?.phrase,
+        puzzleCategory: gameState.currentPuzzle?.category
+      };
+
       // Update session in database
       await supabase
         .from('wheel_game_sessions')
         .update({
-          game_state: newGameState,
+          game_state: gameStateForDb,
           current_player: newGameState.currentPlayerTurn
         })
         .eq('id', gameSession.id);
@@ -172,11 +185,19 @@ export const useSinglePlayerWheel = () => {
         { player1_round_score: (gameSession.player1_round_score || 0) + points } :
         { player2_round_score: (gameSession.player2_round_score || 0) + points };
 
+      const gameStateForDb = {
+        ...newGameState,
+        currentPuzzle: undefined, // Remove complex object for JSON storage
+        puzzleId: gameState.currentPuzzle?.id,
+        puzzlePhrase: gameState.currentPuzzle?.phrase,
+        puzzleCategory: gameState.currentPuzzle?.category
+      };
+
       await supabase
         .from('wheel_game_sessions')
         .update({
           ...scoreUpdate,
-          game_state: newGameState,
+          game_state: gameStateForDb,
           current_player: newGameState.currentPlayerTurn
         })
         .eq('id', gameSession.id);
@@ -188,8 +209,8 @@ export const useSinglePlayerWheel = () => {
 
       if (allLettersRevealed) {
         // Puzzle solved!
-        newGameState.gamePhase = 'round_end';
-        setGameState(newGameState);
+        const solvedGameState = { ...newGameState, gamePhase: 'round_end' as const };
+        setGameState(solvedGameState);
       }
 
     } catch (error) {
@@ -199,7 +220,7 @@ export const useSinglePlayerWheel = () => {
 
   // Computer opponent integration
   const { computerPlayer, getNextMove, simulateComputerTurn } = useComputerOpponent(
-    gameSession?.computer_difficulty as 'easy' | 'medium' | 'hard' || 'medium'
+    (gameSession?.computer_difficulty as 'easy' | 'medium' | 'hard') || 'medium'
   );
 
   // Handle computer turns
