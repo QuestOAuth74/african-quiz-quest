@@ -368,8 +368,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
       {/* Header */}
       <div className="p-4 border-b border-white/20">
         <div className="max-w-6xl mx-auto">
-          {/* Mobile-first layout: stack vertically on mobile, horizontal on larger screens */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Game Controls */}
             <div className="flex items-center gap-4">
               <Button
@@ -404,69 +403,73 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
                 </div>
               </div>
             </div>
-            
-            {/* Live Scores - Centered on mobile, right-aligned on desktop */}
-            <div className="w-full lg:w-auto flex justify-center lg:justify-end">
-              <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10 w-full sm:w-auto max-w-2xl">
-                <h3 className="text-white font-semibold mb-3 text-center text-sm sm:text-base">Live Scores</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2 sm:gap-3 justify-center">
-                  {(players.length > 0 ? players : contextPlayers).map((player) => {
-                    // Use live scores from gameState, fallback to player.score
-                    const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
-                    const isCurrentTurn = gameState?.currentTurn === player.user_id;
-                    
-                    console.log(`🎯 Player ${player.player_name} score:`, {
-                      gameStateScore: gameState?.scores?.[player.user_id],
-                      playerScore: player.score,
-                      finalScore: currentScore,
-                      isCurrentTurn
-                    });
-                    
-                    return (
-                      <Card 
-                        key={player.id || player.user_id} 
-                        className={`${
-                          isCurrentTurn 
-                            ? 'bg-yellow-500/20 border-yellow-400/50 ring-2 ring-yellow-400/30' 
-                            : 'bg-white/10 border-white/20'
-                        } transition-all duration-300 w-full sm:w-auto`}
-                      >
-                        <CardContent className="p-3 sm:p-4">
-                          <div className="flex flex-col items-center gap-2 text-white min-w-0 sm:min-w-[100px] lg:min-w-[120px]">
-                            <div className="flex items-center gap-2">
-                              {player.is_host && <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />}
-                              <span className="font-medium text-xs sm:text-sm text-center truncate max-w-[120px]">
-                                {player.player_name}
-                              </span>
-                            </div>
-                            <Badge 
-                              variant="secondary" 
-                              className={`text-sm sm:text-lg px-2 sm:px-3 py-1 font-bold ${
-                                isCurrentTurn ? 'bg-yellow-400 text-black' : 'bg-blue-500 text-white'
-                              }`}
-                            >
-                              ${currentScore.toLocaleString()}
-                            </Badge>
-                            {isCurrentTurn && (
-                              <div className="flex items-center gap-1 text-xs text-yellow-300">
-                                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                                Your Turn
-                              </div>
-                            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Live Scores - Positioned above the game board */}
+      <div className="p-4 pb-2">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-center">
+            <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10 w-full max-w-4xl">
+              <h3 className="text-white font-semibold mb-3 text-center text-sm sm:text-base">Live Scores</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2 sm:gap-3 justify-center">
+                {(players.length > 0 ? players : contextPlayers).map((player) => {
+                  // Use live scores from gameState, fallback to player.score
+                  const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
+                  const isCurrentTurn = gameState?.currentTurn === player.user_id;
+                  
+                  console.log(`🎯 Player ${player.player_name} score:`, {
+                    gameStateScore: gameState?.scores?.[player.user_id],
+                    playerScore: player.score,
+                    finalScore: currentScore,
+                    isCurrentTurn
+                  });
+                  
+                  return (
+                    <Card 
+                      key={player.id || player.user_id} 
+                      className={`${
+                        isCurrentTurn 
+                          ? 'bg-yellow-500/20 border-yellow-400/50 ring-2 ring-yellow-400/30' 
+                          : 'bg-white/10 border-white/20'
+                      } transition-all duration-300 w-full sm:w-auto`}
+                    >
+                      <CardContent className="p-3 sm:p-4">
+                        <div className="flex flex-col items-center gap-2 text-white min-w-0 sm:min-w-[100px] lg:min-w-[120px]">
+                          <div className="flex items-center gap-2">
+                            {player.is_host && <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />}
+                            <span className="font-medium text-xs sm:text-sm text-center truncate max-w-[120px]">
+                              {player.player_name}
+                            </span>
                           </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-                
-                {/* Debug info */}
-                {players.length === 0 && contextPlayers.length === 0 && (
-                  <div className="text-center text-yellow-400 text-sm mt-2">
-                    Loading players...
-                  </div>
-                )}
+                          <Badge 
+                            variant="secondary" 
+                            className={`text-sm sm:text-lg px-2 sm:px-3 py-1 font-bold ${
+                              isCurrentTurn ? 'bg-yellow-400 text-black' : 'bg-blue-500 text-white'
+                            }`}
+                          >
+                            ${currentScore.toLocaleString()}
+                          </Badge>
+                          {isCurrentTurn && (
+                            <div className="flex items-center gap-1 text-xs text-yellow-300">
+                              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                              Your Turn
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
+              
+              {/* Debug info */}
+              {players.length === 0 && contextPlayers.length === 0 && (
+                <div className="text-center text-yellow-400 text-sm mt-2">
+                  Loading players...
+                </div>
+              )}
             </div>
           </div>
         </div>
