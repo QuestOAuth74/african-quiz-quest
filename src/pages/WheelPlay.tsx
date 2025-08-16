@@ -253,16 +253,191 @@ const WheelPlay = () => {
     }
   };
 
-  const handleBuyVowel = (vowel: string) => {
-    // Implement vowel buying logic
-    console.log('Buying vowel:', vowel);
+  const handleBuyVowel = async (vowel: string) => {
+    if (!gameSession || !user) return;
+
+    try {
+      const VOWEL_COST = 250;
+      const isPlayer1Turn = gameSession.current_player === 1;
+      const roundScoreKey = isPlayer1Turn ? 'player1_round_score' : 'player2_round_score';
+      const currentRoundScore: number = (gameSession as any)[roundScoreKey] || 0;
+
+      if (currentRoundScore < VOWEL_COST) {
+        toast({
+          title: 'Not enough points',
+          description: `You need $${VOWEL_COST} to buy a vowel.`,
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const upperVowel = vowel.toUpperCase();
+      if (!'AEIOU'.includes(upperVowel)) return;
+      if (gameState.guessedLetters.includes(upperVowel)) return;
+
+      const phrase = gameState.currentPuzzle?.phrase.toUpperCase() || '';
+      const isCorrect = phrase.includes(upperVowel);
+
+      // Log the move
+      await supabase
+        .from('wheel_game_moves')
+        .insert({
+          session_id: gameSession.id,
+          player_id: user.id,
+          move_type: 'buy_vowel',
+          move_data: { vowel: upperVowel, correct: isCorrect, cost: VOWEL_COST },
+          points_earned: 0
+        });
+
+      const newGuessedLetters = Array.from(new Set([...gameState.guessedLetters, upperVowel]));
+      const newRevealedLetters = isCorrect
+        ? Array.from(new Set([...gameState.revealedLetters, upperVowel]))
+        : gameState.revealedLetters;
+
+      const newRoundScore = currentRoundScore - VOWEL_COST;
+
+      const newGameState = {
+        revealedLetters: newRevealedLetters,
+        guessedLetters: newGuessedLetters,
+        wheelValue: gameState.wheelValue,
+        isSpinning: false,
+        currentPlayerTurn: gameState.currentPlayerTurn,
+        gamePhase: isCorrect ? 'guessing' as const : gameState.gamePhase
+      };
+
+      const updatedSession = {
+        ...gameSession,
+        [roundScoreKey]: newRoundScore,
+        game_state: newGameState
+      } as typeof gameSession;
+
+      await supabase
+        .from('wheel_game_sessions')
+        .update(updatedSession as any)
+        .eq('id', gameSession.id);
+
+      setGameSession(updatedSession);
+      setGameState(prev => ({
+        ...prev,
+        revealedLetters: newRevealedLetters,
+        guessedLetters: newGuessedLetters,
+      }));
+
+      if (isCorrect) {
+        toast({
+          title: 'Vowel revealed!',
+          description: `${upperVowel} is in the puzzle. You can buy another vowel or solve.`,
+        });
+      } else {
+        toast({
+          title: 'Incorrect vowel',
+          description: `${upperVowel} is not in the puzzle. Turn passes.`,
+          variant: 'destructive'
+        });
+        await switchTurn();
+      }
+    } catch (error) {
+      console.error('Error buying vowel:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to buy vowel. Please try again.',
+        variant: 'destructive'
+      });
+    }
   };
 
-  const handleSolvePuzzle = (solution: string) => {
-    // Implement puzzle solving logic
-    console.log('Solving puzzle:', solution);
-  };
+  const handleSolvePuzzle = async (solution: string) => {
+    if (!gameSession || !user) return;
 
+    try {
+      const normalize = (s: string) => s.toUpperCase().replace(/[^A-Z]/g, '');
+      const target = normalize(gameState.currentPuzzle?.phrase || '');
+      const guess = normalize(solution);
+      const isCorrect = target.length > 0 && guess === target;
+
+      // Log the move
+      await supabase
+        .from('wheel_game_moves')
+        .insert({
+          session_id: gameSession.id,
+          player_id: user.id,
+          move_type: 'solve_puzzle',
+          move_data: { solution: solution.toUpperCase(), correct: isCorrect },
+          points_earned: 0
+        });
+
+      if (isCorrect) {
+        // Reveal all letters
+        const allLetters = Array.from(new Set((gameState.currentPuzzle?.phrase || '')
+          .toUpperCase()
+          .replace(/[^A-Z]/g, '')
+          .split('')));
+        const newRevealed = Array.from(new Set([...gameState.revealedLetters, ...allLetters]));
+        const newGuessed = Array.from(new Set([...gameState.guessedLetters, ...allLetters]));
+
+        const isPlayer1Turn = gameSession.current_player === 1;
+        const roundScoreKey = isPlayer1Turn ? 'player1_round_score' : 'player2_round_score';
+        const totalScoreKey = isPlayer1Turn ? 'player1_score' : 'player2_score';
+        const roundsWonKey = isPlayer1Turn ? 'rounds_won_player1' : 'rounds_won_player2';
+
+        const roundScore: number = (gameSession as any)[roundScoreKey] || 0;
+        const newTotal = ((gameSession as any)[totalScoreKey] || 0) + roundScore;
+        const newRoundsWon = ((gameSession as any)[roundsWonKey] || 0) + 1;
+
+        const newGameState = {
+          revealedLetters: newRevealed,
+          guessedLetters: newGuessed,
+          wheelValue: gameState.wheelValue,
+          isSpinning: false,
+          currentPlayerTurn: gameState.currentPlayerTurn,
+          gamePhase: 'round_end' as const,
+          puzzleSolved: true
+        };
+
+        const updatedSession = {
+          ...gameSession,
+          [totalScoreKey]: newTotal,
+          [roundsWonKey]: newRoundsWon,
+          player1_round_score: 0,
+          player2_round_score: 0,
+          status: 'round_complete',
+          game_state: newGameState
+        } as typeof gameSession;
+
+        await supabase
+          .from('wheel_game_sessions')
+          .update(updatedSession as any)
+          .eq('id', gameSession.id);
+
+        setGameSession(updatedSession);
+        setGameState(prev => ({
+          ...prev,
+          revealedLetters: newRevealed,
+          guessedLetters: newGuessed,
+          gamePhase: 'round_end'
+        }));
+
+        toast({
+          title: 'Correct! Puzzle solved!',
+          description: 'Round complete. Returning to lobby...',
+        });
+      } else {
+        toast({
+          title: 'Incorrect solution',
+          description: 'That solution is not correct. Turn passes.',
+          variant: 'destructive'
+        });
+        await switchTurn();
+      }
+    } catch (error) {
+      console.error('Error solving puzzle:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to submit solution. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
   const isCurrentPlayerTurn = () => {
     if (!gameSession || !user) return false;
     
