@@ -101,6 +101,13 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
         </div>
       )}
       
+      {/* Content Overlay */}
+      {children && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center">
+          {children}
+        </div>
+      )}
+      
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
         <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex justify-center">
