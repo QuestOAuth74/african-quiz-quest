@@ -31,8 +31,6 @@ export interface BlogPost {
 export interface BlogCategory {
   id: string;
   name: string;
-  description?: string;
-  slug: string;
   created_at: string;
   updated_at: string;
 }
@@ -58,7 +56,7 @@ export const useBlogData = () => {
         .from('blog_posts')
         .select(`
           *,
-          category:blog_categories(*),
+          category:categories(*),
           author:profiles!blog_posts_author_id_fkey(display_name, email),
           blog_post_tags(
             tag:blog_tags(*)
@@ -95,7 +93,7 @@ export const useBlogData = () => {
   const fetchCategories = async () => {
     try {
       const { data, error } = await supabase
-        .from('blog_categories')
+        .from('categories')
         .select('*')
         .order('name');
       
@@ -210,7 +208,7 @@ export const useBlogData = () => {
         .from('blog_posts')
         .select(`
           *,
-          category:blog_categories(*),
+          category:categories(*),
           author:profiles!blog_posts_author_id_fkey(display_name, email),
           blog_post_tags(
             tag:blog_tags(*)

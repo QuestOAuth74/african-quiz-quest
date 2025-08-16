@@ -6,8 +6,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Bold, Italic, Heading1, Heading2, Image, Youtube, Link, X } from 'lucide-react';
+import { Bold, Italic, Heading1, Heading2, Image, Youtube, Link, X, Upload, File } from 'lucide-react';
 import { BlogPost, BlogCategory, BlogTag } from '@/hooks/useBlogData';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface BlogEditorProps {
   post?: BlogPost;
@@ -26,7 +28,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 }) => {
   const [title, setTitle] = useState(post?.title || '');
   const [excerpt, setExcerpt] = useState(post?.excerpt || '');
-  const [content, setContent] = useState(post?.content || { blocks: [] });
+  const [mainContent, setMainContent] = useState(post?.content?.mainContent || '');
+  const [content, setContent] = useState(post?.content || { mainContent: '', blocks: [] });
   const [categoryId, setCategoryId] = useState(post?.category_id || '');
   const [selectedTags, setSelectedTags] = useState<string[]>(
     post?.tags?.map(tag => tag.id) || []
@@ -40,12 +43,28 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     (post?.status as 'draft' | 'published' | 'archived') || 'draft'
   );
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
+  const { toast } = useToast();
   const editorRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = async () => {
     if (!title.trim()) {
-      alert('Title is required');
+      toast({
+        title: "Error",
+        description: "Title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!mainContent.trim()) {
+      toast({
+        title: "Error", 
+        description: "Main content body is required",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -59,7 +78,10 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
       const postData: Partial<BlogPost> = {
         title,
         slug,
-        content,
+        content: {
+          mainContent,
+          blocks: content.blocks || []
+        },
         excerpt,
         category_id: categoryId || null,
         featured_image_url: featuredImage || null,
@@ -68,7 +90,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         keywords: keywords.length > 0 ? keywords : null,
         status,
         published_at: status === 'published' && !post?.published_at ? new Date().toISOString() : post?.published_at,
-        reading_time_minutes: calculateReadingTime(content)
+        reading_time_minutes: calculateReadingTime(mainContent + JSON.stringify(content.blocks))
       };
 
       await onSave(postData);
@@ -79,8 +101,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     }
   };
 
-  const calculateReadingTime = (content: any) => {
-    const text = JSON.stringify(content);
+  const calculateReadingTime = (text: string) => {
     const wordCount = text.split(/\s+/).length;
     return Math.max(1, Math.ceil(wordCount / 200));
   };
@@ -104,6 +125,59 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     );
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `blog-files/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('forum-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('forum-images')
+        .getPublicUrl(filePath);
+
+      const fileUrl = data.publicUrl;
+
+      // Insert file link block
+      const newBlock = {
+        id: Date.now().toString(),
+        type: 'file',
+        data: {
+          url: fileUrl,
+          name: file.name,
+          type: file.type
+        }
+      };
+
+      setContent(prev => ({
+        ...prev,
+        blocks: [...(prev.blocks || []), newBlock]
+      }));
+
+      toast({
+        title: "Success",
+        description: "File uploaded successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error uploading file",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const insertBlock = (type: string) => {
     const newBlock = {
       id: Date.now().toString(),
@@ -113,7 +187,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 
     setContent(prev => ({
       ...prev,
-      blocks: [...prev.blocks, newBlock]
+      blocks: [...(prev.blocks || []), newBlock]
     }));
   };
 
@@ -128,7 +202,9 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
       case 'youtube':
         return { url: '', caption: '' };
       case 'link':
-        return { url: '', text: '' };
+        return { url: '', text: '', description: '' };
+      case 'file':
+        return { url: '', name: '', type: '' };
       default:
         return {};
     }
@@ -137,7 +213,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   const updateBlock = (blockId: string, data: any) => {
     setContent(prev => ({
       ...prev,
-      blocks: prev.blocks.map(block =>
+      blocks: (prev.blocks || []).map(block =>
         block.id === blockId ? { ...block, data } : block
       )
     }));
@@ -146,7 +222,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   const removeBlock = (blockId: string) => {
     setContent(prev => ({
       ...prev,
-      blocks: prev.blocks.filter(block => block.id !== blockId)
+      blocks: (prev.blocks || []).filter(block => block.id !== blockId)
     }));
   };
 
@@ -240,19 +316,47 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             />
           </div>
 
-          {/* Content Editor */}
-          <div>
-            <Label>Content</Label>
-            <div className="border rounded-lg p-4 space-y-4">
-              {/* Editor Toolbar */}
-              <div className="flex flex-wrap gap-2 pb-2 border-b">
+          {/* MAIN CONTENT BODY */}
+          <Card className="border-2 border-theme-gold/20">
+            <CardHeader>
+              <CardTitle className="text-xl text-theme-gold">Main Content Body *</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Write the main content of your blog post here. This is the primary text that readers will see.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={mainContent}
+                onChange={(e) => setMainContent(e.target.value)}
+                placeholder="Write your main blog post content here..."
+                className="min-h-[200px] text-base leading-relaxed"
+                rows={10}
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                Word count: {mainContent.split(/\s+/).filter(word => word.length > 0).length} words
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Additional Content Blocks */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Additional Content Elements (Optional)</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Add images, videos, links, and files to enhance your blog post
+              </p>
+            </CardHeader>
+            <CardContent>
+              {/* Toolbar */}
+              <div className="flex flex-wrap gap-2 pb-4 border-b mb-4">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => insertBlock('header')}
                 >
-                  <Heading1 className="h-4 w-4" />
+                  <Heading1 className="h-4 w-4 mr-2" />
+                  Heading
                 </Button>
                 <Button
                   type="button"
@@ -260,7 +364,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
                   size="sm"
                   onClick={() => insertBlock('paragraph')}
                 >
-                  <Bold className="h-4 w-4" />
+                  <Bold className="h-4 w-4 mr-2" />
+                  Paragraph
                 </Button>
                 <Button
                   type="button"
@@ -268,7 +373,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
                   size="sm"
                   onClick={() => insertBlock('image')}
                 >
-                  <Image className="h-4 w-4" />
+                  <Image className="h-4 w-4 mr-2" />
+                  Image
                 </Button>
                 <Button
                   type="button"
@@ -276,7 +382,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
                   size="sm"
                   onClick={() => insertBlock('youtube')}
                 >
-                  <Youtube className="h-4 w-4" />
+                  <Youtube className="h-4 w-4 mr-2" />
+                  YouTube
                 </Button>
                 <Button
                   type="button"
@@ -284,12 +391,30 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
                   size="sm"
                   onClick={() => insertBlock('link')}
                 >
-                  <Link className="h-4 w-4" />
+                  <Link className="h-4 w-4 mr-2" />
+                  Link
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {uploading ? 'Uploading...' : 'Upload File'}
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+                />
               </div>
 
               {/* Content Blocks */}
-              <div className="space-y-4" ref={editorRef}>
+              <div className="space-y-4">
                 {content.blocks?.map((block: any) => (
                   <div key={block.id} className="border rounded p-4 space-y-2">
                     <div className="flex justify-between items-center">
@@ -378,13 +503,41 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
                           onChange={(e) => updateBlock(block.id, { ...block.data, text: e.target.value })}
                           placeholder="Link text"
                         />
+                        <Input
+                          value={block.data.description}
+                          onChange={(e) => updateBlock(block.id, { ...block.data, description: e.target.value })}
+                          placeholder="Link description (optional)"
+                        />
+                      </div>
+                    )}
+
+                    {block.type === 'file' && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 p-2 bg-muted rounded">
+                          <File className="h-4 w-4" />
+                          <span className="text-sm">{block.data.name}</span>
+                          <a 
+                            href={block.data.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-theme-gold text-sm hover:underline ml-auto"
+                          >
+                            View File
+                          </a>
+                        </div>
                       </div>
                     )}
                   </div>
                 ))}
+
+                {(!content.blocks || content.blocks.length === 0) && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No additional content elements added yet. Use the buttons above to add images, videos, links, or files.
+                  </div>
+                )}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* SEO Section */}
           <Card>

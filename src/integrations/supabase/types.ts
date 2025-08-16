@@ -50,33 +50,6 @@ export type Database = {
         }
         Relationships: []
       }
-      blog_categories: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          slug: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          slug: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          slug?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       blog_post_tags: {
         Row: {
           id: string
@@ -173,7 +146,7 @@ export type Database = {
             foreignKeyName: "blog_posts_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "blog_categories"
+            referencedRelation: "categories"
             referencedColumns: ["id"]
           },
         ]

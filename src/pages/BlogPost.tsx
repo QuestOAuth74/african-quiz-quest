@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
-import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter } from 'lucide-react';
+import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const BlogPost: React.FC = () => {
@@ -208,10 +208,34 @@ export const BlogPost: React.FC = () => {
               href={block.data.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-theme-gold hover:text-theme-gold-dark underline font-medium"
+              className="text-theme-gold hover:text-theme-gold-dark underline font-medium block"
             >
               {block.data.text || block.data.url}
             </a>
+            {block.data.description && (
+              <p className="text-sm text-muted-foreground mt-1">{block.data.description}</p>
+            )}
+          </div>
+        );
+
+      case 'file':
+        return (
+          <div key={block.id} className="my-4">
+            <div className="border rounded-lg p-4 flex items-center gap-3">
+              <File className="h-5 w-5 text-theme-gold" />
+              <div className="flex-1">
+                <p className="font-medium">{block.data.name}</p>
+                <p className="text-sm text-muted-foreground">{block.data.type}</p>
+              </div>
+              <a
+                href={block.data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-theme-gold hover:text-theme-gold-dark font-medium"
+              >
+                Download
+              </a>
+            </div>
           </div>
         );
 
@@ -328,9 +352,19 @@ export const BlogPost: React.FC = () => {
           {/* Content */}
           <Card>
             <CardContent className="p-8">
-              <div className="prose prose-lg max-w-none">
-                {post.content.blocks?.map(renderContentBlock)}
+              {/* Main Content */}
+              <div className="prose prose-lg max-w-none mb-8">
+                <div className="text-foreground leading-relaxed whitespace-pre-wrap">
+                  {post.content.mainContent}
+                </div>
               </div>
+
+              {/* Additional Content Blocks */}
+              {post.content.blocks && post.content.blocks.length > 0 && (
+                <div className="prose prose-lg max-w-none border-t pt-6">
+                  {post.content.blocks.map(renderContentBlock)}
+                </div>
+              )}
 
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
