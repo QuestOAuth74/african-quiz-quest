@@ -289,20 +289,23 @@ export const useWheelLobby = () => {
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
-        table: 'wheel_game_sessions',
-        filter: `player1_id.eq.${user.id},player2_id.eq.${user.id}`
+        table: 'wheel_game_sessions'
       }, (payload) => {
         // Navigate both players to the game when a session is created
         if (payload.new) {
-          toast({
-            title: "Game starting!",
-            description: "You're being taken to the game room...",
-          });
-          navigate('/wheel/play', { 
-            state: { 
-              gameSessionId: payload.new.id
-            }
-          });
+          const session = payload.new as any;
+          // Check if current user is one of the players
+          if (session.player1_id === user.id || session.player2_id === user.id) {
+            toast({
+              title: "Game starting!",
+              description: "You're being taken to the game room...",
+            });
+            navigate('/wheel/play', { 
+              state: { 
+                gameSessionId: session.id
+              }
+            });
+          }
         }
       })
       .subscribe();
