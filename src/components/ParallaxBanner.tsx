@@ -58,9 +58,6 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
           transition: 'transform 0.1s ease-out'
         }}
       >
-        {/* Golden Glow Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-yellow-500/8 to-yellow-400/5 z-20" />
-        
         {/* Main Banner Image */}
         <img 
           src={imageSrc}
