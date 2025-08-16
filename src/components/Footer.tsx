@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Home, Trophy, MessageCircle, User, Globe, Youtube } from 'lucide-react';
+import { Home, Trophy, MessageCircle, User, Globe, Youtube, Instagram, Heart, Coffee } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -81,6 +81,39 @@ const Footer = () => {
                 >
                   <Youtube className="h-4 w-4" />
                   YouTube Channel
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://www.instagram.com/historiaafricana1" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <Instagram className="h-4 w-4" />
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://patreon.com/HistoriaAfricanaYoutubeChannel" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <Heart className="h-4 w-4" />
+                  Patreon
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://www.buymeacoffee.com/historiaafricanachannel" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <Coffee className="h-4 w-4" />
+                  Buy Me A Coffee
                 </a>
               </li>
             </ul>
