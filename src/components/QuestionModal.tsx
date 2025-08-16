@@ -65,6 +65,7 @@ const QuestionModal = ({
       setSelectedAnswerIndex(null);
       // Start timer for multiplayer modes when it's not AI turn
       const shouldStartTimer = (gameMode === 'multiplayer' || gameMode === 'online-multiplayer') && currentPlayer !== "Computer";
+      console.log('[QuestionModal] Timer init', { isOpen, qId: question?.id, gameMode, currentPlayer, shouldStartTimer });
       setIsTimerActive(shouldStartTimer);
     }
   }, [isOpen, question, gameMode, currentPlayer]);
@@ -349,18 +350,21 @@ const QuestionModal = ({
               </div>
             )}
           </DialogHeader>
-          
+
+          {!isAIPlayer && (
+            <div className="px-4 pb-2">
+              <AnswerTimer 
+                key={question.id}
+                isActive={isTimerActive}
+                onTimeout={handleTimerTimeout}
+                onStop={() => setIsTimerActive(false)}
+                gameMode={gameMode}
+              />
+            </div>
+          )}
+
           <ScrollArea className={`flex-1 ${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'}`}>
             <div className="space-y-6 pr-4">
-              {/* Answer Timer - Only for multiplayer modes and human players */}
-              {!isAIPlayer && (
-                <AnswerTimer 
-                  isActive={isTimerActive}
-                  onTimeout={handleTimerTimeout}
-                  onStop={() => setIsTimerActive(false)}
-                  gameMode={gameMode}
-                />
-              )}
 
               {/* Question */}
               <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
