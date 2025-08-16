@@ -56,11 +56,10 @@ export function CrosswordGrid({
   };
 
   const handleCellChange = (x: number, y: number, value: string) => {
+    // Allow only letters A-Z or empty string
     const upperValue = value.toUpperCase();
-    
-    // Validate the input against intersections before accepting it
-    if (upperValue && !validateCellInput(x, y, upperValue)) {
-      return; // Reject invalid input
+    if (value && !/^[A-Z]$/.test(upperValue)) {
+      return; // Only allow single letters A-Z
     }
 
     const newGrid = [...grid];
@@ -76,12 +75,7 @@ export function CrosswordGrid({
     }
   };
 
-  const validateCellInput = (x: number, y: number, value: string): boolean => {
-    const expectedLetter = grid[y][x].letter;
-    
-    // The input must match the expected letter for this cell
-    return value === expectedLetter;
-  };
+  // Removed validateCellInput - we now allow free typing and validate only at word completion
 
   const checkAllAffectedWords = (x: number, y: number, currentGrid: CrosswordCell[][]) => {
     // Find all words that contain this cell
@@ -131,16 +125,8 @@ export function CrosswordGrid({
     for (const intersection of wordIntersections) {
       const cell = currentGrid[intersection.y][intersection.x];
       
-      // If there's user input at the intersection, it must match the expected letter
-      if (cell.userInput && cell.userInput !== intersection.letter) {
-        return false;
-      }
-      
-      // Check if the intersecting word is also valid
-      const otherWordId = intersection.word1Id === word.id ? intersection.word2Id : intersection.word1Id;
-      const otherWord = puzzle.words.find(w => w.id === otherWordId);
-      
-      if (otherWord && !isWordValid(otherWord, currentGrid)) {
+      // For word completion, intersection cell must match the expected letter
+      if (!cell.userInput || cell.userInput !== intersection.letter) {
         return false;
       }
     }
@@ -275,13 +261,13 @@ export function CrosswordGrid({
     const isSelected = isCellInSelectedWord(x, y);
     const isHighlighted = isSelected ? "bg-theme-yellow/20 border-theme-yellow" : "bg-background";
     
-    // Enhanced validation feedback
+    // Enhanced validation feedback - show correct/incorrect after typing
     let validationClass = "text-foreground";
     if (cell.userInput) {
       if (cell.userInput === cell.letter) {
-        validationClass = "text-green-600"; // Correct letter
+        validationClass = "text-green-600 bg-green-50"; // Correct letter
       } else {
-        validationClass = "text-red-600 bg-red-50"; // Invalid letter
+        validationClass = "text-red-600 bg-red-50"; // Incorrect letter
       }
     }
     
