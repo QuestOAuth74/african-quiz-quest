@@ -42,6 +42,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     points: number;
     questionId: string;
   } | null>(null);
+  const [roomDetails, setRoomDetails] = useState<any>(null);
 
   // Sync local answered questions with real-time data from both sources
   useEffect(() => {
@@ -60,26 +61,44 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     });
   }, [realtimeAnsweredQuestions, boardState.answeredQuestions]);
 
+  // Ensure we have room details even if coming from Live Lobby (bypass useGameRoom context)
+  useEffect(() => {
+    if (!roomId) return;
+    const fetchRoom = async () => {
+      const { data, error } = await supabase
+        .from('game_rooms')
+        .select('*')
+        .eq('id', roomId)
+        .single();
+      if (!error) setRoomDetails(data);
+    };
+    fetchRoom();
+  }, [roomId]);
+
   // Load questions based on room configuration
   useEffect(() => {
+    const room = currentRoom || roomDetails;
+    if (!room) return;
+
     const loadQuestions = async () => {
       try {
         let categoryData;
-        
+        const config: any = room.game_config || {};
+
         // Handle different config formats
-        if (currentRoom?.game_config?.categories) {
+        if (config.categories && Array.isArray(config.categories)) {
           // Categories specified by name
           const { data } = await supabase
             .from('categories')
             .select('*')
-            .in('name', currentRoom.game_config.categories);
+            .in('name', config.categories);
           categoryData = data;
-        } else if ((currentRoom?.game_config as any)?.selectedCategories) {
+        } else if (config.selectedCategories && Array.isArray(config.selectedCategories)) {
           // Categories specified by ID
           const { data } = await supabase
             .from('categories')
             .select('*')
-            .in('id', (currentRoom.game_config as any).selectedCategories);
+            .in('id', config.selectedCategories);
           categoryData = data;
         } else {
           // No categories specified, load defaults
@@ -99,9 +118,8 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
         setCategories(categoryData);
 
         // Load questions for each category
-        const allQuestions = [];
-        const rowCount = currentRoom?.game_config?.rowCount || 5;
-        
+        const allQuestions: any[] = [];
+        const rowCount = config.rowCount || 5;
         for (const category of categoryData) {
           const { data: questions } = await supabase
             .from('questions')
@@ -134,10 +152,8 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
       }
     };
 
-    if (currentRoom) {
-      loadQuestions();
-    }
-  }, [currentRoom]);
+    loadQuestions();
+  }, [currentRoom, roomDetails]);
 
   // Load answered questions
   useEffect(() => {
@@ -232,7 +248,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
   const gameBoardCategories = categories.map(category => ({
     id: category.id,
     name: category.name,
-    questions: Array.from({ length: currentRoom?.game_config?.rowCount || 5 }, (_, index) => {
+    questions: Array.from({ length: (currentRoom?.game_config?.rowCount || roomDetails?.game_config?.rowCount || 5) }, (_, index) => {
       const points = (index + 1) * 200;
       const question = questionsData.find(q => 
         q.category === category.name && q.points === points
@@ -262,7 +278,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
               Leave Game
             </Button>
             <div className="text-white">
-              <h1 className="text-xl font-bold">Room: {currentRoom?.room_code}</h1>
+              <h1 className="text-xl font-bold">Room: {currentRoom?.room_code || roomDetails?.room_code}</h1>
               <div className="flex items-center gap-4">
                 {isMyTurn ? (
                   <p className="text-green-400 flex items-center gap-2">
@@ -312,7 +328,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
             categories={gameBoardCategories}
             onQuestionSelect={handleQuestionSelect}
             isGameActive={true}
-            rowCount={currentRoom?.game_config?.rowCount || 5}
+            rowCount={currentRoom?.game_config?.rowCount || roomDetails?.game_config?.rowCount || 5}
           />
         </div>
       </div>
