@@ -17,14 +17,10 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
   const soundEffects = useSoundEffects();
 
   useEffect(() => {
-    console.log('AnswerTimer useEffect triggered:', { isActive, gameMode, isVisible });
-    
-    // Only show timer for multiplayer modes
+    // Show timer for multiplayer modes when active
     if (isActive && (gameMode === 'multiplayer' || gameMode === 'online-multiplayer')) {
-      console.log('Timer should be active - starting timer');
       setTimeLeft(30);
       setIsVisible(true);
-      console.log('Timer visibility set to true');
       
       const timer = setInterval(() => {
         setTimeLeft(prev => {
@@ -37,7 +33,6 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
           
           if (prev <= 1) {
             clearInterval(timer);
-            setIsVisible(false);
             onTimeout();
             return 0;
           }
@@ -47,19 +42,15 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
 
       return () => {
         clearInterval(timer);
-        setIsVisible(false);
       };
     } else {
-      console.log('Timer should not be active:', { isActive, gameMode });
       setIsVisible(false);
       onStop?.();
     }
   }, [isActive, gameMode, onTimeout, onStop, soundEffects]);
 
-  console.log('AnswerTimer render:', { isVisible, timeLeft, gameMode });
-  
-  if (!isVisible) {
-    console.log('Timer not visible, returning null');
+  // Always show for multiplayer modes when active
+  if (!isVisible || !(gameMode === 'multiplayer' || gameMode === 'online-multiplayer')) {
     return null;
   }
 
