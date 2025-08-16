@@ -135,8 +135,7 @@ export function CrosswordAdminPanel() {
           word: newWord.word.toUpperCase(),
           clue: newWord.clue,
           category: newWord.category,
-          difficulty: newWord.difficulty,
-          length: newWord.word.length
+          difficulty: newWord.difficulty
         }]);
 
       if (error) throw error;

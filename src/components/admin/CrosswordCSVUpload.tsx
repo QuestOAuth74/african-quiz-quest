@@ -186,8 +186,7 @@ CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
             word: word.word,
             clue: word.clue,
             category: word.category,
-            difficulty: word.difficulty,
-            length: word.word.length
+            difficulty: word.difficulty
           });
 
         if (insertError) {
