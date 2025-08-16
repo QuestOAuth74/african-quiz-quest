@@ -330,12 +330,25 @@ export const useRealtimeGameState = (roomId: string | null) => {
     const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.players.length;
     const nextPlayer = gameState.players[nextPlayerIndex];
 
-    const updatedState = {
-      ...gameState,
-      currentTurn: nextPlayer.user_id
-    };
+    try {
+      // Update the database with the new turn
+      const { error } = await supabase
+        .from('game_rooms')
+        .update({ current_turn_user_id: nextPlayer.user_id })
+        .eq('id', roomId);
 
-    await broadcastGameUpdate(updatedState);
+      if (error) throw error;
+
+      const updatedState = {
+        ...gameState,
+        currentTurn: nextPlayer.user_id
+      };
+
+      await broadcastGameUpdate(updatedState);
+    } catch (error) {
+      console.error('[RealtimeGameState] Failed to update turn:', error);
+      toast.error('Failed to update turn');
+    }
   }, [roomId, gameState, broadcastGameUpdate]);
 
   return {
