@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { WheelGameChallenge } from '@/types/lobby';
 import { Clock, CheckCircle, XCircle, Sword, Users } from 'lucide-react';
+import { PlayerNameDialog } from './PlayerNameDialog';
 
 interface ChallengesPanelProps {
   incomingChallenges: WheelGameChallenge[];
   outgoingChallenges: WheelGameChallenge[];
-  onAccept: (challengeId: string) => void;
+  onAccept: (challengeId: string, playerName: string) => void;
   onDecline: (challengeId: string) => void;
   onCancel: (challengeId: string) => void;
   loading?: boolean;
@@ -22,6 +23,26 @@ export const ChallengesPanel: React.FC<ChallengesPanelProps> = ({
   onCancel,
   loading = false
 }) => {
+  const [showNameDialog, setShowNameDialog] = useState(false);
+  const [selectedChallengeId, setSelectedChallengeId] = useState<string | null>(null);
+
+  const handleAcceptClick = (challengeId: string) => {
+    setSelectedChallengeId(challengeId);
+    setShowNameDialog(true);
+  };
+
+  const handleNameConfirm = (playerName: string) => {
+    if (selectedChallengeId) {
+      onAccept(selectedChallengeId, playerName);
+    }
+    setShowNameDialog(false);
+    setSelectedChallengeId(null);
+  };
+
+  const handleNameCancel = () => {
+    setShowNameDialog(false);
+    setSelectedChallengeId(null);
+  };
   const getTimeRemaining = (expiresAt: string) => {
     const now = new Date();
     const expiry = new Date(expiresAt);
@@ -70,7 +91,7 @@ export const ChallengesPanel: React.FC<ChallengesPanelProps> = ({
                   <div className="flex space-x-2">
                     <Button
                       size="sm"
-                      onClick={() => onAccept(challenge.id)}
+                      onClick={() => handleAcceptClick(challenge.id)}
                       disabled={loading}
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
@@ -158,6 +179,14 @@ export const ChallengesPanel: React.FC<ChallengesPanelProps> = ({
           </CardContent>
         </Card>
       )}
+      
+      <PlayerNameDialog
+        isOpen={showNameDialog}
+        onConfirm={handleNameConfirm}
+        onCancel={handleNameCancel}
+        title="Enter Your Name"
+        defaultName=""
+      />
     </div>
   );
 };

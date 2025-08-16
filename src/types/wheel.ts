@@ -16,6 +16,8 @@ export interface WheelGameSession {
   player2_score: number;
   player1_round_score: number;
   player2_round_score: number;
+  player1_name?: string | null;
+  player2_name?: string | null;
   current_puzzle_id?: string;
   game_state: any;
   status: string;

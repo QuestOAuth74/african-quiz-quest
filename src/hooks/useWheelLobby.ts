@@ -119,7 +119,7 @@ export const useWheelLobby = () => {
   }, [user, fetchChallenges]);
 
   // Accept challenge
-  const acceptChallenge = useCallback(async (challengeId: string) => {
+  const acceptChallenge = useCallback(async (challengeId: string, playerName: string) => {
     if (!user) return null;
 
     try {
@@ -169,6 +169,8 @@ export const useWheelLobby = () => {
           current_puzzle_id: puzzle.id,
           status: 'playing',
           game_mode: 'challenge',
+          player1_name: null, // Will be set when challenger joins
+          player2_name: playerName,
           game_state: {
             currentPuzzle: puzzle,
             revealedLetters: [],

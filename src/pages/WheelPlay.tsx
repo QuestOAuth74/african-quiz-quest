@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeGameSync } from '@/hooks/useRealtimeGameSync';
@@ -10,6 +10,7 @@ import { GuessInput } from '@/components/wheel/GuessInput';
 import { PlayerScoreboard } from '@/components/wheel/PlayerScoreboard';
 import { WheelGameCompletionModal } from '@/components/wheel/WheelGameCompletionModal';
 import { WheelChallengeCompletionModal } from '@/components/wheel/WheelChallengeCompletionModal';
+import { ChallengerNameDialog } from '@/components/wheel/ChallengerNameDialog';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -20,6 +21,7 @@ const WheelPlay = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams<{ sessionId: string }>();
+  const [showNameDialog, setShowNameDialog] = useState(false);
   
   const gameSessionId = params.sessionId || (location.state as any)?.gameSessionId || null;
   
@@ -53,6 +55,15 @@ const WheelPlay = () => {
         player2_id: gameSession.player2_id,
         current_player: gameSession.current_player
       });
+      
+      // Check if this is a challenge game and the current user needs to set their name
+      const isPlayer1 = gameSession.player1_id === user.id;
+      const isPlayer2 = gameSession.player2_id === user.id;
+      const isChallengeMode = gameSession.game_mode === 'challenge';
+      
+      if (isChallengeMode && isPlayer1 && !gameSession.player1_name) {
+        setShowNameDialog(true);
+      }
     }
   }, [authLoading, user, gameSessionId, navigate, gameSession]);
 
@@ -510,12 +521,32 @@ const WheelPlay = () => {
   }
 
   // Determine player names and current user's role
+  const getPlayerNames = () => {
+    if (!gameSession || !user) return { player1Name: 'Player 1', player2Name: 'Player 2' };
+    
+    const isSinglePlayer = gameSession.game_mode === 'single';
+    
+    if (isSinglePlayer) {
+      return { 
+        player1Name: 'You', 
+        player2Name: 'Computer' 
+      };
+    }
+    
+    // For challenge mode, use custom names if available
+    const player1Name = gameSession.player1_name || 'Player 1';
+    const player2Name = gameSession.player2_name || 'Player 2';
+    
+    return { player1Name, player2Name };
+  };
+
+  const { player1Name, player2Name } = getPlayerNames();
   const isPlayer1 = user && gameSession.player1_id === user.id;
   const isSinglePlayer = gameSession.game_mode === 'single';
   
   const player1 = {
     id: gameSession.player1_id,
-    name: isPlayer1 ? 'You' : 'Player 1',
+    name: isPlayer1 ? 'You' : player1Name,
     totalScore: gameSession.player1_score,
     roundScore: gameSession.player1_round_score,
     roundsWon: gameSession.rounds_won_player1
@@ -525,7 +556,7 @@ const WheelPlay = () => {
     id: gameSession.player2_id || 'computer',
     name: isSinglePlayer 
       ? (gameSession.computer_player_data?.name || 'Computer') 
-      : (isPlayer1 ? 'Player 2' : 'You'),
+      : (isPlayer1 ? player2Name : 'You'),
     totalScore: gameSession.player2_score,
     roundScore: gameSession.player2_round_score,
     roundsWon: gameSession.rounds_won_player2
@@ -655,6 +686,15 @@ const WheelPlay = () => {
             puzzle={gameState.currentPuzzle?.phrase || ''}
             category={gameState.currentPuzzle?.category || ''}
             onReturnToLobby={() => navigate('/wheel')}
+          />
+        )}
+        
+        {/* Name Dialog for Challengers */}
+        {showNameDialog && gameSession && user && (
+          <ChallengerNameDialog
+            gameSessionId={gameSession.id}
+            isPlayer1={gameSession.player1_id === user.id}
+            onComplete={() => setShowNameDialog(false)}
           />
         )}
       </div>

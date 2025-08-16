@@ -1305,9 +1305,11 @@ export type Database = {
           game_state: Json
           id: string
           player1_id: string
+          player1_name: string | null
           player1_round_score: number
           player1_score: number
           player2_id: string | null
+          player2_name: string | null
           player2_round_score: number
           player2_score: number
           rounds_won_player1: number
@@ -1325,9 +1327,11 @@ export type Database = {
           game_state?: Json
           id?: string
           player1_id: string
+          player1_name?: string | null
           player1_round_score?: number
           player1_score?: number
           player2_id?: string | null
+          player2_name?: string | null
           player2_round_score?: number
           player2_score?: number
           rounds_won_player1?: number
@@ -1345,9 +1349,11 @@ export type Database = {
           game_state?: Json
           id?: string
           player1_id?: string
+          player1_name?: string | null
           player1_round_score?: number
           player1_score?: number
           player2_id?: string | null
+          player2_name?: string | null
           player2_round_score?: number
           player2_score?: number
           rounds_won_player1?: number

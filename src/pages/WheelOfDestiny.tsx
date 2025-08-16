@@ -31,8 +31,8 @@ export const WheelOfDestiny = () => {
 
   const { createSinglePlayerSession } = useSinglePlayerWheel();
 
-  const handleAcceptChallenge = async (challengeId: string) => {
-    await acceptChallenge(challengeId);
+  const handleAcceptChallenge = async (challengeId: string, playerName: string) => {
+    await acceptChallenge(challengeId, playerName);
     // Navigation handled by real-time subscription in useWheelLobby
   };
 
