@@ -70,7 +70,10 @@ export const GameModeSelector = ({ onSelectMode }: GameModeSelectorProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">
+                <Button className="w-full" onClick={(e) => {
+                  e.stopPropagation();
+                  mode.onClick();
+                }}>
                   Play Now
                 </Button>
               </CardContent>

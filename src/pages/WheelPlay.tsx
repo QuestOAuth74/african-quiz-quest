@@ -54,10 +54,16 @@ const WheelPlay = () => {
         ...prev,
         wheelValue: value,
         isSpinning: false,
-        gamePhase: value === 'BANKRUPT' || value === 'LOSE_TURN' ? 'round_end' : 'guessing'
+        gamePhase: value === 'BANKRUPT' || value === 'LOSE_TURN' ? 'spinning' : 'guessing'
       }));
 
       if (value === 'BANKRUPT') {
+        toast({
+          title: "Bankrupt!",
+          description: "You lost all your round points and your turn!",
+          variant: "destructive"
+        });
+        
         // Player loses all round score
         const updatedSession = {
           ...gameSession,
@@ -73,6 +79,11 @@ const WheelPlay = () => {
         setGameSession(updatedSession);
         switchTurn();
       } else if (value === 'LOSE_TURN') {
+        toast({
+          title: "Lose a Turn!",
+          description: "Your turn is over!",
+          variant: "destructive"
+        });
         switchTurn();
       }
     } catch (error) {
@@ -205,46 +216,72 @@ const WheelPlay = () => {
           <div></div> {/* Spacer for centering */}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column: Scoreboard */}
-          <div className="lg:col-span-1">
-            <PlayerScoreboard
-              player1={player1}
-              player2={player2}
-              currentPlayerTurn={gameSession.current_player}
-              gameStatus={gameSession.status}
-            />
-          </div>
-
-          {/* Middle Column: Game Board */}
-          <div className="lg:col-span-1 space-y-6">
-            <PuzzleBoard
-              puzzle={gameState.currentPuzzle}
-              revealedLetters={gameState.revealedLetters}
+        {/* Check if this is the first turn and no letters revealed yet */}
+        {gameState.gamePhase === 'spinning' && gameState.revealedLetters.length === 0 ? (
+          // Show only the wheel on first turn
+          <div className="flex flex-col items-center justify-center space-y-8 min-h-[60vh]">
+            <div className="text-center space-y-4">
+              <h2 className="text-3xl font-bold text-primary">Ready to Spin?</h2>
+              <p className="text-lg text-muted-foreground">
+                Spin the wheel to start playing! Category: <span className="font-semibold text-primary">{gameState.currentPuzzle.category.toUpperCase()}</span>
+              </p>
+            </div>
+            
+            <WheelComponent
+              onSpin={handleSpin}
+              disabled={!isCurrentPlayerTurn()}
+              isSpinning={gameState.isSpinning}
             />
             
-            <div className="flex justify-center">
-              <WheelComponent
-                onSpin={handleSpin}
-                disabled={!isCurrentPlayerTurn() || gameState.gamePhase !== 'spinning'}
-                isSpinning={gameState.isSpinning}
+            {!isCurrentPlayerTurn() && (
+              <p className="text-center font-semibold text-muted-foreground">
+                Waiting for {gameSession.current_player === 1 ? player1.name : player2.name} to spin...
+              </p>
+            )}
+          </div>
+        ) : (
+          // Show full game layout after first spin
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Left Column: Scoreboard */}
+            <div className="lg:col-span-1">
+              <PlayerScoreboard
+                player1={player1}
+                player2={player2}
+                currentPlayerTurn={gameSession.current_player}
+                gameStatus={gameSession.status}
+              />
+            </div>
+
+            {/* Middle Column: Game Board */}
+            <div className="lg:col-span-1 space-y-6">
+              <PuzzleBoard
+                puzzle={gameState.currentPuzzle}
+                revealedLetters={gameState.revealedLetters}
+              />
+              
+              <div className="flex justify-center">
+                <WheelComponent
+                  onSpin={handleSpin}
+                  disabled={!isCurrentPlayerTurn() || gameState.gamePhase !== 'spinning'}
+                  isSpinning={gameState.isSpinning}
+                />
+              </div>
+            </div>
+
+            {/* Right Column: Game Controls */}
+            <div className="lg:col-span-1">
+              <GuessInput
+                onGuessLetter={handleGuessLetter}
+                onBuyVowel={handleBuyVowel}
+                onSolvePuzzle={handleSolvePuzzle}
+                guessedLetters={gameState.guessedLetters}
+                currentPlayerScore={currentPlayerScore}
+                disabled={!isCurrentPlayerTurn() || gameState.gamePhase !== 'guessing'}
+                wheelValue={gameState.wheelValue}
               />
             </div>
           </div>
-
-          {/* Right Column: Game Controls */}
-          <div className="lg:col-span-1">
-            <GuessInput
-              onGuessLetter={handleGuessLetter}
-              onBuyVowel={handleBuyVowel}
-              onSolvePuzzle={handleSolvePuzzle}
-              guessedLetters={gameState.guessedLetters}
-              currentPlayerScore={currentPlayerScore}
-              disabled={!isCurrentPlayerTurn() || gameState.gamePhase !== 'guessing'}
-              wheelValue={gameState.wheelValue}
-            />
-          </div>
-        </div>
+        )}
 
         {/* Game Status Messages */}
         {!isCurrentPlayerTurn() && (

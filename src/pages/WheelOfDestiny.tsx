@@ -9,11 +9,14 @@ import { OnlinePlayersList } from '@/components/wheel/OnlinePlayersList';
 import { ChallengesPanel } from '@/components/wheel/ChallengesPanel';
 import { GameModeSelector } from '@/components/wheel/GameModeSelector';
 import TopNavigation from '@/components/TopNavigation';
+import { toast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 export const WheelOfDestiny = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<'modes' | 'challenge'>('modes');
+  const [creatingGame, setCreatingGame] = useState(false);
   
   const {
     onlinePlayers,
@@ -41,14 +44,30 @@ export const WheelOfDestiny = () => {
     switch (mode) {
       case 'single':
         if (difficulty) {
-          console.log('Creating single player session...');
-          const session = await createSinglePlayerSession(difficulty);
-          console.log('Session created:', session);
-          if (session) {
-            console.log('Navigating to:', `/wheel/play/${session.id}`);
-            navigate(`/wheel/play/${session.id}`);
-          } else {
-            console.error('Failed to create session');
+          setCreatingGame(true);
+          try {
+            console.log('Creating single player session...');
+            const session = await createSinglePlayerSession(difficulty);
+            console.log('Session created:', session);
+            if (session) {
+              console.log('Navigating to:', `/wheel/play/${session.id}`);
+              navigate(`/wheel/play/${session.id}`);
+            } else {
+              toast({
+                title: "Could not create game",
+                description: "Please try again.",
+                variant: "destructive"
+              });
+            }
+          } catch (error) {
+            console.error('Failed to create session:', error);
+            toast({
+              title: "Could not create game",
+              description: "Please try again.",
+              variant: "destructive"
+            });
+          } finally {
+            setCreatingGame(false);
           }
         }
         break;
@@ -87,7 +106,17 @@ export const WheelOfDestiny = () => {
                 <CardTitle className="text-center">Choose Your Game Mode</CardTitle>
               </CardHeader>
               <CardContent>
-                <GameModeSelector onSelectMode={handleModeSelect} />
+                <div className="relative">
+                  <GameModeSelector onSelectMode={handleModeSelect} />
+                  {creatingGame && (
+                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                      <div className="flex items-center space-x-2 text-primary">
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                        <span className="font-medium">Creating your game...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
