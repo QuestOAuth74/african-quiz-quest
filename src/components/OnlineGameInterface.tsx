@@ -151,11 +151,14 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
                 ...question,
                 category: category.name,
                 correctAnswerIndex,
-                options: question.question_options?.map((opt: any) => ({
-                  id: opt.id,
-                  text: opt.text,
-                  option_type: opt.option_type
-                })) || [],
+                // Sort options by created_at to ensure consistent ordering
+                options: question.question_options
+                  ?.sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                  ?.map((opt: any) => ({
+                    id: opt.id,
+                    text: opt.text,
+                    option_type: opt.option_type
+                  })) || [],
                 // Normalize field names for consistency
                 explanation: question.explanation,
                 historicalContext: question.historical_context,

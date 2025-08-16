@@ -83,7 +83,7 @@ const QuestionModal = ({
       setHasAnswered(true);
       setShowAnswer(true);
       
-      // Play correct/wrong answer sound
+      // Play correct/wrong answer sound based on option_type instead of index
       const selectedOptionObj = question.options?.find(opt => opt.id === selectedOption);
       
       if (selectedOptionObj?.option_type === 'correct') {
@@ -367,8 +367,10 @@ const QuestionModal = ({
                           onClick={() => {
                             setHasAnswered(true);
                             setShowAnswer(true);
-                            setSelectedAnswerIndex(question.correctAnswerIndex);
-                            onAnswer(question.correctAnswerIndex);
+                            // Find correct answer index on the fly
+                            const correctIndex = question.options?.findIndex(opt => opt.option_type === 'correct') ?? 0;
+                            setSelectedAnswerIndex(correctIndex);
+                            onAnswer(correctIndex);
                           }}
                           className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2"
                         >
@@ -434,41 +436,51 @@ const QuestionModal = ({
                     <CardContent className="p-4">
                       <div className="text-center">
                         <div className="flex items-center justify-center gap-2 mb-3">
-                          {selectedAnswerIndex === question.correctAnswerIndex ? (
-                            <CheckCircle className="text-green-800" size={24} />
-                          ) : selectedAnswerIndex === null ? (
-                            <SkipForward className="text-orange-600" size={24} />
-                          ) : (
-                            <XCircle className="text-red-600" size={24} />
-                          )}
-                          <p className={`text-base font-orbitron font-bold uppercase tracking-wider ${
-                            selectedAnswerIndex === question.correctAnswerIndex 
-                              ? 'text-green-800' 
-                              : selectedAnswerIndex === null 
-                                ? 'text-orange-100' 
-                                : 'text-red-100'
-                          }`}>
-                            {selectedAnswerIndex === question.correctAnswerIndex 
-                              ? 'Correct!' 
-                              : selectedAnswerIndex === null 
-                                ? 'Passed' 
-                                : 'Incorrect'}
-                          </p>
+                          {(() => {
+                            // Check correctness using option_type instead of index comparison
+                            const selectedOption = selectedAnswerIndex !== null ? question.options?.[selectedAnswerIndex] : null;
+                            const isCorrect = selectedOption?.option_type === 'correct';
+                            
+                            if (isCorrect) {
+                              return <CheckCircle className="text-green-800" size={24} />;
+                            } else if (selectedAnswerIndex === null) {
+                              return <SkipForward className="text-orange-400" size={24} />;
+                            } else {
+                              return <XCircle className="text-red-400" size={24} />;
+                            }
+                          })()}
                         </div>
+                        <h3 className={`text-xl font-bold mb-3 ${(() => {
+                          const selectedOption = selectedAnswerIndex !== null ? question.options?.[selectedAnswerIndex] : null;
+                          const isCorrect = selectedOption?.option_type === 'correct';
+                          
+                          if (isCorrect) return 'text-green-800';
+                          else if (selectedAnswerIndex === null) return 'text-orange-400';
+                          else return 'text-red-400';
+                        })()}`}>
+                          {(() => {
+                            const selectedOption = selectedAnswerIndex !== null ? question.options?.[selectedAnswerIndex] : null;
+                            const isCorrect = selectedOption?.option_type === 'correct';
+                            
+                            if (isCorrect) return 'Correct! 🎉';
+                            else if (selectedAnswerIndex === null) return 'Question Passed';
+                            else return 'Incorrect';
+                          })()}
+                        </h3>
                         {selectedAnswerIndex !== null && typeof selectedAnswerIndex === 'number' && question.options && (
-                          <p className={`text-sm mb-2 ${
-                            selectedAnswerIndex === question.correctAnswerIndex 
-                              ? 'text-green-800' 
-                              : 'text-red-100'
-                          }`}>
+                          <p className={`text-sm mb-2 ${(() => {
+                            const selectedOption = question.options?.[selectedAnswerIndex];
+                            const isCorrect = selectedOption?.option_type === 'correct';
+                            return isCorrect ? 'text-green-800' : 'text-red-100';
+                          })()}`}>
                             You selected: <strong>{question.options[selectedAnswerIndex]?.text}</strong>
                           </p>
                         )}
-                        <p className={`text-base font-exo font-bold ${
-                          selectedAnswerIndex === question.correctAnswerIndex 
-                            ? 'text-green-800' 
-                            : 'text-white'
-                        }`}>
+                        <p className={`text-base font-exo font-bold ${(() => {
+                          const selectedOption = selectedAnswerIndex !== null ? question.options?.[selectedAnswerIndex] : null;
+                          const isCorrect = selectedOption?.option_type === 'correct';
+                          return isCorrect ? 'text-green-800' : 'text-white';
+                        })()}`}>
                           Correct Answer: {question.options?.find(opt => opt.option_type === 'correct')?.text}
                         </p>
                       </div>
