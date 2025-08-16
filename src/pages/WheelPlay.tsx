@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeGameSync } from '@/hooks/useRealtimeGameSync';
+import { useComputerPlayer } from '@/hooks/useComputerPlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { WheelComponent } from '@/components/wheel/WheelComponent';
 import { PuzzleBoard } from '@/components/wheel/PuzzleBoard';
@@ -41,6 +42,26 @@ const WheelPlay = () => {
       return;
     }
   }, [authLoading, user, gameSessionId, navigate]);
+
+  const switchTurn = async () => {
+    if (!gameSession) return;
+
+    const newPlayer = gameSession.current_player === 1 ? 2 : 1;
+    const updatedSession = { ...gameSession, current_player: newPlayer };
+    
+    await supabase
+      .from('wheel_game_sessions')
+      .update({ current_player: newPlayer })
+      .eq('id', gameSession.id);
+    
+    setGameSession(updatedSession);
+    setGameState(prev => ({ 
+      ...prev, 
+      currentPlayerTurn: newPlayer,
+      gamePhase: 'spinning',
+      wheelValue: 0
+    }));
+  };
 
   const handleSpin = async (value: number | string) => {
     if (!gameSession || !user) return;
@@ -84,14 +105,14 @@ const WheelPlay = () => {
           .eq('id', gameSession.id);
           
         setGameSession(updatedSession);
-        switchTurn();
+        await switchTurn();
       } else if (value === 'LOSE_TURN') {
         toast({
           title: "Lose a Turn!",
           description: "Your turn is over!",
           variant: "destructive"
         });
-        switchTurn();
+        await switchTurn();
       }
     } catch (error) {
       console.error('Error spinning wheel:', error);
@@ -103,24 +124,81 @@ const WheelPlay = () => {
     }
   };
 
-  const switchTurn = () => {
-    if (!gameSession) return;
+  const handleGuessLetter = async (letter: string) => {
+    if (!gameSession || !user) return;
 
-    const newPlayer = gameSession.current_player === 1 ? 2 : 1;
-    const updatedSession = { ...gameSession, current_player: newPlayer };
-    
-    setGameSession(updatedSession);
-    setGameState(prev => ({ 
-      ...prev, 
-      currentPlayerTurn: newPlayer,
-      gamePhase: 'spinning',
-      wheelValue: 0
-    }));
-  };
+    try {
+      // Check if letter is in the puzzle
+      const isCorrect = gameState.currentPuzzle?.phrase.toUpperCase().includes(letter.toUpperCase()) || false;
+      
+      // Record the guess move
+      await supabase
+        .from('wheel_game_moves')
+        .insert({
+          session_id: gameSession.id,
+          player_id: user.id,
+          move_type: 'guess_letter',
+          move_data: { letter, correct: isCorrect },
+          points_earned: isCorrect ? (gameState.wheelValue as number) : 0
+        });
 
-  const handleGuessLetter = (letter: string) => {
-    // Implement letter guessing logic
-    console.log('Guessing letter:', letter);
+      // Update guessed letters
+      const newGuessedLetters = [...gameState.guessedLetters, letter.toUpperCase()];
+      
+      if (isCorrect) {
+        // Letter is correct - add to revealed letters and award points
+        const newRevealedLetters = [...gameState.revealedLetters, letter.toUpperCase()];
+        const letterCount = (gameState.currentPuzzle?.phrase.toUpperCase().match(new RegExp(letter.toUpperCase(), 'g')) || []).length;
+        const pointsEarned = (gameState.wheelValue as number) * letterCount;
+        
+        // Update scores
+        const updatedSession = {
+          ...gameSession,
+          [gameSession.current_player === 1 ? 'player1_round_score' : 'player2_round_score']: 
+            (gameSession.current_player === 1 ? gameSession.player1_round_score : gameSession.player2_round_score) + pointsEarned
+        };
+        
+        await supabase
+          .from('wheel_game_sessions')
+          .update(updatedSession)
+          .eq('id', gameSession.id);
+          
+        setGameSession(updatedSession);
+        
+        setGameState(prev => ({
+          ...prev,
+          revealedLetters: newRevealedLetters,
+          guessedLetters: newGuessedLetters,
+          gamePhase: 'spinning' // Player gets to spin again
+        }));
+        
+        toast({
+          title: "Correct!",
+          description: `Good guess! You earned ${pointsEarned} points.`,
+        });
+      } else {
+        // Letter is wrong - switch turns
+        setGameState(prev => ({
+          ...prev,
+          guessedLetters: newGuessedLetters
+        }));
+        
+        toast({
+          title: "Incorrect",
+          description: `Sorry, "${letter}" is not in the puzzle.`,
+          variant: "destructive"
+        });
+        
+        await switchTurn();
+      }
+    } catch (error) {
+      console.error('Error guessing letter:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process guess. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleBuyVowel = (vowel: string) => {
@@ -153,6 +231,17 @@ const WheelPlay = () => {
     
     return false;
   };
+
+  // Initialize computer player for single player mode
+  const computerPlayer = useComputerPlayer({
+    difficulty: (gameSession?.computer_difficulty as 'easy' | 'medium' | 'hard') || 'medium',
+    currentPuzzle: gameState.currentPuzzle,
+    gameState,
+    onSpin: handleSpin,
+    onGuessLetter: handleGuessLetter,
+    onBuyVowel: handleBuyVowel,
+    onSolvePuzzle: handleSolvePuzzle
+  });
 
   if (loading) {
     return (
@@ -295,6 +384,16 @@ const WheelPlay = () => {
           <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-muted p-4 rounded-lg shadow-lg">
             <p className="text-center font-semibold">
               Waiting for {gameSession.current_player === 1 ? player1.name : player2.name}'s turn...
+            </p>
+          </div>
+        )}
+
+        {/* Computer thinking indicator */}
+        {gameSession?.game_mode === 'single' && gameSession.current_player === 2 && computerPlayer.isThinking && (
+          <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg">
+            <p className="text-center font-semibold flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+              <span>{player2.name} is thinking...</span>
             </p>
           </div>
         )}
