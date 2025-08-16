@@ -22,6 +22,7 @@ import { OnlineMultiplayerLobby } from "@/components/OnlineMultiplayerLobby";
 import { OnlineGameInterface } from "@/components/OnlineGameInterface";
 import { QuizSection } from "@/components/QuizSection";
 import { CrosswordSection } from "@/components/CrosswordSection";
+import { WheelSection } from "@/components/WheelSection";
 
 interface Question {
   id: string;
@@ -695,6 +696,9 @@ const Index = () => {
 
         {/* Quiz Section - African History Focus */}
         <QuizSection />
+
+        {/* Wheel of Destiny Section - African Word Game */}
+        <WheelSection />
 
         {/* Crossword Section - African History Puzzles */}
         <CrosswordSection />
