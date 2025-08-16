@@ -49,7 +49,15 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
       ...realtimeAnsweredQuestions,
       ...boardState.answeredQuestions
     ];
-    setAnsweredQuestions(new Set(combinedAnswered));
+    const newAnsweredSet = new Set(combinedAnswered);
+    setAnsweredQuestions(prev => {
+      // Only update if the sets are actually different
+      if (prev.size !== newAnsweredSet.size || 
+          !Array.from(newAnsweredSet).every(id => prev.has(id))) {
+        return newAnsweredSet;
+      }
+      return prev;
+    });
   }, [realtimeAnsweredQuestions, boardState.answeredQuestions]);
 
   // Load questions based on room configuration

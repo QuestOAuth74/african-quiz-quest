@@ -59,6 +59,45 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
     }
   }, [matchmakingRequests, user?.id]);
 
+  // Handle accepted requests by the original requester
+  useEffect(() => {
+    const acceptedRequests = matchmakingRequests.filter(req => 
+      req.requester_id === user?.id && req.status === 'accepted'
+    );
+    
+    if (acceptedRequests.length > 0) {
+      // For each accepted request, find an active game room to join
+      acceptedRequests.forEach(async (request) => {
+        try {
+          // Try to find an active game for this user
+          const game = await findActiveGame();
+          if (game && game.status === 'active') {
+            const target = onlinePlayers.find(p => p.user_id === request.target_id);
+            const players = [
+              { 
+                id: user?.id, 
+                name: 'You', 
+                score: 0,
+                user_id: user?.id 
+              },
+              { 
+                id: request.target_id, 
+                name: target?.display_name || 'Player', 
+                score: 0,
+                user_id: request.target_id 
+              }
+            ];
+            
+            toast.success('Match accepted! Joining game...');
+            onMatchFound(game.id, players);
+          }
+        } catch (error) {
+          console.error('Error joining accepted game:', error);
+        }
+      });
+    }
+  }, [matchmakingRequests, user?.id, onlinePlayers, findActiveGame, onMatchFound]);
+
   const handleChallengePlayer = (player: any) => {
     setChallengeTarget(player);
     setConfigModalOpen(true);
@@ -90,30 +129,29 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
   const handleMatchResponse = async (requestId: string, accept: boolean) => {
     if (!accept) {
       await respondToMatchRequest(requestId, false);
-      toast.info('Match request declined');
       return;
     }
 
     try {
-      // Accept the match request first
-      const success = await respondToMatchRequest(requestId, true);
-      if (!success) {
-        toast.error('Failed to accept match request');
+      // Find the request details first
+      const request = matchmakingRequests.find(req => req.id === requestId);
+      if (!request) {
+        toast.error('Match request not found');
         return;
       }
 
-      // Create a real game room
-      const room = await createRoom(gameConfig);
+      // Create a real game room using the request's game config
+      const roomConfig = request.game_config || gameConfig;
+      const room = await createRoom(roomConfig);
       if (!room) {
         toast.error('Failed to create game room');
         return;
       }
 
       // Find the requester to add them to the room
-      const request = matchmakingRequests.find(req => req.id === requestId);
-      const requester = onlinePlayers.find(p => p.user_id === request?.requester_id);
-
-      if (request?.requester_id && requester) {
+      const requester = onlinePlayers.find(p => p.user_id === request.requester_id);
+      
+      if (requester) {
         // Add the requester to the room
         const requesterAdded = await addPlayerToRoom(
           room.id, 
@@ -127,8 +165,12 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         }
       }
 
-      // Update both players' status to 'in_game'
-      await updatePlayerStatus('in_game');
+      // Accept the match request
+      const success = await respondToMatchRequest(requestId, true);
+      if (!success) {
+        toast.error('Failed to accept match request');
+        return;
+      }
 
       // Create players array for the game
       const players = [
@@ -139,10 +181,10 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
           user_id: user?.id 
         },
         { 
-          id: request?.requester_id, 
+          id: request.requester_id, 
           name: requester?.display_name || 'Player', 
           score: 0,
-          user_id: request?.requester_id 
+          user_id: request.requester_id 
         }
       ];
 

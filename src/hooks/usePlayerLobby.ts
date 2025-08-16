@@ -178,7 +178,7 @@ export const usePlayerLobby = () => {
         .from('matchmaking_requests')
         .select('*')
         .or(`requester_id.eq.${user.id},target_id.eq.${user.id}`)
-        .eq('status', 'pending')
+        .in('status', ['pending', 'accepted'])
         .order('created_at', { ascending: false });
 
       if (error) throw error;
