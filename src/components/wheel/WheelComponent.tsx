@@ -34,7 +34,7 @@ export const WheelComponent: React.FC<WheelComponentProps> = ({
     if (disabled || isSpinning) return;
 
     const segmentAngle = 360 / WHEEL_SEGMENTS.length;
-    const randomSpin = Math.random() * 360 + 1800; // Multiple rotations plus random
+    const randomSpin = Math.random() * 360 + 3600; // More rotations for dramatic effect
     const finalRotation = (rotation + randomSpin) % 360;
     
     setRotation(rotation + randomSpin);
@@ -44,10 +44,10 @@ export const WheelComponent: React.FC<WheelComponentProps> = ({
     const segmentIndex = Math.floor(normalizedRotation / segmentAngle);
     const selectedSegment = WHEEL_SEGMENTS[segmentIndex];
 
-    // Delay to match animation
+    // Delay to match 5-second animation
     setTimeout(() => {
       onSpin(selectedSegment.value);
-    }, 3000);
+    }, 5000);
   };
 
   const segmentAngle = 360 / WHEEL_SEGMENTS.length;
@@ -68,7 +68,7 @@ export const WheelComponent: React.FC<WheelComponentProps> = ({
             className="drop-shadow-lg"
             style={{
               transform: `rotate(${rotation}deg)`,
-              transition: isSpinning ? 'transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none'
+              transition: isSpinning ? 'transform 5s cubic-bezier(0.25, 0.1, 0.1, 1)' : 'none'
             }}
           >
             {WHEEL_SEGMENTS.map((segment, index) => {
