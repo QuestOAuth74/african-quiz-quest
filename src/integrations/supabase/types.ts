@@ -315,6 +315,33 @@ export type Database = {
         }
         Relationships: []
       }
+      crossword_word_usage: {
+        Row: {
+          created_at: string
+          id: string
+          puzzle_id: string | null
+          used_at: string
+          user_id: string
+          word_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          puzzle_id?: string | null
+          used_at?: string
+          user_id: string
+          word_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          puzzle_id?: string | null
+          used_at?: string
+          user_id?: string
+          word_id?: string
+        }
+        Relationships: []
+      }
       crossword_words: {
         Row: {
           category: string

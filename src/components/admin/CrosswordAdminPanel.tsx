@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CrosswordGenerator } from "@/lib/crosswordGenerator";
 import { CrosswordWordData } from "@/types/crossword";
+import { useCrosswordData } from "@/hooks/useCrosswordData";
 import { Puzzle, Settings, Plus, Trash2, Eye, Play, Upload, Check } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
@@ -27,7 +28,9 @@ export function CrosswordAdminPanel() {
   const [customPuzzleName, setCustomPuzzleName] = useState<string>('');
   const [puzzles, setPuzzles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [excludeUsed, setExcludeUsed] = useState(true);
   const { toast } = useToast();
+  const { usedWordIds, loadWords } = useCrosswordData();
 
   useEffect(() => {
     loadData();
@@ -209,9 +212,14 @@ export function CrosswordAdminPanel() {
       return;
     }
 
-    const filteredWords = selectedCategories.includes('all') 
+    let filteredWords = selectedCategories.includes('all') 
       ? words.filter(w => w.is_active)
       : words.filter(w => w.is_active && selectedCategories.includes(w.category));
+    
+    // Exclude used words if the option is enabled
+    if (excludeUsed) {
+      filteredWords = filteredWords.filter(w => !usedWordIds.has(w.id));
+    }
 
     if (filteredWords.length < 5) {
       toast({
@@ -311,10 +319,22 @@ export function CrosswordAdminPanel() {
   };
 
   const getAvailableWordsCount = () => {
-    const filteredWords = selectedCategories.includes('all') 
+    let filteredWords = selectedCategories.includes('all') 
       ? words.filter(w => w.is_active)
       : words.filter(w => w.is_active && selectedCategories.includes(w.category));
+    
+    // Exclude used words if the option is enabled
+    if (excludeUsed) {
+      filteredWords = filteredWords.filter(w => !usedWordIds.has(w.id));
+    }
+    
     return filteredWords.length;
+  };
+
+  const getTotalWordsCount = () => {
+    return selectedCategories.includes('all') 
+      ? words.filter(w => w.is_active).length
+      : words.filter(w => w.is_active && selectedCategories.includes(w.category)).length;
   };
 
   
@@ -538,18 +558,40 @@ export function CrosswordAdminPanel() {
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
                   <span>5 words</span>
                   <span>20 words</span>
-                </div>
-              </div>
+                 </div>
+               </div>
 
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Available Words:</span>
-                  <Badge variant="outline">{getAvailableWordsCount()} words</Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  From selected categories
-                </p>
-              </div>
+               <div>
+                 <div className="flex items-center space-x-2 mb-3">
+                   <Checkbox
+                     id="exclude-used"
+                     checked={excludeUsed}
+                     onCheckedChange={(checked) => setExcludeUsed(checked as boolean)}
+                   />
+                   <Label htmlFor="exclude-used" className="text-sm font-medium">
+                     Exclude previously used words
+                   </Label>
+                 </div>
+                 <p className="text-xs text-muted-foreground mb-3">
+                   This prevents words from being reused in subsequent crosswords for variety.
+                 </p>
+               </div>
+
+               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                 <div className="flex items-center justify-between">
+                   <span className="text-sm font-medium">Available Words:</span>
+                   <Badge variant="outline">{getAvailableWordsCount()} words</Badge>
+                 </div>
+                 {excludeUsed && (
+                   <div className="flex items-center justify-between text-xs text-muted-foreground">
+                     <span>Total in categories:</span>
+                     <span>{getTotalWordsCount()} words</span>
+                   </div>
+                 )}
+                 <p className="text-xs text-muted-foreground">
+                   From selected categories {excludeUsed ? '(excluding used words)' : ''}
+                 </p>
+               </div>
 
               <Button 
                 onClick={generatePuzzle} 

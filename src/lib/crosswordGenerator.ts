@@ -36,8 +36,9 @@ export class CrosswordGenerator {
     this.placedWords = [];
     this.wordNumber = 1;
 
-    // Sort words by length (longest first for better placement)
-    const sortedWords = [...words].sort((a, b) => b.word.length - a.word.length);
+    // Shuffle words to create variety in placement order, then sort by length for better placement
+    const shuffledWords = [...words].sort(() => Math.random() - 0.5);
+    const sortedWords = shuffledWords.sort((a, b) => b.word.length - a.word.length);
 
     // Place first word in the center
     const firstWord = sortedWords[0];
@@ -55,7 +56,14 @@ export class CrosswordGenerator {
     }
 
     // Convert to CrosswordPuzzle format
-    return this.createPuzzleFromGrid(title, category, difficulty);
+    const puzzle = this.createPuzzleFromGrid(title, category, difficulty);
+    
+    // Store the word IDs used in this puzzle for tracking
+    if (puzzle) {
+      puzzle.usedWordIds = sortedWords.slice(0, this.placedWords.length).map(word => word.id);
+    }
+
+    return puzzle;
   }
 
   private placeWord(word: string, clue: string, startX: number, startY: number, direction: 'across' | 'down', category: string): boolean {

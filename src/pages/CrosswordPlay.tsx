@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useCrosswordGameState } from '@/hooks/useCrosswordGameState';
+import { useCrosswordData } from '@/hooks/useCrosswordData';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ export function CrosswordPlay() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { saveGameState, loadGameState, isSaving } = useCrosswordGameState(user?.id);
+  const { trackWordUsage } = useCrosswordData();
   const [isAdmin, setIsAdmin] = useState(false);
   const [gameState, setGameState] = useState<CrosswordGameState>({
     puzzle: null,
@@ -266,6 +268,12 @@ export function CrosswordPlay() {
       if (puzzleId) {
         saveGameState(puzzleId, { ...newGameState, isCompleted: true });
       }
+      
+      // Track word usage for completed puzzle
+      if (gameState.puzzle?.usedWordIds && gameState.puzzle.usedWordIds.length > 0) {
+        trackWordUsage(gameState.puzzle.usedWordIds, puzzleId);
+      }
+      
       toast({
         title: "Congratulations! 🎉",
         description: "You've completed the crossword puzzle!",

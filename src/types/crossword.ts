@@ -56,6 +56,7 @@ export interface CrosswordPuzzle {
   isCompleted: boolean;
   startTime?: Date;
   completionTime?: Date;
+  usedWordIds?: string[];
 }
 
 export interface CrosswordGameState {
