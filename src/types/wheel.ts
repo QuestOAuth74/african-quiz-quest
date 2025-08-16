@@ -10,7 +10,7 @@ export interface WheelPuzzle {
 export interface WheelGameSession {
   id: string;
   player1_id: string;
-  player2_id: string;
+  player2_id: string | null;
   current_player: number;
   player1_score: number;
   player2_score: number;
@@ -23,6 +23,9 @@ export interface WheelGameSession {
   rounds_won_player2: number;
   created_at: string;
   updated_at: string;
+  game_mode?: string;
+  computer_difficulty?: string;
+  computer_player_data?: any;
 }
 
 export interface WheelGameMove {
