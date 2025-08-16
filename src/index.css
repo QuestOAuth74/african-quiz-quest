@@ -207,12 +207,14 @@ All colors MUST be HSL.
     border: 2px solid hsl(var(--theme-yellow) / 0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-card);
+    color: white;
   }
 
   .jeopardy-button:hover {
     border-color: hsl(var(--theme-yellow));
     box-shadow: var(--shadow-card), 0 0 20px hsl(var(--theme-yellow) / 0.4);
     transform: translateY(-2px);
+    color: white;
   }
 
   .jeopardy-text-glow {
