@@ -1,6 +1,8 @@
 import { Shield } from 'lucide-react';
+import { usePageMeta } from '@/hooks/usePageTitle';
 
 const Privacy = () => {
+  usePageMeta("Privacy Policy", "Read our privacy policy to understand how we collect, use, and protect your personal information.");
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12 max-w-4xl">

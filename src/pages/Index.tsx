@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { GameModeSelector } from "@/components/GameModeSelector";
 import GameSetup from "@/components/GameSetup";
 import { GameHeader } from "@/components/GameHeader";
@@ -73,6 +74,9 @@ const Index = () => {
   const [aiIsSelectingQuestion, setAiIsSelectingQuestion] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [answeringPlayer, setAnsweringPlayer] = useState<string | null>(null);
+
+  // Set page title
+  usePageTitle("African History Games & Quizzes");
 
   // Helper functions for welcome modal timing
   const shouldShowWelcomeModal = (): boolean => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +36,9 @@ const QuizSetup = () => {
   const [questionCounts, setQuestionCounts] = useState<QuestionCounts>({ all: 0, fresh: 0, correct: 0, wrong: 0 });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  // Set page title
+  usePageTitle("Quiz Setup", { loading: authLoading || loading, loadingTitle: "Loading Quiz Setup" });
 
   useEffect(() => {
     if (!authLoading && !user) {

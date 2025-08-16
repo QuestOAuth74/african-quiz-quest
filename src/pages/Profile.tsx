@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,9 @@ const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [updating, setUpdating] = useState(false);
+
+  // Set page title
+  usePageTitle("Profile", { loading: authLoading || loading, loadingTitle: "Loading Profile" });
 
   useEffect(() => {
     if (user) {

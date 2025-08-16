@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { useForumData } from '@/hooks/useForumData';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,6 +62,9 @@ interface Reply {
 
 const Forum = () => {
   const { user, isAuthenticated } = useAuth();
+  
+  // Set page title
+  usePageTitle("Community Forum");
   
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

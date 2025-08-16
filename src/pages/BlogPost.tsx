@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { usePageMeta } from '@/hooks/usePageTitle';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,13 @@ export const BlogPost: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { getPostBySlug, incrementViewCount } = useBlogData();
+
+  // Set dynamic page title with loading state
+  usePageMeta(
+    post?.title || "Blog Post", 
+    post?.meta_description || post?.excerpt || "Read this article on Historia Africana",
+    { loading, loadingTitle: "Loading Article" }
+  );
 
   useEffect(() => {
     const fetchPost = async () => {

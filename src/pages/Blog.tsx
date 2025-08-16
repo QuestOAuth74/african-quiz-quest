@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { usePageMeta } from '@/hooks/usePageTitle';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,9 @@ export const Blog: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const { posts, categories, fetchPosts, loading } = useBlogData();
   const [filteredPosts, setFilteredPosts] = useState(posts);
+
+  // Set page title and meta
+  usePageMeta("Blog", "Discover articles, insights, and stories about African history, culture, and heritage on the Historia Africana blog.");
 
   useEffect(() => {
     fetchPosts('published'); // Only fetch published posts for public view
@@ -33,47 +37,6 @@ export const Blog: React.FC = () => {
     setFilteredPosts(filtered);
   }, [posts, searchTerm, selectedCategory]);
 
-  // Set page title and meta description for SEO
-  useEffect(() => {
-    document.title = 'Blog - Historia Africana | African History Stories & Insights';
-    
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 'Explore fascinating stories, insights, and knowledge about African history. Discover the rich heritage and cultural legacy of the African continent through our engaging blog posts.');
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = 'Explore fascinating stories, insights, and knowledge about African history. Discover the rich heritage and cultural legacy of the African continent through our engaging blog posts.';
-      document.head.appendChild(meta);
-    }
-
-    // Add structured data for SEO
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": "Blog",
-      "name": "Historia Africana Blog",
-      "description": "Stories and insights about African history",
-      "url": window.location.href,
-      "publisher": {
-        "@type": "Organization",
-        "name": "Historia Africana"
-      }
-    };
-
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify(structuredData);
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup structured data on component unmount
-      document.querySelectorAll('script[type="application/ld+json"]').forEach(script => {
-        if (script.textContent?.includes('Historia Africana Blog')) {
-          script.remove();
-        }
-      });
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">

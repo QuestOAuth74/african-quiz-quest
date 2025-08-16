@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,9 @@ const Quiz = () => {
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
   const [hasShownMotivation, setHasShownMotivation] = useState(false);
   const [showQuizCompletionModal, setShowQuizCompletionModal] = useState(false);
+
+  // Set page title
+  usePageTitle("Quiz", { loading: isLoadingQuestions, loadingTitle: "Loading Quiz" });
 
   // Get all question IDs for realtime subscription
   const questionIds = questions.map(q => q.id);
