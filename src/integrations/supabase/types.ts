@@ -1231,6 +1231,123 @@ export type Database = {
         }
         Relationships: []
       }
+      wheel_game_moves: {
+        Row: {
+          created_at: string
+          id: string
+          move_data: Json
+          move_type: string
+          player_id: string
+          points_earned: number
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          move_data?: Json
+          move_type: string
+          player_id: string
+          points_earned?: number
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          move_data?: Json
+          move_type?: string
+          player_id?: string
+          points_earned?: number
+          session_id?: string
+        }
+        Relationships: []
+      }
+      wheel_game_sessions: {
+        Row: {
+          created_at: string
+          current_player: number
+          current_puzzle_id: string | null
+          game_state: Json
+          id: string
+          player1_id: string
+          player1_round_score: number
+          player1_score: number
+          player2_id: string
+          player2_round_score: number
+          player2_score: number
+          rounds_won_player1: number
+          rounds_won_player2: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_player?: number
+          current_puzzle_id?: string | null
+          game_state?: Json
+          id?: string
+          player1_id: string
+          player1_round_score?: number
+          player1_score?: number
+          player2_id: string
+          player2_round_score?: number
+          player2_score?: number
+          rounds_won_player1?: number
+          rounds_won_player2?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_player?: number
+          current_puzzle_id?: string | null
+          game_state?: Json
+          id?: string
+          player1_id?: string
+          player1_round_score?: number
+          player1_score?: number
+          player2_id?: string
+          player2_round_score?: number
+          player2_score?: number
+          rounds_won_player1?: number
+          rounds_won_player2?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wheel_puzzles: {
+        Row: {
+          category: string
+          created_at: string
+          difficulty: number
+          hint: string | null
+          id: string
+          is_active: boolean
+          phrase: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          difficulty?: number
+          hint?: string | null
+          id?: string
+          is_active?: boolean
+          phrase: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          difficulty?: number
+          hint?: string | null
+          id?: string
+          is_active?: boolean
+          phrase?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       online_players: {
