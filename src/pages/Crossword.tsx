@@ -21,9 +21,12 @@ import {
   Zap,
   Users,
   Home,
-  Settings
+  Settings,
+  BookOpen,
+  Target
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import baobabHeaderImage from '@/assets/baobab-talks-header.png';
 
 interface PuzzleData {
   id: string;
@@ -238,32 +241,100 @@ export function Crossword() {
       </header>
 
       {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/80 to-secondary py-16 lg:py-24">
-        <div className="absolute inset-0 bg-grid-white/10 bg-grid-16" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-full mb-6">
-            <Grid3X3 className="w-10 h-10 text-white" />
+      <section className="relative overflow-hidden h-[500px]">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src={baobabHeaderImage} 
+            alt="African History Crosswords" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70" />
+          
+          {/* Crossword Grid Overlay Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="h-full w-full bg-repeat" 
+                 style={{
+                   backgroundImage: `
+                     linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px),
+                     linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px)
+                   `,
+                   backgroundSize: '40px 40px'
+                 }} 
+            />
           </div>
-          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6">
-            African History
-            <span className="block text-yellow-300">Crosswords</span>
-          </h1>
-          <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Challenge your knowledge of African history with our collection of thoughtfully crafted crossword puzzles. 
-            From ancient civilizations to modern achievements.
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-6 text-white/80">
-            <div className="flex items-center space-x-2">
-              <Puzzle className="h-5 w-5" />
-              <span>{puzzles.length} Puzzles Available</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Zap className="h-5 w-5" />
-              <span>Interactive Gameplay</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Trophy className="h-5 w-5" />
-              <span>Track Your Progress</span>
+        </div>
+        
+        <div className="relative h-full flex items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left Content */}
+              <div className="text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
+                  <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
+                    <Grid3X3 className="h-8 w-8 text-white" />
+                  </div>
+                  <Badge variant="secondary" className="px-4 py-2 text-sm font-semibold bg-white/15 text-white border border-white/20 backdrop-blur-sm">
+                    Interactive Learning
+                  </Badge>
+                </div>
+                
+                <h1 className="text-5xl lg:text-7xl font-black text-white mb-6 tracking-tight">
+                  African History
+                  <span className="block text-yellow-300 text-4xl lg:text-6xl mt-2">
+                    Crosswords
+                  </span>
+                </h1>
+                
+                <p className="text-xl lg:text-2xl text-white/90 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                  Challenge your knowledge with thoughtfully crafted puzzles spanning ancient civilizations to modern achievements.
+                </p>
+
+                <div className="flex flex-wrap justify-center lg:justify-start items-center gap-6 text-white/80 mb-8">
+                  <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                    <Puzzle className="h-5 w-5" />
+                    <span className="font-medium">{puzzles.length} Puzzles</span>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                    <BookOpen className="h-5 w-5" />
+                    <span className="font-medium">Multiple Categories</span>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                    <Target className="h-5 w-5" />
+                    <span className="font-medium">All Skill Levels</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Visual Element */}
+              <div className="hidden lg:flex justify-center items-center">
+                <div className="relative">
+                  {/* Large crossword grid visualization */}
+                  <div className="grid grid-cols-8 gap-1 p-6 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20">
+                    {Array.from({ length: 64 }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-8 h-8 rounded border-2 transition-all duration-300 ${
+                          [0, 1, 2, 8, 9, 10, 16, 17, 18, 24, 25, 26, 32, 33, 34, 40, 41, 42].includes(i)
+                            ? 'bg-white/90 border-white text-gray-800 flex items-center justify-center text-sm font-bold'
+                            : Math.random() > 0.7
+                            ? 'bg-yellow-300/80 border-yellow-200'
+                            : 'bg-white/20 border-white/30'
+                        }`}
+                      >
+                        {[0, 1, 2, 8, 9, 10, 16, 17, 18, 24, 25, 26, 32, 33, 34, 40, 41, 42].includes(i) && 
+                          ['A', 'F', 'R', 'I', 'C', 'A', 'H', 'I', 'S', 'T', 'O', 'R', 'Y'][i % 13]
+                        }
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Floating puzzle pieces */}
+                  <div className="absolute -top-4 -right-4 w-12 h-12 bg-yellow-400 rounded-lg rotate-12 opacity-80 animate-bounce" style={{ animationDelay: '0s' }}></div>
+                  <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-blue-400 rounded-lg -rotate-12 opacity-80 animate-bounce" style={{ animationDelay: '1s' }}></div>
+                  <div className="absolute top-1/2 -right-8 w-6 h-6 bg-green-400 rounded-full opacity-80 animate-bounce" style={{ animationDelay: '2s' }}></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
