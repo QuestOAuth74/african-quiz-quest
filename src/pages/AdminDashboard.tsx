@@ -11,7 +11,8 @@ import { CSVUpload } from "@/components/admin/CSVUpload";
 import QuestionManager from "@/components/admin/QuestionManager";
 import ForumModeration from "@/components/admin/ForumModeration";
 import FlaggedQuestionsManager from "@/components/admin/FlaggedQuestionsManager";
-import { LogOut, Users, FileQuestion, FolderOpen, Upload, AlertTriangle } from "lucide-react";
+import UserManager from "@/components/admin/UserManager";
+import { LogOut, Users, FileQuestion, FolderOpen, Upload, AlertTriangle, UserCheck, Activity } from "lucide-react";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
@@ -20,6 +21,9 @@ const AdminDashboard = () => {
     totalCategories: 0,
     totalAdmins: 0,
     flaggedQuestions: 0,
+    totalUsers: 0,
+    activeUsersLastHour: 0,
+    onlineUsers: 0,
   });
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -52,11 +56,16 @@ const AdminDashboard = () => {
 
   const loadStats = async () => {
     try {
-      const [questionsRes, categoriesRes, adminsRes, flaggedRes] = await Promise.all([
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      
+      const [questionsRes, categoriesRes, adminsRes, flaggedRes, usersRes, activeUsersRes, onlineUsersRes] = await Promise.all([
         supabase.from("questions").select("id", { count: "exact", head: true }),
         supabase.from("categories").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_admin", true),
-        supabase.from("questions").select("id", { count: "exact", head: true }).eq("is_flagged", true)
+        supabase.from("questions").select("id", { count: "exact", head: true }).eq("is_flagged", true),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("last_seen", oneHourAgo),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).neq("player_status", "offline").not("player_status", "is", null)
       ]);
 
       setStats({
@@ -64,6 +73,9 @@ const AdminDashboard = () => {
         totalCategories: categoriesRes.count || 0,
         totalAdmins: adminsRes.count || 0,
         flaggedQuestions: flaggedRes.count || 0,
+        totalUsers: usersRes.count || 0,
+        activeUsersLastHour: activeUsersRes.count || 0,
+        onlineUsers: onlineUsersRes.count || 0,
       });
     } catch (error) {
       console.error("Error loading stats:", error);
@@ -94,7 +106,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-8">
           <Card className="jeopardy-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Questions</CardTitle>
@@ -135,11 +147,44 @@ const AdminDashboard = () => {
               <p className="text-xs text-muted-foreground">Need review</p>
             </CardContent>
           </Card>
+          
+          <Card className="jeopardy-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <UserCheck className="h-4 w-4 text-accent" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-accent">{stats.totalUsers}</div>
+              <p className="text-xs text-muted-foreground">Registered</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="jeopardy-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+              <Activity className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-500">{stats.activeUsersLastHour}</div>
+              <p className="text-xs text-muted-foreground">Last hour</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="jeopardy-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Online Now</CardTitle>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-500">{stats.onlineUsers}</div>
+              <p className="text-xs text-muted-foreground">Currently online</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Content */}
         <Tabs defaultValue="questions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-card">
+          <TabsList className="grid w-full grid-cols-7 bg-card">
             <TabsTrigger value="questions" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Questions
             </TabsTrigger>
@@ -159,6 +204,10 @@ const AdminDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="moderation" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Moderation
+            </TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              <Users className="h-4 w-4 mr-2" />
+              Users
             </TabsTrigger>
           </TabsList>
           
@@ -184,6 +233,10 @@ const AdminDashboard = () => {
           
           <TabsContent value="moderation">
             <ForumModeration />
+          </TabsContent>
+          
+          <TabsContent value="users">
+            <UserManager />
           </TabsContent>
         </Tabs>
       </div>
