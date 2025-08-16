@@ -155,6 +155,14 @@ const Footer = () => {
                   About Us
                 </Link>
               </li>
+              <li>
+                <Link 
+                  to="/privacy" 
+                  className="text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
