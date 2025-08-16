@@ -282,7 +282,8 @@ export const useWheelLobby = () => {
         event: '*',
         schema: 'public',
         table: 'wheel_game_challenges'
-      }, () => {
+      }, (payload) => {
+        console.log('Wheel challenge real-time update:', payload);
         fetchChallenges();
       })
       .subscribe();
