@@ -19,7 +19,7 @@ interface OnlineGameInterfaceProps {
 
 export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps) => {
   const { user } = useAuth();
-  const { currentRoom, players: contextPlayers } = useGameRoom();
+  const { currentRoom, players } = useGameRoom();
   const { 
     gameState, 
     selectQuestion, 
@@ -43,7 +43,6 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     questionId: string;
   } | null>(null);
   const [roomDetails, setRoomDetails] = useState<any>(null);
-  const [players, setPlayers] = useState<any[]>([]);
 
   // Sync local answered questions with real-time data from both sources
   useEffect(() => {
@@ -62,63 +61,18 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     });
   }, [realtimeAnsweredQuestions, boardState.answeredQuestions]);
 
-  // Load room details and players
+  // Ensure we have room details even if coming from Live Lobby (bypass useGameRoom context)
   useEffect(() => {
     if (!roomId) return;
-    
-    const loadRoomData = async () => {
-      try {
-        // Fetch room details
-        const { data: room, error: roomError } = await supabase
-          .from('game_rooms')
-          .select('*')
-          .eq('id', roomId)
-          .single();
-        
-        if (!roomError && room) {
-          setRoomDetails(room);
-        }
-
-        // Fetch players for this room
-        const { data: roomPlayers, error: playersError } = await supabase
-          .from('game_room_players')
-          .select('*')
-          .eq('room_id', roomId)
-          .eq('is_active', true)
-          .order('joined_at');
-
-        if (!playersError && roomPlayers) {
-          console.log('🎮 Loaded players:', roomPlayers);
-          setPlayers(roomPlayers);
-        }
-      } catch (error) {
-        console.error('Error loading room data:', error);
-      }
+    const fetchRoom = async () => {
+      const { data, error } = await supabase
+        .from('game_rooms')
+        .select('*')
+        .eq('id', roomId)
+        .single();
+      if (!error) setRoomDetails(data);
     };
-
-    loadRoomData();
-
-    // Set up real-time subscription for player updates
-    const playersChannel = supabase
-      .channel(`players_${roomId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'game_room_players',
-          filter: `room_id=eq.${roomId}`
-        },
-        (payload) => {
-          console.log('🔄 Player update:', payload);
-          loadRoomData(); // Reload players on any change
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(playersChannel);
-    };
+    fetchRoom();
   }, [roomId]);
 
   // Load questions based on room configuration
@@ -285,25 +239,12 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
       isCorrect = selectedOption?.option_type === 'correct';
     }
 
-    // Store the answer temporarily - don't submit yet (except on timeout)
+    // Store the answer temporarily - don't submit to database yet
     setPendingAnswer({
       isCorrect,
       points: selectedQuestion.points,
       questionId: selectedQuestion.id
     });
-
-    // If the player timed out, immediately submit and advance turn
-    if (selectedAnswerIndex === 'timeout') {
-      toast.error("Time's up! Turn lost");
-      const success = await submitAnswer(selectedQuestion.id, false, selectedQuestion.points);
-      if (success) {
-        await nextTurn();
-      }
-      setPendingAnswer(null);
-      setIsQuestionModalOpen(false);
-      setSelectedQuestion(null);
-      return;
-    }
 
     // Show immediate feedback but don't progress the game
     if (isCorrect) {
@@ -380,110 +321,62 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header */}
       <div className="p-4 border-b border-white/20">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            {/* Game Controls */}
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={onBack}
-                variant="outline"
-                size="sm"
-                className="text-white border-white/20"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Leave Game
-              </Button>
-              <div className="text-white">
-                <h1 className="text-lg sm:text-xl font-bold">Room: {currentRoom?.room_code || roomDetails?.room_code}</h1>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  {isMyTurn ? (
-                    <p className="text-green-400 flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4" />
-                      Your turn - Select a question
-                    </p>
-                  ) : (
-                    <p className="text-yellow-400 text-sm">
-                      Waiting for other players...
-                    </p>
-                  )}
-                  <div className="flex items-center gap-2 text-xs">
-                    <div className={`w-2 h-2 rounded-full ${
-                      connectionStatus === 'connected' ? 'bg-green-400' : 
-                      connectionStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'
-                    }`} />
-                    <span className="text-gray-300">{connectionStatus}</span>
-                  </div>
+        <div className="flex items-center justify-between max-w-6xl mx-auto">
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={onBack}
+              variant="outline"
+              size="sm"
+              className="text-white border-white/20"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Leave Game
+            </Button>
+            <div className="text-white">
+              <h1 className="text-xl font-bold">Room: {currentRoom?.room_code || roomDetails?.room_code}</h1>
+              <div className="flex items-center gap-4">
+                {isMyTurn ? (
+                  <p className="text-green-400 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Your turn - Select a question
+                  </p>
+                ) : (
+                  <p className="text-yellow-400">
+                    Waiting for other players...
+                  </p>
+                )}
+                <div className="flex items-center gap-2 text-xs">
+                  <div className={`w-2 h-2 rounded-full ${
+                    connectionStatus === 'connected' ? 'bg-green-400' : 
+                    connectionStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'
+                  }`} />
+                  <span className="text-gray-300">{connectionStatus}</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Live Scores - Positioned above the game board */}
-      <div className="p-4 pb-2">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-center">
-            <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10 w-full max-w-4xl">
-              <h3 className="text-white font-semibold mb-3 text-center text-sm sm:text-base">Live Scores</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2 sm:gap-3 justify-center">
-                {(players.length > 0 ? players : contextPlayers).map((player) => {
-                  // Use live scores from gameState, fallback to player.score
-                  const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
-                  const isCurrentTurn = gameState?.currentTurn === player.user_id;
-                  
-                  console.log(`🎯 Player ${player.player_name} score:`, {
-                    gameStateScore: gameState?.scores?.[player.user_id],
-                    playerScore: player.score,
-                    finalScore: currentScore,
-                    isCurrentTurn
-                  });
-                  
-                  return (
-                    <Card 
-                      key={player.id || player.user_id} 
-                      className={`${
-                        isCurrentTurn 
-                          ? 'bg-yellow-500/20 border-yellow-400/50 ring-2 ring-yellow-400/30' 
-                          : 'bg-white/10 border-white/20'
-                      } transition-all duration-300 w-full sm:w-auto`}
-                    >
-                      <CardContent className="p-3 sm:p-4">
-                        <div className="flex flex-col items-center gap-2 text-white min-w-0 sm:min-w-[100px] lg:min-w-[120px]">
-                          <div className="flex items-center gap-2">
-                            {player.is_host && <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />}
-                            <span className="font-medium text-xs sm:text-sm text-center truncate max-w-[120px]">
-                              {player.player_name}
-                            </span>
-                          </div>
-                          <Badge 
-                            variant="secondary" 
-                            className={`text-sm sm:text-lg px-2 sm:px-3 py-1 font-bold ${
-                              isCurrentTurn ? 'bg-yellow-400 text-black' : 'bg-blue-500 text-white'
-                            }`}
-                          >
-                            ${currentScore.toLocaleString()}
-                          </Badge>
-                          {isCurrentTurn && (
-                            <div className="flex items-center gap-1 text-xs text-yellow-300">
-                              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                              Your Turn
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
+          
+          {/* Player Scores */}
+          <div className="flex gap-4">
+            {players.map((player) => {
+              // Use live scores from gameState, fallback to player.score
+              const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
               
-              {/* Debug info */}
-              {players.length === 0 && contextPlayers.length === 0 && (
-                <div className="text-center text-yellow-400 text-sm mt-2">
-                  Loading players...
-                </div>
-              )}
-            </div>
+              return (
+                <Card key={player.id} className="bg-white/10 border-white/20">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2 text-white">
+                      {player.is_host && <Crown className="w-4 h-4 text-yellow-400" />}
+                      <span className="font-medium">{player.player_name}</span>
+                      <Badge variant="secondary">${currentScore}</Badge>
+                      {gameState?.currentTurn === player.user_id && (
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>

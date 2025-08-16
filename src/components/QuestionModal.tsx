@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useGameAudio } from "@/hooks/useGameAudio";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { AnswerTimer } from "@/components/AnswerTimer";
 
 interface Question {
   id: string;
@@ -52,16 +51,9 @@ const QuestionModal = ({
   const [showAnswer, setShowAnswer] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
-  const [isTimerActive, setIsTimerActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
-  const safetyTimeoutRef = useRef<number | null>(null);
-  const clearSafetyTimeout = () => {
-    if (safetyTimeoutRef.current) {
-      clearTimeout(safetyTimeoutRef.current);
-      safetyTimeoutRef.current = null;
-    }
-  };
+
   useEffect(() => {
     if (isOpen && question) {
       setSelectedOption(null);
@@ -69,31 +61,8 @@ const QuestionModal = ({
       setShowAnswer(false);
       setHasAnswered(false);
       setSelectedAnswerIndex(null);
-      // Start timer for multiplayer modes when it's not AI turn
-      const shouldStartTimer = (gameMode === 'multiplayer' || gameMode === 'online-multiplayer') && currentPlayer !== "Computer";
-      console.log('[QuestionModal] Timer init', { isOpen, qId: question?.id, gameMode, currentPlayer, shouldStartTimer });
-      setIsTimerActive(shouldStartTimer);
-
-      // Safety fallback: force timeout after ~30s even if visual timer fails
-      clearSafetyTimeout();
-      if (shouldStartTimer) {
-        safetyTimeoutRef.current = window.setTimeout(() => {
-          console.log('[QuestionModal] Safety timeout fired', { qId: question.id });
-          timerTimeoutRef.current?.();
-        }, 30500);
-      }
-    } else {
-      // Modal closed or no question
-      console.log('[QuestionModal] Timer deactivated/cleanup', { isOpen, hasQuestion: !!question });
-      setIsTimerActive(false);
-      clearSafetyTimeout();
     }
-
-    return () => {
-      console.log('[QuestionModal] Cleanup effect');
-      clearSafetyTimeout();
-    };
-  }, [isOpen, question?.id, gameMode, currentPlayer]);
+  }, [isOpen, question]);
 
   const handleOptionSelect = (optionId: string) => {
     soundEffects.playButtonClick();
@@ -102,16 +71,12 @@ const QuestionModal = ({
 
   const handleSkip = () => {
     soundEffects.playButtonClick();
-    setIsTimerActive(false); // Stop timer on skip
-    clearSafetyTimeout();
     setHasAnswered(true);
     onAnswer('skip');
   };
 
   const handleSubmit = () => {
     if (selectedOption !== null) {
-      setIsTimerActive(false); // Stop timer on manual submission
-      clearSafetyTimeout();
       // Find the index of the selected option in the options array
       const answerIndex = question.options?.findIndex(opt => opt.id === selectedOption) ?? -1;
       setSelectedAnswerIndex(answerIndex);
@@ -131,28 +96,7 @@ const QuestionModal = ({
     }
   };
 
-  const handleTimerTimeout = useCallback(() => {
-    setIsTimerActive(false);
-    clearSafetyTimeout();
-    setHasAnswered(true);
-    setShowAnswer(true);
-    gameAudio.playWrongAnswer(); // Timeout is considered incorrect
-    toast({
-      title: "Time's up!",
-      description: "No answer selected.",
-      variant: "destructive",
-    });
-    onAnswer('timeout');
-  }, [question?.id]);
-
-  const timerTimeoutRef = useRef(handleTimerTimeout);
-  useEffect(() => {
-    timerTimeoutRef.current = handleTimerTimeout;
-  }, [handleTimerTimeout]);
-
   const handlePass = () => {
-    setIsTimerActive(false); // Stop timer on pass
-    clearSafetyTimeout();
     setHasAnswered(true);
     setShowAnswer(true);
     onAnswer('pass');
@@ -171,7 +115,6 @@ const QuestionModal = ({
     setShowAnswer(false);
     setHasAnswered(false);
     setSelectedAnswerIndex(null);
-    clearSafetyTimeout();
     onClose();
   };
 
@@ -193,7 +136,7 @@ const QuestionModal = ({
             </DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className={`${isMobile ? 'h-[55vh]' : 'h-[70vh]'} pr-4`}>
+          <ScrollArea className={`${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'} pr-4`}>
             <div className="space-y-6">
               {/* Question Display */}
               <Card className="jeopardy-card border-theme-yellow/30">
@@ -385,27 +328,9 @@ const QuestionModal = ({
               </div>
             )}
           </DialogHeader>
-
-          {!isAIPlayer && (
-            <div className="px-4 pb-2">
-              <AnswerTimer 
-                key={question.id}
-                isActive={isTimerActive}
-                onTimeout={handleTimerTimeout}
-                onStop={() => { setIsTimerActive(false); clearSafetyTimeout(); }}
-                gameMode={gameMode}
-              />
-              {(gameMode === 'multiplayer' || gameMode === 'online-multiplayer') && !isTimerActive && (
-                <div className="text-center text-xs text-muted-foreground mt-1">
-                  30 seconds to answer
-                </div>
-              )}
-            </div>
-          )}
-
-          <ScrollArea className={`${isMobile ? 'h-[55vh]' : 'h-[70vh]'} flex-1`}>
+          
+          <ScrollArea className={`flex-1 ${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'}`}>
             <div className="space-y-6 pr-4">
-
               {/* Question */}
               <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
                 <CardContent className="p-4">
@@ -475,6 +400,23 @@ const QuestionModal = ({
                         ))}
                       </div>
                       
+                      <div className="flex gap-3 justify-center mt-6">
+                        <Button
+                          onClick={handleSkip}
+                          variant="outline"
+                          className="jeopardy-button border-orange-500/50 text-orange-400 hover:text-orange-300"
+                        >
+                          <SkipForward className="mr-2" size={16} />
+                          Skip
+                        </Button>
+                        <Button
+                          onClick={handleSubmit}
+                          disabled={!selectedOption}
+                          className="jeopardy-button px-8"
+                        >
+                          Submit Answer
+                        </Button>
+                      </div>
                     </>
                   )}
                 </div>
@@ -588,29 +530,6 @@ const QuestionModal = ({
               )}
             </div>
           </ScrollArea>
-
-          {/* Action bar */}
-          {!isAIPlayer && !showAnswer && !hasAnswered && (
-            <div className="px-4 pt-3 pb-3">
-              <div className="flex gap-3 justify-center">
-                <Button
-                  onClick={handleSkip}
-                  variant="outline"
-                  className="jeopardy-button border-orange-500/50 text-orange-400 hover:text-orange-300"
-                >
-                  <SkipForward className="mr-2" size={16} />
-                  Skip
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!selectedOption}
-                  className="jeopardy-button px-8"
-                >
-                  Submit Answer
-                </Button>
-              </div>
-            </div>
-          )}
         </DialogContent>
       </Dialog>
     </>

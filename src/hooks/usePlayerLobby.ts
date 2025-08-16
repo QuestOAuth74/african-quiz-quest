@@ -304,13 +304,9 @@ export const usePlayerLobby = () => {
     });
 
     return () => {
-      try {
-        if (playersChannel) supabase.removeChannel(playersChannel);
-        if (matchmakingChannel) supabase.removeChannel(matchmakingChannel);
-        if (presence) supabase.removeChannel(presence);
-      } catch (e) {
-        console.warn('[usePlayerLobby] cleanup removeChannel error', e);
-      }
+      supabase.removeChannel(playersChannel);
+      supabase.removeChannel(matchmakingChannel);
+      supabase.removeChannel(presenceChannel);
     };
   }, [user, fetchPlayers, fetchMatchmakingRequests]);
 
