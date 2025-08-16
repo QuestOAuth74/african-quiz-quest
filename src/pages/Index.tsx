@@ -21,6 +21,7 @@ import WelcomeModal from "@/components/WelcomeModal";
 import { OnlineMultiplayerLobby } from "@/components/OnlineMultiplayerLobby";
 import { OnlineGameInterface } from "@/components/OnlineGameInterface";
 import { QuizSection } from "@/components/QuizSection";
+import { CrosswordSection } from "@/components/CrosswordSection";
 
 interface Question {
   id: string;
@@ -694,6 +695,9 @@ const Index = () => {
 
         {/* Quiz Section - African History Focus */}
         <QuizSection />
+
+        {/* Crossword Section - African History Puzzles */}
+        <CrosswordSection />
 
         {/* User Authentication Section */}
         <div className="container mx-auto px-4 py-8">
