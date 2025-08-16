@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Bot, Sparkles, ArrowLeft, Trophy } from "lucide-react";
+import { Users, Bot, Sparkles, ArrowLeft, Trophy, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -125,7 +125,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
             <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
@@ -193,6 +193,30 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
                   size="lg"
                 >
                   JOIN LIVE GAME
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-orange-500/20" style={{ animationDelay: '0.3s' }}>
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-orange-500 to-yellow-600 rounded-xl w-fit shadow-lg">
+                  <RotateCcw size={40} className="text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-orange-400 flex items-center justify-center gap-2">
+                  WHEEL OF DESTINY
+                  <Badge variant="secondary" className="text-xs bg-orange-600 text-white">NEW</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center px-6 pb-6">
+                <p className="text-card-foreground mb-6 text-base leading-relaxed">
+                  Spin the wheel and solve African history puzzles. 2-player word game!
+                </p>
+                <Button 
+                  onClick={() => window.location.href = '/wheel'} 
+                  className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 text-white font-bold text-base py-4 hover:scale-105 transition-all duration-300"
+                  size="lg"
+                >
+                  SPIN TO WIN
                 </Button>
               </CardContent>
             </Card>

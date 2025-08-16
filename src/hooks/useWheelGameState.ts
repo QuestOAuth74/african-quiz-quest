@@ -28,10 +28,11 @@ export const useWheelGameState = () => {
         .from('wheel_puzzles')
         .select('*')
         .eq('is_active', true)
-        .limit(1);
+        .limit(1)
+        .maybeSingle();
 
       if (puzzleError) throw puzzleError;
-      if (!puzzles || puzzles.length === 0) {
+      if (!puzzles) {
         toast({
           title: "No puzzles available",
           description: "Please contact an admin to add wheel puzzles.",
@@ -40,7 +41,7 @@ export const useWheelGameState = () => {
         return null;
       }
 
-      const puzzle = puzzles[0];
+      const puzzle = puzzles;
 
       const { data: session, error } = await supabase
         .from('wheel_game_sessions')
