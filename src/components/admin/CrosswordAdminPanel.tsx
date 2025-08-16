@@ -18,6 +18,7 @@ import { CrosswordCSVUpload } from "./CrosswordCSVUpload";
 export function CrosswordAdminPanel() {
   const [isPublicEnabled, setIsPublicEnabled] = useState(false);
   const [words, setWords] = useState<CrosswordWordData[]>([]);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
   const [newWord, setNewWord] = useState({ word: '', clue: '', category: '', difficulty: 1 });
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [puzzles, setPuzzles] = useState([]);
@@ -39,6 +40,16 @@ export function CrosswordAdminPanel() {
       
       if (featureData) {
         setIsPublicEnabled(featureData.enabled_for_public);
+      }
+
+      // Load categories from the quiz system
+      const { data: categoriesData } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name', { ascending: true });
+      
+      if (categoriesData) {
+        setCategories(categoriesData);
       }
 
       // Load crossword words
@@ -106,6 +117,17 @@ export function CrosswordAdminPanel() {
       return;
     }
 
+    // Validate category exists
+    const validCategory = categories.find(cat => cat.name === newWord.category);
+    if (!validCategory) {
+      toast({
+        title: "Error",
+        description: "Please select a valid category",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('crossword_words')
@@ -113,7 +135,8 @@ export function CrosswordAdminPanel() {
           word: newWord.word.toUpperCase(),
           clue: newWord.clue,
           category: newWord.category,
-          difficulty: newWord.difficulty
+          difficulty: newWord.difficulty,
+          length: newWord.word.length
         }]);
 
       if (error) throw error;
@@ -218,7 +241,7 @@ export function CrosswordAdminPanel() {
     }
   };
 
-  const categories = [...new Set(words.map(w => w.category))];
+  
 
   if (loading) {
     return <div>Loading crossword admin panel...</div>;
@@ -292,11 +315,16 @@ export function CrosswordAdminPanel() {
                 </div>
                 <div>
                   <Label>Category</Label>
-                  <Input
-                    value={newWord.category}
-                    onChange={(e) => setNewWord({...newWord, category: e.target.value})}
-                    placeholder="Ancient Kingdoms"
-                  />
+                  <Select value={newWord.category} onValueChange={(value) => setNewWord({...newWord, category: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(cat => (
+                        <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label>Difficulty (1-5)</Label>
@@ -382,7 +410,7 @@ export function CrosswordAdminPanel() {
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
                     {categories.map(cat => (
-                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

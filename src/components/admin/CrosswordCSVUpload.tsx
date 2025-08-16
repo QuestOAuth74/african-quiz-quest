@@ -43,7 +43,7 @@ KUSH,"NubioKemetic",3,"Kingdom that ruled Egypt as the 25th Dynasty"
 EGYPT,"NubioKemetic",1,"Land of the pharaohs along the Nile River"
 GHANA,"Nations",2,"First great West African trading empire"
 SONGHAI,"Medieval Africa",3,"Last of the great West African trading empires"
-MANSA,"Ancient History",4,"Title meaning king in Mandinka language"`;
+CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
 
   const downloadTemplate = () => {
     const blob = new Blob([csvTemplate], { type: 'text/csv' });
