@@ -145,6 +145,7 @@ export function Crossword() {
   };
 
   const startPuzzle = (puzzleId: string) => {
+    console.log('Starting puzzle with ID:', puzzleId);
     navigate(`/crossword/play/${puzzleId}`);
   };
 

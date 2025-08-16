@@ -34,7 +34,9 @@ export function CrosswordPlay() {
   usePageTitle(gameState.puzzle?.title || "Crossword Puzzle");
 
   useEffect(() => {
+    console.log('CrosswordPlay mounted, puzzleId:', puzzleId);
     if (!puzzleId) {
+      console.log('No puzzleId provided, redirecting to crossword list');
       navigate('/crossword');
       return;
     }
@@ -83,11 +85,12 @@ export function CrosswordPlay() {
       }
     } catch (error) {
       console.error('Error checking access:', error);
-      navigate('/');
+      // Don't redirect on access check errors, let them try to load the puzzle
     }
   };
 
   const loadPuzzle = async () => {
+    console.log('Loading puzzle with ID:', puzzleId);
     try {
       const { data: puzzleData, error } = await supabase
         .from('crossword_puzzles')
@@ -95,6 +98,8 @@ export function CrosswordPlay() {
         .eq('id', puzzleId)
         .eq('is_active', true)
         .single();
+
+      console.log('Puzzle query result:', { puzzleData, error });
 
       if (error) throw error;
 
