@@ -39,7 +39,7 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
   const [challengeTarget, setChallengeTarget] = useState<any>(null);
 
   // Debug logging
-  console.log('LiveLobby Debug:', {
+  console.log('[LiveLobby] Debug:', {
     user: user ? { id: user.id, email: user.email } : null,
     onlinePlayers: onlinePlayers.length,
     waitingPlayers: waitingPlayers.length,
@@ -86,10 +86,11 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
           ];
           
           toast.success('Match accepted! Looking for game room...');
+          console.log('[LiveLobby] Request accepted, waiting for room creation...');
           // Note: We'll rely on real-time updates to find the created game room
           // The accepter creates the room and adds both players
         } catch (error) {
-          console.error('Error handling accepted game:', error);
+          console.error('[LiveLobby] Error handling accepted game:', error);
         }
       });
     }
@@ -99,6 +100,8 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
   useEffect(() => {
     if (!user) return;
 
+    console.log('[LiveLobby] Setting up room listener for user:', user.id);
+    
     const channel = supabase
       .channel(`lobby-user-room-listener-${user.id}`)
       .on(
@@ -111,8 +114,10 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         },
         async (payload) => {
           try {
+            console.log('[LiveLobby] User added to room:', payload);
             const roomId = (payload.new as any).room_id as string;
-            // Fetch players for context (optional)
+            
+            // Fetch players for context
             const { data: playersData } = await supabase
               .from('game_room_players')
               .select('user_id, player_name')
@@ -127,10 +132,12 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
               score: 0,
             }));
 
+            console.log('[LiveLobby] Auto-joining room with players:', players);
             toast.success('Match ready! Joining game room...');
             onMatchFound(roomId, players);
           } catch (e) {
-            console.error('Failed to auto-join room:', e);
+            console.error('[LiveLobby] Failed to auto-join room:', e);
+            toast.error('Failed to join game room');
           }
         }
       )
@@ -150,12 +157,13 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
     if (!user || !challengeTarget) return;
     
     try {
+      console.log('[LiveLobby] Sending configured challenge to:', challengeTarget.user_id);
       await sendMatchRequest(challengeTarget.user_id, config);
       toast.success(`Challenge sent to ${challengeTarget.display_name}!`);
       setConfigModalOpen(false);
       setChallengeTarget(null);
     } catch (error) {
-      console.error('Failed to send challenge:', error);
+      console.error('[LiveLobby] Failed to send challenge:', error);
       toast.error('Failed to send challenge');
       setConfigModalOpen(false);
       setChallengeTarget(null);
@@ -163,6 +171,7 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
   };
 
   const handleSendMatchRequest = async (targetUserId: string) => {
+    console.log('[LiveLobby] Sending match request to:', targetUserId);
     const success = await sendMatchRequest(targetUserId, gameConfig);
     if (success) {
       toast.success('Match request sent! Waiting for response...');
@@ -170,6 +179,8 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
   };
 
   const handleMatchResponse = async (requestId: string, accept: boolean) => {
+    console.log('[LiveLobby] Responding to match request:', requestId, accept);
+    
     if (!accept) {
       await respondToMatchRequest(requestId, false);
       return;
@@ -183,7 +194,9 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         return;
       }
 
-  // Create a real game room using the request's game config
+      console.log('[LiveLobby] Creating room for accepted request:', request);
+
+      // Create a real game room using the request's game config
       const roomConfig = request.game_config || gameConfig;
       const room = await createRoom(roomConfig);
       if (!room) {
@@ -191,26 +204,38 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         return;
       }
 
-      // Find the requester to add them to the room
-      const requester = onlinePlayers.find(p => p.user_id === request.requester_id);
-      
-      if (requester) {
-        // Add the requester to the room
-        const requesterAdded = await addPlayerToRoom(
-          room.id, 
-          request.requester_id, 
-          requester.display_name || 'Player'
-        );
+      console.log('[LiveLobby] Room created:', room.id);
 
-        if (!requesterAdded) {
-          toast.error('Failed to add requester to room');
-          return;
-        }
+      // ALWAYS try to add the requester to the room - even if not found in onlinePlayers
+      let requesterName = 'Player';
+      const requester = onlinePlayers.find(p => p.user_id === request.requester_id);
+      if (requester) {
+        requesterName = requester.display_name || 'Player';
       }
+
+      console.log('[LiveLobby] Adding requester to room:', {
+        roomId: room.id,
+        requesterId: request.requester_id,
+        requesterName
+      });
+
+      const requesterAdded = await addPlayerToRoom(
+        room.id, 
+        request.requester_id, 
+        requesterName
+      );
+
+      if (!requesterAdded) {
+        console.error('[LiveLobby] Failed to add requester to room');
+        toast.error('Failed to add requester to room');
+        return;
+      }
+
+      console.log('[LiveLobby] Requester added successfully, starting game...');
 
       // Immediately start the game as host when both players are present
       try {
-        await supabase
+        const { error: updateError } = await supabase
           .from('game_rooms')
           .update({
             status: 'playing',
@@ -218,8 +243,14 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
             current_turn_user_id: user?.id || null,
           })
           .eq('id', room.id);
+
+        if (updateError) {
+          console.error('[LiveLobby] Failed to start game:', updateError);
+        } else {
+          console.log('[LiveLobby] Game started successfully');
+        }
       } catch (e) {
-        console.error('Failed to start game automatically:', e);
+        console.error('[LiveLobby] Failed to start game automatically:', e);
       }
 
       // Accept the match request
@@ -228,6 +259,8 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         toast.error('Failed to accept match request');
         return;
       }
+
+      console.log('[LiveLobby] Match request accepted, preparing game...');
 
       // Create players array for the game
       const players = [
@@ -239,20 +272,20 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
         },
         { 
           id: request.requester_id, 
-          name: requester?.display_name || 'Player', 
+          name: requesterName, 
           score: 0,
           user_id: request.requester_id 
         }
       ];
 
       toast.success('Match accepted! Joining game room...');
+      console.log('[LiveLobby] Navigating to game room:', room.id);
       onMatchFound(room.id, players);
     } catch (error) {
-      console.error('Error handling match response:', error);
+      console.error('[LiveLobby] Error handling match response:', error);
       toast.error('Failed to start game. Please try again.');
     }
   };
-
 
   const getPlayerDisplayName = (player: any) => {
     return player.display_name || 'Anonymous';

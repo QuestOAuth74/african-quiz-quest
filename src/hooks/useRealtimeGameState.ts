@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -17,6 +18,7 @@ export const useRealtimeGameState = (roomId: string | null) => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [loading, setLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+  const [gameChannel, setGameChannel] = useState<any>(null);
 
   // Initialize game state when room is loaded
   useEffect(() => {
@@ -25,6 +27,8 @@ export const useRealtimeGameState = (roomId: string | null) => {
     const initializeGameState = async () => {
       setLoading(true);
       try {
+        console.log('[RealtimeGameState] Initializing game state for room:', roomId);
+        
         // Fetch current room data
         const { data: roomData } = await supabase
           .from('game_rooms')
@@ -53,17 +57,20 @@ export const useRealtimeGameState = (roomId: string | null) => {
 
           const answeredQuestions = answeredQuestionsData?.map(q => q.question_id) || [];
 
-          setGameState({
+          const initialState = {
             currentTurn: roomData.current_turn_user_id || playersData[0]?.user_id || '',
             currentQuestion: null,
             players: playersData,
             gameStatus: roomData.status as 'waiting' | 'playing' | 'finished',
             scores,
             answeredQuestions
-          });
+          };
+          
+          console.log('[RealtimeGameState] Initial game state:', initialState);
+          setGameState(initialState);
         }
       } catch (error) {
-        console.error('Failed to initialize game state:', error);
+        console.error('[RealtimeGameState] Failed to initialize game state:', error);
         toast.error('Failed to load game state');
       } finally {
         setLoading(false);
@@ -77,20 +84,21 @@ export const useRealtimeGameState = (roomId: string | null) => {
   useEffect(() => {
     if (!roomId) return;
 
+    console.log('[RealtimeGameState] Setting up real-time subscriptions for room:', roomId);
     setConnectionStatus('connecting');
 
-    const gameChannel = supabase
+    const channel = supabase
       .channel(`game-state-${roomId}`)
       .on('broadcast', { event: 'game_update' }, (payload) => {
-        console.log('Game state update received:', payload);
+        console.log('[RealtimeGameState] Game state update received:', payload);
         setGameState(payload.payload);
       })
       .on('broadcast', { event: 'question_selected' }, (payload) => {
-        console.log('Question selected:', payload);
+        console.log('[RealtimeGameState] Question selected:', payload);
         toast.info(`${payload.playerName} selected a question`);
       })
       .on('broadcast', { event: 'answer_submitted' }, (payload) => {
-        console.log('Answer submitted:', payload);
+        console.log('[RealtimeGameState] Answer submitted:', payload);
         toast.info(`${payload.playerName} ${payload.isCorrect ? 'answered correctly' : 'answered incorrectly'}`);
         
         // Update local game state with new score
@@ -112,7 +120,7 @@ export const useRealtimeGameState = (roomId: string | null) => {
         table: 'game_rooms',
         filter: `id=eq.${roomId}`
       }, (payload) => {
-        console.log('Room updated:', payload);
+        console.log('[RealtimeGameState] Room updated:', payload);
         setGameState(prev => {
           if (!prev) return prev;
           return {
@@ -128,7 +136,7 @@ export const useRealtimeGameState = (roomId: string | null) => {
         table: 'game_room_players',
         filter: `room_id=eq.${roomId}`
       }, (payload) => {
-        console.log('Player updated:', payload);
+        console.log('[RealtimeGameState] Player updated:', payload);
         setGameState(prev => {
           if (!prev) return prev;
           const updatedPlayers = prev.players.map(player => 
@@ -152,7 +160,7 @@ export const useRealtimeGameState = (roomId: string | null) => {
         table: 'game_room_questions',
         filter: `room_id=eq.${roomId}`
       }, (payload) => {
-        console.log('Question answered:', payload);
+        console.log('[RealtimeGameState] Question answered:', payload);
         if (payload.new.is_answered) {
           setGameState(prev => {
             if (!prev) return prev;
@@ -164,37 +172,49 @@ export const useRealtimeGameState = (roomId: string | null) => {
         }
       })
       .subscribe((status) => {
-        console.log('Channel subscription status:', status);
+        console.log('[RealtimeGameState] Channel subscription status:', status);
         setConnectionStatus(status === 'SUBSCRIBED' ? 'connected' : 'disconnected');
       });
 
+    setGameChannel(channel);
+
     return () => {
-      supabase.removeChannel(gameChannel);
+      console.log('[RealtimeGameState] Cleaning up subscriptions');
+      supabase.removeChannel(channel);
+      setGameChannel(null);
       setConnectionStatus('disconnected');
     };
   }, [roomId]);
 
-  // Broadcast game state update
+  // Broadcast game state update using the stored channel
   const broadcastGameUpdate = useCallback(async (newGameState: GameState) => {
-    if (!roomId) return;
+    if (!roomId || !gameChannel) {
+      console.warn('[RealtimeGameState] Cannot broadcast - no room or channel');
+      return;
+    }
 
-    console.log('Broadcasting game state update:', newGameState);
+    console.log('[RealtimeGameState] Broadcasting game state update:', newGameState);
     
-    const channel = supabase.channel(`game-state-${roomId}`);
-    await channel.send({
-      type: 'broadcast',
-      event: 'game_update',
-      payload: newGameState
-    });
+    try {
+      await gameChannel.send({
+        type: 'broadcast',
+        event: 'game_update',
+        payload: newGameState
+      });
 
-    setGameState(newGameState);
-  }, [roomId]);
+      setGameState(newGameState);
+    } catch (error) {
+      console.error('[RealtimeGameState] Failed to broadcast game update:', error);
+    }
+  }, [roomId, gameChannel]);
 
   // Handle question selection
   const selectQuestion = useCallback(async (questionId: string, categoryId: string, points: number) => {
-    if (!roomId || !user) return;
+    if (!roomId || !user || !gameChannel) return false;
 
     try {
+      console.log('[RealtimeGameState] Selecting question:', { questionId, categoryId, points });
+      
       // Record question selection in database
       const { error } = await supabase
         .from('game_room_questions')
@@ -207,9 +227,8 @@ export const useRealtimeGameState = (roomId: string | null) => {
 
       if (error) throw error;
 
-      // Broadcast to other players
-      const channel = supabase.channel(`game-state-${roomId}`);
-      await channel.send({
+      // Broadcast to other players using the stored channel
+      await gameChannel.send({
         type: 'broadcast',
         event: 'question_selected',
         payload: {
@@ -222,16 +241,19 @@ export const useRealtimeGameState = (roomId: string | null) => {
 
       return true;
     } catch (err: any) {
+      console.error('[RealtimeGameState] Failed to select question:', err);
       toast.error('Failed to select question');
       return false;
     }
-  }, [roomId, user]);
+  }, [roomId, user, gameChannel]);
 
   // Handle answer submission
   const submitAnswer = useCallback(async (questionId: string, isCorrect: boolean, points: number) => {
-    if (!roomId || !user) return;
+    if (!roomId || !user || !gameChannel) return false;
 
     try {
+      console.log('[RealtimeGameState] Submitting answer:', { questionId, isCorrect, points });
+      
       // Update question as answered
       const { error } = await supabase
         .from('game_room_questions')
@@ -265,9 +287,8 @@ export const useRealtimeGameState = (roomId: string | null) => {
 
       if (playerError) throw playerError;
 
-      // Broadcast answer result
-      const channel = supabase.channel(`game-state-${roomId}`);
-      await channel.send({
+      // Broadcast answer result using the stored channel
+      await gameChannel.send({
         type: 'broadcast',
         event: 'answer_submitted',
         payload: {
@@ -281,15 +302,18 @@ export const useRealtimeGameState = (roomId: string | null) => {
 
       return true;
     } catch (err: any) {
+      console.error('[RealtimeGameState] Failed to submit answer:', err);
       toast.error('Failed to submit answer');
       return false;
     }
-  }, [roomId, user]);
+  }, [roomId, user, gameChannel]);
 
   // Get next turn player
   const nextTurn = useCallback(async () => {
     if (!roomId || !gameState) return;
 
+    console.log('[RealtimeGameState] Moving to next turn');
+    
     const currentPlayerIndex = gameState.players.findIndex(p => p.user_id === gameState.currentTurn);
     const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.players.length;
     const nextPlayer = gameState.players[nextPlayerIndex];
