@@ -54,6 +54,13 @@ const TopNavigation = () => {
             Start Quiz
           </Button>
           
+          <Link
+            to="/blog"
+            className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors px-3 py-2 text-sm rounded-md"
+          >
+            Blog
+          </Link>
+          
           <Button
             variant="ghost"
             size="sm"
@@ -173,6 +180,14 @@ const TopNavigation = () => {
                   >
                     <span>Start Quiz</span>
                   </button>
+                  
+                  <Link
+                    to="/blog"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
+                  >
+                    <span>Blog</span>
+                  </Link>
                   
                   <button
                     onClick={() => {

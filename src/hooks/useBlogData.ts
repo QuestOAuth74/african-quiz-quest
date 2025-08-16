@@ -7,16 +7,16 @@ export interface BlogPost {
   title: string;
   slug: string;
   content: any;
-  excerpt?: string;
-  featured_image_url?: string;
-  meta_title?: string;
-  meta_description?: string;
-  keywords?: string[];
+  excerpt?: string | null;
+  featured_image_url?: string | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  keywords?: string[] | null;
   author_id: string;
-  category_id?: string;
-  status: 'draft' | 'published' | 'archived';
-  published_at?: string;
-  reading_time_minutes?: number;
+  category_id?: string | null;
+  status: string;
+  published_at?: string | null;
+  reading_time_minutes?: number | null;
   view_count: number;
   created_at: string;
   updated_at: string;
@@ -76,10 +76,11 @@ export const useBlogData = () => {
 
       const postsWithTags = data?.map(post => ({
         ...post,
+        author: Array.isArray(post.author) ? post.author[0] : post.author,
         tags: post.blog_post_tags?.map((pt: any) => pt.tag) || []
       })) || [];
 
-      setPosts(postsWithTags);
+      setPosts(postsWithTags as BlogPost[]);
     } catch (error: any) {
       toast({
         title: "Error fetching posts",
@@ -127,11 +128,11 @@ export const useBlogData = () => {
     }
   };
 
-  const createPost = async (postData: Partial<BlogPost>) => {
+  const createPost = async (postData: any) => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
-        .insert([postData])
+        .insert(postData)
         .select()
         .single();
       
@@ -153,7 +154,7 @@ export const useBlogData = () => {
     }
   };
 
-  const updatePost = async (id: string, postData: Partial<BlogPost>) => {
+  const updatePost = async (id: string, postData: any) => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
@@ -223,10 +224,11 @@ export const useBlogData = () => {
 
       const postWithTags = {
         ...data,
+        author: Array.isArray(data.author) ? data.author[0] : data.author,
         tags: data.blog_post_tags?.map((pt: any) => pt.tag) || []
       };
 
-      return postWithTags;
+      return postWithTags as BlogPost;
     } catch (error: any) {
       toast({
         title: "Error fetching post",

@@ -9,6 +9,8 @@ import LeaderboardPage from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import { Blog } from "./pages/Blog";
+import { BlogPost } from "./pages/BlogPost";
 import Forum from "./pages/Forum";
 import Profile from "./pages/Profile";
 import Quiz from "./pages/Quiz";
@@ -35,6 +37,8 @@ const App = () => (
             <Route path="/quiz-setup" element={<ProtectedRoute><QuizSetup /></ProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             {/* Catch-all route must be last */}
             <Route path="*" element={<NotFound />} />
           </Routes>

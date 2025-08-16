@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import CategoryManager from "@/components/admin/CategoryManager";
+import { BlogManager } from "@/components/admin/BlogManager";
 import { CSVUpload } from "@/components/admin/CSVUpload";
 import QuestionManager from "@/components/admin/QuestionManager";
 import ForumModeration from "@/components/admin/ForumModeration";
@@ -138,7 +139,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="questions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-card">
+          <TabsList className="grid w-full grid-cols-6 bg-card">
             <TabsTrigger value="questions" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Questions
             </TabsTrigger>
@@ -152,6 +153,9 @@ const AdminDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="categories" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Categories
+            </TabsTrigger>
+            <TabsTrigger value="blog" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              Blog
             </TabsTrigger>
             <TabsTrigger value="moderation" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Moderation
@@ -172,6 +176,10 @@ const AdminDashboard = () => {
           
           <TabsContent value="categories">
             <CategoryManager onStatsUpdate={loadStats} />
+          </TabsContent>
+          
+          <TabsContent value="blog">
+            <BlogManager />
           </TabsContent>
           
           <TabsContent value="moderation">

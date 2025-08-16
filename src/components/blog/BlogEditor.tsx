@@ -36,7 +36,9 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   const [metaDescription, setMetaDescription] = useState(post?.meta_description || '');
   const [keywords, setKeywords] = useState<string[]>(post?.keywords || []);
   const [keywordInput, setKeywordInput] = useState('');
-  const [status, setStatus] = useState(post?.status || 'draft');
+  const [status, setStatus] = useState<'draft' | 'published' | 'archived'>(
+    (post?.status as 'draft' | 'published' | 'archived') || 'draft'
+  );
   const [loading, setLoading] = useState(false);
 
   const editorRef = useRef<HTMLDivElement>(null);
@@ -168,7 +170,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             </div>
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select value={status} onValueChange={setStatus}>
+              <Select value={status} onValueChange={(value) => setStatus(value as 'draft' | 'published' | 'archived')}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

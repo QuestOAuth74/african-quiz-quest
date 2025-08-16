@@ -1160,6 +1160,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_view_count: {
+        Args: { post_id: string }
+        Returns: undefined
+      }
       is_admin: {
         Args: Record<PropertyKey, never> | { user_uuid?: string }
         Returns: boolean
