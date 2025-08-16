@@ -134,7 +134,7 @@ export const BlogPost: React.FC = () => {
 
   const renderContentBlock = (block: any) => {
     switch (block.type) {
-      case 'header':
+      case 'heading':
         const HeaderTag = `h${block.data.level || 2}` as keyof JSX.IntrinsicElements;
         return (
           <HeaderTag
@@ -172,7 +172,7 @@ export const BlogPost: React.FC = () => {
           </figure>
         );
 
-      case 'youtube':
+      case 'video':
         const getYouTubeId = (url: string) => {
           const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
           const match = url.match(regExp);
