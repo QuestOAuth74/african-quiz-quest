@@ -17,7 +17,11 @@ export const useWheelGameState = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  const createGameSession = useCallback(async (player2Id: string) => {
+  const createGameSession = useCallback(async (
+    player2Id?: string, 
+    gameMode: 'single' | 'challenge' | 'live-multiplayer' = 'challenge', 
+    difficulty?: 'easy' | 'medium' | 'hard'
+  ) => {
     if (!user) return null;
 
     try {
@@ -27,12 +31,10 @@ export const useWheelGameState = () => {
       const { data: puzzles, error: puzzleError } = await supabase
         .from('wheel_puzzles')
         .select('*')
-        .eq('is_active', true)
-        .limit(1)
-        .maybeSingle();
+        .eq('is_active', true);
 
       if (puzzleError) throw puzzleError;
-      if (!puzzles) {
+      if (!puzzles || puzzles.length === 0) {
         toast({
           title: "No puzzles available",
           description: "Please contact an admin to add wheel puzzles.",
@@ -41,24 +43,37 @@ export const useWheelGameState = () => {
         return null;
       }
 
-      const puzzle = puzzles;
+      const puzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
+
+      // Create session data
+      const sessionData: any = {
+        player1_id: user.id,
+        current_puzzle_id: puzzle.id,
+        game_mode: gameMode,
+        game_state: {
+          currentPuzzle: puzzle,
+          revealedLetters: [],
+          guessedLetters: [],
+          wheelValue: 0,
+          isSpinning: false,
+          currentPlayerTurn: 1,
+          gamePhase: 'spinning'
+        }
+      };
+
+      if (gameMode === 'single') {
+        sessionData.computer_difficulty = difficulty || 'medium';
+        sessionData.computer_player_data = {
+          name: `Computer (${difficulty?.toUpperCase() || 'MEDIUM'})`,
+          avatar: '🤖'
+        };
+      } else {
+        sessionData.player2_id = player2Id;
+      }
 
       const { data: session, error } = await supabase
         .from('wheel_game_sessions')
-        .insert({
-          player1_id: user.id,
-          player2_id: player2Id,
-          current_puzzle_id: puzzle.id,
-          game_state: {
-            currentPuzzle: puzzle,
-            revealedLetters: [],
-            guessedLetters: [],
-            wheelValue: 0,
-            isSpinning: false,
-            currentPlayerTurn: 1,
-            gamePhase: 'spinning'
-          }
-        })
+        .insert(sessionData)
         .select()
         .single();
 
@@ -345,6 +360,8 @@ export const useWheelGameState = () => {
     guessLetter,
     buyVowel,
     solvePuzzle,
-    switchTurn
+    switchTurn,
+    setGameSession,
+    setGameState
   };
 };

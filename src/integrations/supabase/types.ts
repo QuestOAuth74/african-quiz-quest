@@ -1296,15 +1296,18 @@ export type Database = {
       }
       wheel_game_sessions: {
         Row: {
+          computer_difficulty: string | null
+          computer_player_data: Json | null
           created_at: string
           current_player: number
           current_puzzle_id: string | null
+          game_mode: string
           game_state: Json
           id: string
           player1_id: string
           player1_round_score: number
           player1_score: number
-          player2_id: string
+          player2_id: string | null
           player2_round_score: number
           player2_score: number
           rounds_won_player1: number
@@ -1313,15 +1316,18 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          computer_difficulty?: string | null
+          computer_player_data?: Json | null
           created_at?: string
           current_player?: number
           current_puzzle_id?: string | null
+          game_mode?: string
           game_state?: Json
           id?: string
           player1_id: string
           player1_round_score?: number
           player1_score?: number
-          player2_id: string
+          player2_id?: string | null
           player2_round_score?: number
           player2_score?: number
           rounds_won_player1?: number
@@ -1330,15 +1336,18 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          computer_difficulty?: string | null
+          computer_player_data?: Json | null
           created_at?: string
           current_player?: number
           current_puzzle_id?: string | null
+          game_mode?: string
           game_state?: Json
           id?: string
           player1_id?: string
           player1_round_score?: number
           player1_score?: number
-          player2_id?: string
+          player2_id?: string | null
           player2_round_score?: number
           player2_score?: number
           rounds_won_player1?: number
