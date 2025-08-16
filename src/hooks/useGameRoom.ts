@@ -142,21 +142,8 @@ export const useGameRoom = () => {
         throw new Error('Room not found or game has already started');
       }
 
-      // Check actual player count instead of relying on potentially stale current_player_count
-      const { count: actualPlayerCount, error: countError } = await supabase
-        .from('game_room_players')
-        .select('*', { count: 'exact', head: true })
-        .eq('room_id', roomData.id)
-        .eq('is_active', true);
-
-      if (countError) {
-        console.error('Error counting players:', countError);
-        throw new Error('Failed to check room capacity');
-      }
-
-      console.log(`Room ${roomCode}: stored count = ${roomData.current_player_count}, actual count = ${actualPlayerCount}`);
-
-      if (actualPlayerCount >= roomData.max_players) {
+      // Check if room is full
+      if (roomData.current_player_count >= roomData.max_players) {
         throw new Error('Room is full');
       }
 

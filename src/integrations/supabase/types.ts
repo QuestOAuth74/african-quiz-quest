@@ -882,10 +882,6 @@ export type Database = {
           user_id: string
         }[]
       }
-      fix_room_player_counts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
       generate_room_code: {
         Args: Record<PropertyKey, never>
         Returns: string
