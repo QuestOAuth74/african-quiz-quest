@@ -9,6 +9,7 @@ import { PuzzleBoard } from '@/components/wheel/PuzzleBoard';
 import { GuessInput } from '@/components/wheel/GuessInput';
 import { PlayerScoreboard } from '@/components/wheel/PlayerScoreboard';
 import { WheelGameCompletionModal } from '@/components/wheel/WheelGameCompletionModal';
+import { WheelChallengeCompletionModal } from '@/components/wheel/WheelChallengeCompletionModal';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -525,8 +526,15 @@ const WheelPlay = () => {
 
   // Check if game is completed
   const isGameCompleted = gameSession.status === 'round_complete' && gameState.gamePhase === 'round_end';
-  const winner = gameSession.current_player === 1 ? player1 : player2;
-  const winnerScore = gameSession.current_player === 1 ? gameSession.player1_score : gameSession.player2_score;
+  
+  // Determine winner based on scores, not current player turn
+  const player1Won = gameSession.player1_score > gameSession.player2_score;
+  const player2Won = gameSession.player2_score > gameSession.player1_score;
+  const isTie = gameSession.player1_score === gameSession.player2_score;
+  
+  // Get winner info for single player modal
+  const winner = player1Won ? player1 : player2Won ? player2 : player1; // fallback to player1 for tie
+  const winnerScore = player1Won ? gameSession.player1_score : gameSession.player2_score;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-primary/10">
@@ -613,15 +621,30 @@ const WheelPlay = () => {
           </div>
         )}
 
-        {/* Game Completion Modal */}
-        <WheelGameCompletionModal
-          isOpen={isGameCompleted}
-          winnerName={winner.name}
-          winnerScore={winnerScore}
-          puzzle={gameState.currentPuzzle?.phrase || ''}
-          category={gameState.currentPuzzle?.category || ''}
-          onReturnToLobby={() => navigate('/wheel')}
-        />
+        {/* Game Completion Modals */}
+        {gameSession.game_mode === 'challenge' ? (
+          <WheelChallengeCompletionModal
+            isOpen={isGameCompleted}
+            player1Name={player1.name}
+            player2Name={player2.name}
+            player1Score={gameSession.player1_score}
+            player2Score={gameSession.player2_score}
+            player1Id={gameSession.player1_id}
+            player2Id={gameSession.player2_id || ''}
+            puzzle={gameState.currentPuzzle?.phrase || ''}
+            category={gameState.currentPuzzle?.category || ''}
+            onReturnToLobby={() => navigate('/wheel')}
+          />
+        ) : (
+          <WheelGameCompletionModal
+            isOpen={isGameCompleted}
+            winnerName={winner.name}
+            winnerScore={winnerScore}
+            puzzle={gameState.currentPuzzle?.phrase || ''}
+            category={gameState.currentPuzzle?.category || ''}
+            onReturnToLobby={() => navigate('/wheel')}
+          />
+        )}
       </div>
     </div>
   );
