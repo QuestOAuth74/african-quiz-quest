@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Home, Trophy, MessageCircle, User, Globe, Youtube, Instagram, Heart, Coffee } from 'lucide-react';
+import { Home, Trophy, MessageCircle, User, Globe, Youtube, Instagram, Heart, Coffee, ExternalLink } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -114,6 +114,17 @@ const Footer = () => {
                 >
                   <Coffee className="h-4 w-4" />
                   Buy Me A Coffee
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://linktr.ee/historiaafricana" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Our Linktree
                 </a>
               </li>
             </ul>
