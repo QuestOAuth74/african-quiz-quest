@@ -30,7 +30,7 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
     <div 
       ref={bannerRef}
       className={`relative w-full overflow-hidden ${
-        isMobile ? 'h-[50vh]' : 'h-screen'
+        isMobile ? 'h-[35vh]' : 'h-screen'
       }`}
     >
       {/* Floating Stars Background - Only on Desktop */}
@@ -65,7 +65,7 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
         <img 
           src={imageSrc}
           alt={alt}
-          className="w-full h-full object-cover"
+          className={`w-full h-full ${isMobile ? 'object-contain' : 'object-cover'}`}
           style={{
             filter: 'brightness(1.1) contrast(1.1) saturate(1.2)',
           }}
