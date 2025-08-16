@@ -11,7 +11,7 @@ import { GuessInput } from '@/components/wheel/GuessInput';
 import { PlayerScoreboard } from '@/components/wheel/PlayerScoreboard';
 import { WheelGameCompletionModal } from '@/components/wheel/WheelGameCompletionModal';
 import { WheelChallengeCompletionModal } from '@/components/wheel/WheelChallengeCompletionModal';
-import { ChallengerNameDialog } from '@/components/wheel/ChallengerNameDialog';
+
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -22,7 +22,7 @@ const WheelPlay = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams<{ sessionId: string }>();
-  const [showNameDialog, setShowNameDialog] = useState(false);
+  
   const [soundEnabled, setSoundEnabled] = useState(true);
   
   const gameSessionId = params.sessionId || (location.state as any)?.gameSessionId || null;
@@ -61,14 +61,6 @@ const WheelPlay = () => {
         current_player: gameSession.current_player
       });
       
-      // Check if this is a challenge game and the current user needs to set their name
-      const isPlayer1 = gameSession.player1_id === user.id;
-      const isPlayer2 = gameSession.player2_id === user.id;
-      const isChallengeMode = gameSession.game_mode === 'challenge';
-      
-      if (isChallengeMode && isPlayer1 && !gameSession.player1_name) {
-        setShowNameDialog(true);
-      }
     }
   }, [authLoading, user, gameSessionId, navigate, gameSession]);
 
@@ -736,14 +728,6 @@ const WheelPlay = () => {
           />
         )}
         
-        {/* Name Dialog for Challengers */}
-        {showNameDialog && gameSession && user && (
-          <ChallengerNameDialog
-            gameSessionId={gameSession.id}
-            isPlayer1={gameSession.player1_id === user.id}
-            onComplete={() => setShowNameDialog(false)}
-          />
-        )}
       </div>
     </div>
   );

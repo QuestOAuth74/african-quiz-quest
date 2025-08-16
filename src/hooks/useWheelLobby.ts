@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { LobbyPlayer, WheelGameChallenge } from '@/types/lobby';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { getDisplayName } from '@/lib/username-generator';
 
 export const useWheelLobby = () => {
   const { user } = useAuth();
@@ -119,7 +120,7 @@ export const useWheelLobby = () => {
   }, [user, fetchChallenges]);
 
   // Accept challenge
-  const acceptChallenge = useCallback(async (challengeId: string, playerName: string) => {
+  const acceptChallenge = useCallback(async (challengeId: string) => {
     if (!user) return null;
 
     try {
@@ -169,8 +170,8 @@ export const useWheelLobby = () => {
           current_puzzle_id: puzzle.id,
           status: 'playing',
           game_mode: 'challenge',
-          player1_name: null, // Will be set when challenger joins
-          player2_name: playerName,
+          player1_name: getDisplayName(null, challenge.challenger_id),
+          player2_name: getDisplayName(null, challenge.challenged_id),
           game_state: {
             currentPuzzle: puzzle,
             revealedLetters: [],
