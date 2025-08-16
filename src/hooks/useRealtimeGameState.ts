@@ -36,11 +36,12 @@ export const useRealtimeGameState = (roomId: string | null) => {
           .eq('id', roomId)
           .single();
 
-        // Fetch players
+        // Fetch players with deterministic ordering
         const { data: playersData } = await supabase
           .from('game_room_players')
           .select('*')
-          .eq('room_id', roomId);
+          .eq('room_id', roomId)
+          .order('joined_at', { ascending: true });
 
         // Fetch answered questions
         const { data: answeredQuestionsData } = await supabase
@@ -57,8 +58,19 @@ export const useRealtimeGameState = (roomId: string | null) => {
 
           const answeredQuestions = answeredQuestionsData?.map(q => q.question_id) || [];
 
+          // Determine current turn deterministically
+          const firstTurn = roomData.current_turn_user_id || (playersData?.length ? playersData[0].user_id : '');
+          
+          console.log('🎮 Initializing game state:', {
+            roomId,
+            currentTurnFromDB: roomData.current_turn_user_id,
+            firstPlayerUserId: playersData?.[0]?.user_id,
+            determinedTurn: firstTurn,
+            playersCount: playersData?.length
+          });
+
           const initialState = {
-            currentTurn: roomData.current_turn_user_id || playersData[0]?.user_id || '',
+            currentTurn: firstTurn,
             currentQuestion: null,
             players: playersData,
             gameStatus: roomData.status as 'waiting' | 'playing' | 'finished',

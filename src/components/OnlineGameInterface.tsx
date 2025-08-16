@@ -249,15 +249,17 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     id: category.id,
     name: category.name,
     questions: Array.from({ length: (currentRoom?.game_config?.rowCount || roomDetails?.game_config?.rowCount || 5) }, (_, index) => {
-      const points = (index + 1) * 200;
+      const boardPoints = (index + 1) * 100; // GameBoard expects $100 increments
+      const dbPoints = (index + 1) * 200; // Database stores $200 increments
       const question = questionsData.find(q => 
-        q.category === category.name && q.points === points
+        q.category === category.name && q.points === dbPoints
       );
       
       return {
-        id: question?.id || `${category.id}-${points}`,
-        points,
-        isAnswered: question ? answeredQuestions.has(question.id) : false
+        id: question?.id || `${category.id}-${boardPoints}`,
+        points: boardPoints, // Use board points for display
+        isAnswered: question ? answeredQuestions.has(question.id) : false,
+        hasQuestion: !!question // Explicitly set if question exists
       };
     })
   }));
