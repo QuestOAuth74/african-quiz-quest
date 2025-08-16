@@ -130,18 +130,18 @@ export class CrosswordGenerator {
     return false;
   }
 
-  private findIntersections(word1: string, word2: string): Intersection[] {
+  private findIntersections(candidateWord: string, placedWord: string): Intersection[] {
     const intersections: Intersection[] = [];
     
-    for (let i = 0; i < word1.length; i++) {
-      for (let j = 0; j < word2.length; j++) {
-        if (word1[i] === word2[j]) {
+    for (let candidateIndex = 0; candidateIndex < candidateWord.length; candidateIndex++) {
+      for (let placedIndex = 0; placedIndex < placedWord.length; placedIndex++) {
+        if (candidateWord[candidateIndex] === placedWord[placedIndex]) {
           intersections.push({
             word1Index: 0,
             word2Index: 1,
-            char: word1[i],
-            word1Position: j,
-            word2Position: i
+            char: candidateWord[candidateIndex],
+            word1Position: placedIndex,
+            word2Position: candidateIndex
           });
         }
       }
@@ -217,7 +217,7 @@ export class CrosswordGenerator {
     // Generate intersections
     const intersections = this.generateIntersections(words);
 
-    return {
+    const puzzle: CrosswordPuzzle = {
       id: `puzzle-${Date.now()}`,
       title,
       category,
@@ -232,6 +232,11 @@ export class CrosswordGenerator {
       intersections,
       isCompleted: false
     };
+
+    // Validate spatial logic after puzzle creation
+    this.validatePuzzleSpatialLogic(puzzle);
+
+    return puzzle;
   }
 
   private generateIntersections(words: CrosswordWord[]): CrosswordIntersection[] {
@@ -287,5 +292,22 @@ export class CrosswordGenerator {
     }
     
     return intersections;
+  }
+
+  private async validatePuzzleSpatialLogic(puzzle: CrosswordPuzzle): Promise<void> {
+    try {
+      const { crosswordUtils } = await import('./crosswordUtils');
+      const validation = crosswordUtils.validateSpatialLogic(puzzle);
+      
+      if (!validation.isValid) {
+        console.error('Spatial validation failed for generated puzzle:', validation.errors);
+      }
+      
+      if (validation.warnings.length > 0) {
+        console.warn('Spatial validation warnings:', validation.warnings);
+      }
+    } catch (error) {
+      console.error('Failed to validate puzzle spatial logic:', error);
+    }
   }
 }
