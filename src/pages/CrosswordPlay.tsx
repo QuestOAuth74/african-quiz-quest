@@ -114,6 +114,7 @@ export function CrosswordPlay() {
           grid: puzzleData.grid_data as any,
           words: wordsData.words,
           clues: wordsData.clues,
+          intersections: wordsData.intersections || [], // Fallback to empty array for legacy data
           isCompleted: false,
           startTime: new Date()
         };

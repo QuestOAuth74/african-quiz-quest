@@ -1,4 +1,4 @@
-import { CrosswordPuzzle, CrosswordWord, CrosswordCell, CrosswordClue, CrosswordWordData } from '@/types/crossword';
+import { CrosswordPuzzle, CrosswordWord, CrosswordCell, CrosswordClue, CrosswordWordData, CrosswordIntersection } from '@/types/crossword';
 
 interface PlacedWord {
   word: string;
@@ -214,6 +214,9 @@ export class CrosswordGenerator {
     acrossClues.sort((a, b) => a.number - b.number);
     downClues.sort((a, b) => a.number - b.number);
 
+    // Generate intersections
+    const intersections = this.generateIntersections(words);
+
     return {
       id: `puzzle-${Date.now()}`,
       title,
@@ -226,7 +229,63 @@ export class CrosswordGenerator {
         across: acrossClues,
         down: downClues
       },
+      intersections,
       isCompleted: false
     };
+  }
+
+  private generateIntersections(words: CrosswordWord[]): CrosswordIntersection[] {
+    const intersections: CrosswordIntersection[] = [];
+    
+    for (let i = 0; i < words.length; i++) {
+      for (let j = i + 1; j < words.length; j++) {
+        const word1 = words[i];
+        const word2 = words[j];
+        
+        // Words must have different directions to intersect
+        if (word1.direction === word2.direction) continue;
+        
+        let horizontalWord: CrosswordWord;
+        let verticalWord: CrosswordWord;
+        
+        if (word1.direction === 'across') {
+          horizontalWord = word1;
+          verticalWord = word2;
+        } else {
+          horizontalWord = word2;
+          verticalWord = word1;
+        }
+        
+        // Check if words actually intersect
+        const intersectionX = verticalWord.startX;
+        const intersectionY = horizontalWord.startY;
+        
+        // Validate intersection boundaries
+        if (intersectionX >= horizontalWord.startX && 
+            intersectionX < horizontalWord.startX + horizontalWord.length &&
+            intersectionY >= verticalWord.startY && 
+            intersectionY < verticalWord.startY + verticalWord.length) {
+          
+          // Get the expected letter at intersection
+          const horizontalIndex = intersectionX - horizontalWord.startX;
+          const verticalIndex = intersectionY - verticalWord.startY;
+          const horizontalLetter = horizontalWord.word[horizontalIndex];
+          const verticalLetter = verticalWord.word[verticalIndex];
+          
+          // Letters must match for valid intersection
+          if (horizontalLetter === verticalLetter) {
+            intersections.push({
+              word1Id: word1.id,
+              word2Id: word2.id,
+              x: intersectionX,
+              y: intersectionY,
+              letter: horizontalLetter
+            });
+          }
+        }
+      }
+    }
+    
+    return intersections;
   }
 }

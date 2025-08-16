@@ -32,6 +32,14 @@ export interface CrosswordClue {
   isCompleted: boolean;
 }
 
+export interface CrosswordIntersection {
+  word1Id: string;
+  word2Id: string;
+  x: number;
+  y: number;
+  letter: string;
+}
+
 export interface CrosswordPuzzle {
   id: string;
   title: string;
@@ -44,6 +52,7 @@ export interface CrosswordPuzzle {
     across: CrosswordClue[];
     down: CrosswordClue[];
   };
+  intersections: CrosswordIntersection[];
   isCompleted: boolean;
   startTime?: Date;
   completionTime?: Date;

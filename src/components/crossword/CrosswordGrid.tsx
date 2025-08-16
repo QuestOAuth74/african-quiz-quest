@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { CrosswordPuzzle, CrosswordWord, CrosswordCell } from '@/types/crossword';
+import { CrosswordPuzzle, CrosswordWord, CrosswordCell, CrosswordIntersection } from '@/types/crossword';
 
 interface CrosswordGridProps {
   puzzle: CrosswordPuzzle;
@@ -17,6 +17,7 @@ export function CrosswordGrid({
   className = '' 
 }: CrosswordGridProps) {
   const [grid, setGrid] = useState<CrosswordCell[][]>(puzzle.grid);
+  const [intersectionMap, setIntersectionMap] = useState<Map<string, CrosswordIntersection[]>>(new Map());
   const inputRefs = useRef<(HTMLInputElement | null)[][]>([]);
 
   useEffect(() => {
@@ -25,56 +26,121 @@ export function CrosswordGrid({
     inputRefs.current = Array(puzzle.gridSize).fill(null).map(() => 
       Array(puzzle.gridSize).fill(null)
     );
+    // Build intersection mapping
+    buildIntersectionMap();
   }, [puzzle]);
 
-  const handleCellChange = (x: number, y: number, value: string) => {
-    const newGrid = [...grid];
-    newGrid[y][x] = { ...newGrid[y][x], userInput: value.toUpperCase() };
-    setGrid(newGrid);
+  const buildIntersectionMap = () => {
+    const map = new Map<string, CrosswordIntersection[]>();
+    
+    // Initialize map for each word
+    puzzle.words.forEach(word => {
+      map.set(word.id, []);
+    });
 
-    // Check if word is complete
-    if (selectedWord) {
-      checkWordCompletion(selectedWord, newGrid);
+    // Find all intersections between words
+    for (let i = 0; i < puzzle.words.length; i++) {
+      for (let j = i + 1; j < puzzle.words.length; j++) {
+        const word1 = puzzle.words[i];
+        const word2 = puzzle.words[j];
+        const intersection = findWordIntersection(word1, word2);
+        
+        if (intersection) {
+          map.get(word1.id)?.push(intersection);
+          map.get(word2.id)?.push(intersection);
+        }
+      }
+    }
+    
+    setIntersectionMap(map);
+  };
+
+  const handleCellChange = (x: number, y: number, value: string) => {
+    const upperValue = value.toUpperCase();
+    
+    // Validate the input against intersections before accepting it
+    if (upperValue && !validateCellInput(x, y, upperValue)) {
+      return; // Reject invalid input
     }
 
+    const newGrid = [...grid];
+    newGrid[y][x] = { ...newGrid[y][x], userInput: upperValue };
+    setGrid(newGrid);
+
+    // Check if any words are complete after this change
+    checkAllAffectedWords(x, y, newGrid);
+
     // Auto-advance to next cell
-    if (value && selectedWord) {
+    if (upperValue && selectedWord) {
       advanceToNextCell(x, y, selectedWord);
     }
   };
 
-  const checkWordCompletion = (word: CrosswordWord, currentGrid: CrosswordCell[][]) => {
-    let isComplete = true;
+  const validateCellInput = (x: number, y: number, value: string): boolean => {
+    const expectedLetter = grid[y][x].letter;
     
-    // First, check if the current word is complete
+    // The input must match the expected letter for this cell
+    return value === expectedLetter;
+  };
+
+  const checkAllAffectedWords = (x: number, y: number, currentGrid: CrosswordCell[][]) => {
+    // Find all words that contain this cell
+    const affectedWords = puzzle.words.filter(word => {
+      if (word.direction === 'across') {
+        return y === word.startY && x >= word.startX && x < word.startX + word.length;
+      } else {
+        return x === word.startX && y >= word.startY && y < word.startY + word.length;
+      }
+    });
+
+    // Check completion for each affected word
+    affectedWords.forEach(word => {
+      checkWordCompletion(word, currentGrid);
+    });
+  };
+
+  const checkWordCompletion = (word: CrosswordWord, currentGrid: CrosswordCell[][]) => {
+    // Check if the word is completely filled with correct letters
+    const isWordComplete = isWordCompleteAndValid(word, currentGrid);
+    
+    // Validate all intersections for this word
+    const intersectionsValid = validateWordIntersections(word, currentGrid);
+    
+    if (isWordComplete && intersectionsValid && !word.isCompleted) {
+      onWordComplete(word.id);
+    }
+  };
+
+  const isWordCompleteAndValid = (word: CrosswordWord, currentGrid: CrosswordCell[][]): boolean => {
     for (let i = 0; i < word.length; i++) {
       const cellX = word.direction === 'across' ? word.startX + i : word.startX;
       const cellY = word.direction === 'down' ? word.startY + i : word.startY;
       const cell = currentGrid[cellY][cellX];
       
-      if (cell.userInput !== cell.letter) {
-        isComplete = false;
-        break;
+      // Cell must have user input and it must match the expected letter
+      if (!cell.userInput || cell.userInput !== cell.letter) {
+        return false;
       }
     }
-
-    // Secondary validation: Check all intersecting words to ensure they remain valid
-    if (isComplete) {
-      isComplete = validateIntersectingWords(word, currentGrid);
-    }
-
-    if (isComplete && !word.isCompleted) {
-      onWordComplete(word.id);
-    }
+    return true;
   };
 
-  const validateIntersectingWords = (completedWord: CrosswordWord, currentGrid: CrosswordCell[][]): boolean => {
-    // Get all words that intersect with the completed word
-    const intersectingWords = puzzle.words.filter(w => w.id !== completedWord.id && wordsIntersect(completedWord, w));
+  const validateWordIntersections = (word: CrosswordWord, currentGrid: CrosswordCell[][]): boolean => {
+    const wordIntersections = intersectionMap.get(word.id) || [];
     
-    // Check each intersecting word to ensure it's still valid
-    for (const intersectingWord of intersectingWords) {
-      if (!isWordValid(intersectingWord, currentGrid)) {
+    for (const intersection of wordIntersections) {
+      const cell = currentGrid[intersection.y][intersection.x];
+      
+      // If there's user input at the intersection, it must match the expected letter
+      if (cell.userInput && cell.userInput !== intersection.letter) {
+        return false;
+      }
+      
+      // Check if the intersecting word is also valid
+      const otherWordId = intersection.word1Id === word.id ? intersection.word2Id : intersection.word1Id;
+      const otherWord = puzzle.words.find(w => w.id === otherWordId);
+      
+      if (otherWord && !isWordValid(otherWord, currentGrid)) {
         return false;
       }
     }
@@ -82,27 +148,50 @@ export function CrosswordGrid({
     return true;
   };
 
-  const wordsIntersect = (word1: CrosswordWord, word2: CrosswordWord): boolean => {
-    // Check if two words intersect
-    if (word1.direction === word2.direction) return false;
+  const findWordIntersection = (word1: CrosswordWord, word2: CrosswordWord): CrosswordIntersection | null => {
+    // Words must have different directions to intersect
+    if (word1.direction === word2.direction) return null;
+    
+    let horizontalWord: CrosswordWord;
+    let verticalWord: CrosswordWord;
     
     if (word1.direction === 'across') {
-      // word1 is horizontal, word2 is vertical
-      return (
-        word2.startX >= word1.startX && 
-        word2.startX < word1.startX + word1.length &&
-        word1.startY >= word2.startY && 
-        word1.startY < word2.startY + word2.length
-      );
+      horizontalWord = word1;
+      verticalWord = word2;
     } else {
-      // word1 is vertical, word2 is horizontal
-      return (
-        word1.startX >= word2.startX && 
-        word1.startX < word2.startX + word2.length &&
-        word2.startY >= word1.startY && 
-        word2.startY < word1.startY + word1.length
-      );
+      horizontalWord = word2;
+      verticalWord = word1;
     }
+    
+    // Check if words actually intersect
+    const intersectionX = verticalWord.startX;
+    const intersectionY = horizontalWord.startY;
+    
+    // Validate intersection boundaries
+    if (intersectionX >= horizontalWord.startX && 
+        intersectionX < horizontalWord.startX + horizontalWord.length &&
+        intersectionY >= verticalWord.startY && 
+        intersectionY < verticalWord.startY + verticalWord.length) {
+      
+      // Get the expected letter at intersection
+      const horizontalIndex = intersectionX - horizontalWord.startX;
+      const verticalIndex = intersectionY - verticalWord.startY;
+      const horizontalLetter = horizontalWord.word[horizontalIndex];
+      const verticalLetter = verticalWord.word[verticalIndex];
+      
+      // Letters must match for valid intersection
+      if (horizontalLetter === verticalLetter) {
+        return {
+          word1Id: word1.id,
+          word2Id: word2.id,
+          x: intersectionX,
+          y: intersectionY,
+          letter: horizontalLetter
+        };
+      }
+    }
+    
+    return null;
   };
 
   const isWordValid = (word: CrosswordWord, currentGrid: CrosswordCell[][]): boolean => {
@@ -185,9 +274,18 @@ export function CrosswordGrid({
 
     const isSelected = isCellInSelectedWord(x, y);
     const isHighlighted = isSelected ? "bg-theme-yellow/20 border-theme-yellow" : "bg-background";
-    const hasCorrectAnswer = cell.userInput === cell.letter ? "text-green-600" : "text-foreground";
     
-    return `${baseClasses} ${isHighlighted} ${hasCorrectAnswer} cursor-pointer hover:bg-theme-yellow/10 transition-colors`;
+    // Enhanced validation feedback
+    let validationClass = "text-foreground";
+    if (cell.userInput) {
+      if (cell.userInput === cell.letter) {
+        validationClass = "text-green-600"; // Correct letter
+      } else {
+        validationClass = "text-red-600 bg-red-50"; // Invalid letter
+      }
+    }
+    
+    return `${baseClasses} ${isHighlighted} ${validationClass} cursor-pointer hover:bg-theme-yellow/10 transition-colors`;
   };
 
   return (
