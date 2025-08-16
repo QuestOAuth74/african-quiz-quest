@@ -22,7 +22,7 @@ export function CrosswordGrid({
 
   useEffect(() => {
     setGrid(puzzle.grid);
-    // Initialize refs array
+    // Initialize refs array properly
     inputRefs.current = Array(puzzle.gridSize).fill(null).map(() => 
       Array(puzzle.gridSize).fill(null)
     );
@@ -300,14 +300,18 @@ export function CrosswordGrid({
               {/* Input cell */}
               {!cell.isBlocked ? (
                 <input
-                  ref={el => { if (!inputRefs.current[y]) inputRefs.current[y] = []; inputRefs.current[y][x] = el; }}
+                  ref={el => { 
+                    if (!inputRefs.current[y]) inputRefs.current[y] = [];
+                    inputRefs.current[y][x] = el;
+                  }}
                   type="text"
                   maxLength={1}
-                  value={cell.userInput}
+                  value={cell.userInput || ''}
                   onChange={(e) => handleCellChange(x, y, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, x, y)}
                   className={getCellClasses(cell, x, y)}
                   disabled={puzzle.isCompleted}
+                  autoComplete="off"
                 />
               ) : (
                 <div className={getCellClasses(cell, x, y)} />
