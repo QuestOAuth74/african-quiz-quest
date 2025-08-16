@@ -352,19 +352,10 @@ export const BlogPost: React.FC = () => {
           {/* Content */}
           <Card>
             <CardContent className="p-8">
-              {/* Main Content */}
-              <div className="prose prose-lg max-w-none mb-8">
-                <div className="text-foreground leading-relaxed whitespace-pre-wrap">
-                  {post.content.mainContent}
-                </div>
+              {/* Content Blocks */}
+              <div className="prose prose-lg max-w-none">
+                {post.content.blocks?.map(renderContentBlock)}
               </div>
-
-              {/* Additional Content Blocks */}
-              {post.content.blocks && post.content.blocks.length > 0 && (
-                <div className="prose prose-lg max-w-none border-t pt-6">
-                  {post.content.blocks.map(renderContentBlock)}
-                </div>
-              )}
 
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
