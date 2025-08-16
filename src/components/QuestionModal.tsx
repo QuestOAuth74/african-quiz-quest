@@ -55,7 +55,13 @@ const QuestionModal = ({
   const [isTimerActive, setIsTimerActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
-
+  const safetyTimeoutRef = useRef<number | null>(null);
+  const clearSafetyTimeout = () => {
+    if (safetyTimeoutRef.current) {
+      clearTimeout(safetyTimeoutRef.current);
+      safetyTimeoutRef.current = null;
+    }
+  };
   useEffect(() => {
     if (isOpen && question) {
       setSelectedOption(null);
@@ -67,8 +73,25 @@ const QuestionModal = ({
       const shouldStartTimer = (gameMode === 'multiplayer' || gameMode === 'online-multiplayer') && currentPlayer !== "Computer";
       console.log('[QuestionModal] Timer init', { isOpen, qId: question?.id, gameMode, currentPlayer, shouldStartTimer });
       setIsTimerActive(shouldStartTimer);
+
+      // Safety fallback: force timeout after ~30s even if visual timer fails
+      clearSafetyTimeout();
+      if (shouldStartTimer) {
+        safetyTimeoutRef.current = window.setTimeout(() => {
+          console.log('[QuestionModal] Safety timeout fired', { qId: question.id });
+          handleTimerTimeout();
+        }, 30500);
+      }
+    } else {
+      // Modal closed or no question
+      setIsTimerActive(false);
+      clearSafetyTimeout();
     }
-  }, [isOpen, question, gameMode, currentPlayer]);
+
+    return () => {
+      clearSafetyTimeout();
+    };
+  }, [isOpen, question, gameMode, currentPlayer, handleTimerTimeout]);
 
   const handleOptionSelect = (optionId: string) => {
     soundEffects.playButtonClick();
@@ -78,6 +101,7 @@ const QuestionModal = ({
   const handleSkip = () => {
     soundEffects.playButtonClick();
     setIsTimerActive(false); // Stop timer on skip
+    clearSafetyTimeout();
     setHasAnswered(true);
     onAnswer('skip');
   };
@@ -85,6 +109,7 @@ const QuestionModal = ({
   const handleSubmit = () => {
     if (selectedOption !== null) {
       setIsTimerActive(false); // Stop timer on manual submission
+      clearSafetyTimeout();
       // Find the index of the selected option in the options array
       const answerIndex = question.options?.findIndex(opt => opt.id === selectedOption) ?? -1;
       setSelectedAnswerIndex(answerIndex);
@@ -104,8 +129,9 @@ const QuestionModal = ({
     }
   };
 
-  const handleTimerTimeout = () => {
+  function handleTimerTimeout() {
     setIsTimerActive(false);
+    clearSafetyTimeout();
     setHasAnswered(true);
     setShowAnswer(true);
     gameAudio.playWrongAnswer(); // Timeout is considered incorrect
@@ -115,10 +141,11 @@ const QuestionModal = ({
       variant: "destructive",
     });
     onAnswer('timeout');
-  };
+  }
 
   const handlePass = () => {
     setIsTimerActive(false); // Stop timer on pass
+    clearSafetyTimeout();
     setHasAnswered(true);
     setShowAnswer(true);
     onAnswer('pass');
@@ -137,6 +164,7 @@ const QuestionModal = ({
     setShowAnswer(false);
     setHasAnswered(false);
     setSelectedAnswerIndex(null);
+    clearSafetyTimeout();
     onClose();
   };
 
@@ -357,9 +385,14 @@ const QuestionModal = ({
                 key={question.id}
                 isActive={isTimerActive}
                 onTimeout={handleTimerTimeout}
-                onStop={() => setIsTimerActive(false)}
+                onStop={() => { setIsTimerActive(false); clearSafetyTimeout(); }}
                 gameMode={gameMode}
               />
+              {(gameMode === 'multiplayer' || gameMode === 'online-multiplayer') && !isTimerActive && (
+                <div className="text-center text-xs text-muted-foreground mt-1">
+                  30 seconds to answer
+                </div>
+              )}
             </div>
           )}
 
