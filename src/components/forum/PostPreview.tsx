@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MessageCircle, ThumbsUp, Eye, Calendar } from 'lucide-react';
 import { UserAvatar } from '@/components/UserAvatar';
 import { UserBadges } from '@/components/UserBadges';
+import { MessageButton } from './MessageButton';
 import { getDisplayName } from '@/lib/username-generator';
 
 interface PostPreviewProps {
@@ -101,15 +102,22 @@ const PostPreview = ({
             </div>
           </div>
           
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onViewPost}
-            className="flex items-center gap-1 h-8"
-          >
-            <Eye className="h-3 w-3" />
-            <span className="text-xs">View</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <MessageButton 
+              recipientId={post.user_id}
+              recipientName={getDisplayName(post.profiles?.display_name, post.user_id)}
+              className="h-8"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onViewPost}
+              className="flex items-center gap-1 h-8"
+            >
+              <Eye className="h-3 w-3" />
+              <span className="text-xs">View</span>
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
