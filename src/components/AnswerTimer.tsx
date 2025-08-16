@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { Clock, AlertTriangle } from "lucide-react";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 
@@ -16,6 +15,18 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
   const [isVisible, setIsVisible] = useState(false);
   const soundEffects = useSoundEffects();
 
+  // Refs to avoid resetting interval when props/objects change identity
+  const onTimeoutRef = useRef(onTimeout);
+  const soundRef = useRef(soundEffects);
+
+  useEffect(() => {
+    onTimeoutRef.current = onTimeout;
+  }, [onTimeout]);
+
+  useEffect(() => {
+    soundRef.current = soundEffects;
+  }, [soundEffects]);
+
   useEffect(() => {
     // Show timer for multiplayer modes when active
     if (isActive && (gameMode === 'multiplayer' || gameMode === 'online-multiplayer')) {
@@ -26,14 +37,14 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
         setTimeLeft(prev => {
           // Audio warnings
           if (prev === 11) {
-            soundEffects.playTimerTick(); // 10 seconds warning
+            soundRef.current?.playTimerTick(); // 10 seconds warning
           } else if (prev === 6) {
-            soundEffects.playTimerTick(); // 5 seconds warning
+            soundRef.current?.playTimerTick(); // 5 seconds warning
           }
           
           if (prev <= 1) {
             clearInterval(timer);
-            onTimeout();
+            onTimeoutRef.current?.();
             return 0;
           }
           return prev - 1;
@@ -47,7 +58,8 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
       setIsVisible(false);
       onStop?.();
     }
-  }, [isActive, gameMode, onTimeout, onStop, soundEffects]);
+    // Intentionally exclude onTimeout and soundEffects to prevent interval resets
+  }, [isActive, gameMode, onStop]);
 
   // Always show for multiplayer modes when active
   if (!isVisible || !(gameMode === 'multiplayer' || gameMode === 'online-multiplayer')) {
@@ -68,7 +80,7 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
   };
 
   return (
-    <div className="w-full max-w-md mx-auto animate-fade-in mb-4">
+    <div className="w-full max-w-md mx-auto animate-fade-in mb-4 pointer-events-none">
       <div className={`bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-md transition-all duration-300 ${getTimerClasses()}`}>
         <div className="flex items-center justify-center gap-2 mb-2">
           {timeLeft <= 5 ? (
