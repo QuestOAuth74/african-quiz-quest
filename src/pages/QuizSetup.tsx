@@ -16,12 +16,23 @@ interface Category {
   name: string;
 }
 
+type QuestionFilter = 'all' | 'fresh' | 'correct' | 'wrong';
+
+interface QuestionCounts {
+  all: number;
+  fresh: number;
+  correct: number;
+  wrong: number;
+}
+
 const QuizSetup = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState<number>(10);
+  const [questionFilter, setQuestionFilter] = useState<QuestionFilter>('all');
+  const [questionCounts, setQuestionCounts] = useState<QuestionCounts>({ all: 0, fresh: 0, correct: 0, wrong: 0 });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -35,6 +46,12 @@ const QuizSetup = () => {
       loadCategories();
     }
   }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (user && selectedCategories.length > 0) {
+      loadQuestionCounts();
+    }
+  }, [user, selectedCategories]);
 
   const loadCategories = async () => {
     try {
@@ -89,6 +106,51 @@ const QuizSetup = () => {
     setSelectedCategories([]);
   };
 
+  const loadQuestionCounts = async () => {
+    if (!user || selectedCategories.length === 0) return;
+
+    try {
+      let questionsQuery = supabase
+        .from('questions')
+        .select('id')
+        .in('category_id', selectedCategories);
+
+      const { data: allQuestions, error: questionsError } = await questionsQuery;
+      if (questionsError) throw questionsError;
+
+      const allQuestionIds = allQuestions?.map(q => q.id) || [];
+      
+      if (allQuestionIds.length === 0) {
+        setQuestionCounts({ all: 0, fresh: 0, correct: 0, wrong: 0 });
+        return;
+      }
+
+      const { data: attempts, error: attemptsError } = await supabase
+        .from('user_question_attempts')
+        .select('question_id, answered_correctly')
+        .eq('user_id', user.id)
+        .in('question_id', allQuestionIds);
+
+      if (attemptsError) throw attemptsError;
+
+      const attemptedQuestionIds = new Set(attempts?.map(a => a.question_id) || []);
+      const correctQuestionIds = new Set(attempts?.filter(a => a.answered_correctly).map(a => a.question_id) || []);
+      const wrongQuestionIds = new Set(attempts?.filter(a => !a.answered_correctly).map(a => a.question_id) || []);
+
+      const freshCount = allQuestionIds.filter(id => !attemptedQuestionIds.has(id)).length;
+
+      setQuestionCounts({
+        all: allQuestionIds.length,
+        fresh: freshCount,
+        correct: correctQuestionIds.size,
+        wrong: wrongQuestionIds.size
+      });
+    } catch (error) {
+      console.error('Error loading question counts:', error);
+      setQuestionCounts({ all: 0, fresh: 0, correct: 0, wrong: 0 });
+    }
+  };
+
   const handleStartQuiz = () => {
     if (selectedCategories.length === 0) {
       toast({
@@ -102,7 +164,8 @@ const QuizSetup = () => {
     // Navigate to quiz with parameters
     const params = new URLSearchParams({
       categories: selectedCategories.join(','),
-      count: questionCount.toString()
+      count: questionCount.toString(),
+      filter: questionFilter
     });
     navigate(`/quiz?${params.toString()}`);
   };
@@ -222,6 +285,31 @@ const QuizSetup = () => {
                 </CardContent>
               </Card>
 
+              {/* Question Type */}
+              <Card className="jeopardy-card">
+                <CardHeader>
+                  <CardTitle className="text-lg font-orbitron text-accent">
+                    Question Type
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Select value={questionFilter} onValueChange={(value: QuestionFilter) => setQuestionFilter(value)}>
+                    <SelectTrigger className="jeopardy-button">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-theme-yellow/30">
+                      <SelectItem value="all">All Questions ({questionCounts.all})</SelectItem>
+                      <SelectItem value="fresh">Fresh Questions Only ({questionCounts.fresh})</SelectItem>
+                      <SelectItem value="correct">Previously Correct ({questionCounts.correct})</SelectItem>
+                      <SelectItem value="wrong">Previously Wrong ({questionCounts.wrong})</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Filter questions based on your previous performance
+                  </p>
+                </CardContent>
+              </Card>
+
               {/* Quiz Summary */}
               <Card className="jeopardy-card">
                 <CardHeader>
@@ -248,6 +336,16 @@ const QuizSetup = () => {
                     <Label className="text-sm font-medium text-muted-foreground">Questions</Label>
                     <p className="text-sm text-theme-yellow font-medium">
                       {questionCount} questions
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Question Type</Label>
+                    <p className="text-sm text-theme-yellow font-medium">
+                      {questionFilter === 'all' ? 'All Questions' :
+                       questionFilter === 'fresh' ? 'Fresh Questions Only' :
+                       questionFilter === 'correct' ? 'Previously Correct' :
+                       'Previously Wrong'}
                     </p>
                   </div>
                   

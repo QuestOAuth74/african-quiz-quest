@@ -39,6 +39,8 @@ interface Category {
   name: string;
 }
 
+type QuestionFilter = 'all' | 'fresh' | 'correct' | 'wrong';
+
 const Quiz = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -83,6 +85,7 @@ const Quiz = () => {
       // Get URL parameters
       const categoriesParam = searchParams.get('categories');
       const countParam = searchParams.get('count');
+      const filterParam = searchParams.get('filter') as QuestionFilter || 'all';
       const selectedCategoryIds = categoriesParam ? categoriesParam.split(',') : [];
       const questionCount = countParam ? parseInt(countParam) : 10;
       
@@ -118,8 +121,41 @@ const Quiz = () => {
       }
       
       if (questionsData && questionsData.length > 0) {
+        let filteredQuestions = questionsData;
+
+        // Apply question filtering based on user attempts
+        if (filterParam !== 'all') {
+          const { data: attempts, error: attemptsError } = await supabase
+            .from('user_question_attempts')
+            .select('question_id, answered_correctly')
+            .eq('user_id', user.id)
+            .in('question_id', questionsData.map(q => q.id));
+
+          if (attemptsError) {
+            console.error('Error loading user attempts:', attemptsError);
+            throw attemptsError;
+          }
+
+          const attemptedQuestionIds = new Set(attempts?.map(a => a.question_id) || []);
+          const correctQuestionIds = new Set(attempts?.filter(a => a.answered_correctly).map(a => a.question_id) || []);
+          const wrongQuestionIds = new Set(attempts?.filter(a => !a.answered_correctly).map(a => a.question_id) || []);
+
+          filteredQuestions = questionsData.filter(question => {
+            switch (filterParam) {
+              case 'fresh':
+                return !attemptedQuestionIds.has(question.id);
+              case 'correct':
+                return correctQuestionIds.has(question.id);
+              case 'wrong':
+                return wrongQuestionIds.has(question.id);
+              default:
+                return true;
+            }
+          });
+        }
+
         // Shuffle questions client-side and take the requested number
-        const shuffledQuestions = [...questionsData].sort(() => Math.random() - 0.5).slice(0, questionCount);
+        const shuffledQuestions = [...filteredQuestions].sort(() => Math.random() - 0.5).slice(0, questionCount);
         setQuestions(shuffledQuestions);
         // Load options from the joined data (unified with Jeopardy)
         if (shuffledQuestions[0]?.question_options) {
