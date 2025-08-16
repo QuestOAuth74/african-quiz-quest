@@ -11,6 +11,7 @@ import { ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { WheelGameSession, GameState } from '@/types/wheel';
 
+// Wheel game play component for two-player matches
 const WheelPlay = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
