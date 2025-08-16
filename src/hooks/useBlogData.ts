@@ -54,14 +54,7 @@ export const useBlogData = () => {
       setLoading(true);
       let query = supabase
         .from('blog_posts')
-        .select(`
-          *,
-          category:categories(*),
-          author:profiles!blog_posts_author_id_fkey(display_name, email),
-          blog_post_tags(
-            tag:blog_tags(*)
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (status) {
@@ -72,13 +65,9 @@ export const useBlogData = () => {
       
       if (error) throw error;
 
-      const postsWithTags = data?.map(post => ({
-        ...post,
-        author: Array.isArray(post.author) ? post.author[0] : post.author,
-        tags: post.blog_post_tags?.map((pt: any) => pt.tag) || []
-      })) || [];
+      const postsList = (data || []) as BlogPost[];
 
-      setPosts(postsWithTags as BlogPost[]);
+      setPosts(postsList);
     } catch (error: any) {
       toast({
         title: "Error fetching posts",
