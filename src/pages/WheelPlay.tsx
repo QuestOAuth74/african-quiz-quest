@@ -43,7 +43,18 @@ const WheelPlay = () => {
       navigate('/wheel', { replace: true });
       return;
     }
-  }, [authLoading, user, gameSessionId, navigate]);
+
+    // Debug logging for game session details
+    if (gameSession) {
+      console.log('WheelPlay session loaded:', {
+        id: gameSession.id,
+        game_mode: gameSession.game_mode,
+        player1_id: gameSession.player1_id,
+        player2_id: gameSession.player2_id,
+        current_player: gameSession.current_player
+      });
+    }
+  }, [authLoading, user, gameSessionId, navigate, gameSession]);
 
   const switchTurn = async () => {
     if (!gameSession) return;
@@ -461,12 +472,13 @@ const WheelPlay = () => {
     return false;
   };
 
-  // Initialize computer player (with safety checks for multiplayer games)
+  // Initialize computer player (only enabled for single-player games)
   const computerPlayer = useComputerPlayer({
     difficulty: (gameSession?.computer_difficulty as 'easy' | 'medium' | 'hard') || 'medium',
     currentPuzzle: gameState.currentPuzzle,
     gameState,
     gameMode: gameSession?.game_mode,
+    enabled: gameSession?.game_mode === 'single',
     onSpin: handleSpin,
     onGuessLetter: handleGuessLetter,
     onBuyVowel: handleBuyVowel,
