@@ -8,6 +8,7 @@ import { WheelComponent } from '@/components/wheel/WheelComponent';
 import { PuzzleBoard } from '@/components/wheel/PuzzleBoard';
 import { GuessInput } from '@/components/wheel/GuessInput';
 import { PlayerScoreboard } from '@/components/wheel/PlayerScoreboard';
+import { WheelGameCompletionModal } from '@/components/wheel/WheelGameCompletionModal';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -521,6 +522,11 @@ const WheelPlay = () => {
     ? gameSession.player1_round_score 
     : gameSession.player2_round_score;
 
+  // Check if game is completed
+  const isGameCompleted = gameSession.status === 'round_complete' && gameState.gamePhase === 'round_end';
+  const winner = gameSession.current_player === 1 ? player1 : player2;
+  const winnerScore = gameSession.current_player === 1 ? gameSession.player1_score : gameSession.player2_score;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-primary/10">
       <div className="container mx-auto px-4 py-6">
@@ -588,7 +594,7 @@ const WheelPlay = () => {
         </div>
 
         {/* Game Status Messages */}
-        {!isCurrentPlayerTurn() && (
+        {!isCurrentPlayerTurn() && !isGameCompleted && (
           <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-muted p-4 rounded-lg shadow-lg">
             <p className="text-center font-semibold">
               Waiting for {gameSession.current_player === 1 ? player1.name : player2.name}'s turn...
@@ -597,7 +603,7 @@ const WheelPlay = () => {
         )}
 
         {/* Computer thinking indicator */}
-        {gameSession?.game_mode === 'single' && gameSession.current_player === 2 && computerPlayer.isThinking && (
+        {gameSession?.game_mode === 'single' && gameSession.current_player === 2 && computerPlayer.isThinking && !isGameCompleted && (
           <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg">
             <p className="text-center font-semibold flex items-center space-x-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
@@ -605,6 +611,16 @@ const WheelPlay = () => {
             </p>
           </div>
         )}
+
+        {/* Game Completion Modal */}
+        <WheelGameCompletionModal
+          isOpen={isGameCompleted}
+          winnerName={winner.name}
+          winnerScore={winnerScore}
+          puzzle={gameState.currentPuzzle?.phrase || ''}
+          category={gameState.currentPuzzle?.category || ''}
+          onReturnToLobby={() => navigate('/wheel')}
+        />
       </div>
     </div>
   );
