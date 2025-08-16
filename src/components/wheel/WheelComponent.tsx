@@ -34,20 +34,25 @@ export const WheelComponent: React.FC<WheelComponentProps> = ({
     if (disabled || isSpinning) return;
 
     const segmentAngle = 360 / WHEEL_SEGMENTS.length;
-    const randomSpin = Math.random() * 360 + 3600; // More rotations for dramatic effect
-    const finalRotation = (rotation + randomSpin) % 360;
     
-    setRotation(rotation + randomSpin);
+    // First randomly select a segment to land on
+    const randomSegmentIndex = Math.floor(Math.random() * WHEEL_SEGMENTS.length);
+    const selectedSegment = WHEEL_SEGMENTS[randomSegmentIndex];
+    
+    // Calculate the target angle for this segment (center of the segment)
+    const targetSegmentAngle = randomSegmentIndex * segmentAngle + segmentAngle / 2;
+    
+    // Add multiple full rotations (8-12 spins) for dramatic effect
+    const extraRotations = 8 + Math.random() * 4; // 8-12 full rotations
+    const totalRotation = extraRotations * 360 + (360 - targetSegmentAngle);
+    
+    // Set the new rotation
+    setRotation(rotation + totalRotation);
 
-    // Calculate which segment the wheel landed on
-    const normalizedRotation = (360 - finalRotation) % 360;
-    const segmentIndex = Math.floor(normalizedRotation / segmentAngle);
-    const selectedSegment = WHEEL_SEGMENTS[segmentIndex];
-
-    // Delay to match 5-second animation
+    // Delay to match animation duration and call onSpin with the predetermined segment
     setTimeout(() => {
       onSpin(selectedSegment.value);
-    }, 5000);
+    }, 4000);
   };
 
   const segmentAngle = 360 / WHEEL_SEGMENTS.length;
@@ -83,7 +88,7 @@ export const WheelComponent: React.FC<WheelComponentProps> = ({
             className="drop-shadow-2xl"
             style={{
               transform: `rotate(${rotation}deg)`,
-              transition: isSpinning ? 'transform 5s cubic-bezier(0.17, 0.67, 0.12, 1.12)' : 'none',
+              transition: isSpinning ? 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none',
               filter: isSpinning ? 'brightness(1.2) saturate(1.3)' : 'brightness(1.1) saturate(1.1)'
             }}
           >
