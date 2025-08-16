@@ -205,27 +205,14 @@ export const useBlogData = () => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select(`
-          *,
-          category:categories(*),
-          author:profiles!blog_posts_author_id_fkey(display_name, email),
-          blog_post_tags(
-            tag:blog_tags(*)
-          )
-        `)
+        .select('*')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
       
       if (error) throw error;
 
-      const postWithTags = {
-        ...data,
-        author: Array.isArray(data.author) ? data.author[0] : data.author,
-        tags: data.blog_post_tags?.map((pt: any) => pt.tag) || []
-      };
-
-      return postWithTags as BlogPost;
+      return data as BlogPost;
     } catch (error: any) {
       toast({
         title: "Error fetching post",
