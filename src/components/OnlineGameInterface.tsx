@@ -120,31 +120,51 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
         // Load questions for each category
         const allQuestions: any[] = [];
         const rowCount = config.rowCount || 5;
+        
+        // Generate the expected point values (DB uses 200-point increments)
+        const expectedPoints = Array.from({ length: rowCount }, (_, index) => (index + 1) * 200);
+        
+        console.log('🎯 Loading questions for categories:', categoryData.map(c => c.name));
+        console.log('🎯 Expected point values:', expectedPoints);
+        
         for (const category of categoryData) {
-          const { data: questions } = await supabase
-            .from('questions')
-            .select(`
-              *,
-              question_options (*)
-            `)
-            .eq('category_id', category.id)
-            .limit(rowCount);
+          // Fetch questions for each expected point value
+          for (const points of expectedPoints) {
+            const { data: questions } = await supabase
+              .from('questions')
+              .select(`
+                *,
+                question_options (*)
+              `)
+              .eq('category_id', category.id)
+              .eq('points', points)
+              .limit(1);
 
-          if (questions) {
-            const formattedQuestions = questions.map(q => ({
-              ...q,
-              category: category.name,
-              options: q.question_options?.map((opt: any) => ({
-                id: opt.id,
-                text: opt.text,
-                option_type: opt.option_type
-              })) || []
-            }));
-            allQuestions.push(...formattedQuestions);
+            if (questions && questions.length > 0) {
+              const question = questions[0];
+              const formattedQuestion = {
+                ...question,
+                category: category.name,
+                options: question.question_options?.map((opt: any) => ({
+                  id: opt.id,
+                  text: opt.text,
+                  option_type: opt.option_type
+                })) || []
+              };
+              allQuestions.push(formattedQuestion);
+            } else {
+              console.warn(`🚨 No question found for category "${category.name}" with ${points} points`);
+            }
           }
         }
 
-        console.log('Loaded questions:', allQuestions.length);
+        console.log('✅ Loaded questions:', allQuestions.length, 'questions');
+        console.log('📋 Questions by category:', 
+          categoryData.map(cat => ({
+            category: cat.name,
+            count: allQuestions.filter(q => q.category === cat.name).length
+          }))
+        );
         setQuestionsData(allQuestions);
       } catch (error) {
         console.error('Failed to load questions:', error);
@@ -255,14 +275,36 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
         q.category === category.name && q.points === dbPoints
       );
       
-      return {
+      const questionObj = {
         id: question?.id || `${category.id}-${boardPoints}`,
         points: boardPoints, // Use board points for display
         isAnswered: question ? answeredQuestions.has(question.id) : false,
         hasQuestion: !!question // Explicitly set if question exists
       };
+      
+      console.log(`🎲 Question for ${category.name} $${boardPoints}:`, {
+        found: !!question,
+        questionId: question?.id,
+        dbPoints,
+        isAnswered: questionObj.isAnswered
+      });
+      
+      return questionObj;
     })
   }));
+
+  // Add debug logging for empty boards
+  if (gameBoardCategories.length > 0) {
+    const totalQuestions = gameBoardCategories.reduce((sum, cat) => sum + cat.questions.filter(q => q.hasQuestion).length, 0);
+    console.log('🎮 GameBoard data:', {
+      categories: gameBoardCategories.length,
+      totalQuestions,
+      questionsPerCategory: gameBoardCategories.map(cat => ({
+        name: cat.name,
+        questions: cat.questions.filter(q => q.hasQuestion).length
+      }))
+    });
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
