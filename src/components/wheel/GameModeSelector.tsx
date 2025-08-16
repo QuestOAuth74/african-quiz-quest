@@ -26,7 +26,7 @@ export const GameModeSelector = ({ onSelectMode }: GameModeSelectorProps) => {
     {
       id: 'single',
       title: 'Single Player',
-      description: 'Play against an AI opponent',
+      description: 'Test your knowledge against an intelligent AI opponent',
       icon: Bot,
       color: 'bg-gradient-to-br from-primary/20 to-primary/10',
       onClick: handleSinglePlayer
@@ -34,24 +34,16 @@ export const GameModeSelector = ({ onSelectMode }: GameModeSelectorProps) => {
     {
       id: 'challenge',
       title: 'Challenge Friends',
-      description: 'Send direct challenges to specific players',
+      description: 'Send direct challenges to specific players online',
       icon: Users,
       color: 'bg-gradient-to-br from-secondary/20 to-secondary/10',
       onClick: () => onSelectMode('challenge')
-    },
-    {
-      id: 'live-multiplayer',
-      title: 'Quick Match',
-      description: 'Find a random opponent online',
-      icon: Zap,
-      color: 'bg-gradient-to-br from-accent/20 to-accent/10',
-      onClick: () => onSelectMode('live-multiplayer')
     }
   ];
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 max-w-4xl mx-auto">
         {modes.map((mode) => {
           const IconComponent = mode.icon;
           return (
