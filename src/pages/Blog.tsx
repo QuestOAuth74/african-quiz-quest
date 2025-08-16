@@ -85,22 +85,25 @@ export const Blog: React.FC = () => {
               <BookOpen className="h-12 w-12" />
               <h1 className="text-5xl md:text-7xl font-bold">Historia Africana</h1>
             </div>
-            <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto leading-relaxed">
-              Discover the rich tapestry of African history through captivating stories, 
-              scholarly insights, and cultural treasures
+            <h2 className="text-2xl md:text-3xl font-semibold mb-4">Blog</h2>
+            <p className="text-xl md:text-2xl font-light max-w-4xl mx-auto leading-relaxed mb-6">
+              Welcome to our exploration of Africa's remarkable past. Here, we share compelling narratives, 
+              historical insights, and cultural discoveries that illuminate the continent's diverse heritage. 
+              From ancient civilizations to modern movements, every story reveals the depth and richness 
+              of African history.
             </p>
             <div className="flex flex-wrap justify-center gap-8 mt-8 text-sm">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                <span>Expert Contributors</span>
+                <span>Expert Historians</span>
               </div>
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                <span>Weekly Updates</span>
+                <span>New Stories Weekly</span>
               </div>
               <div className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                <span>In-Depth Research</span>
+                <span>Authentic Research</span>
               </div>
             </div>
           </div>
