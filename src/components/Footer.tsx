@@ -147,6 +147,14 @@ const Footer = () => {
                   Play Trivia
                 </Link>
               </li>
+              <li>
+                <Link 
+                  to="/about" 
+                  className="text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  About Us
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

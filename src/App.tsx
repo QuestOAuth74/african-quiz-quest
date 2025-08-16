@@ -15,6 +15,7 @@ import Forum from "./pages/Forum";
 import Profile from "./pages/Profile";
 import Quiz from "./pages/Quiz";
 import QuizSetup from "./pages/QuizSetup";
+import About from "./pages/About";
 import Footer from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/about" element={<About />} />
             {/* Catch-all route must be last */}
             <Route path="*" element={<NotFound />} />
           </Routes>
