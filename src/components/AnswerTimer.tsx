@@ -17,10 +17,14 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
   const soundEffects = useSoundEffects();
 
   useEffect(() => {
+    console.log('AnswerTimer useEffect triggered:', { isActive, gameMode, isVisible });
+    
     // Only show timer for multiplayer modes
     if (isActive && (gameMode === 'multiplayer' || gameMode === 'online-multiplayer')) {
+      console.log('Timer should be active - starting timer');
       setTimeLeft(30);
       setIsVisible(true);
+      console.log('Timer visibility set to true');
       
       const timer = setInterval(() => {
         setTimeLeft(prev => {
@@ -46,12 +50,18 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
         setIsVisible(false);
       };
     } else {
+      console.log('Timer should not be active:', { isActive, gameMode });
       setIsVisible(false);
       onStop?.();
     }
   }, [isActive, gameMode, onTimeout, onStop, soundEffects]);
 
-  if (!isVisible) return null;
+  console.log('AnswerTimer render:', { isVisible, timeLeft, gameMode });
+  
+  if (!isVisible) {
+    console.log('Timer not visible, returning null');
+    return null;
+  }
 
   const progressValue = (timeLeft / 30) * 100;
   const getProgressColor = () => {
