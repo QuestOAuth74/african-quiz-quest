@@ -681,7 +681,7 @@ const Index = () => {
           <TopNavigation />
         
         {/* Global Audio Controls */}
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50">
           <AudioControls />
         </div>
 
@@ -710,7 +710,7 @@ const Index = () => {
           <TopNavigation />
           
           {/* Global Audio Controls */}
-          <div className="fixed top-4 right-4 z-50">
+          <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50">
             <AudioControls />
           </div>
           <div className="pt-16">
@@ -734,7 +734,7 @@ const Index = () => {
         <TopNavigation />
         
         {/* Global Audio Controls */}
-        <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-50">
+        <div className="fixed left-2 top-1/2 -translate-y-1/2 sm:left-4 z-50">
           <AudioControls />
         </div>
         <div className="pt-16 p-2 sm:p-4">
@@ -757,7 +757,7 @@ const Index = () => {
         <TopNavigation />
         
         {/* Global Audio Controls */}
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50">
           <AudioControls />
         </div>
 
@@ -782,7 +782,7 @@ const Index = () => {
       <TopNavigation />
       
       {/* Global Audio Controls */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50">
         <AudioControls />
       </div>
 

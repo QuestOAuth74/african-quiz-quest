@@ -64,17 +64,10 @@ export function AudioControls() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className={`relative overflow-hidden group ${
-              isPlaying 
-                ? 'text-theme-yellow hover:text-theme-yellow-light bg-theme-yellow/20 border-theme-yellow/40 animate-pulse shadow-lg shadow-theme-yellow/30' 
-                : 'text-white hover:text-theme-yellow-light hover:bg-white/10 border border-white/20 bg-black/20'
-            } backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-xl`}
+            className="relative overflow-hidden group text-theme-yellow hover:text-theme-yellow-light bg-theme-yellow/20 border-theme-yellow/40 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-xl"
           >
-            <div className={`absolute inset-0 ${isPlaying ? 'bg-gradient-to-r from-theme-yellow/10 to-theme-yellow/30 animate-fade-in' : ''}`} />
-            <VolumeIcon className={`w-5 h-5 relative z-10 ${isPlaying ? 'animate-bounce' : ''} transition-all duration-200 group-hover:scale-125`} />
-            {isPlaying && (
-              <div className="absolute -inset-1 bg-theme-yellow/20 rounded-full animate-ping" />
-            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-theme-yellow/10 to-theme-yellow/30" />
+            <VolumeIcon className="w-5 h-5 relative z-10 transition-all duration-200 group-hover:scale-125" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-64 bg-card border-border">
