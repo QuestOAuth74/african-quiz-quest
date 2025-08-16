@@ -21,29 +21,40 @@ interface Post {
   };
   profiles: {
     display_name: string | null;
-    email: string;
+    email?: string;
   };
 }
 
 interface PostWithMessagingProps {
   post: Post;
-  userUpvotes?: Set<string>;
-  onToggleUpvote?: (postId: string) => void;
-  onToggleReplies?: (postId: string) => void;
-  showReplies?: boolean;
-  replies?: any[];
+  isUpvoted: boolean;
+  onUpvote: () => void;
+  onToggleReplies: () => void;
+  showReplies: boolean;
+  replies: any[];
+  replyContent: string;
+  onReplyContentChange: (content: string) => void;
+  onSubmitReply: () => void;
+  submittingReply: boolean;
+  formatDate: (dateString: string) => string;
+  isAuthenticated: boolean;
 }
 
 export const PostWithMessaging = ({ 
   post, 
-  userUpvotes = new Set(), 
-  onToggleUpvote,
+  isUpvoted,
+  onUpvote,
   onToggleReplies,
-  showReplies = false,
-  replies = []
+  showReplies,
+  replies,
+  replyContent,
+  onReplyContentChange,
+  onSubmitReply,
+  submittingReply,
+  formatDate,
+  isAuthenticated
 }: PostWithMessagingProps) => {
-  const authorName = post.profiles.display_name || post.profiles.email.split('@')[0];
-  const isUpvoted = userUpvotes.has(post.id);
+  const authorName = post.profiles.display_name || (post.profiles.email ? post.profiles.email.split('@')[0] : 'Anonymous User');
 
   return (
     <Card className="bg-white/10 border-white/20 hover:bg-white/15 transition-all duration-300">
@@ -95,7 +106,7 @@ export const PostWithMessaging = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onToggleUpvote?.(post.id)}
+            onClick={onUpvote}
             className={`flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/10 ${
               isUpvoted ? 'text-blue-400 hover:text-blue-300' : ''
             }`}
@@ -107,13 +118,51 @@ export const PostWithMessaging = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onToggleReplies?.(post.id)}
+            onClick={onToggleReplies}
             className="flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/10"
           >
             <MessageCircle className="w-4 h-4" />
             {replies.length} replies
           </Button>
         </div>
+        
+        {showReplies && (
+          <div className="mt-4 space-y-3">
+            {replies.map((reply: any) => (
+              <div key={reply.id} className="bg-white/5 rounded-lg p-3 border border-white/10">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-medium text-white/90">
+                    {reply.profiles?.display_name || 'Anonymous User'}
+                  </span>
+                  <span className="text-xs text-white/50">
+                    {formatDate(reply.created_at)}
+                  </span>
+                </div>
+                <p className="text-sm text-white/80">{reply.content}</p>
+              </div>
+            ))}
+            
+            {isAuthenticated && (
+              <div className="flex gap-2 mt-3">
+                <input
+                  type="text"
+                  value={replyContent}
+                  onChange={(e) => onReplyContentChange(e.target.value)}
+                  placeholder="Write a reply..."
+                  className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                />
+                <Button
+                  onClick={onSubmitReply}
+                  disabled={submittingReply || !replyContent.trim()}
+                  size="sm"
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  Reply
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
