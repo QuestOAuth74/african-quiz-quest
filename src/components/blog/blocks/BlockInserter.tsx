@@ -10,6 +10,9 @@ import {
   File, 
   Quote, 
   List,
+  AlertTriangle,
+  Code,
+  Minus,
   X 
 } from 'lucide-react';
 import { Block } from './BlockEditor';
@@ -25,13 +28,25 @@ export const BlockInserter: React.FC<BlockInserterProps> = ({ onInsert, onClose 
       type: 'paragraph' as const,
       icon: Type,
       label: 'Paragraph',
-      description: 'Write your thoughts with plain text'
+      description: 'Rich text with formatting'
     },
     {
       type: 'heading' as const,
       icon: Heading1,
       label: 'Heading',
-      description: 'Create section headers and titles'
+      description: 'Create section headers'
+    },
+    {
+      type: 'callout' as const,
+      icon: AlertTriangle,
+      label: 'Callout',
+      description: 'Highlighted info box'
+    },
+    {
+      type: 'code' as const,
+      icon: Code,
+      label: 'Code',
+      description: 'Syntax highlighted code'
     },
     {
       type: 'image' as const,
@@ -46,6 +61,18 @@ export const BlockInserter: React.FC<BlockInserterProps> = ({ onInsert, onClose 
       description: 'Embed YouTube videos'
     },
     {
+      type: 'quote' as const,
+      icon: Quote,
+      label: 'Quote',
+      description: 'Highlight important quotes'
+    },
+    {
+      type: 'list' as const,
+      icon: List,
+      label: 'List',
+      description: 'Bulleted or numbered lists'
+    },
+    {
       type: 'link' as const,
       icon: Link,
       label: 'Link',
@@ -58,16 +85,10 @@ export const BlockInserter: React.FC<BlockInserterProps> = ({ onInsert, onClose 
       description: 'Upload and share files'
     },
     {
-      type: 'quote' as const,
-      icon: Quote,
-      label: 'Quote',
-      description: 'Highlight important quotes'
-    },
-    {
-      type: 'list' as const,
-      icon: List,
-      label: 'List',
-      description: 'Create bulleted or numbered lists'
+      type: 'divider' as const,
+      icon: Minus,
+      label: 'Divider',
+      description: 'Visual content separator'
     }
   ];
 

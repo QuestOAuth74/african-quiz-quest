@@ -10,11 +10,14 @@ import { LinkBlock } from './LinkBlock';
 import { FileBlock } from './FileBlock';
 import { QuoteBlock } from './QuoteBlock';
 import { ListBlock } from './ListBlock';
+import { CalloutBlock } from './CalloutBlock';
+import { CodeBlock } from './CodeBlock';
+import { DividerBlock } from './DividerBlock';
 import { BlockInserter } from './BlockInserter';
 
 export interface Block {
   id: string;
-  type: 'paragraph' | 'heading' | 'image' | 'video' | 'link' | 'file' | 'quote' | 'list';
+  type: 'paragraph' | 'heading' | 'image' | 'video' | 'link' | 'file' | 'quote' | 'list' | 'callout' | 'code' | 'divider';
   data: any;
   order: number;
 }
@@ -140,6 +143,12 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ blocks, onChange }) =>
         return { text: '', author: '', source: '' };
       case 'list':
         return { items: [''], type: 'unordered' };
+      case 'callout':
+        return { type: 'info', title: '', content: '' };
+      case 'code':
+        return { code: '', language: 'javascript', filename: '' };
+      case 'divider':
+        return { style: 'solid' };
       default:
         return {};
     }
@@ -173,6 +182,12 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ blocks, onChange }) =>
         return <QuoteBlock key={block.id} {...blockProps} />;
       case 'list':
         return <ListBlock key={block.id} {...blockProps} />;
+      case 'callout':
+        return <CalloutBlock key={block.id} {...blockProps} />;
+      case 'code':
+        return <CodeBlock key={block.id} {...blockProps} />;
+      case 'divider':
+        return <DividerBlock key={block.id} {...blockProps} />;
       default:
         return null;
     }
