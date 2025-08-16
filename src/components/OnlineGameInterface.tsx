@@ -19,7 +19,7 @@ interface OnlineGameInterfaceProps {
 
 export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps) => {
   const { user } = useAuth();
-  const { currentRoom, players } = useGameRoom();
+  const { currentRoom, players: contextPlayers } = useGameRoom();
   const { 
     gameState, 
     selectQuestion, 
@@ -43,6 +43,7 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     questionId: string;
   } | null>(null);
   const [roomDetails, setRoomDetails] = useState<any>(null);
+  const [players, setPlayers] = useState<any[]>([]);
 
   // Sync local answered questions with real-time data from both sources
   useEffect(() => {
@@ -61,18 +62,63 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
     });
   }, [realtimeAnsweredQuestions, boardState.answeredQuestions]);
 
-  // Ensure we have room details even if coming from Live Lobby (bypass useGameRoom context)
+  // Load room details and players
   useEffect(() => {
     if (!roomId) return;
-    const fetchRoom = async () => {
-      const { data, error } = await supabase
-        .from('game_rooms')
-        .select('*')
-        .eq('id', roomId)
-        .single();
-      if (!error) setRoomDetails(data);
+    
+    const loadRoomData = async () => {
+      try {
+        // Fetch room details
+        const { data: room, error: roomError } = await supabase
+          .from('game_rooms')
+          .select('*')
+          .eq('id', roomId)
+          .single();
+        
+        if (!roomError && room) {
+          setRoomDetails(room);
+        }
+
+        // Fetch players for this room
+        const { data: roomPlayers, error: playersError } = await supabase
+          .from('game_room_players')
+          .select('*')
+          .eq('room_id', roomId)
+          .eq('is_active', true)
+          .order('joined_at');
+
+        if (!playersError && roomPlayers) {
+          console.log('🎮 Loaded players:', roomPlayers);
+          setPlayers(roomPlayers);
+        }
+      } catch (error) {
+        console.error('Error loading room data:', error);
+      }
     };
-    fetchRoom();
+
+    loadRoomData();
+
+    // Set up real-time subscription for player updates
+    const playersChannel = supabase
+      .channel(`players_${roomId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'game_room_players',
+          filter: `room_id=eq.${roomId}`
+        },
+        (payload) => {
+          console.log('🔄 Player update:', payload);
+          loadRoomData(); // Reload players on any change
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(playersChannel);
+    };
   }, [roomId]);
 
   // Load questions based on room configuration
@@ -355,28 +401,64 @@ export const OnlineGameInterface = ({ roomId, onBack }: OnlineGameInterfaceProps
               </div>
             </div>
           </div>
-          
-          {/* Player Scores */}
-          <div className="flex gap-4">
-            {players.map((player) => {
-              // Use live scores from gameState, fallback to player.score
-              const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
-              
-              return (
-                <Card key={player.id} className="bg-white/10 border-white/20">
-                  <CardContent className="p-3">
-                    <div className="flex items-center gap-2 text-white">
-                      {player.is_host && <Crown className="w-4 h-4 text-yellow-400" />}
-                      <span className="font-medium">{player.player_name}</span>
-                      <Badge variant="secondary">${currentScore}</Badge>
-                      {gameState?.currentTurn === player.user_id && (
-                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          {/* Player Scores - Make more prominent */}
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <h3 className="text-white font-semibold mb-3 text-center">Live Scores</h3>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {(players.length > 0 ? players : contextPlayers).map((player) => {
+                // Use live scores from gameState, fallback to player.score
+                const currentScore = gameState?.scores?.[player.user_id] ?? player.score ?? 0;
+                const isCurrentTurn = gameState?.currentTurn === player.user_id;
+                
+                console.log(`🎯 Player ${player.player_name} score:`, {
+                  gameStateScore: gameState?.scores?.[player.user_id],
+                  playerScore: player.score,
+                  finalScore: currentScore,
+                  isCurrentTurn
+                });
+                
+                return (
+                  <Card 
+                    key={player.id || player.user_id} 
+                    className={`${
+                      isCurrentTurn 
+                        ? 'bg-yellow-500/20 border-yellow-400/50 ring-2 ring-yellow-400/30' 
+                        : 'bg-white/10 border-white/20'
+                    } transition-all duration-300`}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex flex-col items-center gap-2 text-white min-w-[120px]">
+                        <div className="flex items-center gap-2">
+                          {player.is_host && <Crown className="w-4 h-4 text-yellow-400" />}
+                          <span className="font-medium text-sm">{player.player_name}</span>
+                        </div>
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-lg px-3 py-1 font-bold ${
+                            isCurrentTurn ? 'bg-yellow-400 text-black' : 'bg-blue-500 text-white'
+                          }`}
+                        >
+                          ${currentScore.toLocaleString()}
+                        </Badge>
+                        {isCurrentTurn && (
+                          <div className="flex items-center gap-1 text-xs text-yellow-300">
+                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                            Your Turn
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            
+            {/* Debug info */}
+            {players.length === 0 && contextPlayers.length === 0 && (
+              <div className="text-center text-yellow-400 text-sm mt-2">
+                Loading players...
+              </div>
+            )}
           </div>
         </div>
       </div>
