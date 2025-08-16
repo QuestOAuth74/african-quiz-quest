@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Play, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import TopNavigation from "@/components/TopNavigation";
 
 interface Category {
   id: string;
@@ -186,7 +187,8 @@ const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProp
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light overflow-auto">
-      <div className="container mx-auto px-4 py-8">
+      <TopNavigation />
+      <div className="container mx-auto px-4 pt-20 pb-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
