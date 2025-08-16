@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Clock, Zap, Crown, ArrowLeft, Send, Check, X, Settings } from 'lucide-react';
+import { Users, Clock, Zap, ArrowLeft, Send, Check, X, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,8 +33,7 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
     updatePlayerStatus
   } = usePlayerLobby();
   
-  const { createRoom, addPlayerToRoom, findActiveGame, loading: roomLoading } = useGameRoom();
-  const [activeGame, setActiveGame] = useState<any>(null);
+  const { createRoom, addPlayerToRoom, loading: roomLoading } = useGameRoom();
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [challengeTarget, setChallengeTarget] = useState<any>(null);
 
@@ -66,37 +65,34 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
     );
     
     if (acceptedRequests.length > 0) {
-      // For each accepted request, find an active game room to join
+      // For each accepted request, join the game that was created by the accepter
       acceptedRequests.forEach(async (request) => {
         try {
-          // Try to find an active game for this user
-          const game = await findActiveGame();
-          if (game && game.status === 'active') {
-            const target = onlinePlayers.find(p => p.user_id === request.target_id);
-            const players = [
-              { 
-                id: user?.id, 
-                name: 'You', 
-                score: 0,
-                user_id: user?.id 
-              },
-              { 
-                id: request.target_id, 
-                name: target?.display_name || 'Player', 
-                score: 0,
-                user_id: request.target_id 
-              }
-            ];
-            
-            toast.success('Match accepted! Joining game...');
-            onMatchFound(game.id, players);
-          }
+          const target = onlinePlayers.find(p => p.user_id === request.target_id);
+          const players = [
+            { 
+              id: user?.id, 
+              name: 'You', 
+              score: 0,
+              user_id: user?.id 
+            },
+            { 
+              id: request.target_id, 
+              name: target?.display_name || 'Player', 
+              score: 0,
+              user_id: request.target_id 
+            }
+          ];
+          
+          toast.success('Match accepted! Looking for game room...');
+          // Note: We'll rely on real-time updates to find the created game room
+          // The accepter creates the room and adds both players
         } catch (error) {
-          console.error('Error joining accepted game:', error);
+          console.error('Error handling accepted game:', error);
         }
       });
     }
-  }, [matchmakingRequests, user?.id, onlinePlayers, findActiveGame, onMatchFound]);
+  }, [matchmakingRequests, user?.id, onlinePlayers]);
 
   const handleChallengePlayer = (player: any) => {
     setChallengeTarget(player);
@@ -196,32 +192,6 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
     }
   };
 
-  const handleRejoinGame = () => {
-    if (activeGame) {
-      // Create minimal players array for rejoining
-      const players = [
-        { 
-          id: user?.id, 
-          name: 'You', 
-          score: 0,
-          user_id: user?.id 
-        }
-      ];
-      onMatchFound(activeGame.id, players);
-    }
-  };
-
-  // Check for active games on component mount
-  useEffect(() => {
-    const checkActiveGame = async () => {
-      const game = await findActiveGame();
-      setActiveGame(game);
-    };
-
-    if (user) {
-      checkActiveGame();
-    }
-  }, [user, findActiveGame]);
 
   const getPlayerDisplayName = (player: any) => {
     return player.display_name || 'Anonymous';
@@ -274,20 +244,8 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
               <span className="text-white capitalize text-sm sm:text-base">{currentStatus}</span>
             </div>
             
-            {/* Active game indicator */}
-            {activeGame && (
-              <Button
-                onClick={handleRejoinGame}
-                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
-                size="sm"
-              >
-                <Crown className="w-4 h-4 mr-2" />
-                <span className="truncate">Rejoin Game ({activeGame.room_code})</span>
-              </Button>
-            )}
-            
             {/* Queue controls */}
-            {!activeGame && (currentStatus === 'waiting' ? (
+            {currentStatus === 'waiting' ? (
               <Button
                 onClick={leaveWaitingLobby}
                 variant="outline"
@@ -304,7 +262,7 @@ export const LiveLobby = ({ onBack, onMatchFound, gameConfig }: LiveLobbyProps) 
               >
                 Join Queue
               </Button>
-            ))}
+            )}
           </div>
         </div>
 
