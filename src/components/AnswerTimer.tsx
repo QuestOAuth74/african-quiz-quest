@@ -17,8 +17,8 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
 
   // Refs to avoid resetting interval when props/objects change identity
   const onTimeoutRef = useRef(onTimeout);
+  const onStopRef = useRef(onStop);
   const soundRef = useRef(soundEffects);
-
   useEffect(() => {
     onTimeoutRef.current = onTimeout;
   }, [onTimeout]);
@@ -27,6 +27,9 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
     soundRef.current = soundEffects;
   }, [soundEffects]);
 
+  useEffect(() => {
+    onStopRef.current = onStop;
+  }, [onStop]);
   useEffect(() => {
     // Show timer for multiplayer modes when active
     if (isActive && (gameMode === 'multiplayer' || gameMode === 'online-multiplayer')) {
@@ -56,10 +59,10 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
       };
     } else {
       setIsVisible(false);
-      onStop?.();
+      onStopRef.current?.();
     }
-    // Intentionally exclude onTimeout and soundEffects to prevent interval resets
-  }, [isActive, gameMode, onStop]);
+    // Intentionally exclude onTimeout, onStop and soundEffects to prevent interval resets
+  }, [isActive, gameMode]);
 
   // Always show for multiplayer modes when active
   if (!isVisible || !(gameMode === 'multiplayer' || gameMode === 'online-multiplayer')) {
@@ -80,7 +83,7 @@ export const AnswerTimer = ({ isActive, onTimeout, onStop, gameMode }: AnswerTim
   };
 
   return (
-    <div className="w-full max-w-md mx-auto animate-fade-in mb-4 pointer-events-none">
+    <div className="w-full max-w-md mx-auto animate-fade-in mb-4">
       <div className={`bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-md transition-all duration-300 ${getTimerClasses()}`}>
         <div className="flex items-center justify-center gap-2 mb-2">
           {timeLeft <= 5 ? (
