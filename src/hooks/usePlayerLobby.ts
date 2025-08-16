@@ -60,6 +60,24 @@ export const usePlayerLobby = () => {
     if (!user) return false;
 
     try {
+      // First check if there's already a pending request between these users
+      const { data: existingRequests, error: checkError } = await supabase
+        .from('matchmaking_requests')
+        .select('*')
+        .or(`and(requester_id.eq.${user.id},target_id.eq.${targetUserId}),and(requester_id.eq.${targetUserId},target_id.eq.${user.id})`)
+        .eq('status', 'pending');
+
+      if (checkError) {
+        console.error('Error checking existing requests:', checkError);
+        toast.error('Failed to check existing requests');
+        return false;
+      }
+
+      if (existingRequests && existingRequests.length > 0) {
+        toast.info('A request is already pending between you and this player');
+        return false;
+      }
+
       const { error } = await supabase
         .from('matchmaking_requests')
         .insert({
@@ -68,11 +86,19 @@ export const usePlayerLobby = () => {
           game_config: gameConfig
         });
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          toast.info('A request is already pending between you and this player');
+          return false;
+        } else {
+          throw error;
+        }
+      }
 
       toast.success('Match request sent!');
       return true;
     } catch (err: any) {
+      console.error('Error sending match request:', err);
       toast.error('Failed to send match request');
       return false;
     }
