@@ -75,14 +75,6 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-30" />
       </div>
 
-      {/* Content Overlay */}
-      {children && (
-        <div className="relative z-40 h-full flex items-center justify-center">
-          <div className="text-center px-4 sm:px-6">
-            {children}
-          </div>
-        </div>
-      )}
 
       {/* Animated Golden Border - Only on Desktop */}
       {!isMobile && (

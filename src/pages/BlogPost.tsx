@@ -136,17 +136,17 @@ export const BlogPost: React.FC = () => {
     switch (block.type) {
       case 'heading':
         const HeaderTag = `h${block.data.level || 2}` as keyof JSX.IntrinsicElements;
-        return (
-          <HeaderTag
-            key={block.id}
-            className={`font-bold leading-tight ${
+        return React.createElement(
+          HeaderTag,
+          {
+            key: block.id,
+            className: `font-bold leading-tight ${
               block.data.level === 1 ? 'text-3xl mt-8 mb-4' :
               block.data.level === 2 ? 'text-2xl mt-6 mb-3' :
               'text-xl mt-4 mb-2'
-            }`}
-          >
-            {block.data.text}
-          </HeaderTag>
+            }`
+          },
+          block.data.text
         );
 
       case 'paragraph':

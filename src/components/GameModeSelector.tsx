@@ -38,24 +38,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
       <ParallaxBanner
         imageSrc="https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/jeopardy%20game%20banner.png"
         alt="African History Jeopardy Game Banner"
-      >
-        {/* Hero Content Overlay */}
-        <div className="text-center space-y-6">
-          <div className="flex items-center justify-center gap-2 sm:gap-3">
-            <Sparkles className="text-yellow-400 animate-pulse" size={isMobile ? 20 : 32} />
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white drop-shadow-2xl animate-fade-in">
-              JEOPARDY!
-            </h1>
-            <Sparkles className="text-yellow-400 animate-pulse" size={isMobile ? 20 : 32} />
-          </div>
-          <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-yellow-400 font-light tracking-wide drop-shadow-lg animate-fade-in">
-            AFRICAN HISTORY EDITION
-          </div>
-          <p className="text-yellow-100 text-sm sm:text-lg md:text-xl font-medium drop-shadow-lg animate-fade-in">
-            A free educational game from <span className="text-yellow-400 font-semibold">The Historia Africana</span> YouTube Channel
-          </p>
-        </div>
-      </ParallaxBanner>
+      />
 
       {/* Content Section Below Banner */}
       <div className="bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown p-4 sm:p-6 md:p-8">
@@ -106,6 +89,19 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
           )}
 
           <div className="text-center mb-8 sm:mb-12">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <Sparkles className="text-theme-yellow animate-pulse" size={24} />
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold gradient-text animate-pulse-yellow">
+                JEOPARDY!
+              </h1>
+              <Sparkles className="text-theme-yellow animate-pulse" size={24} />
+            </div>
+            <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-theme-yellow mb-3 sm:mb-4 font-light tracking-wide">
+              AFRICAN HISTORY EDITION
+            </div>
+            <p className="text-theme-yellow-light text-sm sm:text-base md:text-lg lg:text-xl font-medium mb-3 sm:mb-4 px-2">
+              A free educational game from <span className="text-theme-yellow font-semibold">The Historia Africana</span> YouTube Channel
+            </p>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
               Test your knowledge of African history in this authentic Jeopardy-style experience!
             </p>
