@@ -146,15 +146,24 @@ export const BlogPost: React.FC = () => {
     switch (block.type) {
       case 'heading':
         const HeaderTag = `h${block.data.level || 2}` as keyof JSX.IntrinsicElements;
+        const getHeadingStyles = (level: number) => {
+          switch (level) {
+            case 1:
+              return 'text-3xl mt-8 mb-4 p-6 rounded-lg bg-gradient-to-r from-primary/20 via-theme-gold/10 to-primary/20 border-l-4 border-theme-gold relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-theme-gold/5 before:to-transparent before:animate-pulse';
+            case 2:
+              return 'text-2xl mt-6 mb-3 p-4 rounded-lg bg-gradient-to-r from-accent/15 via-muted/30 to-accent/15 border-l-4 border-accent shadow-sm';
+            case 3:
+              return 'text-xl mt-4 mb-2 p-3 rounded-md bg-gradient-to-r from-muted/40 to-muted/20 border-l-3 border-muted-foreground/30';
+            default:
+              return 'text-2xl mt-6 mb-3 p-4 rounded-lg bg-gradient-to-r from-accent/15 via-muted/30 to-accent/15 border-l-4 border-accent shadow-sm';
+          }
+        };
+        
         return React.createElement(
           HeaderTag,
           {
             key: block.id,
-            className: `font-bold leading-tight ${
-              block.data.level === 1 ? 'text-3xl mt-8 mb-4' :
-              block.data.level === 2 ? 'text-2xl mt-6 mb-3' :
-              'text-xl mt-4 mb-2'
-            }`
+            className: `font-bold leading-tight text-foreground ${getHeadingStyles(block.data.level || 2)}`
           },
           block.data.text
         );
@@ -168,14 +177,18 @@ export const BlogPost: React.FC = () => {
 
       case 'image':
         return (
-          <figure key={block.id} className="my-6">
-            <img
-              src={block.data.url}
-              alt={block.data.caption || ''}
-              className="w-full rounded-lg shadow-md"
-            />
+          <figure key={block.id} className="my-8">
+            <div className="blog-image-frame relative p-2 rounded-xl bg-gradient-to-br from-theme-gold/20 via-theme-gold/10 to-theme-gold/20 border border-theme-gold/30 shadow-lg">
+              <img
+                src={block.data.url}
+                alt={block.data.caption || ''}
+                className="w-full rounded-lg shadow-xl relative z-10"
+              />
+              <div className="absolute inset-0 rounded-xl border-2 border-theme-gold/50 animate-pulse-gold"></div>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-theme-gold/10 to-transparent animate-shimmer"></div>
+            </div>
             {block.data.caption && (
-              <figcaption className="text-sm text-muted-foreground text-center mt-2">
+              <figcaption className="text-sm text-muted-foreground text-center mt-3 italic">
                 {block.data.caption}
               </figcaption>
             )}
