@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { LobbyPlayer, WheelGameChallenge } from '@/types/lobby';
@@ -13,6 +13,41 @@ export const useWheelLobby = () => {
   const [incomingChallenges, setIncomingChallenges] = useState<WheelGameChallenge[]>([]);
   const [outgoingChallenges, setOutgoingChallenges] = useState<WheelGameChallenge[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Per-challenge realtime channels to deliver sessionId directly to challenger
+  const challengeChannelsRef = useRef<Record<string, any>>({});
+
+  const subscribeToChallengeChannel = useCallback((challengeId: string) => {
+    if (challengeChannelsRef.current[challengeId]) return;
+    const ch = supabase.channel(`challenge-${challengeId}`);
+    ch.on('broadcast', { event: 'session_created' }, (payload: any) => {
+      if (payload?.sessionId) {
+        console.log('Received session via broadcast for challenge', challengeId, payload.sessionId);
+        navigate(`/wheel/play/${payload.sessionId}`);
+      }
+    });
+    ch.subscribe();
+    challengeChannelsRef.current[challengeId] = ch;
+  }, [navigate]);
+
+  const cleanupChallengeChannel = useCallback((challengeId: string) => {
+    const ch = challengeChannelsRef.current[challengeId];
+    if (ch) {
+      supabase.removeChannel(ch);
+      delete challengeChannelsRef.current[challengeId];
+    }
+  }, []);
+
+  // keep channels for all pending outgoing challenges
+  useEffect(() => {
+    outgoingChallenges.forEach((c) => {
+      if ((c as any).status === 'pending') {
+        subscribeToChallengeChannel((c as any).id);
+      } else {
+        cleanupChallengeChannel((c as any).id);
+      }
+    });
+  }, [outgoingChallenges, subscribeToChallengeChannel, cleanupChallengeChannel]);
 
   // Update user status to 'waiting' when in lobby
   useEffect(() => {
@@ -100,6 +135,11 @@ export const useWheelLobby = () => {
         .single();
 
       if (error) throw error;
+
+      // Subscribe to direct broadcast for this challenge so we get sessionId instantly
+      if (data?.id) {
+        subscribeToChallengeChannel(data.id);
+      }
 
       toast({
         title: "Challenge sent!",
@@ -195,6 +235,25 @@ export const useWheelLobby = () => {
 
       // Navigate immediately for the acceptor
       navigate(`/wheel/play/${session.id}`);
+
+      // Notify the challenger directly via realtime broadcast
+      try {
+        const notify = supabase.channel(`challenge-${challengeId}`);
+        notify.on('broadcast', { event: 'noop' }, () => {}); // ensure channel is active
+        notify.subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            notify.send({
+              type: 'broadcast',
+              event: 'session_created',
+              payload: { sessionId: session.id }
+            });
+            // cleanup shortly after
+            setTimeout(() => supabase.removeChannel(notify), 2000);
+          }
+        });
+      } catch (e) {
+        console.warn('Broadcast notify failed', e);
+      }
       
       fetchChallenges();
       return session;
