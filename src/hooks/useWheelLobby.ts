@@ -187,11 +187,15 @@ export const useWheelLobby = () => {
 
       if (sessionError) throw sessionError;
 
+      console.log('Challenge accepted, navigating to game:', session.id);
       toast({
         title: "Challenge accepted!",
         description: "Starting the game...",
       });
 
+      // Navigate immediately for the acceptor
+      navigate(`/wheel/play/${session.id}`);
+      
       fetchChallenges();
       return session;
     } catch (error) {
@@ -296,17 +300,20 @@ export const useWheelLobby = () => {
         schema: 'public',
         table: 'wheel_game_sessions'
       }, (payload) => {
+        console.log('Game session real-time update:', payload);
         // Navigate both players to the game when a session is created
         if (payload.new) {
           const session = payload.new as any;
+          console.log('Session created for players:', session.player1_id, session.player2_id, 'Current user:', user.id);
+          
           // Check if current user is one of the players
           if (session.player1_id === user.id || session.player2_id === user.id) {
+            console.log('Current user is a player in this session, navigating to game:', session.id);
             toast({
               title: "Game starting!",
               description: "You're being taken to the game room...",
             });
             navigate(`/wheel/play/${session.id}`);
-
           }
         }
       })
