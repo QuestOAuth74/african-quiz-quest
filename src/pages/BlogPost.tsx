@@ -404,28 +404,6 @@ export const BlogPost: React.FC = () => {
                 {post.content.blocks?.map(renderContentBlock)}
               </div>
 
-              {/* PDF Attachment */}
-              {post.pdf_attachment_url && (
-                <div className="mt-8 p-6 bg-muted/50 rounded-lg border">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <File className="h-5 w-5 text-theme-gold" />
-                    Downloadable Resource
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{post.pdf_attachment_name}</p>
-                      <p className="text-sm text-muted-foreground">PDF Document</p>
-                    </div>
-                    <Button
-                      onClick={() => window.open(post.pdf_attachment_url, '_blank')}
-                      className="bg-theme-gold hover:bg-theme-gold-dark text-primary-foreground"
-                    >
-                      <File className="h-4 w-4 mr-2" />
-                      Download PDF
-                    </Button>
-                  </div>
-                </div>
-              )}
 
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
@@ -488,6 +466,38 @@ export const BlogPost: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* PDF Attachment - Prominently displayed at bottom */}
+          {post.pdf_attachment_url && (
+            <Card className="mt-8 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-primary/20">
+              <CardContent className="p-8">
+                <div className="text-center space-y-6">
+                  <div className="flex justify-center">
+                    <div className="p-4 bg-primary/10 rounded-full">
+                      <File className="h-8 w-8 text-primary" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">
+                      Downloadable Resource
+                    </h3>
+                    <p className="text-lg font-semibold text-foreground mb-1">
+                      {post.pdf_attachment_name}
+                    </p>
+                    <p className="text-muted-foreground">PDF Document</p>
+                  </div>
+                  <Button
+                    onClick={() => window.open(post.pdf_attachment_url, '_blank')}
+                    size="lg"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-semibold"
+                  >
+                    <File className="h-5 w-5 mr-3" />
+                    Download PDF
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Back to Blog */}
           <div className="mt-8 text-center">
