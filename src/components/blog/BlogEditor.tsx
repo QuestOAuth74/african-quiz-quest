@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { X, Upload, File, Trash2 } from 'lucide-react';
-import { BlogPost, BlogCategory, BlogTag } from '@/hooks/useBlogData';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
+import { useBlogData, BlogPost } from '@/hooks/useBlogData';
 import { supabase } from '@/integrations/supabase/client';
+import { X, Upload, File, Trash2 } from 'lucide-react';
+import { BlogCategory, BlogTag } from '@/hooks/useBlogData';
+import { useAuth } from '@/hooks/useAuth';
 import { BlockEditor, Block } from './blocks/BlockEditor';
 
 interface BlogEditorProps {
@@ -64,11 +65,57 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfAttachmentUrl, setPdfAttachmentUrl] = useState(post?.pdf_attachment_url || '');
   const [pdfAttachmentName, setPdfAttachmentName] = useState(post?.pdf_attachment_name || '');
+  const [featuredImageUploading, setFeaturedImageUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
 
   const { toast } = useToast();
   const { user } = useAuth();
+
+  const handleFeaturedImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select an image file",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setFeaturedImageUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `blog-images/${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('blog-images')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('blog-images')
+        .getPublicUrl(filePath);
+
+      setFeaturedImage(publicUrl);
+      toast({
+        title: "Image uploaded",
+        description: "Featured image has been uploaded successfully"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Upload failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setFeaturedImageUploading(false);
+    }
+  };
 
   const handlePdfUpload = async (file: File) => {
     if (!user) return;
@@ -301,15 +348,61 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="featured-image">Featured Image URL</Label>
-            <Input
-              id="featured-image"
-              value={featuredImage}
-              onChange={(e) => setFeaturedImage(e.target.value)}
-              placeholder="https://example.com/image.jpg"
-            />
-          </div>
+          {/* Featured Image Upload Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Featured Image</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Upload an image to showcase your blog post
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="featured-image-upload">Upload Image</Label>
+                <Input
+                  id="featured-image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFeaturedImageUpload}
+                  className="cursor-pointer"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="featured-image-url">Or enter image URL</Label>
+                <Input
+                  id="featured-image-url"
+                  value={featuredImage}
+                  onChange={(e) => setFeaturedImage(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+              
+              {featuredImage && (
+                <div className="mt-4">
+                  <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                  <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                    <img
+                      src={featuredImage}
+                      alt="Featured image preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        const sibling = target.nextElementSibling as HTMLElement;
+                        target.style.display = 'none';
+                        if (sibling) sibling.style.display = 'flex';
+                      }}
+                    />
+                    <div 
+                      className="absolute inset-0 bg-muted flex items-center justify-center text-muted-foreground hidden"
+                    >
+                      Failed to load image
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* PDF Attachment Section */}
           <Card>

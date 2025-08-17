@@ -4,7 +4,6 @@ import { usePageMeta } from '@/hooks/usePageTitle';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ParallaxBanner } from '@/components/ParallaxBanner';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
 import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File } from 'lucide-react';
 import { format } from 'date-fns';
@@ -321,55 +320,78 @@ export const BlogPost: React.FC = () => {
 
   return (
     <article className="min-h-screen bg-background">
-      {/* Hero Banner */}
-      <ParallaxBanner 
-        imageSrc={post.featured_image_url || baobabHeader} 
-        alt={post.title}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-primary/80 flex items-center justify-center">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center text-white">
-              <Link 
-                to="/blog" 
-                className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-8 transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Blog
-              </Link>
-              
-              <div className="space-y-6">
-                {post.category && (
-                  <Badge variant="outline" className="border-white/30 text-white bg-white/10">
-                    {post.category.name}
-                  </Badge>
-                )}
-                
-                <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                  {post.title}
-                </h1>
-                
-                <div className="flex flex-wrap justify-center gap-6 text-sm text-white/90">
-                  <span className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    {format(new Date(post.published_at || post.created_at), 'MMMM dd, yyyy')}
-                  </span>
-                  <span>By {post.author?.display_name || 'Historia Africana'}</span>
-                  {post.reading_time_minutes && (
-                    <span className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      {post.reading_time_minutes} min read
-                    </span>
-                  )}
-                  <span className="flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    {post.view_count + 1} views
-                  </span>
-                </div>
+      {/* Modern Hero Section */}
+      <div className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
+          style={{
+            backgroundImage: `url(${post.featured_image_url || baobabHeader})`
+          }}
+        />
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/90 to-background/85" />
+        
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-accent/20 animate-fade-in" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-2xl animate-pulse delay-700" />
+        </div>
+        
+        {/* Content */}
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            {/* Back Button */}
+            <Link 
+              to="/blog" 
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-300 hover-scale group"
+            >
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              <span className="story-link">Back to Blog</span>
+            </Link>
+            
+            {/* Category Badge */}
+            {post.category && (
+              <div className="animate-fade-in delay-300">
+                <Badge 
+                  variant="outline" 
+                  className="border-primary/30 text-primary bg-primary/10 backdrop-blur-sm hover-scale"
+                >
+                  {post.category.name}
+                </Badge>
               </div>
+            )}
+            
+            {/* Title */}
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-foreground animate-fade-in delay-500">
+              {post.title}
+            </h1>
+            
+            {/* Meta Information */}
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground animate-fade-in delay-700">
+              <span className="flex items-center gap-2 hover-scale">
+                <Calendar className="h-4 w-4" />
+                {format(new Date(post.published_at || post.created_at), 'MMMM dd, yyyy')}
+              </span>
+              <span className="hover-scale">
+                By {post.author?.display_name || 'Historia Africana'}
+              </span>
+              {post.reading_time_minutes && (
+                <span className="flex items-center gap-2 hover-scale">
+                  <Clock className="h-4 w-4" />
+                  {post.reading_time_minutes} min read
+                </span>
+              )}
+              <span className="flex items-center gap-2 hover-scale">
+                <Eye className="h-4 w-4" />
+                {post.view_count + 1} views
+              </span>
             </div>
           </div>
         </div>
-      </ParallaxBanner>
+      </div>
 
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
