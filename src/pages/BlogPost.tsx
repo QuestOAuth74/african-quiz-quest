@@ -367,6 +367,29 @@ export const BlogPost: React.FC = () => {
                 {post.content.blocks?.map(renderContentBlock)}
               </div>
 
+              {/* PDF Attachment */}
+              {post.pdf_attachment_url && (
+                <div className="mt-8 p-6 bg-muted/50 rounded-lg border">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <File className="h-5 w-5 text-theme-gold" />
+                    Downloadable Resource
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{post.pdf_attachment_name}</p>
+                      <p className="text-sm text-muted-foreground">PDF Document</p>
+                    </div>
+                    <Button
+                      onClick={() => window.open(post.pdf_attachment_url, '_blank')}
+                      className="bg-theme-gold hover:bg-theme-gold-dark text-primary-foreground"
+                    >
+                      <File className="h-4 w-4 mr-2" />
+                      Download PDF
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
                 <div className="mt-8 pt-6 border-t">

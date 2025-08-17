@@ -131,6 +131,8 @@ export type Database = {
           keywords: string[] | null
           meta_description: string | null
           meta_title: string | null
+          pdf_attachment_name: string | null
+          pdf_attachment_url: string | null
           published_at: string | null
           reading_time_minutes: number | null
           slug: string
@@ -150,6 +152,8 @@ export type Database = {
           keywords?: string[] | null
           meta_description?: string | null
           meta_title?: string | null
+          pdf_attachment_name?: string | null
+          pdf_attachment_url?: string | null
           published_at?: string | null
           reading_time_minutes?: number | null
           slug: string
@@ -169,6 +173,8 @@ export type Database = {
           keywords?: string[] | null
           meta_description?: string | null
           meta_title?: string | null
+          pdf_attachment_name?: string | null
+          pdf_attachment_url?: string | null
           published_at?: string | null
           reading_time_minutes?: number | null
           slug?: string

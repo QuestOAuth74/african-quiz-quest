@@ -6,9 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import { X, Upload, File, Trash2 } from 'lucide-react';
 import { BlogPost, BlogCategory, BlogTag } from '@/hooks/useBlogData';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { BlockEditor, Block } from './blocks/BlockEditor';
 
 interface BlogEditorProps {
@@ -58,9 +60,71 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>(
     (post?.status as 'draft' | 'published' | 'archived') || 'draft'
   );
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfAttachmentUrl, setPdfAttachmentUrl] = useState(post?.pdf_attachment_url || '');
+  const [pdfAttachmentName, setPdfAttachmentName] = useState(post?.pdf_attachment_name || '');
   const [loading, setLoading] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  const handlePdfUpload = async (file: File) => {
+    if (!user) return;
+    
+    setUploadingPdf(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = fileName;
+
+      const { error: uploadError } = await supabase.storage
+        .from('blog-pdfs')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('blog-pdfs')
+        .getPublicUrl(filePath);
+
+      setPdfAttachmentUrl(publicUrl);
+      setPdfAttachmentName(file.name);
+      setPdfFile(null);
+      
+      toast({
+        title: "Success",
+        description: "PDF uploaded successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload PDF",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingPdf(false);
+    }
+  };
+
+  const handleRemovePdf = async () => {
+    if (pdfAttachmentUrl && user) {
+      try {
+        const filePath = pdfAttachmentUrl.split('/').pop();
+        if (filePath) {
+          await supabase.storage
+            .from('blog-pdfs')
+            .remove([filePath]);
+        }
+      } catch (error) {
+        console.error('Error removing PDF:', error);
+      }
+    }
+    
+    setPdfAttachmentUrl('');
+    setPdfAttachmentName('');
+    setPdfFile(null);
+  };
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -90,6 +154,11 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 
     setLoading(true);
     try {
+      // Upload PDF if there's a new file
+      if (pdfFile) {
+        await handlePdfUpload(pdfFile);
+      }
+
       const slug = post?.slug || title.toLowerCase()
         .replace(/[^a-z0-9\s]/g, '')
         .replace(/\s+/g, '-')
@@ -111,7 +180,9 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         keywords: keywords.length > 0 ? keywords : null,
         status,
         published_at: status === 'published' && !post?.published_at ? new Date().toISOString() : post?.published_at,
-        reading_time_minutes: Math.max(1, Math.ceil(allText.split(/\s+/).filter(w => w.length > 0).length / 200))
+        reading_time_minutes: Math.max(1, Math.ceil(allText.split(/\s+/).filter(w => w.length > 0).length / 200)),
+        pdf_attachment_url: pdfAttachmentUrl || null,
+        pdf_attachment_name: pdfAttachmentName || null
       };
 
       await onSave(postData);
@@ -226,6 +297,85 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
               placeholder="https://example.com/image.jpg"
             />
           </div>
+
+          {/* PDF Attachment Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">PDF Attachment</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Upload a PDF file that readers can download with this article.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {pdfAttachmentUrl ? (
+                <div className="border rounded-lg p-4 flex items-center gap-3">
+                  <File className="h-5 w-5 text-theme-gold" />
+                  <div className="flex-1">
+                    <p className="font-medium">{pdfAttachmentName}</p>
+                    <p className="text-sm text-muted-foreground">PDF Document</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(pdfAttachmentUrl, '_blank')}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemovePdf}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <Label htmlFor="pdf-upload">Upload PDF</Label>
+                  <div className="mt-2">
+                    <Input
+                      id="pdf-upload"
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && file.type === 'application/pdf') {
+                          setPdfFile(file);
+                        } else {
+                          toast({
+                            title: "Error",
+                            description: "Please select a valid PDF file",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      disabled={uploadingPdf}
+                    />
+                  </div>
+                  {pdfFile && (
+                    <div className="mt-2 p-3 border rounded-lg bg-muted">
+                      <div className="flex items-center gap-2">
+                        <File className="h-4 w-4" />
+                        <span className="text-sm">{pdfFile.name}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setPdfFile(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <Card className="border-2 border-theme-gold/20">
             <CardHeader>

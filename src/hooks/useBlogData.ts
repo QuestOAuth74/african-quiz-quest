@@ -18,6 +18,8 @@ export interface BlogPost {
   published_at?: string | null;
   reading_time_minutes?: number | null;
   view_count: number;
+  pdf_attachment_url?: string | null;
+  pdf_attachment_name?: string | null;
   created_at: string;
   updated_at: string;
   category?: BlogCategory;
