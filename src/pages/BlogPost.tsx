@@ -417,6 +417,21 @@ export const BlogPost: React.FC = () => {
                 </div>
               )}
 
+              {/* Bibliography Section */}
+              {post.bibliography && (
+                <div className="mt-8 pt-6 border-t">
+                  <h3 className="text-lg font-semibold mb-4 text-foreground">References</h3>
+                  <div className="prose prose-sm max-w-none">
+                    <div className="bg-muted/30 rounded-lg p-4 border-l-4 border-accent">
+                      <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-sans leading-relaxed">
+                        {post.bibliography}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+
               {/* Share Section */}
               <div className="mt-8 pt-6 border-t">
                 <h3 className="text-sm font-medium text-muted-foreground mb-3">Share this post</h3>

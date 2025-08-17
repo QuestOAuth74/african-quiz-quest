@@ -30,6 +30,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 }) => {
   const [title, setTitle] = useState(post?.title || '');
   const [excerpt, setExcerpt] = useState(post?.excerpt || '');
+  const [bibliography, setBibliography] = useState(post?.bibliography || '');
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (post?.content?.blocks) {
       return post.content.blocks.map((block: any, index: number) => ({
@@ -173,6 +174,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         slug,
         content: { blocks },
         excerpt,
+        bibliography,
         category_id: categoryId || null,
         featured_image_url: featuredImage || null,
         meta_title: metaTitle || null,
@@ -252,6 +254,17 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
               onChange={(e) => setExcerpt(e.target.value)}
               placeholder="Brief description of the post"
               rows={3}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="bibliography">References/Bibliography</Label>
+            <Textarea
+              id="bibliography"
+              value={bibliography}
+              onChange={(e) => setBibliography(e.target.value)}
+              placeholder="Add your sources, references, and bibliography here...&#10;Example:&#10;1. Smith, J. (2023). African History. New York: Academic Press.&#10;2. https://example.com/article&#10;3. Brown, A. &amp; Wilson, B. (2022). &quot;Cultural Studies&quot;. Journal of History, 45(2), 123-145."
+              rows={4}
             />
           </div>
 
