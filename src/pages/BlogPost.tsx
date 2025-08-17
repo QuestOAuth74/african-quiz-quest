@@ -169,9 +169,11 @@ export const BlogPost: React.FC = () => {
         );
 
       case 'paragraph':
+        // Strip HTML tags and render clean text
+        const cleanText = block.data.text?.replace(/<[^>]*>/g, '') || '';
         return (
           <p key={block.id} className="text-foreground leading-relaxed mb-4">
-            {block.data.text}
+            {cleanText}
           </p>
         );
 
