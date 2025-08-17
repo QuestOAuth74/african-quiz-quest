@@ -286,9 +286,31 @@ export const useWheelLobby = () => {
         event: '*',
         schema: 'public',
         table: 'wheel_game_challenges'
-      }, (payload) => {
+      }, async (payload) => {
         console.log('Wheel challenge real-time update:', payload);
         fetchChallenges();
+
+        const ch: any = payload.new;
+        if (ch && ch.status === 'accepted' && ch.challenger_id === user.id) {
+          // Fallback: challenger navigates after seeing accepted status
+          try {
+            const { data: session } = await supabase
+              .from('wheel_game_sessions')
+              .select('id, player1_id, player2_id, created_at')
+              .eq('player1_id', ch.challenger_id)
+              .eq('player2_id', ch.challenged_id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+
+            if (session) {
+              console.log('Found session for accepted challenge (fallback):', session.id);
+              navigate(`/wheel/play/${session.id}`);
+            }
+          } catch (e) {
+            console.warn('Fallback navigation lookup failed:', e);
+          }
+        }
       })
       .subscribe();
 
