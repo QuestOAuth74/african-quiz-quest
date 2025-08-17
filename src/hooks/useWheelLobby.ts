@@ -292,24 +292,35 @@ export const useWheelLobby = () => {
 
         const ch: any = payload.new;
         if (ch && ch.status === 'accepted' && ch.challenger_id === user.id) {
-          // Fallback: challenger navigates after seeing accepted status
-          try {
-            const { data: session } = await supabase
-              .from('wheel_game_sessions')
-              .select('id, player1_id, player2_id, created_at')
-              .eq('player1_id', ch.challenger_id)
-              .eq('player2_id', ch.challenged_id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .maybeSingle();
+          // Fallback with retries: challenger navigates after seeing accepted status
+          const waitForSession = async () => {
+            const attemptDelays = [200, 300, 400, 600, 800, 1000, 1200, 1500];
+            for (const delay of attemptDelays) {
+              try {
+                const { data: session } = await supabase
+                  .from('wheel_game_sessions')
+                  .select('id, player1_id, player2_id, created_at')
+                  .eq('player1_id', ch.challenger_id)
+                  .eq('player2_id', ch.challenged_id)
+                  .order('created_at', { ascending: false })
+                  .limit(1)
+                  .maybeSingle();
 
-            if (session) {
-              console.log('Found session for accepted challenge (fallback):', session.id);
-              navigate(`/wheel/play/${session.id}`);
+                if (session) {
+                  console.log('Found session for accepted challenge (fallback):', session.id);
+                  navigate(`/wheel/play/${session.id}`);
+                  return;
+                }
+              } catch (e) {
+                console.warn('Fallback navigation lookup attempt failed:', e);
+              }
+              // wait before next attempt
+              await new Promise((res) => setTimeout(res, delay));
             }
-          } catch (e) {
-            console.warn('Fallback navigation lookup failed:', e);
-          }
+            console.warn('No session found after challenge accepted (fallback exhausted)');
+          };
+
+          waitForSession();
         }
       })
       .subscribe();
