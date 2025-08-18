@@ -9,6 +9,7 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { UserBadges } from '@/components/UserBadges';
 import { ThumbsUp, MessageCircle, Send, Smile } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 interface Post {
   id: string;
@@ -99,24 +100,31 @@ export const PostWithMessaging = ({
 
         {/* Post Content */}
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-foreground leading-tight">
-            {post.title}
-          </h3>
+          <Link 
+            to={`/forum/${post.id}`}
+            className="block group"
+          >
+            <h3 className="text-xl font-bold text-foreground leading-tight group-hover:text-primary transition-colors cursor-pointer">
+              {post.title}
+            </h3>
+          </Link>
           <p className="text-muted-foreground leading-relaxed">
             {post.content}
           </p>
           
           {/* Post Image */}
           {post.image_url && (
-            <div className="forum-image-frame">
-              <div className="forum-image-content">
-                <img 
-                  src={post.image_url} 
-                  alt="Post image" 
-                  className="w-full max-h-96 object-cover"
-                />
+            <Link to={`/forum/${post.id}`} className="block">
+              <div className="forum-image-frame cursor-pointer group">
+                <div className="forum-image-content">
+                  <img 
+                    src={post.image_url} 
+                    alt="Post image" 
+                    className="w-full max-h-96 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
               </div>
-            </div>
+            </Link>
           )}
         </div>
 

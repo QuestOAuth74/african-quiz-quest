@@ -21,6 +21,7 @@ import WheelOfDestiny from "./pages/WheelOfDestiny";
 import WheelPlay from "./pages/WheelPlay";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
+import ForumPost from "./pages/ForumPost";
 import Footer from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
+            <Route path="/forum/:postId" element={<ProtectedRoute><ForumPost /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
             <Route path="/quiz-setup" element={<ProtectedRoute><QuizSetup /></ProtectedRoute>} />
