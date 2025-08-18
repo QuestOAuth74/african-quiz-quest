@@ -117,7 +117,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     }
   };
 
-  const handlePdfUpload = async (file: File): Promise<{ url: string; name: string } | null> => {
+  const handlePdfUpload = async (file: File): Promise<{ path: string; name: string } | null> => {
     if (!user) return null;
     
     setUploadingPdf(true);
@@ -132,11 +132,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('blog-pdfs')
-        .getPublicUrl(filePath);
-
-      setPdfAttachmentUrl(publicUrl);
+      // Store the storage path, not the public URL
+      setPdfAttachmentUrl(filePath);
       setPdfAttachmentName(file.name);
       setPdfFile(null);
       
@@ -145,7 +142,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         description: "PDF uploaded successfully",
       });
 
-      return { url: publicUrl, name: file.name };
+      return { path: filePath, name: file.name };
     } catch (error: any) {
       toast({
         title: "Error",
@@ -205,14 +202,14 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 
     setLoading(true);
     try {
-      // Upload PDF if there's a new file and get the URL/name
+      // Upload PDF if there's a new file and get the path/name
       let finalPdfUrl = pdfAttachmentUrl;
       let finalPdfName = pdfAttachmentName;
       
       if (pdfFile) {
         const pdfResult = await handlePdfUpload(pdfFile);
         if (pdfResult) {
-          finalPdfUrl = pdfResult.url;
+          finalPdfUrl = pdfResult.path;
           finalPdfName = pdfResult.name;
         }
       }

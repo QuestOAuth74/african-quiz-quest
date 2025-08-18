@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File, LogIn } from 'lucide-react';
 import { format } from 'date-fns';
 import baobabHeader from '@/assets/baobab-talks-header.png';
@@ -15,6 +16,8 @@ export const BlogPost: React.FC = () => {
   const [post, setPost] = useState<BlogPostType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [generatingPdfUrl, setGeneratingPdfUrl] = useState(false);
   const { getPostBySlug, incrementViewCount } = useBlogData();
   const { user, isAuthenticated } = useAuth();
 
@@ -24,6 +27,33 @@ export const BlogPost: React.FC = () => {
     post?.meta_description || post?.excerpt || "Read this article on Historia Africana",
     { loading, loadingTitle: "Loading Article" }
   );
+  
+  // Function to generate a signed URL for PDF download
+  const generatePdfUrl = async (pdfPath: string) => {
+    if (!isAuthenticated || !pdfPath) return null;
+    
+    setGeneratingPdfUrl(true);
+    try {
+      const { data, error } = await supabase.storage
+        .from('blog-pdfs')
+        .createSignedUrl(pdfPath, 3600); // 1 hour expiry
+      
+      if (error) throw error;
+      return data.signedUrl;
+    } catch (error) {
+      console.error('Error generating PDF URL:', error);
+      return null;
+    } finally {
+      setGeneratingPdfUrl(false);
+    }
+  };
+
+  // Generate PDF URL when user authenticates and PDF exists
+  useEffect(() => {
+    if (isAuthenticated && post?.pdf_attachment_url && !pdfUrl) {
+      generatePdfUrl(post.pdf_attachment_url).then(setPdfUrl);
+    }
+  }, [isAuthenticated, post?.pdf_attachment_url, pdfUrl]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -491,12 +521,13 @@ export const BlogPost: React.FC = () => {
                   
                   {isAuthenticated ? (
                     <Button
-                      onClick={() => window.open(post.pdf_attachment_url, '_blank')}
+                      onClick={() => pdfUrl && window.open(pdfUrl, '_blank')}
                       size="lg"
+                      disabled={generatingPdfUrl || !pdfUrl}
                       className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-semibold"
                     >
                       <File className="h-5 w-5 mr-3" />
-                      Download PDF
+                      {generatingPdfUrl ? 'Preparing Download...' : 'Download PDF'}
                     </Button>
                   ) : (
                     <div className="space-y-4">

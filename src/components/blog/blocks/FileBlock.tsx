@@ -36,22 +36,18 @@ export const FileBlock: React.FC<FileBlockProps> = ({
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `blog-files/${fileName}`;
-
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      
       const { error: uploadError } = await supabase.storage
-        .from('forum-images')
-        .upload(filePath, file);
+        .from('blog-pdfs')
+        .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage
-        .from('forum-images')
-        .getPublicUrl(filePath);
-
+      // Store the storage path, not the public URL
       onUpdate({
         ...block.data,
-        url: data.publicUrl,
+        url: fileName, // Store path for private bucket
         name: file.name,
         type: file.type,
         size: file.size
