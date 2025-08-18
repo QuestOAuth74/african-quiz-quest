@@ -74,8 +74,8 @@ const ForumPost = () => {
 
   const fetchPost = async () => {
     try {
-      // Fetch post data
-      const { data: postData, error } = await supabase
+      // Fetch post data with explicit typing to avoid infinite type recursion
+      const { data: postData, error }: { data: any | null; error: any } = await supabase
         .from('forum_posts')
         .select('*')
         .eq('id', postId)
@@ -88,15 +88,15 @@ const ForumPost = () => {
         return;
       }
 
-      // Fetch category data
-      const { data: categoryData } = await supabase
+      // Fetch category data with explicit typing
+      const { data: categoryData }: { data: any | null; error: any } = await supabase
         .from('forum_categories')
         .select('name')
         .eq('id', postData.category_id)
         .single();
 
-      // Fetch profile data
-      const { data: profileData } = await supabase
+      // Fetch profile data with explicit typing
+      const { data: profileData }: { data: any | null; error: any } = await supabase
         .from('profiles')
         .select('display_name')
         .eq('user_id', postData.user_id)
@@ -124,13 +124,13 @@ const ForumPost = () => {
 
   const fetchReplies = async () => {
     try {
-      // Fetch replies
-      const { data: repliesData, error } = await supabase
+      // Fetch replies with explicit typing to avoid infinite type recursion
+      const { data: repliesData, error }: { data: any[] | null; error: any } = await supabase
         .from('forum_post_replies')
         .select('*')
         .eq('post_id', postId)
-        .eq('is_approved', true)
-        .order('created_at', { ascending: true }) as any;
+        .eq('moderation_status', 'approved')
+        .order('created_at', { ascending: true });
 
       if (error) {
         console.error('Error fetching replies:', error);
@@ -144,15 +144,15 @@ const ForumPost = () => {
         return;
       }
 
-      // Get user profiles separately
-      const userIds = [...new Set(repliesData.map(reply => reply.user_id))];
-      const { data: profiles } = await supabase
+      // Get user profiles separately with explicit typing
+      const userIds: string[] = [...new Set(repliesData.map((reply: any) => reply.user_id as string))];
+      const { data: profiles }: { data: any[] | null; error: any } = await supabase
         .from('profiles')
         .select('user_id, display_name')
         .in('user_id', userIds);
 
-      const typedReplies: ReplyData[] = repliesData.map(reply => {
-        const profile = profiles?.find(p => p.user_id === reply.user_id);
+      const typedReplies: ReplyData[] = repliesData.map((reply: any) => {
+        const profile = profiles?.find((p: any) => p.user_id === reply.user_id);
         return {
           id: reply.id,
           post_id: reply.post_id,
@@ -175,12 +175,12 @@ const ForumPost = () => {
     if (!user || !postId) return;
 
     try {
-      const { data } = await supabase
+      const { data }: { data: any | null; error: any } = await supabase
         .from('forum_post_upvotes')
         .select('id')
         .eq('post_id', postId)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       setIsUpvoted(!!data);
     } catch (error) {
