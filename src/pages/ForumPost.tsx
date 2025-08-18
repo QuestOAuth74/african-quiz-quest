@@ -292,6 +292,16 @@ const ForumPost = () => {
       <div className="min-h-screen bg-background">
         <TopNavigation />
         <div className="container mx-auto px-4 py-8">
+          {/* Back link in loading state */}
+          <div className="mb-6">
+            <Link 
+              to="/forum" 
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-105"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="font-medium">Back to Forum</span>
+            </Link>
+          </div>
           <div className="text-center">Loading...</div>
         </div>
       </div>
@@ -303,11 +313,19 @@ const ForumPost = () => {
       <div className="min-h-screen bg-background">
         <TopNavigation />
         <div className="container mx-auto px-4 py-8">
+          {/* Back link in error state */}
+          <div className="mb-6">
+            <Link 
+              to="/forum" 
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-105"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="font-medium">Back to Forum</span>
+            </Link>
+          </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Post not found</h1>
-            <Link to="/forum">
-              <Button>Return to Forum</Button>
-            </Link>
+            <p className="text-muted-foreground mb-4">The post you're looking for doesn't exist or has been removed.</p>
           </div>
         </div>
       </div>
