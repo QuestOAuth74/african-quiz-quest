@@ -117,8 +117,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     }
   };
 
-  const handlePdfUpload = async (file: File) => {
-    if (!user) return;
+  const handlePdfUpload = async (file: File): Promise<{ url: string; name: string } | null> => {
+    if (!user) return null;
     
     setUploadingPdf(true);
     try {
@@ -144,12 +144,15 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         title: "Success",
         description: "PDF uploaded successfully",
       });
+
+      return { url: publicUrl, name: file.name };
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || "Failed to upload PDF",
         variant: "destructive",
       });
+      return null;
     } finally {
       setUploadingPdf(false);
     }
@@ -202,9 +205,16 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 
     setLoading(true);
     try {
-      // Upload PDF if there's a new file
+      // Upload PDF if there's a new file and get the URL/name
+      let finalPdfUrl = pdfAttachmentUrl;
+      let finalPdfName = pdfAttachmentName;
+      
       if (pdfFile) {
-        await handlePdfUpload(pdfFile);
+        const pdfResult = await handlePdfUpload(pdfFile);
+        if (pdfResult) {
+          finalPdfUrl = pdfResult.url;
+          finalPdfName = pdfResult.name;
+        }
       }
 
       const slug = post?.slug || title.toLowerCase()
@@ -230,8 +240,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         status,
         published_at: status === 'published' && !post?.published_at ? new Date().toISOString() : post?.published_at,
         reading_time_minutes: Math.max(1, Math.ceil(allText.split(/\s+/).filter(w => w.length > 0).length / 200)),
-        pdf_attachment_url: pdfAttachmentUrl || null,
-        pdf_attachment_name: pdfAttachmentName || null
+        pdf_attachment_url: finalPdfUrl || null,
+        pdf_attachment_name: finalPdfName || null
       };
 
       await onSave(postData);
