@@ -476,7 +476,7 @@ export const BlogPost: React.FC = () => {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         <BlogCategoriesSidebar currentCategory={post?.category_id} />
         
