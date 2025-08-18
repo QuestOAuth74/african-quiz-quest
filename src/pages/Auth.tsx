@@ -12,7 +12,7 @@ import { Eye, EyeOff, ArrowLeft, User, Mail, Lock, Shield } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 
-const HCAPTCHA_SITE_KEY = "3aea831e-1fce-42ba-a638-0fe8210e1d4a";
+const HCAPTCHA_SITE_KEY = "2da2cd02-0a7e-49d2-bc3a-3ebe2feac7b8";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +49,9 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: {
+          captchaToken: signInCaptchaToken,
+        }
       });
 
       if (error) {
@@ -135,6 +138,7 @@ const Auth = () => {
         password,
         options: {
           emailRedirectTo: redirectUrl,
+          captchaToken: signUpCaptchaToken,
           data: {
             display_name: displayName.trim()
           }
