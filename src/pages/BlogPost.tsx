@@ -5,7 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
-import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File, LogIn } from 'lucide-react';
 import { format } from 'date-fns';
 import baobabHeader from '@/assets/baobab-talks-header.png';
 
@@ -15,6 +16,7 @@ export const BlogPost: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { getPostBySlug, incrementViewCount } = useBlogData();
+  const { user, isAuthenticated } = useAuth();
 
   // Set dynamic page title with loading state
   usePageMeta(
@@ -486,14 +488,36 @@ export const BlogPost: React.FC = () => {
                     </p>
                     <p className="text-muted-foreground">PDF Document</p>
                   </div>
-                  <Button
-                    onClick={() => window.open(post.pdf_attachment_url, '_blank')}
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-semibold"
-                  >
-                    <File className="h-5 w-5 mr-3" />
-                    Download PDF
-                  </Button>
+                  
+                  {isAuthenticated ? (
+                    <Button
+                      onClick={() => window.open(post.pdf_attachment_url, '_blank')}
+                      size="lg"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-semibold"
+                    >
+                      <File className="h-5 w-5 mr-3" />
+                      Download PDF
+                    </Button>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="p-4 bg-muted/50 rounded-lg border border-border/50">
+                        <p className="text-foreground font-medium mb-2">Sign in required</p>
+                        <p className="text-muted-foreground text-sm">
+                          Please sign in to access this downloadable resource.
+                        </p>
+                      </div>
+                      <Link to="/auth">
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3 text-lg font-semibold"
+                        >
+                          <LogIn className="h-5 w-5 mr-3" />
+                          Sign In to Download
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
