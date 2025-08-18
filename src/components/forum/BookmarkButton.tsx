@@ -23,17 +23,19 @@ const BookmarkButton = ({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (user && !initialBookmarked) {
+    if (user) {
+      console.log(`BookmarkButton: Checking bookmark status for user ${user.id} and post ${postId}`);
       checkBookmarkStatus();
     } else {
-      setIsBookmarked(initialBookmarked);
+      setIsBookmarked(false);
     }
-  }, [user, postId, initialBookmarked]);
+  }, [user, postId]);
 
   const checkBookmarkStatus = async () => {
     if (!user) return;
 
     try {
+      console.log(`BookmarkButton: Querying database for user ${user.id} and post ${postId}`);
       const { data, error } = await supabase
         .from('forum_post_bookmarks')
         .select('id')
@@ -41,11 +43,18 @@ const BookmarkButton = ({
         .eq('post_id', postId)
         .maybeSingle();
 
-      if (!error) {
-        setIsBookmarked(!!data);
+      if (error) {
+        console.error('BookmarkButton: Database error:', error);
+        toast.error('Failed to check bookmark status');
+        return;
       }
+
+      const isBookmarked = !!data;
+      console.log(`BookmarkButton: Post ${postId} is ${isBookmarked ? 'bookmarked' : 'not bookmarked'} for user ${user.id}`);
+      setIsBookmarked(isBookmarked);
     } catch (error) {
-      console.error('Error checking bookmark status:', error);
+      console.error('BookmarkButton: Error checking bookmark status:', error);
+      toast.error('Error checking bookmark status');
     }
   };
 
@@ -55,42 +64,59 @@ const BookmarkButton = ({
       return;
     }
 
+    // Optimistic update for better UX
+    const previousState = isBookmarked;
+    setIsBookmarked(!isBookmarked);
     setIsLoading(true);
     
     try {
-      if (isBookmarked) {
-        const { error } = await supabase
+      if (previousState) {
+        console.log(`BookmarkButton: Removing bookmark for user ${user.id} and post ${postId}`);
+        const { error, data } = await supabase
           .from('forum_post_bookmarks')
           .delete()
           .eq('user_id', user.id)
-          .eq('post_id', postId);
+          .eq('post_id', postId)
+          .select();
 
         if (error) {
+          console.error('BookmarkButton: Delete error:', error);
+          setIsBookmarked(previousState); // Revert optimistic update
           toast.error('Failed to remove bookmark');
           return;
         }
 
-        setIsBookmarked(false);
+        console.log(`BookmarkButton: Successfully removed bookmark. Deleted records:`, data);
         onBookmarkChange?.(false);
         toast.success('Bookmark removed');
       } else {
-        const { error } = await supabase
+        console.log(`BookmarkButton: Adding bookmark for user ${user.id} and post ${postId}`);
+        const { error, data } = await supabase
           .from('forum_post_bookmarks')
           .insert({
             user_id: user.id,
             post_id: postId
-          });
+          })
+          .select();
 
         if (error) {
-          toast.error('Failed to bookmark post');
+          console.error('BookmarkButton: Insert error:', error);
+          setIsBookmarked(previousState); // Revert optimistic update
+          if (error.code === '23505') {
+            toast.error('Post is already bookmarked');
+          } else {
+            toast.error('Failed to bookmark post');
+          }
           return;
         }
 
-        setIsBookmarked(true);
+        console.log(`BookmarkButton: Successfully added bookmark. Created record:`, data);
         onBookmarkChange?.(true);
         toast.success('Post bookmarked');
       }
     } catch (error) {
+      console.error('BookmarkButton: Unexpected error:', error);
+      setIsBookmarked(previousState); // Revert optimistic update
       toast.error('Error updating bookmark');
     } finally {
       setIsLoading(false);
