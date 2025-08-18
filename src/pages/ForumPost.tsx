@@ -323,10 +323,10 @@ const ForumPost = () => {
         <div className="mb-6">
           <Link 
             to="/forum" 
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-105"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Forum
+            <span className="font-medium">Back to Forum</span>
           </Link>
         </div>
 
