@@ -6,7 +6,7 @@ import GameSetup from "@/components/GameSetup";
 import { GameHeader } from "@/components/GameHeader";
 import { GameBoard } from "@/components/GameBoard";
 import QuestionModal from "@/components/QuestionModal";
-import UserAuth from "@/components/UserAuth";
+
 import TopNavigation from "@/components/TopNavigation";
 import { AudioControls } from "@/components/AudioControls";
 import { Button } from "@/components/ui/button";
@@ -703,12 +703,6 @@ const Index = () => {
         {/* Crossword Section - African History Puzzles */}
         <CrosswordSection />
 
-        {/* User Authentication Section */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-md mx-auto">
-            <UserAuth />
-          </div>
-        </div>
       </div>
     );
   }
