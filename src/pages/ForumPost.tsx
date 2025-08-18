@@ -291,7 +291,7 @@ const ForumPost = () => {
     return (
       <div className="min-h-screen bg-background">
         <TopNavigation />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 pt-20">
           {/* Back link in loading state */}
           <div className="mb-6">
             <Link 
@@ -312,7 +312,7 @@ const ForumPost = () => {
     return (
       <div className="min-h-screen bg-background">
         <TopNavigation />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 pt-20">
           {/* Back link in error state */}
           <div className="mb-6">
             <Link 
@@ -336,7 +336,7 @@ const ForumPost = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
       <TopNavigation />
       
-      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6">
+      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 pt-20">
         {/* Breadcrumb Navigation */}
         <div className="mb-6">
           <Link 
