@@ -23,10 +23,12 @@ const BookmarkButton = ({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user && !initialBookmarked) {
       checkBookmarkStatus();
+    } else {
+      setIsBookmarked(initialBookmarked);
     }
-  }, [user, postId]);
+  }, [user, postId, initialBookmarked]);
 
   const checkBookmarkStatus = async () => {
     if (!user) return;

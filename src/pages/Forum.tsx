@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useForumData } from '@/hooks/useForumData';
 import { useBookmarks } from '@/hooks/useBookmarks';
+import { useDebounce } from '@/hooks/useDebounce';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -93,16 +94,19 @@ const Forum = () => {
   const [replyContent, setReplyContent] = useState<{ [postId: string]: string }>({});
   const [submittingReply, setSubmittingReply] = useState<string | null>(null);
 
-  // Build filters object
-  const filters = {
+  // Debounce search term to prevent excessive API calls
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  
+  // Build filters object with memoization
+  const filters = useMemo(() => ({
     selectedCategory,
-    searchTerm,
+    searchTerm: debouncedSearchTerm,
     sortBy,
     sortOrder,
     timeFilter,
     userFilter,
     popularityFilter
-  };
+  }), [selectedCategory, debouncedSearchTerm, sortBy, sortOrder, timeFilter, userFilter, popularityFilter]);
 
   // Use the custom hook for forum data
   const {
@@ -125,10 +129,10 @@ const Forum = () => {
     refetchBookmarks
   } = useBookmarks(user);
 
-  // Reset visible posts count when filters change
+  // Reset visible posts count when filters change (with debounced search)
   useEffect(() => {
     setVisiblePostsCount(10);
-  }, [selectedCategory, searchTerm, sortBy, sortOrder, timeFilter, userFilter, popularityFilter]);
+  }, [selectedCategory, debouncedSearchTerm, sortBy, sortOrder, timeFilter, userFilter, popularityFilter]);
 
   // Calculate active filters count
   const activeFiltersCount = [
@@ -137,24 +141,24 @@ const Forum = () => {
     popularityFilter !== 'all'
   ].filter(Boolean).length;
 
-  // Filter handlers
-  const handleClearFilters = () => {
+  // Memoized filter handlers
+  const handleClearFilters = useCallback(() => {
     setTimeFilter('all');
     setUserFilter('all');
     setPopularityFilter('all');
-  };
+  }, []);
 
-  const handleSortOrderChange = () => {
+  const handleSortOrderChange = useCallback(() => {
     setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
-  };
+  }, []);
 
-  const handleShowMorePosts = () => {
+  const handleShowMorePosts = useCallback(() => {
     setVisiblePostsCount(prev => prev + postsPerPage);
-  };
+  }, [postsPerPage]);
 
-  const handleShowLessPosts = () => {
+  const handleShowLessPosts = useCallback(() => {
     setVisiblePostsCount(postsPerPage);
-  };
+  }, [postsPerPage]);
 
   const toggleReplies = async (postId: string) => {
     if (showReplies.has(postId)) {
@@ -361,7 +365,7 @@ const Forum = () => {
             <TabsTrigger value="messages">Messages</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="posts" className="space-y-6">
+          <TabsContent value="posts" className="space-y-6" style={{ display: 'block' }}>
             {/* Stories-like Category Filter */}
             <div className="bg-background/80 backdrop-blur-sm rounded-3xl p-6 mb-6 border border-border/30 shadow-lg">
               <h2 className="text-lg font-semibold mb-4 text-foreground">Explore Topics</h2>

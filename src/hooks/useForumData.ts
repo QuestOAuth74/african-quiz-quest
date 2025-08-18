@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -52,6 +52,8 @@ export const useForumData = (user: any, filters: ForumFilters) => {
   const [replies, setReplies] = useState<{ [postId: string]: Reply[] }>({});
   const [userUpvotes, setUserUpvotes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchCategories = useCallback(async () => {
     const { data, error } = await supabase
@@ -147,17 +149,42 @@ export const useForumData = (user: any, filters: ForumFilters) => {
   }, [filters, user]);
 
   const fetchPosts = useCallback(async () => {
-    const query = buildPostsQuery();
-    const { data, error } = await query;
-    
-    if (error) {
-      toast.error('Failed to load posts');
-      setLoading(false);
-      return;
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
     
-    setPosts(data || []);
-    setLoading(false);
+    // Clear previous debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    // Debounce the request
+    debounceTimerRef.current = setTimeout(async () => {
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+      
+      try {
+        const query = buildPostsQuery();
+        const { data, error } = await query;
+        
+        if (error && !abortController.signal.aborted) {
+          toast.error('Failed to load posts');
+          setLoading(false);
+          return;
+        }
+        
+        if (!abortController.signal.aborted) {
+          setPosts(data || []);
+          setLoading(false);
+        }
+      } catch (error: any) {
+        if (!abortController.signal.aborted) {
+          toast.error('Failed to load posts');
+          setLoading(false);
+        }
+      }
+    }, 300);
   }, [buildPostsQuery]);
 
   const fetchUserUpvotes = useCallback(async () => {
@@ -244,6 +271,16 @@ export const useForumData = (user: any, filters: ForumFilters) => {
 
   useEffect(() => {
     fetchPosts();
+    
+    // Cleanup function to cancel ongoing requests
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
   }, [fetchPosts]);
 
   useEffect(() => {

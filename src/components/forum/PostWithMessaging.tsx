@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -56,7 +56,7 @@ interface PostWithMessagingProps {
 // Common emojis for easy insertion
 const commonEmojis = ['😀', '😂', '😍', '🤔', '👍', '👎', '❤️', '🔥', '💯', '🎉', '🌟', '✨'];
 
-export const PostWithMessaging = ({ 
+export const PostWithMessaging = memo(({ 
   post, 
   isUpvoted,
   onUpvote,
@@ -430,4 +430,4 @@ export const PostWithMessaging = ({
       </CardContent>
     </Card>
   );
-};
+});
