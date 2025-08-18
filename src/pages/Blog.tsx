@@ -1,20 +1,29 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { usePageMeta } from '@/hooks/usePageTitle';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useBlogData } from '@/hooks/useBlogData';
 import { Search, Clock, Eye, Calendar, BookOpen, Users, TrendingUp, Sparkles, Globe, Star } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const Blog: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
+  const [currentPage, setCurrentPage] = useState(1);
   const { posts, categories, fetchPosts, loading } = useBlogData();
   const [filteredPosts, setFilteredPosts] = useState(posts);
+  
+  const postsPerPage = 5;
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  const currentPosts = filteredPosts.slice(startIndex, endIndex);
 
   // Set page title and meta
   usePageMeta("Blog", "Discover articles, insights, and stories about African history, culture, and heritage on the Historia Africana blog.");
@@ -34,7 +43,18 @@ export const Blog: React.FC = () => {
     }
 
     setFilteredPosts(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [posts, searchTerm, selectedCategory]);
+
+  // Update URL when category changes
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    if (category === 'all') {
+      setSearchParams({});
+    } else {
+      setSearchParams({ category });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,7 +146,7 @@ export const Blog: React.FC = () => {
                   className="pl-12 h-12 text-base bg-background border-2 border-border focus:border-theme-yellow"
                 />
               </div>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select value={selectedCategory} onValueChange={handleCategoryChange}>
                 <SelectTrigger className="w-full md:w-56 h-12 border-2 border-border focus:border-theme-yellow">
                   <SelectValue placeholder="Choose category" />
                 </SelectTrigger>
@@ -153,8 +173,9 @@ export const Blog: React.FC = () => {
               <p className="text-lg text-muted-foreground">Loading amazing stories...</p>
             </div>
           ) : filteredPosts.length > 0 ? (
-            <div className="grid gap-8 md:gap-10">
-              {filteredPosts.map((post, index) => (
+            <>
+              <div className="grid gap-8 md:gap-10">
+                {currentPosts.map((post, index) => (
                 <article key={post.id} className={`group ${index === 0 ? 'md:col-span-2' : ''}`}>
                   <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-theme-yellow/20 bg-gradient-to-br from-card to-card/50">
                     <div className={`grid ${post.featured_image_url ? 'md:grid-cols-2' : 'md:grid-cols-1'} gap-0`}>
@@ -236,8 +257,48 @@ export const Blog: React.FC = () => {
                     </div>
                   </Card>
                 </article>
-              ))}
-            </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-12">
+                  <Pagination>
+                    <PaginationContent>
+                      {currentPage > 1 && (
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            className="cursor-pointer hover:bg-muted"
+                          />
+                        </PaginationItem>
+                      )}
+                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      
+                      {currentPage < totalPages && (
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            className="cursor-pointer hover:bg-muted"
+                          />
+                        </PaginationItem>
+                      )}
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-16">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-muted/50 rounded-full mb-6">

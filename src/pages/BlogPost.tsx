@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { usePageMeta } from '@/hooks/usePageTitle';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { BlogCategoriesSidebar } from '@/components/blog/BlogCategoriesSidebar';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +15,7 @@ import baobabHeader from '@/assets/baobab-talks-header.png';
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
   const [post, setPost] = useState<BlogPostType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -351,7 +354,11 @@ export const BlogPost: React.FC = () => {
   }
 
   return (
-    <article className="min-h-screen bg-background">
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <BlogCategoriesSidebar currentCategory={post?.category_id} />
+        
+        <article className="flex-1">
       {/* Modern Hero Section */}
       <div className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
@@ -565,6 +572,8 @@ export const BlogPost: React.FC = () => {
           </div>
         </div>
       </main>
-    </article>
+        </article>
+      </div>
+    </SidebarProvider>
   );
 };
