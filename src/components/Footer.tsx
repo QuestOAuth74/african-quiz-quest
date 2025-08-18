@@ -72,7 +72,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link 
-                  to="/quiz-setup" 
+                  to="/quiz" 
                   className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
                 >
                   <Target className="h-4 w-4" />
@@ -81,7 +81,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link 
-                  to="/wheel-play" 
+                  to="/wheel" 
                   className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
                 >
                   <Crosshair className="h-4 w-4" />
@@ -90,7 +90,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link 
-                  to="/crossword-play" 
+                  to="/crossword" 
                   className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
                 >
                   <Grid3X3 className="h-4 w-4" />
