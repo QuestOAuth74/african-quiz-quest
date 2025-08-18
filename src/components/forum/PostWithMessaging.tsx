@@ -44,8 +44,13 @@ interface PostWithMessagingProps {
   onReplyContentChange: (content: string) => void;
   onSubmitReply: () => void;
   submittingReply: boolean;
-  formatDate: (dateString: string) => string;
+  formatDate?: (dateString: string) => string;
   isAuthenticated: boolean;
+  onViewPost?: (id: string) => void;
+  user?: any;
+  onBookmarkRemove?: () => void;
+  showBookmarkedAt?: boolean;
+  bookmarkedAt?: string;
 }
 
 // Common emojis for easy insertion
@@ -63,7 +68,12 @@ export const PostWithMessaging = ({
   onSubmitReply,
   submittingReply,
   formatDate,
-  isAuthenticated
+  isAuthenticated,
+  onViewPost,
+  user: currentUser,
+  onBookmarkRemove,
+  showBookmarkedAt = false,
+  bookmarkedAt
 }: PostWithMessagingProps) => {
   const { user } = useAuth();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -166,16 +176,32 @@ export const PostWithMessaging = ({
                 <Badge variant="secondary" className="text-xs px-2 py-0.5">
                   {post.forum_categories?.name}
                 </Badge>
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(post.created_at)}
-                </span>
+                 <span className="text-xs text-muted-foreground">
+                   {formatDate ? formatDate(post.created_at) : new Date(post.created_at).toLocaleDateString()}
+                 </span>
+                 {showBookmarkedAt && bookmarkedAt && (
+                   <span className="text-xs text-primary">
+                     • Bookmarked {formatDate ? formatDate(bookmarkedAt) : new Date(bookmarkedAt).toLocaleDateString()}
+                   </span>
+                 )}
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <MessageButton recipientId={post.user_id} recipientName={authorName} />
-            <BookmarkButton postId={post.id} />
-          </div>
+           <div className="flex items-center gap-2">
+             <MessageButton recipientId={post.user_id} recipientName={authorName} />
+             {onBookmarkRemove ? (
+               <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={onBookmarkRemove}
+                 className="flex items-center gap-2 text-muted-foreground hover:text-destructive"
+               >
+                 Remove Bookmark
+               </Button>
+              ) : (
+                <BookmarkButton postId={post.id} />
+              )}
+           </div>
         </div>
 
         {/* Post Content */}
@@ -295,7 +321,7 @@ export const PostWithMessaging = ({
                           {reply.profiles?.display_name || 'Anonymous User'}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {formatDate(reply.created_at)}
+                          {formatDate ? formatDate(reply.created_at) : new Date(reply.created_at).toLocaleDateString()}
                         </span>
                       </div>
                       {user?.id === reply.user_id && editingReply !== reply.id && (

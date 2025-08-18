@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useForumData } from '@/hooks/useForumData';
+import { useBookmarks } from '@/hooks/useBookmarks';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { MessageCircle, Plus, Upload, X, Image as ImageIcon, ThumbsUp, Reply, Send, Filter, ChevronDown, ChevronUp, Bookmark } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import TopNavigation from '@/components/TopNavigation';
@@ -114,6 +115,15 @@ const Forum = () => {
     fetchReplies,
     toggleUpvote
   } = useForumData(user, filters);
+
+  // Use the bookmarks hook
+  const {
+    bookmarkedPosts,
+    loading: bookmarksLoading,
+    removeBookmark,
+    isPostBookmarked,
+    refetchBookmarks
+  } = useBookmarks(user);
 
   // Reset visible posts count when filters change
   useEffect(() => {
@@ -339,8 +349,15 @@ const Forum = () => {
       <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6">
         {/* Tab Navigation */}
         <Tabs defaultValue="posts" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="posts">Posts</TabsTrigger>
+            <TabsTrigger value="bookmarks" disabled={!isAuthenticated}>
+              Bookmarks {isAuthenticated && bookmarkedPosts.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 text-xs bg-primary text-primary-foreground rounded-full">
+                  {bookmarkedPosts.length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
           </TabsList>
           
@@ -660,6 +677,80 @@ const Forum = () => {
             </div>
           </TabsContent>
           
+          <TabsContent value="bookmarks">
+            {isAuthenticated ? (
+              <div className="space-y-6">
+                {bookmarksLoading ? (
+                  <div className="text-center py-8">
+                    <div className="text-muted-foreground">Loading bookmarked posts...</div>
+                  </div>
+                ) : bookmarkedPosts.length === 0 ? (
+                  <Card className="p-8 text-center">
+                    <Bookmark className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No bookmarked posts yet</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Bookmark posts you want to revisit later by clicking the bookmark button.
+                    </p>
+                    <Button onClick={() => {
+                      const postsTab = document.querySelector('[value="posts"]') as HTMLButtonElement;
+                      postsTab?.click();
+                    }}>
+                      Browse Posts
+                    </Button>
+                  </Card>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-semibold">Your Bookmarked Posts</h2>
+                      <div className="text-sm text-muted-foreground">
+                        {bookmarkedPosts.length} post{bookmarkedPosts.length !== 1 ? 's' : ''}
+                      </div>
+                    </div>
+                    
+                     {bookmarkedPosts.map((post) => (
+                      <PostWithMessaging
+                        key={post.id}
+                        post={post}
+                        isUpvoted={userUpvotes.has(post.id)}
+                        showReplies={showReplies.has(post.id)}
+                        replies={replies[post.id] || []}
+                        replyContent={replyContent[post.id] || ''}
+                        submittingReply={submittingReply === post.id}
+                        onViewPost={(id) => window.location.href = `/forum/${id}`}
+                        onUpvote={() => toggleUpvote(post.id)}
+                        onToggleReplies={() => toggleReplies(post.id)}
+                        onReplyContentChange={(content) => 
+                          setReplyContent(prev => ({ ...prev, [post.id]: content }))
+                        }
+                        onSubmitReply={() => submitReply(post.id)}
+                        formatDate={formatDate}
+                        user={user}
+                        isAuthenticated={isAuthenticated}
+                        onBookmarkRemove={() => {
+                          removeBookmark(post.id);
+                          refetchBookmarks();
+                        }}
+                        showBookmarkedAt={true}
+                        bookmarkedAt={post.bookmarked_at}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <Bookmark className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Sign in to view bookmarks</h3>
+                <p className="text-muted-foreground mb-4">
+                  Save posts you want to revisit later with bookmarks.
+                </p>
+                <Link to="/auth">
+                  <Button>Sign In</Button>
+                </Link>
+              </Card>
+            )}
+          </TabsContent>
+
           <TabsContent value="messages">
             {isAuthenticated ? (
               <PrivateMessages />
