@@ -10,6 +10,9 @@ import { UserBadges } from '@/components/UserBadges';
 import { ThumbsUp, MessageCircle, Send, Smile } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Post {
   id: string;
@@ -62,13 +65,90 @@ export const PostWithMessaging = ({
   formatDate,
   isAuthenticated
 }: PostWithMessagingProps) => {
+  const { user } = useAuth();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [editingPost, setEditingPost] = useState(false);
+  const [editPostContent, setEditPostContent] = useState('');
+  const [editingReply, setEditingReply] = useState<string | null>(null);
+  const [editReplyContent, setEditReplyContent] = useState('');
   const authorName = post.profiles.display_name || (post.profiles.email ? post.profiles.email.split('@')[0] : 'Anonymous User');
   const replyCount = post.forum_post_replies?.length || replies.length || 0;
 
   const insertEmoji = (emoji: string) => {
     onReplyContentChange(replyContent + emoji);
     setShowEmojiPicker(false);
+  };
+
+  const handleEditPost = () => {
+    setEditingPost(true);
+    setEditPostContent(post.content);
+  };
+
+  const savePostEdit = async () => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('forum_posts')
+        .update({ 
+          content: editPostContent.trim(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', post.id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Update the post content in the UI (parent component would need to handle this)
+      setEditingPost(false);
+      toast.success('Post updated successfully!');
+      // Refresh the page to show updated content
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating post:', error);
+      toast.error('Failed to update post');
+    }
+  };
+
+  const cancelPostEdit = () => {
+    setEditingPost(false);
+    setEditPostContent('');
+  };
+
+  const handleEditReply = (replyId: string, currentContent: string) => {
+    setEditingReply(replyId);
+    setEditReplyContent(currentContent);
+  };
+
+  const saveReplyEdit = async (replyId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('forum_post_replies')
+        .update({ 
+          content: editReplyContent.trim(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', replyId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setEditingReply(null);
+      setEditReplyContent('');
+      toast.success('Reply updated successfully!');
+      // Refresh to show updated reply
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating reply:', error);
+      toast.error('Failed to update reply');
+    }
+  };
+
+  const cancelReplyEdit = () => {
+    setEditingReply(null);
+    setEditReplyContent('');
   };
 
   return (
@@ -100,17 +180,59 @@ export const PostWithMessaging = ({
 
         {/* Post Content */}
         <div className="space-y-4">
-          <Link 
-            to={`/forum/${post.id}`}
-            className="block group"
-          >
-            <h3 className="text-xl font-bold text-foreground leading-tight group-hover:text-primary transition-colors cursor-pointer">
-              {post.title}
-            </h3>
-          </Link>
-          <p className="text-muted-foreground leading-relaxed">
-            {post.content}
-          </p>
+          <div className="flex items-start justify-between">
+            <Link 
+              to={`/forum/${post.id}`}
+              className="block group flex-1"
+            >
+              <h3 className="text-xl font-bold text-foreground leading-tight group-hover:text-primary transition-colors cursor-pointer">
+                {post.title}
+              </h3>
+            </Link>
+            {user?.id === post.user_id && !editingPost && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEditPost}
+                className="ml-2 text-xs"
+              >
+                Edit
+              </Button>
+            )}
+          </div>
+          
+          {editingPost ? (
+            <div className="space-y-3">
+              <Textarea
+                value={editPostContent}
+                onChange={(e) => setEditPostContent(e.target.value)}
+                rows={4}
+                className="rounded-xl border-border/30 bg-background/80 resize-none"
+              />
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={cancelPostEdit}
+                  className="rounded-full"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={savePostEdit}
+                  disabled={!editPostContent.trim()}
+                  className="rounded-full"
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-muted-foreground leading-relaxed">
+              {post.content}
+            </p>
+          )}
           
           {/* Post Image */}
           {post.image_url && (
@@ -166,18 +288,60 @@ export const PostWithMessaging = ({
               <div className="space-y-3 pl-4 border-l-2 border-primary/20">
                 {replies.map((reply: any) => (
                   <div key={reply.id} className="bg-muted/30 rounded-2xl p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <UserAvatar size="sm" />
-                      <span className="font-medium text-sm">
-                        {reply.profiles?.display_name || 'Anonymous User'}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDate(reply.created_at)}
-                      </span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <UserAvatar size="sm" />
+                        <span className="font-medium text-sm">
+                          {reply.profiles?.display_name || 'Anonymous User'}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDate(reply.created_at)}
+                        </span>
+                      </div>
+                      {user?.id === reply.user_id && editingReply !== reply.id && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditReply(reply.id, reply.content)}
+                          className="text-xs"
+                        >
+                          Edit
+                        </Button>
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {reply.content}
-                    </p>
+                    
+                    {editingReply === reply.id ? (
+                      <div className="space-y-3">
+                        <Textarea
+                          value={editReplyContent}
+                          onChange={(e) => setEditReplyContent(e.target.value)}
+                          rows={3}
+                          className="rounded-xl border-border/30 bg-background/80 resize-none"
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={cancelReplyEdit}
+                            className="rounded-full"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => saveReplyEdit(reply.id)}
+                            disabled={!editReplyContent.trim()}
+                            className="rounded-full"
+                          >
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {reply.content}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>

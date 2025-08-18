@@ -61,6 +61,10 @@ const ForumPost = () => {
   const [submittingReply, setSubmittingReply] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [editingPost, setEditingPost] = useState(false);
+  const [editPostContent, setEditPostContent] = useState('');
+  const [editingReply, setEditingReply] = useState<string | null>(null);
+  const [editReplyContent, setEditReplyContent] = useState('');
 
   usePageTitle(post?.title || 'Forum Post');
 
@@ -277,6 +281,80 @@ const ForumPost = () => {
     }
   };
 
+  const handleEditPost = () => {
+    if (!post) return;
+    setEditingPost(true);
+    setEditPostContent(post.content);
+  };
+
+  const savePostEdit = async () => {
+    if (!post || !user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('forum_posts')
+        .update({ 
+          content: editPostContent.trim(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', post.id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setPost(prev => prev ? { ...prev, content: editPostContent.trim() } : null);
+      setEditingPost(false);
+      toast.success('Post updated successfully!');
+    } catch (error) {
+      console.error('Error updating post:', error);
+      toast.error('Failed to update post');
+    }
+  };
+
+  const cancelPostEdit = () => {
+    setEditingPost(false);
+    setEditPostContent('');
+  };
+
+  const handleEditReply = (replyId: string, currentContent: string) => {
+    setEditingReply(replyId);
+    setEditReplyContent(currentContent);
+  };
+
+  const saveReplyEdit = async (replyId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('forum_post_replies')
+        .update({ 
+          content: editReplyContent.trim(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', replyId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setReplies(prev => prev.map(reply => 
+        reply.id === replyId 
+          ? { ...reply, content: editReplyContent.trim() }
+          : reply
+      ));
+      setEditingReply(null);
+      setEditReplyContent('');
+      toast.success('Reply updated successfully!');
+    } catch (error) {
+      console.error('Error updating reply:', error);
+      toast.error('Failed to update reply');
+    }
+  };
+
+  const cancelReplyEdit = () => {
+    setEditingReply(null);
+    setEditReplyContent('');
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -376,6 +454,16 @@ const ForumPost = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {user?.id === post.user_id && !editingPost && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleEditPost}
+                    className="flex items-center gap-2"
+                  >
+                    Edit
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -400,9 +488,38 @@ const ForumPost = () => {
 
             {/* Post Content */}
             <div className="prose prose-lg max-w-none mb-6">
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                {post.content}
-              </p>
+              {editingPost ? (
+                <div className="space-y-4">
+                  <Textarea
+                    value={editPostContent}
+                    onChange={(e) => setEditPostContent(e.target.value)}
+                    rows={6}
+                    className="rounded-xl border-border/30 bg-background/80 resize-none"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={cancelPostEdit}
+                      className="rounded-full"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={savePostEdit}
+                      disabled={!editPostContent.trim()}
+                      className="rounded-full"
+                    >
+                      Save Changes
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                  {post.content}
+                </p>
+              )}
             </div>
 
             {/* Post Image */}
@@ -515,26 +632,68 @@ const ForumPost = () => {
                 {replies.map((reply) => (
                   <div key={reply.id} className="border-l-2 border-primary/20 pl-6">
                     <div className="bg-muted/30 rounded-2xl p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <UserAvatar 
-                          displayName={reply.profiles?.display_name}
-                          userId={reply.user_id}
-                          size="sm"
-                        />
-                        <div>
-                          <span className="font-medium text-sm">
-                            {getDisplayName(reply.profiles?.display_name, reply.user_id)}
-                          </span>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-muted-foreground">
-                              {formatDate(reply.created_at)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                        {reply.content}
-                      </p>
+                       <div className="flex items-center justify-between mb-4">
+                         <div className="flex items-center gap-3">
+                           <UserAvatar 
+                             displayName={reply.profiles?.display_name}
+                             userId={reply.user_id}
+                             size="sm"
+                           />
+                           <div>
+                             <span className="font-medium text-sm">
+                               {getDisplayName(reply.profiles?.display_name, reply.user_id)}
+                             </span>
+                             <div className="flex items-center gap-2 mt-1">
+                               <span className="text-xs text-muted-foreground">
+                                 {formatDate(reply.created_at)}
+                               </span>
+                             </div>
+                           </div>
+                         </div>
+                         {user?.id === reply.user_id && editingReply !== reply.id && (
+                           <Button
+                             variant="ghost"
+                             size="sm"
+                             onClick={() => handleEditReply(reply.id, reply.content)}
+                             className="text-xs"
+                           >
+                             Edit
+                           </Button>
+                         )}
+                       </div>
+                       
+                       {editingReply === reply.id ? (
+                         <div className="space-y-3">
+                           <Textarea
+                             value={editReplyContent}
+                             onChange={(e) => setEditReplyContent(e.target.value)}
+                             rows={3}
+                             className="rounded-xl border-border/30 bg-background/80 resize-none"
+                           />
+                           <div className="flex gap-2 justify-end">
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={cancelReplyEdit}
+                               className="rounded-full"
+                             >
+                               Cancel
+                             </Button>
+                             <Button
+                               size="sm"
+                               onClick={() => saveReplyEdit(reply.id)}
+                               disabled={!editReplyContent.trim()}
+                               className="rounded-full"
+                             >
+                               Save Changes
+                             </Button>
+                           </div>
+                         </div>
+                       ) : (
+                         <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                           {reply.content}
+                         </p>
+                       )}
                     </div>
                   </div>
                 ))}
