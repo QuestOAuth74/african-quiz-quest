@@ -9,7 +9,7 @@ import { BlogCategoriesSidebar } from '@/components/blog/BlogCategoriesSidebar';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File, LogIn } from 'lucide-react';
+import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File, LogIn, Quote, AlertCircle, CheckCircle, AlertTriangle, Info, Lightbulb, Hash } from 'lucide-react';
 import { format } from 'date-fns';
 import baobabHeader from '@/assets/baobab-talks-header.png';
 
@@ -295,6 +295,128 @@ export const BlogPost: React.FC = () => {
                 Download
               </a>
             </div>
+          </div>
+        );
+
+      case 'quote':
+        return (
+          <blockquote key={block.id} className="border-l-4 border-theme-gold pl-6 py-4 bg-muted/30 rounded-r-lg my-6">
+            <Quote className="h-6 w-6 text-theme-gold mb-2" />
+            <p className="text-lg italic font-medium leading-relaxed">
+              "{block.data.text}"
+            </p>
+            {(block.data.author || block.data.source) && (
+              <footer className="mt-3 text-sm text-muted-foreground">
+                {block.data.author && <cite>— {block.data.author}</cite>}
+                {block.data.source && (
+                  <span>
+                    {block.data.author ? ', ' : '— '}
+                    {block.data.source}
+                  </span>
+                )}
+              </footer>
+            )}
+          </blockquote>
+        );
+
+      case 'list':
+        const ListTag = block.data.listType === 'ordered' ? 'ol' : 'ul';
+        return (
+          <ListTag key={block.id} className={`my-4 space-y-2 ${block.data.listType === 'ordered' ? 'list-decimal' : 'list-disc'} list-inside`}>
+            {block.data.items?.map((item: string, index: number) => (
+              <li key={index} className="text-foreground leading-relaxed">
+                {item}
+              </li>
+            ))}
+          </ListTag>
+        );
+
+      case 'callout':
+        const getCalloutIcon = (type: string) => {
+          switch (type) {
+            case 'info': return Info;
+            case 'warning': return AlertTriangle;
+            case 'success': return CheckCircle;
+            case 'error': return AlertCircle;
+            case 'tip': return Lightbulb;
+            default: return Info;
+          }
+        };
+
+        const getCalloutStyles = (type: string) => {
+          switch (type) {
+            case 'info': return 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200';
+            case 'warning': return 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-200';
+            case 'success': return 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200';
+            case 'error': return 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200';
+            case 'tip': return 'bg-purple-50 border-purple-200 text-purple-800 dark:bg-purple-950 dark:border-purple-800 dark:text-purple-200';
+            default: return 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200';
+          }
+        };
+
+        const CalloutIcon = getCalloutIcon(block.data.calloutType || 'info');
+        
+        return (
+          <div key={block.id} className={`my-6 p-4 rounded-lg border-l-4 ${getCalloutStyles(block.data.calloutType || 'info')}`}>
+            <div className="flex items-start gap-3">
+              <CalloutIcon className="h-5 w-5 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                {block.data.title && (
+                  <h4 className="font-semibold mb-2">{block.data.title}</h4>
+                )}
+                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: block.data.content || '' }} />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'code':
+        return (
+          <div key={block.id} className="my-6">
+            <div className="bg-muted rounded-lg border">
+              {(block.data.language || block.data.filename) && (
+                <div className="flex items-center justify-between px-4 py-2 border-b bg-muted/50 rounded-t-lg">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Hash className="h-4 w-4" />
+                    {block.data.language && <span>{block.data.language}</span>}
+                    {block.data.filename && <span>{block.data.filename}</span>}
+                  </div>
+                </div>
+              )}
+              <pre className="p-4 overflow-x-auto">
+                <code className="text-sm font-mono">{block.data.code}</code>
+              </pre>
+            </div>
+          </div>
+        );
+
+      case 'divider':
+        const getDividerElement = (style: string) => {
+          switch (style) {
+            case 'stars':
+              return (
+                <div className="text-center text-2xl text-muted-foreground">
+                  ✦ ✦ ✦
+                </div>
+              );
+            case 'dashed':
+              return <hr className="border-dashed border-muted-foreground/30" />;
+            case 'dotted':
+              return <hr className="border-dotted border-muted-foreground/30" />;
+            case 'double':
+              return <hr className="border-double border-2 border-muted-foreground/30" />;
+            case 'thick':
+              return <hr className="border-2 border-muted-foreground/30" />;
+            case 'gradient':
+              return <hr className="h-px bg-gradient-to-r from-transparent via-muted-foreground/30 to-transparent border-0" />;
+            default:
+              return <hr className="border-muted-foreground/30" />;
+          }
+        };
+
+        return (
+          <div key={block.id} className="my-8">
+            {getDividerElement(block.data.dividerStyle || 'solid')}
           </div>
         );
 
