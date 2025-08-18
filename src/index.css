@@ -418,6 +418,32 @@ All colors MUST be HSL.
   animation: shimmer 2s linear infinite;
 }
 
+/* Forum image frame with gold glowing rim */
+.forum-image-frame {
+  @apply relative rounded-2xl overflow-hidden;
+  background: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
+  padding: 2px;
+  box-shadow: 
+    0 4px 16px hsl(var(--theme-yellow) / 0.25),
+    0 6px 30px hsl(var(--theme-yellow) / 0.15),
+    inset 0 1px 0 hsl(var(--theme-yellow-light) / 0.6);
+  transition: all 0.3s ease;
+}
+
+.forum-image-frame:hover {
+  box-shadow: 
+    0 6px 24px hsl(var(--theme-yellow) / 0.4),
+    0 10px 40px hsl(var(--theme-yellow) / 0.25),
+    inset 0 1px 0 hsl(var(--theme-yellow-light) / 0.8);
+  transform: scale(1.02);
+}
+
+.forum-image-content {
+  @apply rounded-xl overflow-hidden bg-background;
+  display: block;
+  width: 100%;
+}
+
 /* Crossword-specific styles */
 .crossword-grid {
   font-family: 'Orbitron', monospace;

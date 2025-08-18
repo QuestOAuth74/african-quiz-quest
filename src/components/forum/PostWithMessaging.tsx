@@ -108,12 +108,14 @@ export const PostWithMessaging = ({
           
           {/* Post Image */}
           {post.image_url && (
-            <div className="rounded-2xl overflow-hidden border border-border/20">
-              <img 
-                src={post.image_url} 
-                alt="Post image" 
-                className="w-full max-h-96 object-cover"
-              />
+            <div className="forum-image-frame">
+              <div className="forum-image-content">
+                <img 
+                  src={post.image_url} 
+                  alt="Post image" 
+                  className="w-full max-h-96 object-cover"
+                />
+              </div>
             </div>
           )}
         </div>
