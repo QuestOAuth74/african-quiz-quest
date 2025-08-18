@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Home, Trophy, MessageCircle, User, Globe, Youtube, Instagram, Heart, Coffee, ExternalLink } from 'lucide-react';
+import { Home, Trophy, MessageCircle, User, Globe, Youtube, Instagram, Heart, Coffee, ExternalLink, Gamepad2, Target, Crosshair, Grid3X3 } from 'lucide-react';
 
 const Footer = () => {
   return (
     <footer className="bg-theme-brown-dark border-t border-theme-yellow/20 mt-auto">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
             <h3 className="text-theme-yellow font-semibold text-lg">Historia Africana</h3>
@@ -52,6 +52,49 @@ const Footer = () => {
                 >
                   <User className="h-4 w-4" />
                   Profile
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Games Section */}
+          <div className="space-y-4">
+            <h4 className="text-theme-yellow font-medium">Games</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link 
+                  to="/" 
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <Gamepad2 className="h-4 w-4" />
+                  Jeopardy Quiz
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/quiz-setup" 
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <Target className="h-4 w-4" />
+                  Quick Quiz
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/wheel-play" 
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <Crosshair className="h-4 w-4" />
+                  Wheel of Destiny
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/crossword-play" 
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                  Crossword Puzzles
                 </Link>
               </li>
             </ul>
