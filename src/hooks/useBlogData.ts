@@ -238,6 +238,7 @@ export const useBlogData = () => {
   useEffect(() => {
     fetchCategories();
     fetchTags();
+    fetchPosts('published'); // Auto-load published posts for counting in sidebars
   }, []);
 
   return {
