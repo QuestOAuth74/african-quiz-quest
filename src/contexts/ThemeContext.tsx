@@ -13,7 +13,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    // Graceful fallback to avoid crashes if used outside provider (e.g., during initial mount)
+    const fallback: ThemeContextType = {
+      theme: (typeof window !== 'undefined' && (localStorage.getItem('app-theme') as Theme)) || 'brown-gold',
+      setTheme: () => {},
+      toggleTheme: () => {},
+    };
+    return fallback;
   }
   return context;
 };
