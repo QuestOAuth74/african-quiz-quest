@@ -52,16 +52,29 @@ All colors MUST be HSL.
     --theme-gold-light: 45 95% 70%;
     --theme-gold-dark: 45 95% 40%;
 
-    /* Gradients */
+    /* Professional Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--theme-brown)), hsl(var(--theme-brown-light)));
     --gradient-yellow: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
     --gradient-card: linear-gradient(145deg, hsl(var(--theme-brown-light)), hsl(var(--theme-brown-dark)));
     --gradient-background: radial-gradient(ellipse at center, hsl(var(--theme-brown-dark)), hsl(var(--background)));
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
 
-    /* Shadows */
+    /* Professional Shadows */
     --shadow-card: 0 8px 32px -8px hsl(var(--theme-brown-dark) / 0.4);
     --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.3);
     --shadow-inset: inset 0 2px 4px hsl(var(--theme-brown-dark) / 0.3);
+    --shadow-soft: 0 2px 8px -1px hsl(var(--theme-brown-dark) / 0.1), 0 1px 3px -1px hsl(var(--theme-brown-dark) / 0.06);
+    --shadow-medium: 0 4px 16px -2px hsl(var(--theme-brown-dark) / 0.15), 0 2px 6px -1px hsl(var(--theme-brown-dark) / 0.08);
+    --shadow-large: 0 8px 32px -4px hsl(var(--theme-brown-dark) / 0.2), 0 4px 12px -2px hsl(var(--theme-brown-dark) / 0.1);
+    --shadow-glow: 0 0 20px hsl(var(--theme-yellow) / 0.15);
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--theme-brown-dark) / 0.25);
+
+    /* Transitions */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 35 25% 10%;
     --sidebar-foreground: 45 95% 88%;
@@ -73,18 +86,31 @@ All colors MUST be HSL.
     --sidebar-ring: 45 95% 55%;
   }
 
-  /* Instagram-like animations and utilities */
+  /* Professional Animations and Utilities */
   .animate-fade-in {
     animation: fade-in 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.4s ease-out forwards;
   }
 
   .animate-scale-in {
     animation: scale-in 0.4s ease-out forwards;
   }
 
+  .animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-out forwards;
+  }
+
+  .animate-stagger-fade-in {
+    animation: stagger-fade-in 0.6s ease-out forwards;
+  }
+
   .story-link {
     position: relative;
     display: inline-block;
+    transition: var(--transition-smooth);
   }
 
   .story-link::after {
@@ -97,7 +123,7 @@ All colors MUST be HSL.
     left: 0;
     background-color: hsl(var(--primary));
     transform-origin: bottom right;
-    transition: transform 0.3s ease-out;
+    transition: var(--transition-smooth);
   }
 
   .story-link:hover::after {

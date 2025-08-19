@@ -35,20 +35,20 @@ const TopNavigation = () => {
     navigate('/');
   };
   return (
-    <nav className="w-full bg-theme-brown-dark/95 backdrop-blur-sm border-b border-theme-yellow/20 py-2 sm:py-3 px-3 sm:px-4 fixed top-0 z-40">
+    <nav className="w-full bg-theme-brown-dark/95 backdrop-blur-lg border-b border-theme-yellow/20 py-2 sm:py-3 px-3 sm:px-4 fixed top-0 z-40 transition-all duration-300">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-theme-yellow font-semibold text-base sm:text-lg truncate">
+        <div className="flex items-center gap-2 animate-fade-in">
+          <span className="text-theme-yellow font-semibold text-base sm:text-lg truncate hover:text-theme-yellow-light transition-colors duration-300">
             Historia Africana
           </span>
         </div>
         
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3 animate-slide-in-right">
           <Button
             variant="ghost"
             size="sm"
-            className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors"
+            className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-md"
             onClick={() => handleProtectedNavigation('/quiz-setup', 'Start Quiz')}
           >
             Start Quiz

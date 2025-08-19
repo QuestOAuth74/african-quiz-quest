@@ -342,11 +342,11 @@ const Forum = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 animate-fade-in">
       <TopNavigation />
       
       {/* Modern Header Section */}
-      <div className="relative">
+      <div className="relative animate-fade-in-up">
         <ForumHeader />
       </div>
       
@@ -367,7 +367,7 @@ const Forum = () => {
           
           <TabsContent value="posts" className="space-y-6" style={{ display: 'block' }}>
             {/* Stories-like Category Filter */}
-            <div className="bg-background/80 backdrop-blur-sm rounded-3xl p-6 mb-6 border border-border/30 shadow-lg">
+            <div className="glass-card rounded-3xl p-6 mb-6 border border-border/30 elegant-shadow hover:shadow-2xl transition-all duration-500 animate-fade-in-up">
               <h2 className="text-lg font-semibold mb-4 text-foreground">Explore Topics</h2>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 <button
@@ -461,7 +461,7 @@ const Forum = () => {
 
             {/* Instagram-style Create Post Section */}
             {isAuthenticated ? (
-              <Card className="mb-8 border-0 shadow-2xl bg-background/80 backdrop-blur-xl rounded-3xl overflow-hidden">
+              <Card className="mb-8 border-0 elegant-shadow bg-gradient-to-br from-card via-card/95 to-muted/30 rounded-3xl overflow-hidden hover:shadow-2xl hover:scale-[1.01] transition-all duration-500 animate-fade-in-up gradient-shimmer">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
                 <CardHeader className="relative p-6">
                   <div className="flex items-center justify-between">
