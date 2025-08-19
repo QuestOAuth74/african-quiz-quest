@@ -6,12 +6,17 @@ import { cn } from '@/lib/utils';
 
 export const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  
+  const handleToggle = () => {
+    console.log('🖱️ Theme toggle clicked, current theme:', theme);
+    toggleTheme();
+  };
 
   return (
     <Button
       variant="ghost"
       size="sm"
-      onClick={toggleTheme}
+      onClick={handleToggle}
       className={cn(
         "relative h-9 w-16 rounded-full p-0 transition-all duration-500",
         "bg-muted hover:bg-muted/80",

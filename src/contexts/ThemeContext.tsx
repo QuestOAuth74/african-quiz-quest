@@ -13,13 +13,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    // Graceful fallback to avoid crashes if used outside provider (e.g., during initial mount)
-    const fallback: ThemeContextType = {
-      theme: (typeof window !== 'undefined' && (localStorage.getItem('app-theme') as Theme)) || 'brown-gold',
-      setTheme: () => {},
-      toggleTheme: () => {},
-    };
-    return fallback;
+    console.warn('⚠️ useTheme called outside ThemeProvider - using fallback');
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
 };
@@ -44,11 +39,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     document.documentElement.classList.add(`theme-${theme}`);
     
     // Debug logging to verify theme switching
-    console.log('Theme switched to:', theme);
+    console.log('🎨 Theme switched to:', theme);
+    console.log('📄 Current document classes:', document.documentElement.className);
+    console.log('💾 localStorage theme:', localStorage.getItem('app-theme'));
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'brown-gold' ? 'lake' : 'brown-gold');
+    const newTheme = theme === 'brown-gold' ? 'lake' : 'brown-gold';
+    console.log('🔄 Toggling theme from', theme, 'to', newTheme);
+    setTheme(newTheme);
   };
 
   return (
