@@ -77,62 +77,62 @@ All colors MUST be HSL.
   --sidebar-ring: 45 95% 55%;
 }
 
-/* Neo-Brutalism Theme - Pure, Bold, Maximum Contrast */
+/* Neo-Brutalism Theme - Classic Bold Contrast */
 :root.theme-lake {
-  /* Core semantic colors - Pure Neo-Brutalism */
+  /* Core semantic colors - Pure contrast for maximum readability */
   --background: 0 0% 100%;
   --foreground: 0 0% 0%;
   --card: 0 0% 100%;
   --card-foreground: 0 0% 0%;
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 0%;
-  --primary: 0 100% 50%;
+  --primary: 220 100% 50%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 240 100% 50%;
-  --secondary-foreground: 0 0% 100%;
+  --secondary: 0 0% 90%;
+  --secondary-foreground: 0 0% 0%;
   --muted: 0 0% 95%;
-  --muted-foreground: 0 0% 0%;
-  --accent: 60 100% 50%;
-  --accent-foreground: 0 0% 0%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 0 100% 50%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 100% 50%;
   --destructive-foreground: 0 0% 100%;
   --border: 0 0% 0%;
-  --input: 0 0% 95%;
-  --ring: 0 100% 50%;
+  --input: 0 0% 98%;
+  --ring: 220 100% 50%;
   --radius: 0rem;
 
-  /* Neo-Brutalism theme colors - Pure primaries */
+  /* Neo-Brutalism theme colors - Classic web colors */
   --theme-brown: 0 0% 0%;
-  --theme-brown-light: 0 0% 20%;
+  --theme-brown-light: 0 0% 30%;
   --theme-brown-dark: 0 0% 0%;
-  --theme-yellow: 60 100% 50%;
-  --theme-yellow-light: 60 100% 60%;
-  --theme-yellow-dark: 60 100% 40%;
+  --theme-yellow: 0 100% 50%;
+  --theme-yellow-light: 0 100% 60%;
+  --theme-yellow-dark: 0 100% 40%;
 
-  /* Theme gold for special effects - Pure yellow */
-  --theme-gold: 60 100% 50%;
-  --theme-gold-light: 60 100% 60%;
-  --theme-gold-dark: 60 100% 40%;
+  /* Theme gold for special effects - Pure red accent */
+  --theme-gold: 0 100% 50%;
+  --theme-gold-light: 0 100% 60%;
+  --theme-gold-dark: 0 100% 40%;
 
-  /* Neo-Brutalism Gradients - No gradients, pure blocks */
-  --gradient-primary: hsl(0 100% 50%);
-  --gradient-yellow: hsl(60 100% 50%);
+  /* Neo-Brutalism Gradients - Solid colors only */
+  --gradient-primary: hsl(220 100% 50%);
+  --gradient-yellow: hsl(0 100% 50%);
   --gradient-card: hsl(0 0% 100%);
   --gradient-background: hsl(0 0% 100%);
   --gradient-glass: none;
   --gradient-shimmer: none;
 
-  /* Neo-Brutalism Shadows - Maximum brutalist impact */
-  --shadow-card: 6px 6px 0px hsl(0 0% 0%);
-  --shadow-yellow: 4px 4px 0px hsl(0 0% 0%);
-  --shadow-inset: inset 3px 3px 0px hsl(0 0% 90%);
-  --shadow-soft: 3px 3px 0px hsl(0 0% 0%);
-  --shadow-medium: 8px 8px 0px hsl(0 0% 0%);
-  --shadow-large: 12px 12px 0px hsl(0 0% 0%);
-  --shadow-glow: 6px 6px 0px hsl(0 100% 50%);
-  --shadow-elegant: 8px 8px 0px hsl(0 0% 0%);
+  /* Neo-Brutalism Shadows - Bold black outlines */
+  --shadow-card: 4px 4px 0px hsl(0 0% 0%);
+  --shadow-yellow: 3px 3px 0px hsl(0 0% 0%);
+  --shadow-inset: inset 2px 2px 0px hsl(0 0% 95%);
+  --shadow-soft: 2px 2px 0px hsl(0 0% 0%);
+  --shadow-medium: 6px 6px 0px hsl(0 0% 0%);
+  --shadow-large: 8px 8px 0px hsl(0 0% 0%);
+  --shadow-glow: 4px 4px 0px hsl(220 100% 50%);
+  --shadow-elegant: 6px 6px 0px hsl(0 0% 0%);
 
-  /* Neo-Brutalism Transitions - Zero smoothness */
+  /* Neo-Brutalism Transitions - Instant feedback */
   --transition-fast: none;
   --transition-smooth: none;
   --transition-elegant: none;
