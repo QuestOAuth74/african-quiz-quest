@@ -30,7 +30,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('app-theme', theme);
-    document.documentElement.className = `theme-${theme}`;
+    
+    // Remove all theme classes first
+    document.documentElement.classList.remove('theme-brown-gold', 'theme-lake');
+    
+    // Add the new theme class
+    document.documentElement.classList.add(`theme-${theme}`);
+    
+    // Debug logging to verify theme switching
+    console.log('Theme switched to:', theme);
   }, [theme]);
 
   const toggleTheme = () => {
