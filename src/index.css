@@ -77,60 +77,60 @@ All colors MUST be HSL.
   --sidebar-ring: 45 95% 55%;
 }
 
-/* Lake Theme */
+/* Lake Theme - Professional Navy & Slate */
 :root.theme-lake {
-  /* Core semantic colors */
-  --background: 200 50% 96%;
-  --foreground: 210 90% 15%;
-  --card: 200 30% 92%;
-  --card-foreground: 210 85% 20%;
-  --popover: 200 40% 94%;
-  --popover-foreground: 210 90% 15%;
-  --primary: 180 85% 65%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 200 25% 88%;
-  --secondary-foreground: 210 80% 25%;
-  --muted: 200 20% 90%;
-  --muted-foreground: 210 60% 45%;
-  --accent: 15 90% 70%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 85% 65%;
-  --destructive-foreground: 0 40% 98%;
-  --border: 200 20% 85%;
-  --input: 200 20% 85%;
-  --ring: 180 85% 65%;
+  /* Core semantic colors - Professional navy/slate palette */
+  --background: 220 25% 6%;
+  --foreground: 210 15% 95%;
+  --card: 220 20% 10%;
+  --card-foreground: 210 15% 95%;
+  --popover: 220 25% 8%;
+  --popover-foreground: 210 15% 95%;
+  --primary: 205 90% 65%;
+  --primary-foreground: 220 30% 5%;
+  --secondary: 215 25% 20%;
+  --secondary-foreground: 210 15% 95%;
+  --muted: 220 15% 15%;
+  --muted-foreground: 210 15% 75%;
+  --accent: 200 85% 55%;
+  --accent-foreground: 220 30% 5%;
+  --destructive: 0 75% 60%;
+  --destructive-foreground: 210 15% 95%;
+  --border: 220 15% 25%;
+  --input: 220 15% 18%;
+  --ring: 205 90% 65%;
   --radius: 0.75rem;
 
-  /* Custom theme colors */
-  --theme-brown: 180 85% 65%;
-  --theme-brown-light: 185 80% 75%;
-  --theme-brown-dark: 175 90% 55%;
-  --theme-yellow: 15 90% 70%;
-  --theme-yellow-light: 20 95% 80%;
-  --theme-yellow-dark: 10 85% 60%;
+  /* Professional navy/slate theme colors */
+  --theme-brown: 215 25% 25%;
+  --theme-brown-light: 215 20% 35%;
+  --theme-brown-dark: 215 30% 15%;
+  --theme-yellow: 200 85% 55%;
+  --theme-yellow-light: 200 80% 65%;
+  --theme-yellow-dark: 200 90% 45%;
 
-  /* Theme gold for special effects */
-  --theme-gold: 15 90% 70%;
-  --theme-gold-light: 20 95% 80%;
-  --theme-gold-dark: 10 85% 60%;
+  /* Theme gold for special effects - sophisticated cyan */
+  --theme-gold: 200 85% 55%;
+  --theme-gold-light: 200 80% 65%;
+  --theme-gold-dark: 200 90% 45%;
 
   /* Professional Gradients */
   --gradient-primary: linear-gradient(135deg, hsl(var(--theme-brown)), hsl(var(--theme-brown-light)));
   --gradient-yellow: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
-  --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)));
-  --gradient-background: radial-gradient(ellipse at center, hsl(var(--background)), hsl(var(--muted)));
-  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
-  --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--theme-brown-dark)));
+  --gradient-background: radial-gradient(ellipse at center, hsl(var(--theme-brown-dark)), hsl(var(--background)));
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(200, 235, 255, 0.15) 50%, transparent 100%);
 
   /* Professional Shadows */
-  --shadow-card: 0 8px 32px -8px hsl(var(--foreground) / 0.15);
-  --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.3);
-  --shadow-inset: inset 0 2px 4px hsl(var(--foreground) / 0.1);
-  --shadow-soft: 0 2px 8px -1px hsl(var(--foreground) / 0.08), 0 1px 3px -1px hsl(var(--foreground) / 0.04);
-  --shadow-medium: 0 4px 16px -2px hsl(var(--foreground) / 0.12), 0 2px 6px -1px hsl(var(--foreground) / 0.06);
-  --shadow-large: 0 8px 32px -4px hsl(var(--foreground) / 0.15), 0 4px 12px -2px hsl(var(--foreground) / 0.08);
-  --shadow-glow: 0 0 20px hsl(var(--primary) / 0.4);
-  --shadow-elegant: 0 10px 30px -10px hsl(var(--foreground) / 0.15);
+  --shadow-card: 0 8px 32px -8px hsl(var(--theme-brown-dark) / 0.6);
+  --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.25);
+  --shadow-inset: inset 0 2px 4px hsl(var(--theme-brown-dark) / 0.4);
+  --shadow-soft: 0 2px 8px -1px hsl(var(--theme-brown-dark) / 0.3), 0 1px 3px -1px hsl(var(--theme-brown-dark) / 0.15);
+  --shadow-medium: 0 4px 16px -2px hsl(var(--theme-brown-dark) / 0.4), 0 2px 6px -1px hsl(var(--theme-brown-dark) / 0.2);
+  --shadow-large: 0 8px 32px -4px hsl(var(--theme-brown-dark) / 0.5), 0 4px 12px -2px hsl(var(--theme-brown-dark) / 0.25);
+  --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+  --shadow-elegant: 0 10px 30px -10px hsl(var(--theme-brown-dark) / 0.4);
 
   /* Transitions */
   --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -138,14 +138,14 @@ All colors MUST be HSL.
   --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --sidebar-background: 200 30% 92%;
-  --sidebar-foreground: 210 85% 20%;
-  --sidebar-primary: 180 85% 65%;
-  --sidebar-primary-foreground: 210 40% 98%;
-  --sidebar-accent: 200 25% 88%;
-  --sidebar-accent-foreground: 210 80% 25%;
-  --sidebar-border: 200 20% 85%;
-  --sidebar-ring: 180 85% 65%;
+  --sidebar-background: 220 20% 8%;
+  --sidebar-foreground: 210 15% 95%;
+  --sidebar-primary: 205 90% 65%;
+  --sidebar-primary-foreground: 220 30% 5%;
+  --sidebar-accent: 215 25% 18%;
+  --sidebar-accent-foreground: 210 15% 95%;
+  --sidebar-border: 220 15% 25%;
+  --sidebar-ring: 205 90% 65%;
 }
 
 /* Root fallback (defaults to brown-gold) */
