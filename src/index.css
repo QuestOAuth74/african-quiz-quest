@@ -7,7 +7,7 @@ All colors MUST be HSL.
 */
 
 /* Brown-Gold Theme (Default) */
-.theme-brown-gold {
+:root.theme-brown-gold {
   /* Core semantic colors */
   --background: 35 20% 8%;
   --foreground: 45 95% 88%;
@@ -78,7 +78,7 @@ All colors MUST be HSL.
 }
 
 /* Lake Theme */
-.theme-lake {
+:root.theme-lake {
   /* Core semantic colors */
   --background: 200 50% 96%;
   --foreground: 210 90% 15%;
