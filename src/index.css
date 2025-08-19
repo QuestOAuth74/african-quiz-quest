@@ -77,66 +77,66 @@ All colors MUST be HSL.
   --sidebar-ring: 45 95% 55%;
 }
 
-/* Neo-Brutalism Theme - Classic Bold Contrast */
+/* Professional Clean Theme - Calm & Minimal */
 :root.theme-lake {
-  /* Core semantic colors - Pure contrast for maximum readability */
+  /* Core semantic colors - Professional clean palette */
   --background: 0 0% 100%;
-  --foreground: 0 0% 0%;
+  --foreground: 0 0% 10%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 0%;
+  --card-foreground: 0 0% 15%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 0%;
-  --primary: 220 100% 50%;
+  --popover-foreground: 0 0% 15%;
+  --primary: 210 100% 45%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 90%;
-  --secondary-foreground: 0 0% 0%;
-  --muted: 0 0% 95%;
-  --muted-foreground: 0 0% 40%;
-  --accent: 0 100% 50%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 100% 50%;
+  --secondary: 210 40% 95%;
+  --secondary-foreground: 210 10% 25%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 40% 94%;
+  --accent-foreground: 210 10% 25%;
+  --destructive: 0 85% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 0%;
-  --input: 0 0% 98%;
-  --ring: 220 100% 50%;
-  --radius: 0rem;
+  --border: 214 32% 91%;
+  --input: 0 0% 100%;
+  --ring: 210 100% 45%;
+  --radius: 0.5rem;
 
-  /* Neo-Brutalism theme colors - Classic web colors */
-  --theme-brown: 0 0% 0%;
-  --theme-brown-light: 0 0% 30%;
-  --theme-brown-dark: 0 0% 0%;
-  --theme-yellow: 0 100% 50%;
-  --theme-yellow-light: 0 100% 60%;
-  --theme-yellow-dark: 0 100% 40%;
+  /* Professional theme colors - Subtle and clean */
+  --theme-brown: 210 10% 25%;
+  --theme-brown-light: 210 10% 40%;
+  --theme-brown-dark: 210 10% 15%;
+  --theme-yellow: 210 100% 45%;
+  --theme-yellow-light: 210 100% 55%;
+  --theme-yellow-dark: 210 100% 35%;
 
-  /* Theme gold for special effects - Pure red accent */
-  --theme-gold: 0 100% 50%;
-  --theme-gold-light: 0 100% 60%;
-  --theme-gold-dark: 0 100% 40%;
+  /* Theme gold for special effects - Subtle blue accent */
+  --theme-gold: 210 100% 45%;
+  --theme-gold-light: 210 100% 55%;
+  --theme-gold-dark: 210 100% 35%;
 
-  /* Neo-Brutalism Gradients - Solid colors only */
-  --gradient-primary: hsl(220 100% 50%);
-  --gradient-yellow: hsl(0 100% 50%);
-  --gradient-card: hsl(0 0% 100%);
-  --gradient-background: hsl(0 0% 100%);
-  --gradient-glass: none;
-  --gradient-shimmer: none;
+  /* Professional Gradients - Subtle and clean */
+  --gradient-primary: linear-gradient(135deg, hsl(210 100% 45%) 0%, hsl(210 100% 40%) 100%);
+  --gradient-yellow: linear-gradient(135deg, hsl(210 100% 45%) 0%, hsl(210 100% 40%) 100%);
+  --gradient-card: linear-gradient(0deg, hsl(0 0% 100%) 0%, hsl(210 40% 99%) 100%);
+  --gradient-background: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 99%) 100%);
+  --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.8) 0%, hsla(0, 0%, 100%, 0.6) 100%);
+  --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(210 100% 45% / 0.1) 50%, transparent 100%);
 
-  /* Neo-Brutalism Shadows - Bold black outlines */
-  --shadow-card: 4px 4px 0px hsl(0 0% 0%);
-  --shadow-yellow: 3px 3px 0px hsl(0 0% 0%);
-  --shadow-inset: inset 2px 2px 0px hsl(0 0% 95%);
-  --shadow-soft: 2px 2px 0px hsl(0 0% 0%);
-  --shadow-medium: 6px 6px 0px hsl(0 0% 0%);
-  --shadow-large: 8px 8px 0px hsl(0 0% 0%);
-  --shadow-glow: 4px 4px 0px hsl(220 100% 50%);
-  --shadow-elegant: 6px 6px 0px hsl(0 0% 0%);
+  /* Professional Shadows - Subtle and elegant */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-yellow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-inset: inset 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-soft: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 0 1px hsl(210 100% 45% / 0.2);
+  --shadow-elegant: 0 8px 16px -4px rgb(0 0 0 / 0.1), 0 4px 8px -4px rgb(0 0 0 / 0.1);
 
-  /* Neo-Brutalism Transitions - Instant feedback */
-  --transition-fast: none;
-  --transition-smooth: none;
-  --transition-elegant: none;
-  --transition-bounce: none;
+  /* Professional Transitions - Smooth and polished */
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
   --sidebar-background: 240 100% 90%;
   --sidebar-foreground: 0 0% 0%;
