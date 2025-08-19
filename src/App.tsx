@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import LeaderboardPage from "./pages/Leaderboard";
@@ -29,11 +30,12 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <div className="min-h-screen flex flex-col">
-        <BrowserRouter>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <div className="min-h-screen flex flex-col transition-colors duration-500">
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -57,10 +59,11 @@ const App = () => (
             {/* Catch-all route must be last */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <Footer />
-        </BrowserRouter>
-      </div>
-    </TooltipProvider>
+            <Footer />
+          </BrowserRouter>
+        </div>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

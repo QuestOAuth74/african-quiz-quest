@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const TopNavigation = () => {
   const [open, setOpen] = useState(false);
@@ -135,6 +136,8 @@ const TopNavigation = () => {
               <ExternalLink className="w-3 h-3" />
             </a>
           </Button>
+          
+          <ThemeToggle />
         </div>
 
         {/* Mobile Hamburger Menu */}

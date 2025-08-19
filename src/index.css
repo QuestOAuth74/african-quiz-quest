@@ -6,85 +6,220 @@
 All colors MUST be HSL.
 */
 
+/* Brown-Gold Theme (Default) */
+.theme-brown-gold {
+  /* Core semantic colors */
+  --background: 35 20% 8%;
+  --foreground: 45 95% 88%;
+  --card: 35 25% 12%;
+  --card-foreground: 45 95% 88%;
+  --popover: 35 25% 10%;
+  --popover-foreground: 45 95% 88%;
+  --primary: 45 95% 75%;
+  --primary-foreground: 35 30% 12%;
+  --secondary: 45 85% 65%;
+  --secondary-foreground: 35 30% 12%;
+  --muted: 35 15% 25%;
+  --muted-foreground: 45 95% 85%;
+  --accent: 45 95% 55%;
+  --accent-foreground: 35 30% 12%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 35 20% 30%;
+  --input: 35 20% 25%;
+  --ring: 45 95% 55%;
+  --radius: 0.75rem;
+
+  /* Brown and yellow theme colors */
+  --theme-brown: 35 30% 18%;
+  --theme-brown-light: 35 25% 28%;
+  --theme-brown-dark: 35 35% 10%;
+  --theme-yellow: 45 95% 55%;
+  --theme-yellow-light: 45 95% 70%;
+  --theme-yellow-dark: 45 95% 40%;
+
+  /* Theme gold for special effects */
+  --theme-gold: 45 95% 55%;
+  --theme-gold-light: 45 95% 70%;
+  --theme-gold-dark: 45 95% 40%;
+
+  /* Professional Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(var(--theme-brown)), hsl(var(--theme-brown-light)));
+  --gradient-yellow: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
+  --gradient-card: linear-gradient(145deg, hsl(var(--theme-brown-light)), hsl(var(--theme-brown-dark)));
+  --gradient-background: radial-gradient(ellipse at center, hsl(var(--theme-brown-dark)), hsl(var(--background)));
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+
+  /* Professional Shadows */
+  --shadow-card: 0 8px 32px -8px hsl(var(--theme-brown-dark) / 0.4);
+  --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.3);
+  --shadow-inset: inset 0 2px 4px hsl(var(--theme-brown-dark) / 0.3);
+  --shadow-soft: 0 2px 8px -1px hsl(var(--theme-brown-dark) / 0.1), 0 1px 3px -1px hsl(var(--theme-brown-dark) / 0.06);
+  --shadow-medium: 0 4px 16px -2px hsl(var(--theme-brown-dark) / 0.15), 0 2px 6px -1px hsl(var(--theme-brown-dark) / 0.08);
+  --shadow-large: 0 8px 32px -4px hsl(var(--theme-brown-dark) / 0.2), 0 4px 12px -2px hsl(var(--theme-brown-dark) / 0.1);
+  --shadow-glow: 0 0 20px hsl(var(--theme-yellow) / 0.15);
+  --shadow-elegant: 0 10px 30px -10px hsl(var(--theme-brown-dark) / 0.25);
+
+  /* Transitions */
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  --sidebar-background: 35 25% 10%;
+  --sidebar-foreground: 45 95% 88%;
+  --sidebar-primary: 45 95% 55%;
+  --sidebar-primary-foreground: 35 30% 12%;
+  --sidebar-accent: 35 20% 18%;
+  --sidebar-accent-foreground: 45 95% 88%;
+  --sidebar-border: 35 20% 30%;
+  --sidebar-ring: 45 95% 55%;
+}
+
+/* Lake Theme */
+.theme-lake {
+  /* Core semantic colors */
+  --background: 200 50% 96%;
+  --foreground: 210 90% 15%;
+  --card: 200 30% 92%;
+  --card-foreground: 210 85% 20%;
+  --popover: 200 40% 94%;
+  --popover-foreground: 210 90% 15%;
+  --primary: 180 85% 65%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 200 25% 88%;
+  --secondary-foreground: 210 80% 25%;
+  --muted: 200 20% 90%;
+  --muted-foreground: 210 60% 45%;
+  --accent: 15 90% 70%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 85% 65%;
+  --destructive-foreground: 0 40% 98%;
+  --border: 200 20% 85%;
+  --input: 200 20% 85%;
+  --ring: 180 85% 65%;
+  --radius: 0.75rem;
+
+  /* Custom theme colors */
+  --theme-brown: 180 85% 65%;
+  --theme-brown-light: 185 80% 75%;
+  --theme-brown-dark: 175 90% 55%;
+  --theme-yellow: 15 90% 70%;
+  --theme-yellow-light: 20 95% 80%;
+  --theme-yellow-dark: 10 85% 60%;
+
+  /* Theme gold for special effects */
+  --theme-gold: 15 90% 70%;
+  --theme-gold-light: 20 95% 80%;
+  --theme-gold-dark: 10 85% 60%;
+
+  /* Professional Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(var(--theme-brown)), hsl(var(--theme-brown-light)));
+  --gradient-yellow: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
+  --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)));
+  --gradient-background: radial-gradient(ellipse at center, hsl(var(--background)), hsl(var(--muted)));
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+  --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+
+  /* Professional Shadows */
+  --shadow-card: 0 8px 32px -8px hsl(var(--foreground) / 0.15);
+  --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.3);
+  --shadow-inset: inset 0 2px 4px hsl(var(--foreground) / 0.1);
+  --shadow-soft: 0 2px 8px -1px hsl(var(--foreground) / 0.08), 0 1px 3px -1px hsl(var(--foreground) / 0.04);
+  --shadow-medium: 0 4px 16px -2px hsl(var(--foreground) / 0.12), 0 2px 6px -1px hsl(var(--foreground) / 0.06);
+  --shadow-large: 0 8px 32px -4px hsl(var(--foreground) / 0.15), 0 4px 12px -2px hsl(var(--foreground) / 0.08);
+  --shadow-glow: 0 0 20px hsl(var(--primary) / 0.4);
+  --shadow-elegant: 0 10px 30px -10px hsl(var(--foreground) / 0.15);
+
+  /* Transitions */
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  --sidebar-background: 200 30% 92%;
+  --sidebar-foreground: 210 85% 20%;
+  --sidebar-primary: 180 85% 65%;
+  --sidebar-primary-foreground: 210 40% 98%;
+  --sidebar-accent: 200 25% 88%;
+  --sidebar-accent-foreground: 210 80% 25%;
+  --sidebar-border: 200 20% 85%;
+  --sidebar-ring: 180 85% 65%;
+}
+
+/* Root fallback (defaults to brown-gold) */
+:root {
+  /* Core semantic colors */
+  --background: 35 20% 8%;
+  --foreground: 45 95% 88%;
+  --card: 35 25% 12%;
+  --card-foreground: 45 95% 88%;
+  --popover: 35 25% 10%;
+  --popover-foreground: 45 95% 88%;
+  --primary: 45 95% 75%;
+  --primary-foreground: 35 30% 12%;
+  --secondary: 45 85% 65%;
+  --secondary-foreground: 35 30% 12%;
+  --muted: 35 15% 25%;
+  --muted-foreground: 45 95% 85%;
+  --accent: 45 95% 55%;
+  --accent-foreground: 35 30% 12%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 35 20% 30%;
+  --input: 35 20% 25%;
+  --ring: 45 95% 55%;
+  --radius: 0.75rem;
+
+  /* Brown and yellow theme colors */
+  --theme-brown: 35 30% 18%;
+  --theme-brown-light: 35 25% 28%;
+  --theme-brown-dark: 35 35% 10%;
+  --theme-yellow: 45 95% 55%;
+  --theme-yellow-light: 45 95% 70%;
+  --theme-yellow-dark: 45 95% 40%;
+
+  /* Theme gold for special effects */
+  --theme-gold: 45 95% 55%;
+  --theme-gold-light: 45 95% 70%;
+  --theme-gold-dark: 45 95% 40%;
+
+  /* Professional Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(var(--theme-brown)), hsl(var(--theme-brown-light)));
+  --gradient-yellow: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
+  --gradient-card: linear-gradient(145deg, hsl(var(--theme-brown-light)), hsl(var(--theme-brown-dark)));
+  --gradient-background: radial-gradient(ellipse at center, hsl(var(--theme-brown-dark)), hsl(var(--background)));
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+
+  /* Professional Shadows */
+  --shadow-card: 0 8px 32px -8px hsl(var(--theme-brown-dark) / 0.4);
+  --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.3);
+  --shadow-inset: inset 0 2px 4px hsl(var(--theme-brown-dark) / 0.3);
+  --shadow-soft: 0 2px 8px -1px hsl(var(--theme-brown-dark) / 0.1), 0 1px 3px -1px hsl(var(--theme-brown-dark) / 0.06);
+  --shadow-medium: 0 4px 16px -2px hsl(var(--theme-brown-dark) / 0.15), 0 2px 6px -1px hsl(var(--theme-brown-dark) / 0.08);
+  --shadow-large: 0 8px 32px -4px hsl(var(--theme-brown-dark) / 0.2), 0 4px 12px -2px hsl(var(--theme-brown-dark) / 0.1);
+  --shadow-glow: 0 0 20px hsl(var(--theme-yellow) / 0.15);
+  --shadow-elegant: 0 10px 30px -10px hsl(var(--theme-brown-dark) / 0.25);
+
+  /* Transitions */
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  --sidebar-background: 35 25% 10%;
+  --sidebar-foreground: 45 95% 88%;
+  --sidebar-primary: 45 95% 55%;
+  --sidebar-primary-foreground: 35 30% 12%;
+  --sidebar-accent: 35 20% 18%;
+  --sidebar-accent-foreground: 45 95% 88%;
+  --sidebar-border: 35 20% 30%;
+  --sidebar-ring: 45 95% 55%;
+}
+
 @layer base {
-  :root {
-    /* Brown and yellow theme design system */
-    --background: 35 20% 8%;
-    --foreground: 45 95% 88%;
-
-    --card: 35 25% 12%;
-    --card-foreground: 45 95% 88%;
-
-    --popover: 35 25% 10%;
-    --popover-foreground: 45 95% 88%;
-
-    --primary: 45 95% 75%;
-    --primary-foreground: 35 30% 12%;
-
-    --secondary: 45 85% 65%;
-    --secondary-foreground: 35 30% 12%;
-
-    --muted: 35 15% 25%;
-    --muted-foreground: 45 95% 85%;
-
-    --accent: 45 95% 55%;
-    --accent-foreground: 35 30% 12%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 35 20% 30%;
-    --input: 35 20% 25%;
-    --ring: 45 95% 55%;
-
-    --radius: 0.75rem;
-
-    /* Brown and yellow theme colors */
-    --theme-brown: 35 30% 18%;
-    --theme-brown-light: 35 25% 28%;
-    --theme-brown-dark: 35 35% 10%;
-    --theme-yellow: 45 95% 55%;
-    --theme-yellow-light: 45 95% 70%;
-    --theme-yellow-dark: 45 95% 40%;
-
-    /* Theme gold for special effects */
-    --theme-gold: 45 95% 55%;
-    --theme-gold-light: 45 95% 70%;
-    --theme-gold-dark: 45 95% 40%;
-
-    /* Professional Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--theme-brown)), hsl(var(--theme-brown-light)));
-    --gradient-yellow: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
-    --gradient-card: linear-gradient(145deg, hsl(var(--theme-brown-light)), hsl(var(--theme-brown-dark)));
-    --gradient-background: radial-gradient(ellipse at center, hsl(var(--theme-brown-dark)), hsl(var(--background)));
-    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
-
-    /* Professional Shadows */
-    --shadow-card: 0 8px 32px -8px hsl(var(--theme-brown-dark) / 0.4);
-    --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.3);
-    --shadow-inset: inset 0 2px 4px hsl(var(--theme-brown-dark) / 0.3);
-    --shadow-soft: 0 2px 8px -1px hsl(var(--theme-brown-dark) / 0.1), 0 1px 3px -1px hsl(var(--theme-brown-dark) / 0.06);
-    --shadow-medium: 0 4px 16px -2px hsl(var(--theme-brown-dark) / 0.15), 0 2px 6px -1px hsl(var(--theme-brown-dark) / 0.08);
-    --shadow-large: 0 8px 32px -4px hsl(var(--theme-brown-dark) / 0.2), 0 4px 12px -2px hsl(var(--theme-brown-dark) / 0.1);
-    --shadow-glow: 0 0 20px hsl(var(--theme-yellow) / 0.15);
-    --shadow-elegant: 0 10px 30px -10px hsl(var(--theme-brown-dark) / 0.25);
-
-    /* Transitions */
-    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    --sidebar-background: 35 25% 10%;
-    --sidebar-foreground: 45 95% 88%;
-    --sidebar-primary: 45 95% 55%;
-    --sidebar-primary-foreground: 35 30% 12%;
-    --sidebar-accent: 35 20% 18%;
-    --sidebar-accent-foreground: 45 95% 88%;
-    --sidebar-border: 35 20% 30%;
-    --sidebar-ring: 45 95% 55%;
-  }
 
   /* Professional Animations and Utilities */
   .animate-fade-in {
@@ -464,11 +599,84 @@ All colors MUST be HSL.
   transform: scale(1.02);
 }
 
-.forum-image-content {
-  @apply rounded-xl overflow-hidden bg-background;
-  display: block;
-  width: 100%;
-}
+  .forum-image-content {
+    @apply rounded-xl overflow-hidden bg-background;
+    display: block;
+    width: 100%;
+  }
+
+  /* Theme-adaptive component styles */
+  .theme-adaptive-card {
+    @apply bg-card/80 backdrop-blur-sm border-border/50;
+    @apply shadow-elegant hover:shadow-large;
+    @apply transition-all duration-500;
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)/0.9) 100%);
+  }
+
+  .theme-brown-gold .theme-adaptive-card {
+    @apply hover:shadow-[0_12px_48px_hsl(var(--theme-yellow)/0.3)];
+  }
+
+  .theme-lake .theme-adaptive-card {
+    @apply hover:shadow-[0_12px_48px_hsl(var(--primary)/0.4)];
+  }
+
+  .theme-adaptive-button {
+    @apply bg-primary/90 hover:bg-primary;
+    @apply shadow-soft hover:shadow-glow;
+    @apply transform hover:scale-105 active:scale-95;
+    @apply transition-all duration-300;
+  }
+
+  /* Lake theme specific effects */
+  .theme-lake .water-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .theme-lake .water-ripple::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary)/0.1), transparent);
+    animation: ripple 3s infinite;
+  }
+
+  .theme-lake .gentle-wave {
+    animation: wave 3s ease-in-out infinite;
+  }
+
+  .theme-lake .bubble-float {
+    animation: bubble 4s ease-in-out infinite;
+  }
+
+  /* Brown-gold theme specific effects */
+  .theme-brown-gold .earth-glow {
+    animation: earthGlow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes ripple {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  @keyframes wave {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(1deg); }
+  }
+
+  @keyframes bubble {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-10px) scale(1.05); }
+  }
+
+  @keyframes earthGlow {
+    0% { box-shadow: 0 0 20px hsl(var(--theme-yellow) / 0.3); }
+    100% { box-shadow: 0 0 30px hsl(var(--theme-yellow) / 0.6); }
+  }
 
 /* Crossword-specific styles */
 .crossword-grid {
