@@ -41,7 +41,7 @@ export interface WheelGameMove {
 }
 
 export interface WheelSegment {
-  value: number | 'BANKRUPT' | 'LOSE_TURN';
+  value: number | string;
   color: string;
 }
 
