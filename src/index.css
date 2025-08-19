@@ -77,65 +77,65 @@ All colors MUST be HSL.
   --sidebar-ring: 45 95% 55%;
 }
 
-/* Neo-Brutalism Theme - Raw, Bold, Uncompromising Design */
+/* Neo-Brutalism Theme - Pure, Bold, Maximum Contrast */
 :root.theme-lake {
-  /* Core semantic colors - Concrete & Industrial */
-  --background: 0 0% 96%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 98%;
-  --card-foreground: 0 0% 10%;
-  --popover: 0 0% 98%;
-  --popover-foreground: 0 0% 10%;
-  --primary: 16 100% 50%;
+  /* Core semantic colors - Pure Neo-Brutalism */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+  --primary: 0 100% 50%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 220 70% 25%;
+  --secondary: 240 100% 50%;
   --secondary-foreground: 0 0% 100%;
-  --muted: 0 0% 90%;
-  --muted-foreground: 0 0% 25%;
-  --accent: 84 80% 45%;
-  --accent-foreground: 0 0% 10%;
-  --destructive: 348 83% 47%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 0%;
+  --accent: 60 100% 50%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 100% 50%;
   --destructive-foreground: 0 0% 100%;
   --border: 0 0% 0%;
-  --input: 0 0% 90%;
-  --ring: 16 100% 50%;
+  --input: 0 0% 95%;
+  --ring: 0 100% 50%;
   --radius: 0rem;
 
-  /* Neo-Brutalism theme colors - Industrial palette */
+  /* Neo-Brutalism theme colors - Pure primaries */
   --theme-brown: 0 0% 0%;
-  --theme-brown-light: 0 0% 30%;
+  --theme-brown-light: 0 0% 20%;
   --theme-brown-dark: 0 0% 0%;
-  --theme-yellow: 16 100% 50%;
-  --theme-yellow-light: 16 100% 60%;
-  --theme-yellow-dark: 16 100% 40%;
+  --theme-yellow: 60 100% 50%;
+  --theme-yellow-light: 60 100% 60%;
+  --theme-yellow-dark: 60 100% 40%;
 
-  /* Theme gold for special effects - Electric lime */
-  --theme-gold: 84 80% 45%;
-  --theme-gold-light: 84 80% 55%;
-  --theme-gold-dark: 84 80% 35%;
+  /* Theme gold for special effects - Pure yellow */
+  --theme-gold: 60 100% 50%;
+  --theme-gold-light: 60 100% 60%;
+  --theme-gold-dark: 60 100% 40%;
 
-  /* Neo-Brutalism Gradients - Hard stops and blocks */
-  --gradient-primary: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
-  --gradient-yellow: linear-gradient(90deg, hsl(var(--theme-yellow)) 0%, hsl(var(--theme-yellow)) 100%);
-  --gradient-card: linear-gradient(0deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%);
-  --gradient-background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(0 0% 92%) 100%);
+  /* Neo-Brutalism Gradients - No gradients, pure blocks */
+  --gradient-primary: hsl(0 100% 50%);
+  --gradient-yellow: hsl(60 100% 50%);
+  --gradient-card: hsl(0 0% 100%);
+  --gradient-background: hsl(0 0% 100%);
   --gradient-glass: none;
   --gradient-shimmer: none;
 
-  /* Neo-Brutalism Shadows - Chunky geometric layers */
-  --shadow-card: 4px 4px 0px hsl(0 0% 0%), 8px 8px 0px hsl(0 0% 30%);
-  --shadow-yellow: 3px 3px 0px hsl(0 0% 0%), 6px 6px 0px hsl(0 0% 50%);
-  --shadow-inset: inset 3px 3px 0px hsl(0 0% 80%), inset -1px -1px 0px hsl(0 0% 100%);
-  --shadow-soft: 4px 4px 0px hsl(0 0% 0%);
-  --shadow-medium: 6px 6px 0px hsl(0 0% 0%), 12px 12px 0px hsl(0 0% 40%);
-  --shadow-large: 8px 8px 0px hsl(0 0% 0%), 16px 16px 0px hsl(0 0% 20%), 24px 24px 0px hsl(0 0% 40%);
-  --shadow-glow: 6px 6px 0px hsl(var(--primary)), 12px 12px 0px hsl(0 0% 60%);
-  --shadow-elegant: 5px 5px 0px hsl(0 0% 0%), 10px 10px 0px hsl(0 0% 30%);
+  /* Neo-Brutalism Shadows - Maximum brutalist impact */
+  --shadow-card: 6px 6px 0px hsl(0 0% 0%);
+  --shadow-yellow: 4px 4px 0px hsl(0 0% 0%);
+  --shadow-inset: inset 3px 3px 0px hsl(0 0% 90%);
+  --shadow-soft: 3px 3px 0px hsl(0 0% 0%);
+  --shadow-medium: 8px 8px 0px hsl(0 0% 0%);
+  --shadow-large: 12px 12px 0px hsl(0 0% 0%);
+  --shadow-glow: 6px 6px 0px hsl(0 100% 50%);
+  --shadow-elegant: 8px 8px 0px hsl(0 0% 0%);
 
-  /* Neo-Brutalism Transitions - Immediate and harsh */
+  /* Neo-Brutalism Transitions - Zero smoothness */
   --transition-fast: none;
-  --transition-smooth: all 0.05s step-end;
-  --transition-elegant: all 0.1s step-end;
+  --transition-smooth: none;
+  --transition-elegant: none;
   --transition-bounce: none;
 
   --sidebar-background: 240 100% 90%;
