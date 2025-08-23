@@ -1035,6 +1035,83 @@ export type Database = {
           },
         ]
       }
+      senet_games: {
+        Row: {
+          created_at: string
+          finished_at: string | null
+          game_state: Json
+          guest_user_id: string | null
+          host_user_id: string
+          id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["senet_game_status"]
+          type: Database["public"]["Enums"]["senet_game_type"]
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          finished_at?: string | null
+          game_state?: Json
+          guest_user_id?: string | null
+          host_user_id: string
+          id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["senet_game_status"]
+          type?: Database["public"]["Enums"]["senet_game_type"]
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          finished_at?: string | null
+          game_state?: Json
+          guest_user_id?: string | null
+          host_user_id?: string
+          id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["senet_game_status"]
+          type?: Database["public"]["Enums"]["senet_game_type"]
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: []
+      }
+      senet_moves: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          move_data: Json
+          move_number: number
+          player_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          move_data: Json
+          move_number: number
+          player_user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          move_data?: Json
+          move_number?: number
+          player_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "senet_moves_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "senet_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_badges: {
         Row: {
           badge_id: string
@@ -1586,6 +1663,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      senet_game_status: "waiting" | "active" | "finished" | "abandoned"
+      senet_game_type: "single_player" | "online_multiplayer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1714,6 +1793,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      senet_game_status: ["waiting", "active", "finished", "abandoned"],
+      senet_game_type: ["single_player", "online_multiplayer"],
     },
   },
 } as const
