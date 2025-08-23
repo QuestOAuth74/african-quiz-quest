@@ -151,13 +151,13 @@ export const OwareGameInterface = ({ gameMode, rules = 'abapa', onBack }: OwareG
           <CardTitle className="text-lg">How to Play</CardTitle>
         </CardHeader>
         <CardContent className="text-sm space-y-2">
-          <p><strong>Rules:</strong> Standard Oware (Abapa)</p>
-          <p>• <strong>Objective:</strong> Capture more than 24 stones (more than half of 48 total)</p>
+          <p><strong>Rules:</strong> Four-Four (Anan-Anan) - Classic Oware</p>
+          <p>• <strong>Objective:</strong> Capture more stones than your opponent</p>
           <p>• <strong>Your Turn:</strong> Click one of your pits (bottom row) to sow stones counter-clockwise</p>
           <p>• <strong>Sowing:</strong> Pick up all stones from a pit and drop one stone per pit going counter-clockwise</p>
-          <p>• <strong>Capture:</strong> When your last stone lands in opponent's pit with exactly 2-3 stones, capture those stones</p>
-          <p>• <strong>Chain Capture:</strong> Continue capturing backwards from adjacent pits that also have 2-3 stones</p>
-          <p>• <strong>Feed Rule:</strong> You cannot capture all opponent's stones - they must be left with at least one move</p>
+          <p>• <strong>Capture:</strong> When any pit reaches exactly 4 stones during sowing, those 4 stones are captured!</p>
+          <p>• <strong>Continue:</strong> If your last stone lands in a pit with stones, pick them up and continue sowing</p>
+          <p>• <strong>End Game:</strong> When 8 or fewer stones remain on the board, the game ends</p>
           <p>• <strong>Lap Rule:</strong> If sowing 12+ stones, skip the original empty pit when you circle back</p>
         </CardContent>
       </Card>

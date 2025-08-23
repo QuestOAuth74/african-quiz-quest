@@ -56,16 +56,17 @@ export const useAnimatedOwareGame = (
     setEffectsVolume(0.3);
   }, [setEffectsVolume]);
 
-  // Check if game is over using standard Oware (Abapa) rules
+  // Check if game is over using Four-Four (Anan-Anan) rules
   const checkGameEnd = useCallback((board: OwareBoard): { isGameEnd: boolean; winner: 1 | 2 | null } => {
     const playerOneTotalStones = board.playerOnePits.reduce((sum, pit) => sum + pit.stones, 0);
     const playerTwoTotalStones = board.playerTwoPits.reduce((sum, pit) => sum + pit.stones, 0);
+    const totalStonesOnBoard = playerOneTotalStones + playerTwoTotalStones;
     
     let isGameEnd = false;
     let winner: 1 | 2 | null = null;
     
-    // Game ends when someone captures more than 24 stones (more than half of 48)
-    if (board.playerOneScore > 24 || board.playerTwoScore > 24) {
+    // Game ends when 8 or fewer stones remain on the board
+    if (totalStonesOnBoard <= 8) {
       isGameEnd = true;
     }
     
@@ -75,6 +76,7 @@ export const useAnimatedOwareGame = (
     }
     
     if (isGameEnd) {
+      // When game ends, remaining stones go to the last player who captured
       if (board.playerOneScore > board.playerTwoScore) winner = 1;
       else if (board.playerTwoScore > board.playerOneScore) winner = 2;
     }
@@ -82,7 +84,7 @@ export const useAnimatedOwareGame = (
     return { isGameEnd, winner };
   }, []);
 
-  // Generate sowing sequence using proper Oware (Abapa) rules
+  // Generate sowing sequence using Four-Four (Anan-Anan) rules - capture on 4 stones
   const generateSowingSequence = useCallback((board: OwareBoard, player: 1 | 2, pitIndex: number) => {
     const sequence: Array<{ side: 1 | 2; index: number; isCapture?: boolean; capturedStones?: number }> = [];
     const tempBoard = JSON.parse(JSON.stringify(board)) as OwareBoard;
@@ -96,8 +98,9 @@ export const useAnimatedOwareGame = (
     
     let currentSide = player;
     let currentPitIndex = pitIndex;
+    let totalCaptured = 0;
     
-    // Sow stones counter-clockwise
+    // Continue sowing until no more stones to distribute
     while (stones > 0) {
       // Move to next pit in counter-clockwise direction
       if (currentSide === 1) {
@@ -126,72 +129,79 @@ export const useAnimatedOwareGame = (
       
       // Add to animation sequence
       sequence.push({ side: currentSide, index: currentPitIndex });
-    }
-    
-    // Check for captures (only from opponent's side) per Abapa rules
-    const lastSide = currentSide;
-    const lastPitIndex = currentPitIndex;
-
-    let captured: Array<{ index: number; stones: number }> = [];
-    let totalCaptured = 0;
-    
-    if (lastSide !== player) { // Last stone landed on opponent's side
-      const opponentPits = lastSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
-      const lastPitStones = opponentPits[lastPitIndex].stones;
       
-      // Capture if pit has exactly 2 or 3 stones
-      if (lastPitStones === 2 || lastPitStones === 3) {
-        let captureIndex = lastPitIndex;
+      // Check for capture - if pit now has exactly 4 stones, capture them!
+      if (targetPits[currentPitIndex].stones === 4) {
+        const capturedStones = 4;
+        targetPits[currentPitIndex].stones = 0;
+        totalCaptured += capturedStones;
         
-        // Capture backwards while pits have 2 or 3 stones
-        while (captureIndex >= 0) {
-          const pitStones = opponentPits[captureIndex].stones;
-          if (pitStones === 2 || pitStones === 3) {
-            captured.push({ index: captureIndex, stones: pitStones });
-            totalCaptured += pitStones;
-            opponentPits[captureIndex].stones = 0;
-            
-            // Mark capture in sequence for visuals
-            const captureSequenceIndex = sequence.findIndex(
-              step => step.side === lastSide && step.index === captureIndex
-            );
-            if (captureSequenceIndex !== -1) {
-              sequence[captureSequenceIndex].isCapture = true;
-              sequence[captureSequenceIndex].capturedStones = pitStones;
-            }
-            
-            captureIndex--;
-          } else {
-            break; // Stop chain if pit doesn't have 2-3 stones
-          }
+        // Mark this step as a capture in the sequence
+        sequence[sequence.length - 1].isCapture = true;
+        sequence[sequence.length - 1].capturedStones = capturedStones;
+        
+        // Award stones to the current player (who made the move)
+        if (player === 1) {
+          tempBoard.playerOneScore += capturedStones;
+        } else {
+          tempBoard.playerTwoScore += capturedStones;
         }
       }
     }
     
-    // Feed rule: cannot capture all opponent's stones
-    const opponentSide = player === 1 ? 2 : 1;
-    const opponentRow = opponentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
-    const opponentHasStones = opponentRow.some(pit => pit.stones > 0);
+    // After sowing ends, check if we need to continue (pickup and continue sowing)
+    // In Four-Four rules, if the last pit you dropped into has stones, pick them up and continue
+    const lastTargetPits = currentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
+    const lastPitStones = lastTargetPits[currentPitIndex].stones;
     
-    if (!opponentHasStones && captured.length > 0) {
-      // Revert captures: restore stones and remove capture flags; no score awarded
-      captured.forEach(({ index, stones }) => {
-        opponentRow[index].stones = stones;
-        const seqIdx = sequence.findIndex(step => step.side === opponentSide && step.index === index);
-        if (seqIdx !== -1) {
-          delete sequence[seqIdx].isCapture;
-          delete sequence[seqIdx].capturedStones;
+    // If last pit has stones (and we haven't captured from it), pick up and continue
+    if (lastPitStones > 0 && !sequence[sequence.length - 1]?.isCapture) {
+      stones = lastPitStones;
+      lastTargetPits[currentPitIndex].stones = 0;
+      
+      // Continue sowing from this pit
+      while (stones > 0) {
+        // Move to next pit
+        if (currentSide === 1) {
+          currentPitIndex++;
+          if (currentPitIndex > 5) {
+            currentSide = 2;
+            currentPitIndex = 0;
+          }
+        } else {
+          currentPitIndex++;
+          if (currentPitIndex > 5) {
+            currentSide = 1;
+            currentPitIndex = 0;
+          }
         }
-      });
-      totalCaptured = 0;
-    }
-
-    // Apply score
-    if (totalCaptured > 0) {
-      if (player === 1) {
-        tempBoard.playerOneScore += totalCaptured;
-      } else {
-        tempBoard.playerTwoScore += totalCaptured;
+        
+        // Skip original pit
+        if (currentSide === player && currentPitIndex === pitIndex && stones > 0) {
+          continue;
+        }
+        
+        const nextTargetPits = currentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
+        nextTargetPits[currentPitIndex].stones++;
+        stones--;
+        
+        sequence.push({ side: currentSide, index: currentPitIndex });
+        
+        // Check for capture again
+        if (nextTargetPits[currentPitIndex].stones === 4) {
+          const capturedStones = 4;
+          nextTargetPits[currentPitIndex].stones = 0;
+          totalCaptured += capturedStones;
+          
+          sequence[sequence.length - 1].isCapture = true;
+          sequence[sequence.length - 1].capturedStones = capturedStones;
+          
+          if (player === 1) {
+            tempBoard.playerOneScore += capturedStones;
+          } else {
+            tempBoard.playerTwoScore += capturedStones;
+          }
+        }
       }
     }
     

@@ -81,13 +81,13 @@ export const OwareGameModes = ({ onSelectMode }: OwareGameModesProps) => {
         {/* Game Rules Summary */}
         <Card className="max-w-2xl mx-auto">
           <CardContent className="p-6">
-            <h3 className="font-semibold mb-4">Standard Oware (Abapa) Rules</h3>
+            <h3 className="font-semibold mb-4">Four-Four (Anan-Anan) Rules - Classic Oware</h3>
             <div className="text-sm text-muted-foreground space-y-2 text-left">
-              <p>• <strong>Objective:</strong> Capture more than 24 stones (more than half of 48 total)</p>
+              <p>• <strong>Objective:</strong> Capture more stones than your opponent</p>
               <p>• <strong>Sowing:</strong> Pick up all stones from your pit and distribute counter-clockwise</p>
-              <p>• <strong>Capture:</strong> When your last stone lands in opponent's pit with 2-3 stones</p>
-              <p>• <strong>Chain Capture:</strong> Continue capturing backwards from adjacent 2-3 stone pits</p>
-              <p>• <strong>Feed Rule:</strong> Cannot capture all opponent's stones - they must have moves available</p>
+              <p>• <strong>Capture:</strong> When any pit reaches exactly 4 stones during sowing, capture those 4 stones</p>
+              <p>• <strong>Continue:</strong> If your last stone lands in a pit with stones, pick them up and continue</p>
+              <p>• <strong>End Game:</strong> When 8 or fewer stones remain on the board, the game ends</p>
             </div>
           </CardContent>
         </Card>
