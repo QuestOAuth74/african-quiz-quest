@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, RotateCcw, Volume2, VolumeX, Music, Users, Crown } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -143,6 +144,41 @@ export default function SenetPlay() {
       playTurnChange();
     }
   }, [gameState?.currentPlayer, playTurnChange]);
+
+  // Trigger confetti when game finishes
+  useEffect(() => {
+    if (gameState?.winner) {
+      const celebrateWin = () => {
+        // Multiple confetti bursts for celebration
+        const duration = 3000;
+        const animationEnd = Date.now() + duration;
+        
+        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+        
+        const runAnimation = () => {
+          const timeLeft = animationEnd - Date.now();
+          
+          if (timeLeft <= 0) return;
+          
+          confetti({
+            particleCount: randomInRange(50, 100),
+            angle: randomInRange(55, 125),
+            spread: randomInRange(50, 70),
+            origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+            colors: ['#D4AF37', '#B8860B', '#FFA500', '#F4A460', '#CD853F', '#DEB887']
+          });
+          
+          requestAnimationFrame(runAnimation);
+        };
+        
+        runAnimation();
+      };
+
+      // Delay confetti slightly to let the win state render first
+      const timer = setTimeout(celebrateWin, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [gameState?.winner]);
 
   const handleSquareClick = (position: number) => {
     if (!gameState) return;
