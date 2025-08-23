@@ -131,12 +131,12 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
       
       <div className="relative z-10">
         <div className="text-center mb-6">
-          <h3 className="text-2xl font-bold text-yellow-900 flex items-center justify-center gap-3 drop-shadow-lg">
+          <h3 className="text-2xl font-bold text-white flex items-center justify-center gap-3 drop-shadow-lg">
             <span className="text-3xl">𓋹</span>
             Sacred Senet Board of the Afterlife
             <span className="text-3xl">𓋹</span>
           </h3>
-          <p className="text-yellow-800 font-semibold mt-2 text-lg">Journey through the underworld to eternal life</p>
+          <p className="text-white font-semibold mt-2 text-lg">Journey through the underworld to eternal life</p>
         </div>
         
         {/* Ornamental border */}
