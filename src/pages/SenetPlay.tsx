@@ -76,7 +76,7 @@ export default function SenetPlay() {
 
   const { isThinking } = useSenetAI(
     isMultiplayer ? null : gameState, 
-    isMultiplayer ? () => Promise.resolve(false) : makeMove, 
+    isMultiplayer ? () => false : makeMove, 
     isMultiplayer ? () => null : throwSticks
   );
   
