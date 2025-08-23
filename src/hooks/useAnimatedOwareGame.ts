@@ -49,7 +49,7 @@ export const useAnimatedOwareGame = (
     sequenceIndex: 0,
   });
 
-  const { playCorrectAnswer, playWrongAnswer, setEffectsVolume } = useGameAudio();
+  const { playCorrectAnswer, playWrongAnswer, playPebbleDrop, setEffectsVolume } = useGameAudio();
 
   // Initialize audio volume
   useEffect(() => {
@@ -266,6 +266,7 @@ export const useAnimatedOwareGame = (
       } else {
         // Add stone to pit
         targetPits[step.index].stones++;
+        playPebbleDrop(); // Pebble drop sound for each stone placed
       }
 
       // Update visual board state
@@ -279,7 +280,7 @@ export const useAnimatedOwareGame = (
     };
 
     animateStep();
-  }, [gameState.board, checkGameEnd, playCorrectAnswer]);
+  }, [gameState.board, checkGameEnd, playCorrectAnswer, playPebbleDrop]);
 
   // Make a move with animation
   const makeMove = useCallback((pitIndex: number) => {
@@ -336,29 +337,50 @@ export const useAnimatedOwareGame = (
       !animationState.isAnimating &&
       !gameState.isThinking
     ) {
-      setGameState(prev => ({ ...prev, isThinking: true }));
-      const t = window.setTimeout(() => {
-        const board = gameState.board;
-        let bestMove = -1;
-        let bestScore = -Infinity;
-        for (let i = 0; i < 6; i++) {
-          if (board.playerTwoPits[i].stones > 0) {
-            const { finalBoard } = generateSowingSequence(board, 2, i);
-            const scoreDiff = finalBoard.playerTwoScore - board.playerTwoScore;
-            if (scoreDiff > bestScore) {
-              bestScore = scoreDiff;
-              bestMove = i;
+      console.log('AI should move now, triggering thinking...');
+      
+      const timeoutId = setTimeout(() => {
+        console.log('AI timeout triggered, calculating move...');
+        setGameState(prev => ({ ...prev, isThinking: true }));
+        
+        // Add another small delay to show thinking state
+        const moveTimeout = setTimeout(() => {
+          const board = gameState.board;
+          let bestMove = -1;
+          let bestScore = -Infinity;
+          
+          // Find valid moves
+          const validMoves = [];
+          for (let i = 0; i < 6; i++) {
+            if (board.playerTwoPits[i].stones > 0) {
+              validMoves.push(i);
+              const { finalBoard } = generateSowingSequence(board, 2, i);
+              const scoreDiff = finalBoard.playerTwoScore - board.playerTwoScore;
+              if (scoreDiff > bestScore) {
+                bestScore = scoreDiff;
+                bestMove = i;
+              }
             }
           }
-        }
-        setGameState(prev => ({ ...prev, isThinking: false }));
-        if (bestMove >= 0) {
-          makeMove(bestMove);
-        }
-      }, 800 + Math.random() * 600);
-      return () => clearTimeout(t);
+          
+          console.log('AI valid moves:', validMoves, 'best move:', bestMove);
+          
+          setGameState(prev => ({ ...prev, isThinking: false }));
+          
+          if (bestMove >= 0) {
+            console.log('AI making move:', bestMove);
+            makeMove(bestMove);
+          } else {
+            console.log('AI has no valid moves!');
+          }
+        }, 500);
+        
+        return () => clearTimeout(moveTimeout);
+      }, 1000);
+      
+      return () => clearTimeout(timeoutId);
     }
-  }, [gameState.gameStatus, gameState.currentPlayer, gameState.gameMode, animationState.isAnimating, gameState.isThinking, gameState.board, generateSowingSequence, makeMove]);
+  }, [gameState.gameStatus, gameState.currentPlayer, gameState.gameMode, animationState.isAnimating, gameState.isThinking]);
 
   return {
     gameState,

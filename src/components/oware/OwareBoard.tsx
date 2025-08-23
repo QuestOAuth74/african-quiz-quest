@@ -60,15 +60,15 @@ export const OwareBoard = ({
           `
         }}
       >
-        {/* Decorative African Patterns */}
+        {/* Decorative Adinkra Symbols */}
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex gap-6 text-amber-600/60 text-2xl pointer-events-none">
-          <span className="drop-shadow-lg">𓀀</span>
-          <span className="drop-shadow-lg">𓂧</span>
-          <span className="drop-shadow-lg">𓃭</span>
-          <span className="drop-shadow-lg">𓄿</span>
-          <span className="drop-shadow-lg">𓅓</span>
-          <span className="drop-shadow-lg">𓆑</span>
-          <span className="drop-shadow-lg">𓇯</span>
+          <span className="drop-shadow-lg font-bold">⚹</span> {/* Adwo - peace/tranquility */}
+          <span className="drop-shadow-lg font-bold">✧</span> {/* Dwennimmen - ram's horns/humility */}
+          <span className="drop-shadow-lg font-bold">❋</span> {/* Aya - fern/endurance */}
+          <span className="drop-shadow-lg font-bold">⚘</span> {/* Funtunfunefu - siamese twins/unity */}
+          <span className="drop-shadow-lg font-bold">⚜</span> {/* Bi Nka Bi - no one should bite another */}
+          <span className="drop-shadow-lg font-bold">✦</span> {/* Akoma - heart/patience */}
+          <span className="drop-shadow-lg font-bold">◉</span> {/* Gye Nyame - except God */}
         </div>
         
         {/* Player Two (Top Row) */}
