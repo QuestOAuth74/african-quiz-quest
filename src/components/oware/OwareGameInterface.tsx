@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { OwareBoard } from './OwareBoard';
+import { OwareBoard3D } from './OwareBoard3D';
 import { useAnimatedOwareGame } from '@/hooks/useAnimatedOwareGame';
 import { ArrowLeft, RotateCcw, Trophy } from 'lucide-react';
 
@@ -136,7 +136,7 @@ export const OwareGameInterface = ({ gameMode, rules = 'abapa', onBack }: OwareG
       )}
 
       {/* Game Board */}
-      <OwareBoard
+      <OwareBoard3D
         board={gameState.board}
         currentPlayer={gameState.currentPlayer}
         onPitClick={handlePitClick}
