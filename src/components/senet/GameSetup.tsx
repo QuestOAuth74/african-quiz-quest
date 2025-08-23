@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Brain, Swords, Crown, Bot, Users, Globe } from 'lucide-react';
+import { SenetMultiplayerLobby } from './SenetMultiplayerLobby';
 
 interface GameSetupProps {
   onStartGame: (difficulty: 'easy' | 'medium' | 'hard') => void;
@@ -10,119 +12,172 @@ interface GameSetupProps {
 
 export const GameSetup = ({ onStartGame }: GameSetupProps) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+  const [gameMode, setGameMode] = useState<'single' | 'multiplayer'>('single');
 
-  const difficultyInfo = {
-    easy: {
-      title: 'Novice Scribe',
-      description: 'The AI makes mostly random moves with occasional good decisions',
-      icon: '𓂋',
-      color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+  const gameModeOptions = [
+    {
+      mode: 'single' as const,
+      title: 'Single Player',
+      description: 'Play against the AI pharaoh',
+      icon: Bot,
+      color: 'bg-blue-500',
     },
-    medium: {
-      title: 'Temple Priest', 
-      description: 'The AI uses basic strategy and tactical thinking',
-      icon: '𓊪',
-      color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100'
+    {
+      mode: 'multiplayer' as const,
+      title: 'Online Multiplayer',
+      description: 'Challenge other players worldwide',
+      icon: Globe,
+      color: 'bg-purple-500',
     },
-    hard: {
+  ];
+
+  const difficultyOptions = [
+    {
+      level: 'easy' as const,
+      title: 'Apprentice Scribe',
+      description: 'Perfect for learning the sacred rules',
+      icon: Brain,
+      color: 'bg-green-500',
+    },
+    {
+      level: 'medium' as const,
+      title: 'Temple Guardian',
+      description: 'Balanced challenge for experienced players',
+      icon: Swords,
+      color: 'bg-yellow-500',
+    },
+    {
+      level: 'hard' as const,
       title: 'Pharaoh\'s Champion',
-      description: 'The AI employs advanced strategy, blocking, and forward planning',
-      icon: '𓋹',
-      color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-    }
-  };
+      description: 'Ultimate test worthy of the gods',
+      icon: Crown,
+      color: 'bg-red-500',
+    },
+  ];
+
+  if (gameMode === 'multiplayer') {
+    return <SenetMultiplayerLobby />;
+  }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Header */}
       <div className="text-center space-y-4">
-        <div className="text-6xl">𓋹</div>
-        <h1 className="text-4xl font-bold text-foreground">Ancient Senet</h1>
-        <p className="text-lg text-muted-foreground">
-          Journey through the afterlife in the sacred game of the Pharaohs
+        <div className="flex items-center justify-center gap-3">
+          <div className="text-6xl animate-pulse">𓋹</div>
+          <h1 className="text-4xl font-bold text-foreground">Ancient Senet</h1>
+          <div className="text-6xl animate-pulse">𓋹</div>
+        </div>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Journey through the underworld in this sacred game of ancient Egypt. 
+          Navigate the path to eternal life using strategy, luck, and divine favor.
         </p>
       </div>
 
-      <Card className="border-amber-200 dark:border-amber-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="text-amber-600">𓆃</span>
-            About Senet
+      {/* Game Mode Selection */}
+      <Card className="border-primary/20 shadow-xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl flex items-center justify-center gap-3">
+            <Users className="h-7 w-7 text-primary" />
+            Choose Game Mode
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            Senet is one of the oldest known board games, played in ancient Egypt over 5,000 years ago. 
-            Archaeological evidence shows it was enjoyed by pharaohs and commoners alike, including 
-            Tutankhamun who was buried with multiple Senet sets.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-              <h4 className="font-semibold text-foreground mb-2">Game Objective</h4>
-              <p className="text-muted-foreground">
-                Race your pieces through the underworld and be the first to reach the afterlife 
-                by moving all pieces off the board.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-2">Sacred Mechanics</h4>
-              <p className="text-muted-foreground">
-                Use throwing sticks to determine movement, navigate special squares with 
-                mystical powers, and capture opponent pieces.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-primary/20">
-        <CardHeader>
-          <CardTitle>Choose Your Opponent</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {(Object.keys(difficultyInfo) as Array<keyof typeof difficultyInfo>).map((difficulty) => (
-              <div
-                key={difficulty}
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                  selectedDifficulty === difficulty
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50'
-                }`}
-                onClick={() => setSelectedDifficulty(difficulty)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{difficultyInfo[difficulty].icon}</span>
-                    <div>
-                      <h3 className="font-semibold text-foreground">
-                        {difficultyInfo[difficulty].title}
-                      </h3>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {gameModeOptions.map((option) => {
+              const Icon = option.icon;
+              return (
+                <Card
+                  key={option.mode}
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                    gameMode === option.mode
+                      ? 'ring-4 ring-primary shadow-2xl'
+                      : 'hover:shadow-lg'
+                  }`}
+                  onClick={() => setGameMode(option.mode)}
+                >
+                  <CardContent className="p-6 text-center space-y-4">
+                    <div className="flex items-center justify-center">
+                      <div className={`p-4 rounded-full ${option.color} text-white shadow-lg`}>
+                        <Icon className="h-8 w-8" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold">{option.title}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {difficultyInfo[difficulty].description}
+                        {option.description}
                       </p>
                     </div>
-                  </div>
-                  <Badge className={difficultyInfo[difficulty].color}>
-                    {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-                  </Badge>
+                    {gameMode === option.mode && (
+                      <Badge className="bg-primary text-primary-foreground">
+                        Selected
+                      </Badge>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+          
+          <Separator />
+          
+          {gameMode === 'single' && (
+            <>
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-center">Select AI Difficulty</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {difficultyOptions.map((option) => {
+                    const Icon = option.icon;
+                    return (
+                      <Card
+                        key={option.level}
+                        className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                          selectedDifficulty === option.level
+                            ? 'ring-2 ring-primary'
+                            : ''
+                        }`}
+                        onClick={() => setSelectedDifficulty(option.level)}
+                      >
+                        <CardContent className="p-4 text-center space-y-3">
+                          <div className="flex items-center justify-center">
+                            <div className={`p-3 rounded-full ${option.color} text-white`}>
+                              <Icon className="h-6 w-6" />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-bold">{option.title}</h4>
+                            <p className="text-xs text-muted-foreground">
+                              {option.description}
+                            </p>
+                          </div>
+                          {selectedDifficulty === option.level && (
+                            <Badge variant="secondary" className="text-xs">
+                              Selected
+                            </Badge>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
-            ))}
-          </div>
-
-          <Separator className="my-6" />
-
-          <div className="flex justify-center">
-            <Button
-              onClick={() => onStartGame(selectedDifficulty)}
-              size="lg"
-              className="bg-amber-600 hover:bg-amber-700 text-white min-w-48"
-            >
-              <span className="text-lg mr-2">𓋹</span>
-              Begin Sacred Journey
-            </Button>
-          </div>
+              
+              <div className="text-center space-y-4">
+                <Button
+                  onClick={() => onStartGame(selectedDifficulty)}
+                  size="lg"
+                  className="px-8 py-6 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Crown className="h-5 w-5 mr-3" />
+                  Begin Sacred Journey
+                  <Crown className="h-5 w-5 ml-3" />
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  Your quest through the afterlife awaits...
+                </p>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

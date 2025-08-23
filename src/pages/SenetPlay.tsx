@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, RotateCcw, Volume2, VolumeX, Music } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Volume2, VolumeX, Music, Users, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +10,11 @@ import { SenetBoard } from '@/components/senet/SenetBoard';
 import { ThrowingSticks } from '@/components/senet/ThrowingSticks';
 import { FullscreenToggle } from '@/components/FullscreenToggle';
 import { useSenetGame } from '@/hooks/useSenetGame';
+import { useOnlineSenetGame } from '@/hooks/useOnlineSenetGame';
 import { useSenetAI } from '@/hooks/useSenetAI';
 import { useSenetAudio } from '@/hooks/useSenetAudio';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 export default function SenetPlay() {
@@ -20,19 +22,63 @@ export default function SenetPlay() {
   const { gameId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const difficulty = (searchParams.get('difficulty') as 'easy' | 'medium' | 'hard') || 'medium';
+  const mode = searchParams.get('mode') || 'single';
+  const isMultiplayer = mode === 'multiplayer';
   
-  const {
-    gameState,
-    isProcessing,
-    throwSticks,
-    makeMove,
-    resetGame,
-    setAIDifficulty
-  } = useSenetGame();
+  // Use different hooks based on game mode
+  const singlePlayerGame = useSenetGame();
+  const multiplayerGame = useOnlineSenetGame(isMultiplayer ? gameId : undefined);
+  
+  // Select the appropriate game state and actions
+  const gameState = isMultiplayer ? multiplayerGame.gameState : singlePlayerGame.gameState;
+  const isProcessing = isMultiplayer ? multiplayerGame.isLoading : singlePlayerGame.isProcessing;
+  const makeMove = isMultiplayer ? 
+    (position: number) => {
+      // Handle multiplayer move
+      const piece = gameState?.board[position];
+      if (piece && gameState) {
+        multiplayerGame.makeMove({
+          type: 'make_move',
+          fromPosition: position,
+          toPosition: position + gameState.lastRoll,
+          pieceId: piece.id
+        });
+        return true;
+      }
+      return false;
+    } : 
+    singlePlayerGame.makeMove;
+  
+  const throwSticks = isMultiplayer ? 
+    () => {
+      // Handle multiplayer throw
+      const result = {
+        sticks: Array.from({ length: 4 }, () => Math.random() < 0.5),
+        value: 0
+      };
+      result.value = result.sticks.filter(s => s).length || 6;
+      
+      multiplayerGame.makeMove({
+        type: 'throw_sticks',
+        roll: result.value
+      });
+      
+      return result;
+    } : 
+    singlePlayerGame.throwSticks;
 
-  const { isThinking } = useSenetAI(gameState, makeMove, throwSticks);
+  const resetGame = isMultiplayer ? 
+    () => navigate('/senet') : 
+    singlePlayerGame.resetGame;
+
+  const { isThinking } = useSenetAI(
+    isMultiplayer ? null : gameState, 
+    isMultiplayer ? () => Promise.resolve(false) : makeMove, 
+    isMultiplayer ? () => null : throwSticks
+  );
   
   const {
     isPlayingMusic,
@@ -68,8 +114,10 @@ export default function SenetPlay() {
   };
 
   useEffect(() => {
-    setAIDifficulty(difficulty);
-  }, [difficulty, setAIDifficulty]);
+    if (!isMultiplayer) {
+      singlePlayerGame.setAIDifficulty(difficulty);
+    }
+  }, [difficulty, isMultiplayer]);
 
   // Start background music and game start sound when component mounts
   useEffect(() => {
@@ -95,9 +143,20 @@ export default function SenetPlay() {
   }, [gameState.currentPlayer, playTurnChange]);
 
   const handleSquareClick = (position: number) => {
+    if (!gameState) return;
+    
     if (gameState.gamePhase === 'moving' && gameState.availableMoves.includes(position)) {
       const piece = gameState.board[position];
-      if (piece && piece.player === gameState.currentPlayer && !gameState.players.find(p => p.id === gameState.currentPlayer)?.isAI) {
+      const currentPlayerIsAI = gameState.players.find(p => p.id === gameState.currentPlayer)?.isAI;
+      
+      // In multiplayer, check if it's the current user's turn
+      if (isMultiplayer && multiplayerGame.onlineGame) {
+        const isMyTurn = (gameState.currentPlayer === 1 && multiplayerGame.onlineGame.host_user_id === user?.id) ||
+                        (gameState.currentPlayer === 2 && multiplayerGame.onlineGame.guest_user_id === user?.id);
+        if (!isMyTurn) return;
+      }
+      
+      if (piece && piece.player === gameState.currentPlayer && !currentPlayerIsAI) {
         // Check if there's a capture
         const targetPiece = gameState.board.find(p => p && p.position === position && p.player !== gameState.currentPlayer);
         if (targetPiece) {
@@ -111,12 +170,36 @@ export default function SenetPlay() {
   };
 
   const handleThrowSticks = () => {
-    if (gameState.gamePhase === 'throwing' && !gameState.players.find(p => p.id === gameState.currentPlayer)?.isAI) {
+    if (!gameState) return null;
+    
+    const currentPlayerIsAI = gameState.players.find(p => p.id === gameState.currentPlayer)?.isAI;
+    
+    // In multiplayer, check if it's the current user's turn
+    if (isMultiplayer && multiplayerGame.onlineGame) {
+      const isMyTurn = (gameState.currentPlayer === 1 && multiplayerGame.onlineGame.host_user_id === user?.id) ||
+                      (gameState.currentPlayer === 2 && multiplayerGame.onlineGame.guest_user_id === user?.id);
+      if (!isMyTurn) return null;
+    }
+    
+    if (gameState.gamePhase === 'throwing' && !currentPlayerIsAI) {
       playStickThrow();
       return throwSticks();
     }
     return null;
   };
+
+  // Return loading state if no game state
+  if (!gameState) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950 dark:to-orange-950 flex items-center justify-center">
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-center">Loading game...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const currentPlayerInfo = gameState.players.find(p => p.id === gameState.currentPlayer);
   const playerPieces = gameState.board.filter(p => p?.player === 1).length;
@@ -138,7 +221,9 @@ export default function SenetPlay() {
               Back to Setup
             </Button>
             <div className="text-2xl">𓋹</div>
-            <h1 className="text-xl font-bold text-foreground">Ancient Senet</h1>
+            <h1 className="text-xl font-bold text-foreground">
+              Ancient Senet {isMultiplayer && <Badge variant="secondary" className="ml-2"><Users className="h-3 w-3 mr-1" />Online</Badge>}
+            </h1>
           </div>
           
           <div className="flex items-center gap-2">

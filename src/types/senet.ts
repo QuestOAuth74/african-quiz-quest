@@ -33,6 +33,46 @@ export interface SenetGameState {
   winner?: 1 | 2;
   createdAt: Date;
   updatedAt: Date;
+  isMultiplayer?: boolean;
+  gameId?: string;
+}
+
+// Online multiplayer types
+export interface SenetOnlineGame {
+  id: string;
+  type: 'single_player' | 'online_multiplayer';
+  status: 'waiting' | 'active' | 'finished' | 'abandoned';
+  host_user_id: string;
+  guest_user_id?: string;
+  game_state: SenetGameState;
+  winner_user_id?: string;
+  created_at: string;
+  updated_at: string;
+  started_at?: string;
+  finished_at?: string;
+}
+
+export interface SenetOnlineMove {
+  id: string;
+  game_id: string;
+  player_user_id: string;
+  move_data: {
+    type: 'throw_sticks' | 'make_move';
+    roll?: number;
+    fromPosition?: number;
+    toPosition?: number;
+    pieceId?: string;
+  };
+  move_number: number;
+  created_at: string;
+}
+
+export interface SenetLobbyPlayer {
+  user_id: string;
+  display_name: string;
+  last_seen: string;
+  is_online: boolean;
+  player_status: string;
 }
 
 export interface ThrowingSticksResult {
