@@ -3,12 +3,21 @@ import { OwareBoard as OwareBoardType } from '@/types/oware';
 import { OwarePit } from './OwarePit';
 import { cn } from '@/lib/utils';
 
+interface AnimationState {
+  isAnimating: boolean;
+  currentStones: number;
+  currentPit: { side: 1 | 2; index: number } | null;
+  sowingSequence: Array<{ side: 1 | 2; index: number; isCapture?: boolean }>;
+  sequenceIndex: number;
+}
+
 interface OwareBoardProps {
   board: OwareBoardType;
   currentPlayer: 1 | 2;
   onPitClick: (pitIndex: number) => void;
   selectedPit: number | null;
   isGameActive: boolean;
+  animationState?: AnimationState;
   className?: string;
 }
 
@@ -18,6 +27,7 @@ export const OwareBoard = ({
   onPitClick,
   selectedPit,
   isGameActive,
+  animationState,
   className
 }: OwareBoardProps) => {
   return (
@@ -72,16 +82,23 @@ export const OwareBoard = ({
             </div>
           </div>
           <div className="flex justify-center gap-6">
-            {board.playerTwoPits.slice().reverse().map((pit, index) => (
-              <OwarePit
-                key={`p2-${5 - index}`}
-                pit={{ ...pit, index: 5 - index }}
-                isClickable={currentPlayer === 2 && isGameActive && pit.stones > 0}
-                isSelected={selectedPit === (5 - index) && currentPlayer === 2}
-                onClick={() => currentPlayer === 2 && isGameActive && onPitClick(5 - index)}
-                player={2}
-              />
-            ))}
+            {board.playerTwoPits.slice().reverse().map((pit, index) => {
+              const actualIndex = 5 - index;
+              const isAnimating = animationState?.currentPit?.side === 2 && 
+                                animationState?.currentPit?.index === actualIndex;
+              
+              return (
+                <OwarePit
+                  key={`p2-${actualIndex}`}
+                  pit={{ ...pit, index: actualIndex }}
+                  isClickable={currentPlayer === 2 && isGameActive && pit.stones > 0}
+                  isSelected={selectedPit === actualIndex && currentPlayer === 2}
+                  isAnimating={isAnimating}
+                  onClick={() => currentPlayer === 2 && isGameActive && onPitClick(actualIndex)}
+                  player={2}
+                />
+              );
+            })}
           </div>
         </div>
 
@@ -94,16 +111,22 @@ export const OwareBoard = ({
         {/* Player One (Bottom Row) */}
         <div className="mt-12">
           <div className="flex justify-center gap-6 mb-6">
-            {board.playerOnePits.map((pit, index) => (
-              <OwarePit
-                key={`p1-${index}`}
-                pit={pit}
-                isClickable={currentPlayer === 1 && isGameActive && pit.stones > 0}
-                isSelected={selectedPit === index && currentPlayer === 1}
-                onClick={() => currentPlayer === 1 && isGameActive && onPitClick(index)}
-                player={1}
-              />
-            ))}
+            {board.playerOnePits.map((pit, index) => {
+              const isAnimating = animationState?.currentPit?.side === 1 && 
+                                animationState?.currentPit?.index === index;
+              
+              return (
+                <OwarePit
+                  key={`p1-${index}`}
+                  pit={pit}
+                  isClickable={currentPlayer === 1 && isGameActive && pit.stones > 0}
+                  isSelected={selectedPit === index && currentPlayer === 1}
+                  isAnimating={isAnimating}
+                  onClick={() => currentPlayer === 1 && isGameActive && onPitClick(index)}
+                  player={1}
+                />
+              );
+            })}
           </div>
           <div className="flex justify-center">
             <div className="bg-gradient-to-r from-amber-800 to-amber-900 text-amber-100 px-6 py-3 rounded-xl font-bold text-lg shadow-lg border-2 border-amber-700">

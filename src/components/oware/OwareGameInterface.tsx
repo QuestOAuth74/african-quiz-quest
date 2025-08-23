@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { OwareBoard } from './OwareBoard';
-import { useOwareGame } from '@/hooks/useOwareGame';
+import { useAnimatedOwareGame } from '@/hooks/useAnimatedOwareGame';
 import { ArrowLeft, RotateCcw, Trophy } from 'lucide-react';
 
 interface OwareGameInterfaceProps {
@@ -12,13 +12,15 @@ interface OwareGameInterfaceProps {
 }
 
 export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: OwareGameInterfaceProps) => {
-  const { gameState, selectedPit, setSelectedPit, makeMove, startGame, resetGame } = useOwareGame(gameMode, rules);
+  const { gameState, selectedPit, setSelectedPit, makeMove, startGame, resetGame, animationState } = useAnimatedOwareGame(gameMode, rules);
   const [isPaused, setIsPaused] = useState(false);
 
   const handlePitClick = (pitIndex: number) => {
-    if ((gameState.gameStatus === 'playing' || gameState.gameStatus === 'waiting') && !isPaused && !gameState.isThinking) {
+    if ((gameState.gameStatus === 'playing' || gameState.gameStatus === 'waiting') && 
+        !isPaused && 
+        !gameState.isThinking && 
+        !animationState.isAnimating) {
       if (gameState.gameStatus === 'waiting') {
-        console.log('Auto-starting game from pit click');
         startGame();
       }
       makeMove(pitIndex);
@@ -88,6 +90,9 @@ export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: Ow
           {gameState.isThinking && (
             <p className="text-sm text-muted-foreground mt-1">AI is thinking...</p>
           )}
+          {animationState.isAnimating && (
+            <p className="text-sm text-primary mt-1">Sowing stones...</p>
+          )}
         </div>
         
         <div className="flex gap-2">
@@ -112,10 +117,7 @@ export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: Ow
           <Card>
             <CardContent className="py-6">
               <p className="text-lg mb-4">Ready to play Oware?</p>
-              <Button onClick={() => {
-                console.log('Start Game button clicked!');
-                startGame();
-              }}>Start Game</Button>
+              <Button onClick={startGame}>Start Game</Button>
             </CardContent>
           </Card>
         </div>
@@ -139,7 +141,8 @@ export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: Ow
         currentPlayer={gameState.currentPlayer}
         onPitClick={handlePitClick}
         selectedPit={selectedPit}
-        isGameActive={(gameState.gameStatus === 'playing' || gameState.gameStatus === 'waiting') && !isPaused}
+        isGameActive={(gameState.gameStatus === 'playing' || gameState.gameStatus === 'waiting') && !isPaused && !animationState.isAnimating}
+        animationState={animationState}
       />
 
       {/* Game Rules Card */}

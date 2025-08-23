@@ -6,6 +6,7 @@ interface OwarePitProps {
   pit: OwarePitType;
   isClickable: boolean;
   isSelected: boolean;
+  isAnimating?: boolean;
   onClick: () => void;
   player: 1 | 2;
 }
@@ -14,6 +15,7 @@ export const OwarePit = ({
   pit,
   isClickable,
   isSelected,
+  isAnimating = false,
   onClick,
   player
 }: OwarePitProps) => {
@@ -51,6 +53,7 @@ export const OwarePit = ({
         "shadow-[inset_0_8px_16px_rgba(0,0,0,0.6),_inset_0_-2px_8px_rgba(92,65,36,0.3),_0_4px_8px_rgba(0,0,0,0.4)]",
         isClickable && "cursor-pointer hover:shadow-[inset_0_8px_16px_rgba(0,0,0,0.7),_inset_0_-2px_8px_rgba(92,65,36,0.4),_0_6px_12px_rgba(0,0,0,0.5)]",
         isSelected && "ring-4 ring-yellow-400 ring-opacity-75",
+        isAnimating && "ring-4 ring-green-400 ring-opacity-90 animate-pulse",
         !isClickable && "opacity-75"
       )}
       onClick={isClickable ? onClick : undefined}
