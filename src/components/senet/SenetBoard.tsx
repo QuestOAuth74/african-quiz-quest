@@ -18,34 +18,38 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
     const piece = board[position];
     
     return cn(
-      // Base square styling with 3D effects
+      // Base Egyptian sandstone square styling with hieroglyphic patterns
       "relative w-16 h-16 flex items-center justify-center",
       "transition-all duration-300 cursor-pointer",
-      // 3D border effects
-      "border-t-2 border-l-2 border-r border-b",
-      "border-t-yellow-200 border-l-yellow-300 border-r-yellow-900 border-b-yellow-950",
-      // 3D background with depth
-      "bg-gradient-to-br from-yellow-100 via-orange-200 to-yellow-300",
-      "shadow-[inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.3),0_4px_8px_rgba(0,0,0,0.3)]",
-      "hover:shadow-[inset_3px_3px_6px_rgba(255,255,255,0.9),inset_-3px_-3px_6px_rgba(0,0,0,0.4),0_6px_12px_rgba(0,0,0,0.4)]",
-      "hover:transform hover:-translate-y-0.5 hover:scale-105",
-      // 3D perspective
+      // Egyptian temple stone border effects
+      "border-t-2 border-l-2 border-r-2 border-b-2",
+      "border-t-amber-200 border-l-amber-300 border-r-amber-900 border-b-amber-950",
+      // Ancient sandstone background with depth
+      "bg-gradient-to-br from-amber-50 via-yellow-100 to-amber-200",
+      "shadow-[inset_3px_3px_6px_rgba(255,248,220,0.9),inset_-3px_-3px_6px_rgba(139,69,19,0.4),0_4px_12px_rgba(101,67,33,0.4)]",
+      "hover:shadow-[inset_4px_4px_8px_rgba(255,248,220,1),inset_-4px_-4px_8px_rgba(139,69,19,0.6),0_6px_16px_rgba(101,67,33,0.6)]",
+      "hover:transform hover:-translate-y-1 hover:scale-105",
+      // Egyptian temple perspective
       "transform-style-3d",
       {
-        // Special squares with enhanced 3D styling
-        "bg-gradient-to-br from-red-200 via-red-300 to-red-400 border-t-red-200 border-l-red-300 border-r-red-900 border-b-red-950 shadow-[inset_2px_2px_4px_rgba(255,200,200,0.8),inset_-2px_-2px_4px_rgba(100,0,0,0.5),0_4px_12px_rgba(220,38,38,0.4)]": specialSquare?.effect === 'safe',
-        "bg-gradient-to-br from-blue-200 via-cyan-300 to-cyan-400 border-t-cyan-200 border-l-cyan-300 border-r-cyan-900 border-b-cyan-950 shadow-[inset_2px_2px_4px_rgba(200,255,255,0.8),inset_-2px_-2px_4px_rgba(0,50,100,0.5),0_4px_12px_rgba(6,182,212,0.4)]": specialSquare?.effect === 'restart',
-        "bg-gradient-to-br from-purple-200 via-violet-300 to-violet-400 border-t-violet-200 border-l-violet-300 border-r-violet-900 border-b-violet-950 shadow-[inset_2px_2px_4px_rgba(220,200,255,0.8),inset_-2px_-2px_4px_rgba(50,0,100,0.5),0_4px_12px_rgba(139,92,246,0.4)]": specialSquare?.effect === 'must_roll_exact',
+        // Sacred squares - Ra's protection (golden red)
+        "bg-gradient-to-br from-red-100 via-orange-200 to-red-200 border-t-red-300 border-l-orange-300 border-r-red-800 border-b-red-900 shadow-[inset_3px_3px_6px_rgba(255,230,230,0.9),inset_-3px_-3px_6px_rgba(127,29,29,0.6),0_4px_16px_rgba(185,28,28,0.5)] text-red-900": specialSquare?.effect === 'safe',
         
-        // Available move highlighting with 3D glow
-        "ring-4 ring-lime-400 ring-opacity-100 bg-gradient-to-br from-lime-200 via-green-300 to-green-400 animate-bounce shadow-[inset_2px_2px_6px_rgba(255,255,255,0.9),inset_-2px_-2px_6px_rgba(0,100,0,0.3),0_6px_20px_rgba(132,204,22,0.6),0_0_30px_rgba(132,204,22,0.4)] transform -translate-y-1": isAvailable && piece?.player === currentPlayer,
-        "hover:ring-2 hover:ring-yellow-400 hover:ring-opacity-50": !isAvailable,
+        // House of Waters - Nile blue renewal 
+        "bg-gradient-to-br from-cyan-100 via-blue-200 to-cyan-200 border-t-cyan-300 border-l-blue-300 border-r-cyan-800 border-b-blue-900 shadow-[inset_3px_3px_6px_rgba(230,250,255,0.9),inset_-3px_-3px_6px_rgba(12,74,110,0.6),0_4px_16px_rgba(8,145,178,0.5)] text-cyan-900": specialSquare?.effect === 'restart',
         
-        // Board corner styling for 3D papyrus effect
-        "rounded-tl-3xl": position === 0,
-        "rounded-tr-3xl": position === 9, 
-        "rounded-bl-3xl": position === 29,
-        "rounded-br-3xl": position === 20,
+        // Sacred Houses - Pharaoh's purple chambers
+        "bg-gradient-to-br from-purple-100 via-violet-200 to-purple-200 border-t-violet-300 border-l-purple-300 border-r-purple-800 border-b-violet-900 shadow-[inset_3px_3px_6px_rgba(245,230,255,0.9),inset_-3px_-3px_6px_rgba(76,29,149,0.6),0_4px_16px_rgba(124,58,237,0.5)] text-purple-900": specialSquare?.effect === 'must_roll_exact',
+        
+        // Available move highlighting - Ankh life glow
+        "ring-4 ring-lime-300 ring-opacity-100 bg-gradient-to-br from-lime-100 via-green-200 to-emerald-200 animate-pulse shadow-[inset_3px_3px_8px_rgba(240,255,240,1),inset_-3px_-3px_8px_rgba(21,128,61,0.4),0_8px_24px_rgba(34,197,94,0.8),0_0_40px_rgba(34,197,94,0.6)] transform -translate-y-2 scale-110": isAvailable && piece?.player === currentPlayer,
+        "hover:ring-2 hover:ring-amber-400 hover:ring-opacity-60": !isAvailable,
+        
+        // Egyptian temple corner styling for papyrus scrolls
+        "rounded-tl-[1rem]": position === 0,
+        "rounded-tr-[1rem]": position === 9, 
+        "rounded-bl-[1rem]": position === 29,
+        "rounded-br-[1rem]": position === 20,
       }
     );
   };
@@ -150,68 +154,165 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
   };
 
   return (
-    <div className="relative perspective-1000" style={{ perspective: '1000px' }}>
-      {/* 3D Board Container */}
-      <div className="relative p-8 rounded-3xl shadow-2xl transform-gpu"
+    <div className="relative w-full max-w-6xl mx-auto" style={{ perspective: '1200px' }}>
+      {/* Ancient Egyptian Temple Board Container */}
+      <div className="relative p-8 rounded-[2rem] shadow-2xl transform-gpu"
            style={{
-             background: 'linear-gradient(135deg, #FEF3C7 0%, #F59E0B 15%, #D97706 35%, #92400E 65%, #451A03 100%)',
-             boxShadow: `
-               inset 4px 4px 12px rgba(255,255,255,0.3),
-               inset -4px -4px 12px rgba(0,0,0,0.5),
-               0 20px 40px rgba(0,0,0,0.6),
-               0 8px 16px rgba(0,0,0,0.4),
-               0 0 0 2px rgba(146,64,14,0.8),
-               0 0 0 4px rgba(68,26,3,0.6)
+             background: `
+               linear-gradient(135deg, 
+                 #8B4513 0%,      /* Saddle Brown - Ancient stone */
+                 #CD853F 12%,     /* Peru - Weathered sandstone */
+                 #DEB887 25%,     /* Burlywood - Desert sand */
+                 #F4A460 40%,     /* Sandy Brown - Sunlit stone */
+                 #D2691E 60%,     /* Chocolate - Deep carved stone */
+                 #A0522D 80%,     /* Sienna - Ancient temple walls */
+                 #654321 100%     /* Dark Brown - Deep shadows */
+               )
              `,
-             transform: 'rotateX(2deg) rotateY(-1deg)',
+             boxShadow: `
+               inset 6px 6px 20px rgba(244,164,96,0.4),
+               inset -6px -6px 20px rgba(101,67,33,0.8),
+               0 25px 50px rgba(0,0,0,0.7),
+               0 12px 24px rgba(0,0,0,0.5),
+               0 0 0 3px #8B4513,
+               0 0 0 6px #654321,
+               0 0 40px rgba(218,165,32,0.3)
+             `,
+             transform: 'rotateX(3deg) rotateY(-2deg)',
              transformOrigin: 'center center'
            }}>
         
-        {/* Enhanced 3D papyrus texture overlay */}
-        <div className="absolute inset-0 rounded-3xl opacity-30"
+        {/* Ancient Egyptian Hieroglyphic Border Pattern */}
+        <div className="absolute inset-2 rounded-[1.5rem] opacity-20"
              style={{
                backgroundImage: `
-                 radial-gradient(circle at 25% 25%, rgba(0,0,0,0.1) 1px, transparent 1px),
-                 radial-gradient(circle at 75% 75%, rgba(0,0,0,0.1) 1px, transparent 1px),
-                 linear-gradient(45deg, rgba(0,0,0,0.05) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.05) 75%),
-                 url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.08'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")
+                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M20 5L25 15H35L27 22L30 32L20 27L10 32L13 22L5 15H15L20 5Z' fill='%23DAA520' opacity='0.3'/%3E%3C/svg%3E"),
+                 linear-gradient(45deg, transparent 40%, rgba(218,165,32,0.1) 50%, transparent 60%)
                `,
-               backgroundSize: '30px 30px, 30px 30px, 20px 20px, 60px 60px',
-               backgroundPosition: '0 0, 15px 15px, 10px 10px, 0 0'
+               backgroundSize: '40px 40px, 100px 100px',
+               backgroundPosition: '0 0, 20px 20px'
              }}>
         </div>
         
-        {/* 3D Inner glow effect */}
-        <div className="absolute inset-4 rounded-2xl"
+        {/* Temple Interior Golden Glow */}
+        <div className="absolute inset-6 rounded-2xl"
              style={{
-               background: 'radial-gradient(ellipse at center, rgba(251,191,36,0.2) 0%, transparent 70%)',
-               boxShadow: 'inset 0 0 20px rgba(251,191,36,0.3)'
+               background: `
+                 radial-gradient(ellipse at center, 
+                   rgba(218,165,32,0.4) 0%, 
+                   rgba(184,134,11,0.2) 40%, 
+                   transparent 80%
+                 )
+               `,
+               boxShadow: 'inset 0 0 30px rgba(218,165,32,0.4)'
              }}>
+        </div>
+        
+        {/* Ornate Egyptian Corner Decorations */}
+        <div className="absolute top-4 left-4 text-4xl opacity-80" 
+             style={{ 
+               color: '#DAA520',
+               textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(218,165,32,0.5)',
+               filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+             }}>
+          𓋹
+        </div>
+        <div className="absolute top-4 right-4 text-4xl opacity-80" 
+             style={{ 
+               color: '#DAA520',
+               textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(218,165,32,0.5)',
+               filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+             }}>
+          𓋹
+        </div>
+        <div className="absolute bottom-4 left-4 text-4xl opacity-80" 
+             style={{ 
+               color: '#DAA520',
+               textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(218,165,32,0.5)',
+               filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+             }}>
+          𓋹
+        </div>
+        <div className="absolute bottom-4 right-4 text-4xl opacity-80" 
+             style={{ 
+               color: '#DAA520',
+               textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(218,165,32,0.5)',
+               filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+             }}>
+          𓋹
         </div>
         
         <div className="relative z-10">
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-white flex items-center justify-center gap-3"
-                style={{
-                  textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(251,191,36,0.5)',
-                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
-                }}>
-              <span className="text-3xl">𓋹</span>
-              Sacred Senet Board of the Afterlife
-              <span className="text-3xl">𓋹</span>
-            </h3>
-            <p className="text-white font-semibold mt-2 text-lg"
-               style={{
-                 textShadow: '1px 1px 3px rgba(0,0,0,0.8)'
-               }}>
-              Journey through the underworld to eternal life
-            </p>
+          {/* Enhanced Egyptian Temple Header */}
+          <div className="text-center mb-8">
+            {/* Main Title with Pharaoh's Crown */}
+            <div className="relative mb-4">
+              <h3 className="text-3xl font-black text-transparent bg-clip-text flex items-center justify-center gap-4"
+                  style={{
+                    backgroundImage: 'linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FF8C00 50%, #DAA520 75%, #B8860B 100%)',
+                    textShadow: '0 0 30px rgba(218,165,32,0.8), 0 0 60px rgba(255,215,0,0.4)',
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(218,165,32,0.6))'
+                  }}>
+                <span className="text-4xl animate-pulse" style={{ color: '#FFD700' }}>𓋹</span>
+                <span className="tracking-wider">𓊃𓈖𓏏 SENET 𓊃𓈖𓏏</span>
+                <span className="text-4xl animate-pulse" style={{ color: '#FFD700' }}>𓋹</span>
+              </h3>
+              
+              {/* Sacred Underworld Subtitle */}
+              <div className="text-xl font-bold text-amber-200 mt-3 tracking-wide"
+                   style={{
+                     textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 20px rgba(251,191,36,0.5)'
+                   }}>
+                <span className="opacity-80">⟨ Sacred Game of Passing ⟩</span>
+              </div>
+              
+              <p className="text-amber-100 font-semibold mt-2 text-lg tracking-wide"
+                 style={{
+                   textShadow: '1px 1px 3px rgba(0,0,0,0.8)'
+                 }}>
+                Journey through the underworld to eternal rebirth
+              </p>
+            </div>
+            
+            {/* Ancient Egyptian Decorative Elements */}
+            <div className="flex items-center justify-center gap-8 mb-4">
+              <div className="flex items-center gap-2 text-amber-300 text-2xl opacity-80">
+                <span>𓇳</span><span>𓈖</span><span>𓊨</span>
+              </div>
+              <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-60"></div>
+              <div className="text-3xl text-amber-400 opacity-90 animate-bounce">⚱️</div>
+              <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-60"></div>
+              <div className="flex items-center gap-2 text-amber-300 text-2xl opacity-80">
+                <span>𓀀</span><span>𓀁</span><span>𓋹</span>
+              </div>
+            </div>
           </div>
           
-          {/* Enhanced ornamental border with 3D effect */}
-          <div className="mb-6 relative h-2">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-800 to-transparent rounded-full"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-600 to-transparent rounded-full transform translate-y-0.5 opacity-50"></div>
+          {/* Enhanced Sacred Border with Multiple Layers */}
+          <div className="mb-8 relative h-6 flex items-center justify-center">
+            {/* Base golden line */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-full h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent rounded-full opacity-80"></div>
+            </div>
+            
+            {/* Top highlight line */}
+            <div className="absolute inset-0 flex items-center justify-center transform -translate-y-1">
+              <div className="w-4/5 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent rounded-full opacity-60"></div>
+            </div>
+            
+            {/* Bottom shadow line */}
+            <div className="absolute inset-0 flex items-center justify-center transform translate-y-1">
+              <div className="w-4/5 h-0.5 bg-gradient-to-r from-transparent via-amber-800 to-transparent rounded-full opacity-40"></div>
+            </div>
+            
+            {/* Central Egyptian ornament */}
+            <div className="relative z-10 bg-gradient-to-br from-amber-400 via-amber-600 to-amber-800 px-4 py-1 rounded-full text-amber-100 font-black text-sm"
+                 style={{
+                   boxShadow: 'inset 2px 2px 4px rgba(255,255,255,0.3), inset -2px -2px 4px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.4)',
+                   textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
+                 }}>
+              𓊨 SACRED BOARD 𓊨
+            </div>
           </div>
           
           {/* 3D Board Surface */}
@@ -247,49 +348,49 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
             </div>
           </div>
           
-          {/* Enhanced Egyptian-themed legend with 3D effects */}
-          <div className="mt-6 grid grid-cols-2 gap-6 text-sm font-medium text-white">
-            <div className="space-y-3">
+          {/* Enhanced Egyptian-themed legend with authentic temple colors */}
+          <div className="mt-8 grid grid-cols-2 gap-6 text-sm font-medium text-amber-100">
+            <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded shadow-lg"
+                <div className="w-6 h-6 rounded-lg shadow-lg border border-amber-700"
                      style={{
-                       background: 'linear-gradient(135deg, #fecaca 0%, #f87171 50%, #dc2626 100%)',
-                       boxShadow: 'inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.3)'
+                       background: 'linear-gradient(135deg, #fed7d7 0%, #fc8181 30%, #e53e3e 70%, #9b2c2c 100%)',
+                       boxShadow: 'inset 2px 2px 4px rgba(255,255,255,0.6), inset -2px -2px 4px rgba(127,29,29,0.6), 0 3px 6px rgba(0,0,0,0.4)'
                      }}></div>
-                <span className="font-bold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
-                  𓇳 Safe Square - Protected by gods
+                <span className="font-bold text-amber-100" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(218,165,32,0.3)' }}>
+                  𓇳 Sacred Square - Ra's Protection
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded shadow-lg"
+                <div className="w-6 h-6 rounded-lg shadow-lg border border-amber-700"
                      style={{
-                       background: 'linear-gradient(135deg, #a7f3d0 0%, #34d399 50%, #059669 100%)',
-                       boxShadow: 'inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.3)'
+                       background: 'linear-gradient(135deg, #c6f6d5 0%, #68d391 30%, #38a169 70%, #2f855a 100%)',
+                       boxShadow: 'inset 2px 2px 4px rgba(255,255,255,0.6), inset -2px -2px 4px rgba(12,74,110,0.6), 0 3px 6px rgba(0,0,0,0.4)'
                      }}></div>
-                <span className="font-bold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
-                  𓈖 House of Water - Return to start
+                <span className="font-bold text-amber-100" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(218,165,32,0.3)' }}>
+                  𓈖 House of Waters - Nile's Renewal
                 </span>
               </div>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded shadow-lg"
+                <div className="w-6 h-6 rounded-lg shadow-lg border border-amber-700"
                      style={{
-                       background: 'linear-gradient(135deg, #ddd6fe 0%, #a78bfa 50%, #7c3aed 100%)',
-                       boxShadow: 'inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.3)'
+                       background: 'linear-gradient(135deg, #e9d5ff 0%, #c084fc 30%, #9333ea 70%, #6b21a8 100%)',
+                       boxShadow: 'inset 2px 2px 4px rgba(255,255,255,0.6), inset -2px -2px 4px rgba(76,29,149,0.6), 0 3px 6px rgba(0,0,0,0.4)'
                      }}></div>
-                <span className="font-bold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
-                  𓊨 Sacred Houses - Roll exact
+                <span className="font-bold text-amber-100" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(218,165,32,0.3)' }}>
+                  𓊨 Sacred Houses - Pharaoh's Chambers
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 ring-2 ring-lime-400 rounded animate-bounce shadow-lg"
+                <div className="w-6 h-6 ring-2 ring-lime-300 rounded-lg animate-pulse shadow-lg border border-amber-700"
                      style={{
-                       background: 'linear-gradient(135deg, #d9f99d 0%, #84cc16 50%, #65a30d 100%)',
-                       boxShadow: '0 0 10px rgba(132,204,22,0.6), inset 1px 1px 2px rgba(255,255,255,0.9), inset -1px -1px 2px rgba(0,0,0,0.2)'
+                       background: 'linear-gradient(135deg, #ecfdf5 0%, #86efac 30%, #22c55e 70%, #15803d 100%)',
+                       boxShadow: '0 0 16px rgba(34,197,94,0.8), inset 2px 2px 4px rgba(255,255,255,0.9), inset -2px -2px 4px rgba(21,128,61,0.4)'
                      }}></div>
-                <span className="font-bold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
-                  ✨ Available Move
+                <span className="font-bold text-amber-100" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(218,165,32,0.3)' }}>
+                  ✨ Available Move - Path of Destiny
                 </span>
               </div>
             </div>
