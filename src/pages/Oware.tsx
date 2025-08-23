@@ -4,6 +4,7 @@ import TopNavigation from '@/components/TopNavigation';
 import { OwareGameModes } from '@/components/oware/OwareGameModes';
 import { OwareMultiplayerLobby } from '@/components/oware/OwareMultiplayerLobby';
 import { OwareGameInterface } from '@/components/oware/OwareGameInterface';
+import { AudioControls } from '@/components/AudioControls';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 type GameView = 'menu' | 'single-player' | 'multiplayer' | 'tutorial' | 'game';
@@ -95,6 +96,12 @@ export default function Oware() {
     <PageTransition>
       <div className="min-h-screen bg-gradient-to-br from-amber-900/20 via-stone-900/30 to-neutral-900/40 dark:from-amber-950 dark:via-stone-950 dark:to-neutral-950">
         <TopNavigation />
+        
+        {/* Audio Controls - positioned in top-right */}
+        <div className="fixed top-20 right-4 z-40">
+          <AudioControls />
+        </div>
+        
         <main className="container mx-auto px-4 py-8 pt-24">
           {renderContent()}
         </main>

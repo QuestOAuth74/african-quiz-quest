@@ -19,7 +19,7 @@ export function AudioControls() {
     setVolumeLevel,
     handleUserInteraction
   } = useBackgroundMusic(
-    "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/game-background%20ha1.mp3",
+    "https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/amankwatia%20song.MP3",
     {
       autoPlay: true,
       loop: true,
