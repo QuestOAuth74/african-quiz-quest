@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { PageTransition } from '@/components/PageTransition';
 import TopNavigation from '@/components/TopNavigation';
-import Footer from '@/components/Footer';
 import { OwareGameModes } from '@/components/oware/OwareGameModes';
 import { OwareMultiplayerLobby } from '@/components/oware/OwareMultiplayerLobby';
 import { OwareGameInterface } from '@/components/oware/OwareGameInterface';
@@ -102,7 +101,6 @@ export default function Oware() {
         <main className="container mx-auto px-4 py-8 pt-24">
           {renderContent()}
         </main>
-        <Footer />
       </div>
     </PageTransition>
   );
