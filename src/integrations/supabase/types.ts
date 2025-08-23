@@ -125,6 +125,27 @@ export type Database = {
             referencedRelation: "blog_comments"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_blog_comments_post_id"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_blog_comments_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "online_players"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_blog_comments_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       blog_post_tags: {
