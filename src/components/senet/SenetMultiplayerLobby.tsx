@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Crown, Copy, Share, Clock, Swords } from 'lucide-react';
+import { Users, Crown, Copy, Share, Clock, Swords, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -188,6 +188,19 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Back Button */}
+      <div className="flex items-center mb-4">
+        <Button
+          onClick={() => navigate('/senet')}
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Senet
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-3">
@@ -195,7 +208,7 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
           <h1 className="text-3xl font-bold text-foreground">Senet Multiplayer</h1>
           <div className="text-4xl">𓋹</div>
         </div>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-amber-700 dark:text-amber-200 text-lg">
           Challenge other players in the ancient Egyptian game of Senet
         </p>
       </div>
