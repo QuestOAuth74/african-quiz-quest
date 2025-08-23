@@ -89,7 +89,7 @@ export const useAnimatedOwareGame = (
     const sourcePits = player === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
     
     // Check if pit has stones
-    if (sourcePits[pitIndex].stones === 0) return { sequence, finalBoard: board };
+    if (sourcePits[pitIndex].stones === 0) return { sequence, finalBoard: board, source: { side: player, index: pitIndex, removed: 0 } };
     
     let stones = sourcePits[pitIndex].stones;
     sourcePits[pitIndex].stones = 0;
@@ -128,9 +128,12 @@ export const useAnimatedOwareGame = (
       sequence.push({ side: currentSide, index: currentPitIndex });
     }
     
-    // Check for captures (only from opponent's side)
+    // Check for captures (only from opponent's side) per Abapa rules
     const lastSide = currentSide;
     const lastPitIndex = currentPitIndex;
+
+    let captured: Array<{ index: number; stones: number }> = [];
+    let totalCaptured = 0;
     
     if (lastSide !== player) { // Last stone landed on opponent's side
       const opponentPits = lastSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
@@ -139,16 +142,16 @@ export const useAnimatedOwareGame = (
       // Capture if pit has exactly 2 or 3 stones
       if (lastPitStones === 2 || lastPitStones === 3) {
         let captureIndex = lastPitIndex;
-        let totalCaptured = 0;
         
         // Capture backwards while pits have 2 or 3 stones
         while (captureIndex >= 0) {
           const pitStones = opponentPits[captureIndex].stones;
           if (pitStones === 2 || pitStones === 3) {
+            captured.push({ index: captureIndex, stones: pitStones });
             totalCaptured += pitStones;
             opponentPits[captureIndex].stones = 0;
             
-            // Mark capture in sequence
+            // Mark capture in sequence for visuals
             const captureSequenceIndex = sequence.findIndex(
               step => step.side === lastSide && step.index === captureIndex
             );
@@ -162,31 +165,45 @@ export const useAnimatedOwareGame = (
             break; // Stop chain if pit doesn't have 2-3 stones
           }
         }
-        
-        // Add captured stones to player's score
-        if (player === 1) {
-          tempBoard.playerOneScore += totalCaptured;
-        } else {
-          tempBoard.playerTwoScore += totalCaptured;
-        }
       }
     }
     
-    // Check for "feed" rule - cannot capture all opponent's stones
+    // Feed rule: cannot capture all opponent's stones
     const opponentSide = player === 1 ? 2 : 1;
-    const opponentPits = opponentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
-    const opponentHasStones = opponentPits.some(pit => pit.stones > 0);
+    const opponentRow = opponentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
+    const opponentHasStones = opponentRow.some(pit => pit.stones > 0);
     
-    if (!opponentHasStones) {
-      // Reverse all captures and return original board
-      return { sequence: [], finalBoard: board };
+    if (!opponentHasStones && captured.length > 0) {
+      // Revert captures: restore stones and remove capture flags; no score awarded
+      captured.forEach(({ index, stones }) => {
+        opponentRow[index].stones = stones;
+        const seqIdx = sequence.findIndex(step => step.side === opponentSide && step.index === index);
+        if (seqIdx !== -1) {
+          delete sequence[seqIdx].isCapture;
+          delete sequence[seqIdx].capturedStones;
+        }
+      });
+      totalCaptured = 0;
+    }
+
+    // Apply score
+    if (totalCaptured > 0) {
+      if (player === 1) {
+        tempBoard.playerOneScore += totalCaptured;
+      } else {
+        tempBoard.playerTwoScore += totalCaptured;
+      }
     }
     
-    return { sequence, finalBoard: tempBoard };
+    return { sequence, finalBoard: tempBoard, source: { side: player, index: pitIndex, removed: 0 } };
   }, []);
 
   // Animate the sowing process with proper visual feedback
-  const animateSowing = useCallback((sequence: Array<{ side: 1 | 2; index: number; isCapture?: boolean; capturedStones?: number }>, finalBoard: OwareBoard) => {
+  const animateSowing = useCallback((
+    sequence: Array<{ side: 1 | 2; index: number; isCapture?: boolean; capturedStones?: number }>,
+    finalBoard: OwareBoard,
+    source: { side: 1 | 2; index: number }
+  ) => {
     // Start animation
     setAnimationState(prev => ({
       ...prev,
@@ -197,6 +214,13 @@ export const useAnimatedOwareGame = (
 
     let currentIndex = 0;
     const workingBoard = JSON.parse(JSON.stringify(gameState.board)) as OwareBoard;
+
+    // Clear the source pit for visual accuracy
+    if (source.side === 1) {
+      workingBoard.playerOnePits[source.index].stones = 0;
+    } else {
+      workingBoard.playerTwoPits[source.index].stones = 0;
+    }
 
     const animateStep = () => {
       if (currentIndex >= sequence.length) {
@@ -263,44 +287,17 @@ export const useAnimatedOwareGame = (
     if (animationState.isAnimating) return; // Prevent moves during animation
     
     const currentPlayer = gameState.currentPlayer;
-    const { sequence, finalBoard } = generateSowingSequence(gameState.board, currentPlayer, pitIndex);
+    const { sequence, finalBoard, source } = generateSowingSequence(gameState.board, currentPlayer, pitIndex);
     
     if (sequence.length === 0) {
       playWrongAnswer(); // Invalid move sound
       return;
     }
 
-    animateSowing(sequence, finalBoard);
+    animateSowing(sequence, finalBoard, source);
   }, [gameState, animationState.isAnimating, generateSowingSequence, animateSowing, playWrongAnswer]);
 
-  // Simple AI for single-player mode
-  const makeAIMove = useCallback(() => {
-    if (gameState.gameMode !== 'single-player' || gameState.currentPlayer !== 2) return;
-    if (animationState.isAnimating) return;
-    
-    setGameState(prev => ({ ...prev, isThinking: true }));
-    
-    setTimeout(() => {
-      const board = gameState.board;
-      let bestMove = 0;
-      let bestScore = -1;
-      
-      for (let i = 0; i < 6; i++) {
-        if (board.playerTwoPits[i].stones > 0) {
-          const { finalBoard } = generateSowingSequence(board, 2, i);
-          const scoreDiff = finalBoard.playerTwoScore - board.playerTwoScore;
-          
-          if (scoreDiff > bestScore || (scoreDiff === bestScore && board.playerTwoPits[i].stones > board.playerTwoPits[bestMove].stones)) {
-            bestMove = i;
-            bestScore = scoreDiff;
-          }
-        }
-      }
-      
-      setGameState(prev => ({ ...prev, isThinking: false }));
-      makeMove(bestMove);
-    }, 1000 + Math.random() * 1000);
-  }, [gameState, animationState.isAnimating, generateSowingSequence, makeMove]);
+  // AI handled in effect below
 
   // Start game
   const startGame = useCallback(() => {
@@ -330,15 +327,38 @@ export const useAnimatedOwareGame = (
     });
   }, [gameMode]);
 
-  // AI move effect
+  // AI move effect (single-player): schedule only when it's AI's turn and not already thinking/animating
   useEffect(() => {
-    if (gameState.gameStatus === 'playing' && 
-        gameState.currentPlayer === 2 && 
-        gameState.gameMode === 'single-player' &&
-        !animationState.isAnimating) {
-      makeAIMove();
+    if (
+      gameState.gameStatus === 'playing' &&
+      gameState.currentPlayer === 2 &&
+      gameState.gameMode === 'single-player' &&
+      !animationState.isAnimating &&
+      !gameState.isThinking
+    ) {
+      setGameState(prev => ({ ...prev, isThinking: true }));
+      const t = window.setTimeout(() => {
+        const board = gameState.board;
+        let bestMove = -1;
+        let bestScore = -Infinity;
+        for (let i = 0; i < 6; i++) {
+          if (board.playerTwoPits[i].stones > 0) {
+            const { finalBoard } = generateSowingSequence(board, 2, i);
+            const scoreDiff = finalBoard.playerTwoScore - board.playerTwoScore;
+            if (scoreDiff > bestScore) {
+              bestScore = scoreDiff;
+              bestMove = i;
+            }
+          }
+        }
+        setGameState(prev => ({ ...prev, isThinking: false }));
+        if (bestMove >= 0) {
+          makeMove(bestMove);
+        }
+      }, 800 + Math.random() * 600);
+      return () => clearTimeout(t);
     }
-  }, [gameState.gameStatus, gameState.currentPlayer, gameState.gameMode, animationState.isAnimating, makeAIMove]);
+  }, [gameState.gameStatus, gameState.currentPlayer, gameState.gameMode, animationState.isAnimating, gameState.isThinking, gameState.board, generateSowingSequence, makeMove]);
 
   return {
     gameState,
