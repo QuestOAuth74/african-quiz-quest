@@ -15,6 +15,7 @@ import { useRealtimeQuestions } from "@/hooks/useRealtimeQuestions";
 import QuestionRating from "@/components/QuestionRating";
 import MotivationalPopup from "@/components/MotivationalPopup";
 import QuizCompletionModal from "@/components/QuizCompletionModal";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import confetti from "canvas-confetti";
 
 interface Question {
@@ -476,8 +477,11 @@ const Quiz = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-theme-yellow">Traditional Quiz</h1>
-            <div className="text-theme-yellow-light">
-              Question {currentQuestionIndex + 1} of {questions.length}
+            <div className="flex items-center gap-4">
+              <div className="text-theme-yellow-light">
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </div>
+              <FullscreenToggle />
             </div>
           </div>
           

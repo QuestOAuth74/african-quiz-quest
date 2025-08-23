@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CrosswordGrid } from '@/components/crossword/CrosswordGrid';
 import { CrosswordClues } from '@/components/crossword/CrosswordClues';
 import { CrosswordPuzzle, CrosswordWord, CrosswordGameState } from '@/types/crossword';
+import { FullscreenToggle } from '@/components/FullscreenToggle';
 import { ArrowLeft, Clock, Trophy, Lightbulb, RotateCcw, Home, Pause, Play, Save } from 'lucide-react';
 
 export function CrosswordPlay() {
@@ -414,6 +415,7 @@ export function CrosswordPlay() {
                 <Save className="h-4 w-4" />
                 {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save' : 'Saved'}
               </Button>
+              <FullscreenToggle />
             </div>
           </div>
         </div>

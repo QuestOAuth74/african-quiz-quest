@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeGameSync } from '@/hooks/useRealtimeGameSync';
 import { useComputerPlayer } from '@/hooks/useComputerPlayer';
 import { useWheelSoundEffects } from '@/hooks/useWheelSoundEffects';
+import { FullscreenToggle } from '@/components/FullscreenToggle';
 import { supabase } from '@/integrations/supabase/client';
 import { WheelComponent } from '@/components/wheel/WheelComponent';
 import { PuzzleBoard } from '@/components/wheel/PuzzleBoard';
@@ -622,18 +623,21 @@ const WheelPlay = () => {
           
           <h1 className="text-2xl font-bold text-primary">Wheel of African Destiny</h1>
           
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setSoundEnabled(!soundEnabled);
-              soundEffects.setVolume(soundEnabled ? 0 : 0.3);
-            }}
-            className="flex items-center space-x-2"
-          >
-            {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            <span className="hidden sm:inline">{soundEnabled ? 'Sound On' : 'Sound Off'}</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSoundEnabled(!soundEnabled);
+                soundEffects.setVolume(soundEnabled ? 0 : 0.3);
+              }}
+              className="flex items-center space-x-2"
+            >
+              {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+              <span className="hidden sm:inline">{soundEnabled ? 'Sound On' : 'Sound Off'}</span>
+            </Button>
+            <FullscreenToggle />
+          </div>
         </div>
 
         {/* Always show full game layout */}

@@ -10,6 +10,7 @@ import QuestionModal from "@/components/QuestionModal";
 import TopNavigation from "@/components/TopNavigation";
 import { AudioControls } from "@/components/AudioControls";
 import { Button } from "@/components/ui/button";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { Settings, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import GameCompletionModal from "@/components/GameCompletionModal";
@@ -793,6 +794,9 @@ const Index = () => {
       </div>
 
       <div className="pt-16">
+        <div className="flex items-center justify-end px-4 py-2">
+          <FullscreenToggle />
+        </div>
         <GameHeader 
           players={players}
           gameMode={gameMode}
