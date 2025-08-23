@@ -1,3 +1,4 @@
+
 import { OwareBoard as OwareBoardType } from '@/types/oware';
 import { OwarePit } from './OwarePit';
 import { cn } from '@/lib/utils';
@@ -31,10 +32,10 @@ export const OwareBoard = ({
           "rounded-3xl p-12 border-8 border-amber-800",
           // 3D board effect with multiple shadows and highlights
           "shadow-[0_20px_40px_rgba(0,0,0,0.6),_inset_0_4px_8px_rgba(146,91,50,0.3),_inset_0_-4px_16px_rgba(0,0,0,0.4)]",
-          // Wood grain texture effect
-          "before:absolute before:inset-0 before:rounded-3xl before:opacity-20",
+          // Wood grain texture effect + ensure overlays don't block clicks
+          "before:absolute before:inset-0 before:rounded-3xl before:opacity-20 before:pointer-events-none",
           "before:bg-gradient-to-br before:from-transparent before:via-amber-700/30 before:to-transparent",
-          "after:absolute after:inset-0 after:rounded-3xl after:opacity-10",
+          "after:absolute after:inset-0 after:rounded-3xl after:opacity-10 after:pointer-events-none",
           "after:bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.1)_70%)]"
         )}
         style={{
@@ -50,7 +51,7 @@ export const OwareBoard = ({
         }}
       >
         {/* Decorative African Patterns */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex gap-6 text-amber-600/60 text-2xl">
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex gap-6 text-amber-600/60 text-2xl pointer-events-none">
           <span className="drop-shadow-lg">𓀀</span>
           <span className="drop-shadow-lg">𓂧</span>
           <span className="drop-shadow-lg">𓃭</span>

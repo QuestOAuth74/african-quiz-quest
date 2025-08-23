@@ -1,3 +1,4 @@
+
 import { OwarePit as OwarePitType } from '@/types/oware';
 import { cn } from '@/lib/utils';
 
@@ -122,7 +123,7 @@ export const OwarePit = ({
 
       {/* Subtle glow effect when selected */}
       {isSelected && (
-        <div className="absolute inset-0 rounded-full bg-yellow-400/20 animate-pulse" />
+        <div className="absolute inset-0 rounded-full bg-yellow-400/20 animate-pulse pointer-events-none" />
       )}
     </div>
   );
