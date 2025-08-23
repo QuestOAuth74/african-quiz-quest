@@ -46,6 +46,13 @@ const TopNavigation = () => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-3 animate-slide-in-right">
+          <Link
+            to="/"
+            className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors px-3 py-2 text-sm rounded-md"
+          >
+            Home
+          </Link>
+          
           <Button
             variant="ghost"
             size="sm"

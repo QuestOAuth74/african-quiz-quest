@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Home, Trophy, MessageCircle, User, Globe, Youtube, Instagram, Heart, Coffee, ExternalLink, Gamepad2, Target, Crosshair, Grid3X3, Crown } from 'lucide-react';
+import { Home, Trophy, MessageCircle, User, Globe, Youtube, Instagram, Heart, Coffee, ExternalLink, Gamepad2, Target, Crosshair, Grid3X3, Crown, Circle } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -104,6 +104,15 @@ const Footer = () => {
                 >
                   <Crown className="h-4 w-4" />
                   Ancient Senet
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/oware" 
+                  className="flex items-center gap-2 text-theme-yellow-light hover:text-theme-yellow transition-colors text-sm"
+                >
+                  <Circle className="h-4 w-4" />
+                  Oware (African Chess)
                 </Link>
               </li>
             </ul>

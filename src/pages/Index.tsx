@@ -25,6 +25,7 @@ import { QuizSection } from "@/components/QuizSection";
 import { CrosswordSection } from "@/components/CrosswordSection";
 import { WheelSection } from "@/components/WheelSection";
 import { SenetSection } from "@/components/SenetSection";
+import { OwareSection } from "@/components/OwareSection";
 
 interface Question {
   id: string;
@@ -707,6 +708,9 @@ const Index = () => {
 
         {/* Senet Section - Ancient Egyptian Game */}
         <SenetSection />
+
+        {/* Oware Section - African Chess Game */}
+        <OwareSection />
 
       </div>
     );
