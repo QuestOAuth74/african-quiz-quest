@@ -2,9 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { OwareGameState, OwareBoard, OwarePit } from '@/types/oware';
 import { useGameAudio } from './useGameAudio';
 
-type OwareRules = 'anan-anan' | 'abapa';
-
-// Initialize an empty Oware board with 4 stones in each pit
+// Initialize an Oware board with 4 stones in each pit (48 total stones)
 const createInitialBoard = (): OwareBoard => {
   const playerOnePits: OwarePit[] = [];
   const playerTwoPits: OwarePit[] = [];
@@ -31,8 +29,7 @@ interface AnimationState {
 }
 
 export const useAnimatedOwareGame = (
-  gameMode: 'single-player' | 'multiplayer' = 'single-player',
-  rules: OwareRules = 'anan-anan'
+  gameMode: 'single-player' | 'multiplayer' = 'single-player'
 ) => {
   const [gameState, setGameState] = useState<OwareGameState>({
     board: createInitialBoard(),
@@ -59,25 +56,20 @@ export const useAnimatedOwareGame = (
     setEffectsVolume(0.3);
   }, [setEffectsVolume]);
 
-  // Check if game is over based on rules
+  // Check if game is over using standard Oware (Abapa) rules
   const checkGameEnd = useCallback((board: OwareBoard): { isGameEnd: boolean; winner: 1 | 2 | null } => {
     const playerOneTotalStones = board.playerOnePits.reduce((sum, pit) => sum + pit.stones, 0);
     const playerTwoTotalStones = board.playerTwoPits.reduce((sum, pit) => sum + pit.stones, 0);
-    const totalStonesOnBoard = playerOneTotalStones + playerTwoTotalStones;
     
     let isGameEnd = false;
     let winner: 1 | 2 | null = null;
     
-    if (rules === 'anan-anan') {
-      if (totalStonesOnBoard <= 8) {
-        isGameEnd = true;
-      }
-    } else if (rules === 'abapa') {
-      if (board.playerOneScore > 24 || board.playerTwoScore > 24) {
-        isGameEnd = true;
-      }
+    // Game ends when someone captures more than 24 stones (more than half of 48)
+    if (board.playerOneScore > 24 || board.playerTwoScore > 24) {
+      isGameEnd = true;
     }
     
+    // Game ends if one side has no stones (cannot move)
     if (playerOneTotalStones === 0 || playerTwoTotalStones === 0) {
       isGameEnd = true;
     }
@@ -88,127 +80,114 @@ export const useAnimatedOwareGame = (
     }
     
     return { isGameEnd, winner };
-  }, [rules]);
+  }, []);
 
-  // Generate animated sowing sequence
+  // Generate sowing sequence using proper Oware (Abapa) rules
   const generateSowingSequence = useCallback((board: OwareBoard, player: 1 | 2, pitIndex: number) => {
-    const sequence: Array<{ side: 1 | 2; index: number; isCapture?: boolean }> = [];
+    const sequence: Array<{ side: 1 | 2; index: number; isCapture?: boolean; capturedStones?: number }> = [];
     const tempBoard = JSON.parse(JSON.stringify(board)) as OwareBoard;
-    const isPlayerOne = player === 1;
-    const sourcePits = isPlayerOne ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
+    const sourcePits = player === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
     
+    // Check if pit has stones
     if (sourcePits[pitIndex].stones === 0) return { sequence, finalBoard: board };
     
     let stones = sourcePits[pitIndex].stones;
     sourcePits[pitIndex].stones = 0;
     
-    let currentPitIndex = pitIndex;
     let currentSide = player;
-    let continueDistribution = true;
+    let currentPitIndex = pitIndex;
     
-    while (continueDistribution) {
-      while (stones > 0) {
-        // Move to next pit
-        if (currentSide === 1) {
-          currentPitIndex++;
-          if (currentPitIndex > 5) {
-            currentSide = 2;
-            currentPitIndex = 0;
-          }
-        } else {
-          currentPitIndex++;
-          if (currentPitIndex > 5) {
-            currentSide = 1;
-            currentPitIndex = 0;
-          }
+    // Sow stones counter-clockwise
+    while (stones > 0) {
+      // Move to next pit in counter-clockwise direction
+      if (currentSide === 1) {
+        currentPitIndex++;
+        if (currentPitIndex > 5) {
+          currentSide = 2;
+          currentPitIndex = 0;
         }
-        
-        // Skip the original pit if we circle back to it
-        if (currentSide === player && currentPitIndex === pitIndex && stones > 1) {
-          continue;
-        }
-        
-        // Add to sequence
-        sequence.push({ side: currentSide, index: currentPitIndex });
-        
-        // Place stone
-        const targetPits = currentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
-        targetPits[currentPitIndex].stones++;
-        stones--;
-        
-        // Check for captures
-        if (rules === 'anan-anan' && targetPits[currentPitIndex].stones === 4) {
-          sequence[sequence.length - 1].isCapture = true;
-          const capturingPlayer = (stones === 0) ? player : (currentSide === 1 ? 1 : 2);
-          
-          if (capturingPlayer === 1) {
-            tempBoard.playerOneScore += 4;
-          } else {
-            tempBoard.playerTwoScore += 4;
-          }
-          targetPits[currentPitIndex].stones = 0;
+      } else {
+        currentPitIndex++;
+        if (currentPitIndex > 5) {
+          currentSide = 1;
+          currentPitIndex = 0;
         }
       }
       
-      if (rules === 'anan-anan') {
-        const lastPits = currentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
-        if (lastPits[currentPitIndex].stones > 0) {
-          stones = lastPits[currentPitIndex].stones;
-          lastPits[currentPitIndex].stones = 0;
-        } else {
-          continueDistribution = false;
-        }
-      } else {
-        continueDistribution = false;
+      // Skip the original pit if we have 12+ stones (lap rule)
+      if (currentSide === player && currentPitIndex === pitIndex && stones > 0) {
+        continue;
+      }
+      
+      // Place one stone in current pit
+      const targetPits = currentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
+      targetPits[currentPitIndex].stones++;
+      stones--;
+      
+      // Add to animation sequence
+      sequence.push({ side: currentSide, index: currentPitIndex });
+    }
+    
+    // Check for captures (only from opponent's side)
+    const lastSide = currentSide;
+    const lastPitIndex = currentPitIndex;
+    
+    if (lastSide !== player) { // Last stone landed on opponent's side
+      const opponentPits = lastSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
+      const lastPitStones = opponentPits[lastPitIndex].stones;
+      
+      // Capture if pit has exactly 2 or 3 stones
+      if (lastPitStones === 2 || lastPitStones === 3) {
+        let captureIndex = lastPitIndex;
+        let totalCaptured = 0;
         
-        // Abapa capture logic
-        if (currentSide !== player) {
-          const targetPits = currentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
-          const lastPitStones = targetPits[currentPitIndex].stones;
-          
-          if (lastPitStones === 2 || lastPitStones === 3) {
-            let captureIndex = currentPitIndex;
-            while (captureIndex >= 0) {
-              const capturedStones = targetPits[captureIndex].stones;
-              if (capturedStones === 2 || capturedStones === 3) {
-                if (player === 1) {
-                  tempBoard.playerOneScore += capturedStones;
-                } else {
-                  tempBoard.playerTwoScore += capturedStones;
-                }
-                targetPits[captureIndex].stones = 0;
-                captureIndex--;
-              } else {
-                break;
-              }
+        // Capture backwards while pits have 2 or 3 stones
+        while (captureIndex >= 0) {
+          const pitStones = opponentPits[captureIndex].stones;
+          if (pitStones === 2 || pitStones === 3) {
+            totalCaptured += pitStones;
+            opponentPits[captureIndex].stones = 0;
+            
+            // Mark capture in sequence
+            const captureSequenceIndex = sequence.findIndex(
+              step => step.side === lastSide && step.index === captureIndex
+            );
+            if (captureSequenceIndex !== -1) {
+              sequence[captureSequenceIndex].isCapture = true;
+              sequence[captureSequenceIndex].capturedStones = pitStones;
             }
+            
+            captureIndex--;
+          } else {
+            break; // Stop chain if pit doesn't have 2-3 stones
           }
+        }
+        
+        // Add captured stones to player's score
+        if (player === 1) {
+          tempBoard.playerOneScore += totalCaptured;
+        } else {
+          tempBoard.playerTwoScore += totalCaptured;
         }
       }
     }
     
-    // Handle end game for anan-anan
-    if (rules === 'anan-anan') {
-      const totalStones = tempBoard.playerOnePits.reduce((sum, pit) => sum + pit.stones, 0) + 
-                         tempBoard.playerTwoPits.reduce((sum, pit) => sum + pit.stones, 0);
-      
-      if (totalStones <= 8) {
-        if (player === 1) {
-          tempBoard.playerOneScore += totalStones;
-        } else {
-          tempBoard.playerTwoScore += totalStones;
-        }
-        
-        tempBoard.playerOnePits.forEach(pit => pit.stones = 0);
-        tempBoard.playerTwoPits.forEach(pit => pit.stones = 0);
-      }
+    // Check for "feed" rule - cannot capture all opponent's stones
+    const opponentSide = player === 1 ? 2 : 1;
+    const opponentPits = opponentSide === 1 ? tempBoard.playerOnePits : tempBoard.playerTwoPits;
+    const opponentHasStones = opponentPits.some(pit => pit.stones > 0);
+    
+    if (!opponentHasStones) {
+      // Reverse all captures and return original board
+      return { sequence: [], finalBoard: board };
     }
     
     return { sequence, finalBoard: tempBoard };
-  }, [rules]);
+  }, []);
 
-  // Animate the sowing process
-  const animateSowing = useCallback((sequence: Array<{ side: 1 | 2; index: number; isCapture?: boolean }>, finalBoard: OwareBoard) => {
+  // Animate the sowing process with proper visual feedback
+  const animateSowing = useCallback((sequence: Array<{ side: 1 | 2; index: number; isCapture?: boolean; capturedStones?: number }>, finalBoard: OwareBoard) => {
+    // Start animation
     setAnimationState(prev => ({
       ...prev,
       isAnimating: true,
@@ -217,10 +196,11 @@ export const useAnimatedOwareGame = (
     }));
 
     let currentIndex = 0;
+    const workingBoard = JSON.parse(JSON.stringify(gameState.board)) as OwareBoard;
 
     const animateStep = () => {
       if (currentIndex >= sequence.length) {
-        // Animation complete
+        // Animation complete - apply final board state
         setGameState(prev => {
           const gameEnd = checkGameEnd(finalBoard);
           return {
@@ -245,36 +225,37 @@ export const useAnimatedOwareGame = (
 
       const step = sequence[currentIndex];
       
-      // Update visual state
+      // Update visual animation state
       setAnimationState(prev => ({
         ...prev,
         currentPit: { side: step.side, index: step.index },
         sequenceIndex: currentIndex,
       }));
 
-      // Update board state incrementally for visual feedback
-      setGameState(prev => {
-        const newBoard = JSON.parse(JSON.stringify(prev.board)) as OwareBoard;
-        const targetPits = step.side === 1 ? newBoard.playerOnePits : newBoard.playerTwoPits;
+      // Update working board for visual feedback (stone by stone)
+      const targetPits = step.side === 1 ? workingBoard.playerOnePits : workingBoard.playerTwoPits;
+      
+      if (step.isCapture && step.capturedStones) {
+        // Handle capture visually
+        targetPits[step.index].stones = 0;
+        playCorrectAnswer(); // Capture sound effect
+      } else {
+        // Add stone to pit
         targetPits[step.index].stones++;
+      }
 
-        if (step.isCapture) {
-          targetPits[step.index].stones = 0;
-          playCorrectAnswer(); // Sound effect for capture
-        }
-
-        return {
-          ...prev,
-          board: newBoard,
-        };
-      });
+      // Update visual board state
+      setGameState(prev => ({
+        ...prev,
+        board: { ...workingBoard }
+      }));
 
       currentIndex++;
-      setTimeout(animateStep, 500); // 500ms between each stone placement
+      setTimeout(animateStep, 800); // Slower animation - 800ms between moves
     };
 
     animateStep();
-  }, [checkGameEnd, playCorrectAnswer]);
+  }, [gameState.board, checkGameEnd, playCorrectAnswer]);
 
   // Make a move with animation
   const makeMove = useCallback((pitIndex: number) => {

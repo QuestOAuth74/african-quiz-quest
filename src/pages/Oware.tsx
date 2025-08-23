@@ -14,7 +14,6 @@ export default function Oware() {
   const [currentView, setCurrentView] = useState<GameView>('menu');
   const [gameId, setGameId] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
-  const [selectedRules, setSelectedRules] = useState<'anan-anan' | 'abapa'>('anan-anan');
 
   const handleSelectMode = (mode: 'single-player' | 'multiplayer' | 'tutorial') => {
     console.log('handleSelectMode called with:', mode);
@@ -46,8 +45,6 @@ export default function Oware() {
         return (
           <OwareGameModes 
             onSelectMode={handleSelectMode} 
-            selectedRules={selectedRules}
-            onRulesChange={setSelectedRules}
           />
         );
       
@@ -81,7 +78,6 @@ export default function Oware() {
         return (
           <OwareGameInterface
             gameMode={gameId ? 'multiplayer' : 'single-player'}
-            rules={selectedRules}
             onBack={handleBackToMenu}
           />
         );
@@ -90,8 +86,6 @@ export default function Oware() {
         return (
           <OwareGameModes 
             onSelectMode={handleSelectMode} 
-            selectedRules={selectedRules}
-            onRulesChange={setSelectedRules}
           />
         );
     }

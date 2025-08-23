@@ -11,8 +11,8 @@ interface OwareGameInterfaceProps {
   onBack: () => void;
 }
 
-export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: OwareGameInterfaceProps) => {
-  const { gameState, selectedPit, setSelectedPit, makeMove, startGame, resetGame, animationState } = useAnimatedOwareGame(gameMode, rules);
+export const OwareGameInterface = ({ gameMode, rules = 'abapa', onBack }: OwareGameInterfaceProps) => {
+  const { gameState, selectedPit, setSelectedPit, makeMove, startGame, resetGame, animationState } = useAnimatedOwareGame(gameMode);
   const [isPaused, setIsPaused] = useState(false);
 
   const handlePitClick = (pitIndex: number) => {
@@ -85,7 +85,7 @@ export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: Ow
         
         <div className="text-center">
           <h1 className="text-2xl font-bold">
-            {gameMode === 'single-player' ? 'vs AI' : 'Multiplayer'} Oware ({rules === 'anan-anan' ? 'Anan-Anan' : 'Abapa'})
+            {gameMode === 'single-player' ? 'vs AI' : 'Multiplayer'} Oware
           </h1>
           {gameState.isThinking && (
             <p className="text-sm text-muted-foreground mt-1">AI is thinking...</p>
@@ -151,22 +151,14 @@ export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: Ow
           <CardTitle className="text-lg">How to Play</CardTitle>
         </CardHeader>
         <CardContent className="text-sm space-y-2">
-          <p><strong>Rules:</strong> {rules === 'anan-anan' ? 'Anan-Anan (Four-Four)' : 'Abapa'}</p>
-          <p>• <strong>Objective:</strong> Capture more stones than your opponent</p>
-          <p>• <strong>Your Turn:</strong> Click one of your pits (bottom row) to sow stones</p>
-          <p>• <strong>Sowing:</strong> Stones are distributed counter-clockwise, one per pit</p>
-          {rules === 'anan-anan' ? (
-            <>
-              <p>• <strong>Capture:</strong> When any pit reaches 4 stones during distribution, they are captured!</p>
-              <p>• <strong>Continue:</strong> Pick up from last pit and keep sowing until reaching an empty pit</p>
-              <p>• <strong>End Game:</strong> When 8 stones remain, last capturer takes all remaining stones</p>
-            </>
-          ) : (
-            <>
-              <p>• <strong>Capture:</strong> When last stone lands in opponent's pit with 2-3 stones, capture working backwards</p>
-              <p>• <strong>End Game:</strong> First player to capture more than 24 stones wins</p>
-            </>
-          )}
+          <p><strong>Rules:</strong> Standard Oware (Abapa)</p>
+          <p>• <strong>Objective:</strong> Capture more than 24 stones (more than half of 48 total)</p>
+          <p>• <strong>Your Turn:</strong> Click one of your pits (bottom row) to sow stones counter-clockwise</p>
+          <p>• <strong>Sowing:</strong> Pick up all stones from a pit and drop one stone per pit going counter-clockwise</p>
+          <p>• <strong>Capture:</strong> When your last stone lands in opponent's pit with exactly 2-3 stones, capture those stones</p>
+          <p>• <strong>Chain Capture:</strong> Continue capturing backwards from adjacent pits that also have 2-3 stones</p>
+          <p>• <strong>Feed Rule:</strong> You cannot capture all opponent's stones - they must be left with at least one move</p>
+          <p>• <strong>Lap Rule:</strong> If sowing 12+ stones, skip the original empty pit when you circle back</p>
         </CardContent>
       </Card>
     </div>
