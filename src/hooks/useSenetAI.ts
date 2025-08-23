@@ -140,14 +140,14 @@ const getAdvancedAIMove = (gameState: SenetGameState, moves: AIMove[]): number =
 };
 
 export const useSenetAI = (
-  gameState: SenetGameState,
+  gameState: SenetGameState | null,
   makeMove: (position: number) => boolean,
   throwSticks: () => any
 ) => {
   const [isThinking, setIsThinking] = useState(false);
   
   const makeAIMove = useCallback(async () => {
-    if (!gameState.players.find(p => p.id === gameState.currentPlayer && p.isAI)) {
+    if (!gameState || !gameState.players.find(p => p.id === gameState.currentPlayer && p.isAI)) {
       return;
     }
     
@@ -176,6 +176,8 @@ export const useSenetAI = (
   
   // Trigger AI move when it's AI's turn
   useEffect(() => {
+    if (!gameState) return;
+    
     const isAITurn = gameState.players.find(p => p.id === gameState.currentPlayer && p.isAI);
     const shouldAct = (gameState.gamePhase === 'throwing' || gameState.gamePhase === 'moving') && 
                       !gameState.winner && !isThinking;
@@ -184,7 +186,7 @@ export const useSenetAI = (
       const timeout = setTimeout(makeAIMove, 500);
       return () => clearTimeout(timeout);
     }
-  }, [gameState.currentPlayer, gameState.gamePhase, gameState.winner, isThinking, makeAIMove]);
+  }, [gameState?.currentPlayer, gameState?.gamePhase, gameState?.winner, isThinking, makeAIMove]);
   
   return { isThinking };
 };
