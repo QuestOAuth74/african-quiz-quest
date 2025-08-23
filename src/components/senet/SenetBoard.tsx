@@ -28,8 +28,8 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
         "bg-gradient-to-br from-blue-200 to-cyan-400 border-cyan-800 shadow-cyan-300/50": specialSquare?.effect === 'restart', 
         "bg-gradient-to-br from-purple-200 to-violet-400 border-purple-800 shadow-purple-300/50": specialSquare?.effect === 'must_roll_exact',
         
-        // Available move highlighting - bright and visible
-        "ring-4 ring-emerald-400 ring-opacity-80 bg-gradient-to-br from-emerald-100 to-emerald-300 animate-pulse": isAvailable && piece?.player === currentPlayer,
+        // Available move highlighting - extremely visible
+        "ring-4 ring-lime-400 ring-opacity-100 bg-gradient-to-br from-lime-200 to-green-400 animate-bounce shadow-lg shadow-lime-400/60": isAvailable && piece?.player === currentPlayer,
         "hover:ring-2 hover:ring-yellow-400": !isAvailable,
         
         // Board corner styling for papyrus effect
@@ -52,14 +52,15 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
              style={{ backgroundImage: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\"><rect width=\"20\" height=\"20\" fill=\"%23D97706\"/><path d=\"M10 5l3 3-3 3-3-3z\" fill=\"%23F59E0B\"/></svg>')" }}>
         </div>
         
-        {/* Special square symbols - larger and more prominent */}
+        {/* Special square symbols - extremely visible */}
         {specialSquare && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
-            <span className="text-3xl font-bold drop-shadow-lg" 
+            <span className="text-4xl font-black drop-shadow-2xl" 
                   style={{ 
-                    color: specialSquare.effect === 'safe' ? '#991B1B' : 
-                           specialSquare.effect === 'restart' ? '#155E75' : '#581C87',
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+                    color: specialSquare.effect === 'safe' ? '#7F1D1D' : 
+                           specialSquare.effect === 'restart' ? '#0C4A6E' : '#4C1D95',
+                    textShadow: '3px 3px 6px rgba(0,0,0,0.8), 1px 1px 3px rgba(255,255,255,0.3)',
+                    WebkitTextStroke: '1px rgba(0,0,0,0.5)'
                   }}
                   title={specialSquare.description}>
               {specialSquare.symbol}
@@ -75,8 +76,8 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
           />
         )}
         
-        {/* Square numbers - more visible */}
-        <div className="absolute bottom-1 right-1 text-xs font-bold bg-black/20 text-white px-1 rounded">
+        {/* Square numbers - much more visible */}
+        <div className="absolute bottom-1 right-1 text-sm font-black bg-black/80 text-white px-1.5 py-0.5 rounded-md shadow-lg border border-white/30">
           {position + 1}
         </div>
       </>
@@ -170,7 +171,7 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
               <span className="font-bold">𓊨 Sacred Houses - Roll exact</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-gradient-to-br from-emerald-100 to-emerald-300 ring-4 ring-emerald-400 rounded animate-pulse"></div>
+              <div className="w-4 h-4 bg-gradient-to-br from-lime-200 to-green-400 ring-4 ring-lime-400 rounded animate-bounce shadow-lg"></div>
               <span className="font-bold">✨ Available Move</span>
             </div>
           </div>

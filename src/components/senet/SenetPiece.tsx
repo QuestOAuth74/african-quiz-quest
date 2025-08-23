@@ -12,30 +12,34 @@ export const SenetPiece = ({ piece, isHighlighted }: SenetPieceProps) => {
   return (
     <div
       className={cn(
-        "w-12 h-12 rounded-full border-3 flex items-center justify-center text-lg font-bold",
-        "transition-all duration-300 z-20 relative shadow-lg",
+        "w-14 h-14 rounded-full border-4 flex items-center justify-center text-lg font-bold",
+        "transition-all duration-300 z-20 relative shadow-2xl",
         {
-          // Player 1 (human) pieces - bright gold/amber
-          "bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-amber-800 text-amber-900": isPlayer1,
-          "shadow-amber-500/60 drop-shadow-lg": isPlayer1,
+          // Player 1 (human) pieces - extremely bright gold
+          "bg-gradient-to-br from-yellow-200 via-amber-300 to-yellow-400 border-amber-900 text-amber-900": isPlayer1,
           
-          // Player 2 (AI) pieces - deep silver/slate
-          "bg-gradient-to-br from-slate-300 via-gray-400 to-slate-500 border-slate-800 text-slate-900": !isPlayer1,
-          "shadow-slate-500/60 drop-shadow-lg": !isPlayer1,
+          // Player 2 (AI) pieces - high contrast silver/blue
+          "bg-gradient-to-br from-slate-200 via-blue-300 to-slate-300 border-slate-900 text-slate-900": !isPlayer1,
           
-          // Highlighted state for available moves - glowing effect
-          "ring-4 ring-emerald-300 ring-offset-2 scale-125 animate-bounce": isHighlighted,
-          "hover:scale-110": !isHighlighted,
+          // Highlighted state for available moves - extremely visible
+          "ring-6 ring-lime-300 ring-offset-3 scale-150 animate-bounce shadow-lime-400/80": isHighlighted,
+          "hover:scale-125": !isHighlighted,
         }
       )}
       style={{
-        boxShadow: isPlayer1 
-          ? '0 8px 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3)'
-          : '0 8px 16px rgba(71, 85, 105, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3)'
+        boxShadow: isHighlighted 
+          ? '0 0 30px rgba(132, 204, 22, 0.8), 0 12px 24px rgba(0, 0, 0, 0.5), inset 0 4px 8px rgba(255, 255, 255, 0.4)'
+          : isPlayer1 
+            ? '0 10px 20px rgba(245, 158, 11, 0.6), inset 0 4px 8px rgba(255, 255, 255, 0.4), 0 0 0 2px rgba(146, 64, 14, 0.3)'
+            : '0 10px 20px rgba(71, 85, 105, 0.6), inset 0 4px 8px rgba(255, 255, 255, 0.4), 0 0 0 2px rgba(15, 23, 42, 0.3)'
       }}
       aria-label={`${isPlayer1 ? 'Your' : 'Opponent'} piece`}
     >
-      <span className="text-2xl drop-shadow-md">
+      <span className="text-3xl font-black drop-shadow-lg" 
+            style={{ 
+              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 1px 1px 2px rgba(255,255,255,0.3)',
+              WebkitTextStroke: '0.5px rgba(0,0,0,0.3)'
+            }}>
         {isPlayer1 ? '𓀀' : '𓀁'}
       </span>
     </div>
