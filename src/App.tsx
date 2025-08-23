@@ -20,6 +20,8 @@ import { Crossword } from "./pages/Crossword";
 import { CrosswordPlay } from "./pages/CrosswordPlay";
 import WheelOfDestiny from "./pages/WheelOfDestiny";
 import WheelPlay from "./pages/WheelPlay";
+import Senet from "./pages/Senet";
+import SenetPlay from "./pages/SenetPlay";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import ForumPost from "./pages/ForumPost";
@@ -48,8 +50,9 @@ const App = () => (
             <Route path="/crossword" element={<ProtectedRoute><Crossword /></ProtectedRoute>} />
             <Route path="/crossword/play/:puzzleId" element={<ProtectedRoute><CrosswordPlay /></ProtectedRoute>} />
             <Route path="/wheel" element={<ProtectedRoute><WheelOfDestiny /></ProtectedRoute>} />
-            {/* Removed /wheel/play without :sessionId to prevent ambiguous routing */}
             <Route path="/wheel/play/:sessionId" element={<ProtectedRoute><WheelPlay /></ProtectedRoute>} />
+            <Route path="/senet" element={<Senet />} />
+            <Route path="/senet/play/:gameId" element={<SenetPlay />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/blog" element={<Blog />} />
