@@ -60,15 +60,15 @@ export const GameSetup = ({ onStartGame }: GameSetupProps) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 pt-8">
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-3">
-          <div className="text-6xl animate-pulse">𓋹</div>
-          <h1 className="text-4xl font-bold text-foreground">Ancient Senet</h1>
-          <div className="text-6xl animate-pulse">𓋹</div>
+          <div className="text-6xl animate-pulse text-amber-600 dark:text-amber-400">𓋹</div>
+          <h1 className="text-4xl font-bold text-amber-900 dark:text-amber-100">Ancient Senet</h1>
+          <div className="text-6xl animate-pulse text-amber-600 dark:text-amber-400">𓋹</div>
         </div>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-xl text-amber-700 dark:text-amber-200 max-w-2xl mx-auto">
           Journey through the underworld in this sacred game of ancient Egypt. 
           Navigate the path to eternal life using strategy, luck, and divine favor.
         </p>
