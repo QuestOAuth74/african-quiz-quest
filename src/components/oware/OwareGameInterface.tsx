@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { OwareBoard } from './OwareBoard';
 import { useAnimatedOwareGame } from '@/hooks/useAnimatedOwareGame';
 import { FullscreenToggle } from '@/components/FullscreenToggle';
 import { ArrowLeft, RotateCcw, Trophy } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface OwareGameInterfaceProps {
   gameMode: 'single-player' | 'multiplayer';
@@ -15,6 +16,41 @@ interface OwareGameInterfaceProps {
 export const OwareGameInterface = ({ gameMode, rules = 'abapa', onBack }: OwareGameInterfaceProps) => {
   const { gameState, selectedPit, setSelectedPit, makeMove, startGame, resetGame, animationState } = useAnimatedOwareGame(gameMode);
   const [isPaused, setIsPaused] = useState(false);
+
+  // Trigger confetti when game finishes
+  useEffect(() => {
+    if (gameState.gameStatus === 'finished') {
+      const celebrateWin = () => {
+        // Multiple confetti bursts for celebration
+        const duration = 3000;
+        const animationEnd = Date.now() + duration;
+        
+        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+        
+        const runAnimation = () => {
+          const timeLeft = animationEnd - Date.now();
+          
+          if (timeLeft <= 0) return;
+          
+          confetti({
+            particleCount: randomInRange(50, 100),
+            angle: randomInRange(55, 125),
+            spread: randomInRange(50, 70),
+            origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+            colors: ['#FFD700', '#FFA500', '#FF6347', '#32CD32', '#1E90FF', '#FF69B4']
+          });
+          
+          requestAnimationFrame(runAnimation);
+        };
+        
+        runAnimation();
+      };
+
+      // Delay confetti slightly to let the win state render first
+      const timer = setTimeout(celebrateWin, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [gameState.gameStatus]);
 
   const handlePitClick = (pitIndex: number) => {
     if ((gameState.gameStatus === 'playing' || gameState.gameStatus === 'waiting') && 
