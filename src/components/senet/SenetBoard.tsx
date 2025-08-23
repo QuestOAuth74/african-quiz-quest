@@ -17,18 +17,18 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
     const isAvailable = availableMoves.includes(position);
     const piece = board[position];
     
-    return cn(
-      // Base Egyptian sandstone square styling with hieroglyphic patterns
-      "relative w-16 h-16 flex items-center justify-center",
-      "transition-all duration-300 cursor-pointer",
-      // Egyptian temple stone border effects
-      "border-t-2 border-l-2 border-r-2 border-b-2",
-      "border-t-stone-600 border-l-stone-700 border-r-stone-900 border-b-black",
-      // Ancient dark wood background with depth
-      "bg-gradient-to-br from-stone-800 via-stone-900 to-black",
-      "shadow-[inset_3px_3px_6px_rgba(68,64,60,0.9),inset_-3px_-3px_6px_rgba(0,0,0,0.8),0_4px_12px_rgba(0,0,0,0.7)]",
-      "hover:shadow-[inset_4px_4px_8px_rgba(68,64,60,1),inset_-4px_-4px_8px_rgba(0,0,0,0.9),0_6px_16px_rgba(0,0,0,0.8)]",
-      "hover:transform hover:-translate-y-1 hover:scale-105",
+            return cn(
+              // Base Egyptian sandstone square styling with hieroglyphic patterns
+              "relative flex items-center justify-center senet-square",
+              "transition-all duration-300 cursor-pointer",
+              // Egyptian temple stone border effects
+              "border-t-2 border-l-2 border-r-2 border-b-2",
+              "border-t-stone-600 border-l-stone-700 border-r-stone-900 border-b-black",
+              // Ancient dark wood background with depth
+              "bg-gradient-to-br from-stone-800 via-stone-900 to-black",
+              "shadow-[inset_3px_3px_6px_rgba(68,64,60,0.9),inset_-3px_-3px_6px_rgba(0,0,0,0.8),0_4px_12px_rgba(0,0,0,0.7)]",
+              "hover:shadow-[inset_4px_4px_8px_rgba(68,64,60,1),inset_-4px_-4px_8px_rgba(0,0,0,0.9),0_6px_16px_rgba(0,0,0,0.8)]",
+              "hover:transform hover:-translate-y-1 hover:scale-105",
       // Egyptian temple perspective
       "transform-style-3d",
       {

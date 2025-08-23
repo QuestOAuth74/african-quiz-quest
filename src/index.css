@@ -743,3 +743,34 @@ All colors MUST be HSL.
   background: hsl(142 71% 45% / 0.2) !important;
   animation: pulse 1s ease-in-out;
 }
+
+/* Mobile landscape orientation improvements for Senet game */
+@media screen and (orientation: landscape) and (max-height: 700px) {
+  /* Optimize Senet board layout for landscape mobile */
+  .senet-board-container {
+    padding: 0.5rem;
+    max-height: 90vh;
+  }
+  
+  /* Adjust game controls for landscape */
+  .senet-controls {
+    max-width: 300px;
+  }
+  
+  /* Reduce padding on mobile landscape */
+  .senet-page {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  /* Optimize header spacing */
+  .senet-header {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Make board squares slightly smaller on small landscape screens */
+  .senet-square {
+    width: 3rem;
+    height: 3rem;
+  }
+}

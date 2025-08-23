@@ -4,10 +4,14 @@ import { GameSetup } from '@/components/senet/GameSetup';
 import TopNavigation from '@/components/TopNavigation';
 import { FullscreenToggle } from '@/components/FullscreenToggle';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { useScreenOrientation } from '@/hooks/useScreenOrientation';
 
 export default function Senet() {
   usePageTitle('Ancient Senet - The Pharaoh\'s Game');
   const navigate = useNavigate();
+  
+  // Enable landscape orientation for better Senet gameplay on mobile
+  useScreenOrientation('any', true);
 
   const handleStartGame = (difficulty: 'easy' | 'medium' | 'hard') => {
     // Generate game ID and navigate to play page
