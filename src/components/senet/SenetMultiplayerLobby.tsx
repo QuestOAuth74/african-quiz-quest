@@ -191,7 +191,10 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
       {/* Back Button */}
       <div className="flex items-center mb-6">
         <Button
-          onClick={() => navigate('/senet')}
+          onClick={() => {
+            console.log('Back button clicked, navigating to /senet');
+            navigate('/senet');
+          }}
           variant="default"
           size="lg"
           className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
