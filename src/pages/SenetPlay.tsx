@@ -61,12 +61,12 @@ export default function SenetPlay() {
       <div className="max-w-7xl mx-auto space-y-4">
         
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between bg-background/80 backdrop-blur-sm rounded-lg p-4 border border-border/50 shadow-sm">
           <div className="flex items-center gap-4">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => navigate('/senet')}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-foreground border-border hover:bg-accent"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Setup
@@ -76,11 +76,13 @@ export default function SenetPlay() {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={resetGame}>
+            <Button variant="outline" onClick={resetGame} className="border-border hover:bg-accent">
               <RotateCcw className="h-4 w-4 mr-2" />
               New Game
             </Button>
-            <FullscreenToggle />
+            <div className="bg-background/80 rounded-lg p-1 border border-border/50">
+              <FullscreenToggle />
+            </div>
           </div>
         </div>
 
