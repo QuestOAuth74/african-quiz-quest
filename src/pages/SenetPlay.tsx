@@ -126,6 +126,7 @@ export default function SenetPlay() {
 
   // Handle game state changes for audio
   useEffect(() => {
+    if (!gameState) return;
     if (gameState.winner) {
       if (gameState.winner === 1) {
         playGameWin();
@@ -133,14 +134,15 @@ export default function SenetPlay() {
         playGameLose();
       }
     }
-  }, [gameState.winner, playGameWin, playGameLose]);
+  }, [gameState?.winner, playGameWin, playGameLose]);
 
   // Play turn change sound
   useEffect(() => {
+    if (!gameState) return;
     if (gameState.moveHistory.length > 0) {
       playTurnChange();
     }
-  }, [gameState.currentPlayer, playTurnChange]);
+  }, [gameState?.currentPlayer, playTurnChange]);
 
   const handleSquareClick = (position: number) => {
     if (!gameState) return;
