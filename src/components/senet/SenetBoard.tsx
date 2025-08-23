@@ -1,6 +1,7 @@
 import { SenetGameState, SPECIAL_SQUARES } from '@/types/senet';
 import { SenetPiece } from './SenetPiece';
 import { cn } from '@/lib/utils';
+import { useSenetAudio } from '@/hooks/useSenetAudio';
 
 interface SenetBoardProps {
   gameState: SenetGameState;
@@ -9,6 +10,7 @@ interface SenetBoardProps {
 
 export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
   const { board, availableMoves, currentPlayer } = gameState;
+  const { playSpecialSquare } = useSenetAudio();
 
   const getSquareStyle = (position: number) => {
     const specialSquare = SPECIAL_SQUARES.find(s => s.position === position);
@@ -97,11 +99,21 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
           <div
             key={position}
             className={getSquareStyle(position)}
-            onClick={() => onSquareClick(position)}
+            onClick={() => {
+              const specialSquare = SPECIAL_SQUARES.find(s => s.position === position);
+              if (specialSquare) {
+                playSpecialSquare();
+              }
+              onSquareClick(position);
+            }}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
+                const specialSquare = SPECIAL_SQUARES.find(s => s.position === position);
+                if (specialSquare) {
+                  playSpecialSquare();
+                }
                 onSquareClick(position);
               }
             }}

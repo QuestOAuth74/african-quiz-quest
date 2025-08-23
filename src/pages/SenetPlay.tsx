@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { ThrowingSticks } from '@/components/senet/ThrowingSticks';
 import { FullscreenToggle } from '@/components/FullscreenToggle';
 import { useSenetGame } from '@/hooks/useSenetGame';
 import { useSenetAI } from '@/hooks/useSenetAI';
+import { useSenetAudio } from '@/hooks/useSenetAudio';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { cn } from '@/lib/utils';
 
@@ -31,15 +32,58 @@ export default function SenetPlay() {
   } = useSenetGame();
 
   const { isThinking } = useSenetAI(gameState, makeMove, throwSticks);
+  
+  const {
+    isPlayingMusic,
+    playMusic,
+    pauseMusic,
+    playStickThrow,
+    playPieceMove,
+    playPieceCapture,
+    playGameStart,
+    playGameWin,
+    playGameLose,
+    playTurnChange
+  } = useSenetAudio();
 
   useEffect(() => {
     setAIDifficulty(difficulty);
   }, [difficulty, setAIDifficulty]);
 
+  // Start background music and game start sound when component mounts
+  useEffect(() => {
+    playGameStart();
+  }, [playGameStart]);
+
+  // Handle game state changes for audio
+  useEffect(() => {
+    if (gameState.winner) {
+      if (gameState.winner === 1) {
+        playGameWin();
+      } else {
+        playGameLose();
+      }
+    }
+  }, [gameState.winner, playGameWin, playGameLose]);
+
+  // Play turn change sound
+  useEffect(() => {
+    if (gameState.moveHistory.length > 0) {
+      playTurnChange();
+    }
+  }, [gameState.currentPlayer, playTurnChange]);
+
   const handleSquareClick = (position: number) => {
     if (gameState.gamePhase === 'moving' && gameState.availableMoves.includes(position)) {
       const piece = gameState.board[position];
       if (piece && piece.player === gameState.currentPlayer && !gameState.players.find(p => p.id === gameState.currentPlayer)?.isAI) {
+        // Check if there's a capture
+        const targetPiece = gameState.board.find(p => p && p.position === position && p.player !== gameState.currentPlayer);
+        if (targetPiece) {
+          playPieceCapture();
+        } else {
+          playPieceMove();
+        }
         makeMove(position);
       }
     }
@@ -47,6 +91,7 @@ export default function SenetPlay() {
 
   const handleThrowSticks = () => {
     if (gameState.gamePhase === 'throwing' && !gameState.players.find(p => p.id === gameState.currentPlayer)?.isAI) {
+      playStickThrow();
       return throwSticks();
     }
     return null;
@@ -76,6 +121,13 @@ export default function SenetPlay() {
           </div>
           
           <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={isPlayingMusic ? pauseMusic : playMusic}
+              className="border-border hover:bg-accent"
+            >
+              {isPlayingMusic ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            </Button>
             <Button variant="outline" onClick={resetGame} className="border-border hover:bg-accent">
               <RotateCcw className="h-4 w-4 mr-2" />
               New Game
