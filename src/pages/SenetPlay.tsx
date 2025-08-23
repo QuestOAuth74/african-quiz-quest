@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, RotateCcw, Volume2, VolumeX, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
 import { SenetBoard } from '@/components/senet/SenetBoard';
 import { ThrowingSticks } from '@/components/senet/ThrowingSticks';
 import { FullscreenToggle } from '@/components/FullscreenToggle';
@@ -37,8 +38,10 @@ export default function SenetPlay() {
     isPlayingMusic,
     isMusicEnabled,
     toggleMusic,
+    setMusicVolume,
     isSoundEnabled,
     toggleSoundEffects,
+    setEffectsVolume,
     playStickThrow,
     playPieceMove,
     playPieceCapture,
@@ -48,6 +51,21 @@ export default function SenetPlay() {
     playTurnChange,
     playCriticalSquare
   } = useSenetAudio();
+  
+  const [musicVolume, setMusicVolumeState] = useState(20);
+  const [effectsVolume, setEffectsVolumeState] = useState(30);
+  
+  const handleMusicVolumeChange = (value: number[]) => {
+    const vol = value[0];
+    setMusicVolumeState(vol);
+    setMusicVolume(vol / 100);
+  };
+  
+  const handleEffectsVolumeChange = (value: number[]) => {
+    const vol = value[0];
+    setEffectsVolumeState(vol);
+    setEffectsVolume(vol / 100);
+  };
 
   useEffect(() => {
     setAIDifficulty(difficulty);
@@ -134,7 +152,7 @@ export default function SenetPlay() {
               )}
               title={isMusicEnabled ? "Disable Background Music" : "Enable Background Music"}
             >
-              <Music className={cn("h-4 w-4", !isMusicEnabled && "line-through")} />
+              {isMusicEnabled ? <Music className="h-4 w-4" /> : <Music className="h-4 w-4 opacity-50" />}
             </Button>
             <Button 
               variant="outline" 
@@ -261,6 +279,50 @@ export default function SenetPlay() {
               disabled={gameState.gamePhase !== 'throwing' || !!currentPlayerInfo?.isAI || !!gameState.winner || isProcessing}
               currentPlayer={gameState.currentPlayer}
             />
+
+            {/* Instructions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Audio Controls</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 text-sm">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Music className="h-4 w-4" />
+                    <span className="font-medium">Music Volume</span>
+                  </div>
+                  <Slider
+                    value={[musicVolume]}
+                    onValueChange={handleMusicVolumeChange}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                    disabled={!isMusicEnabled}
+                  />
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {musicVolume}%
+                  </div>
+                </div>
+                <Separator />
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Volume2 className="h-4 w-4" />
+                    <span className="font-medium">Effects Volume</span>
+                  </div>
+                  <Slider
+                    value={[effectsVolume]}
+                    onValueChange={handleEffectsVolumeChange}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                    disabled={!isSoundEnabled}
+                  />
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {effectsVolume}%
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Instructions */}
             <Card>

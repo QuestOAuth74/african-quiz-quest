@@ -25,8 +25,8 @@ interface SenetAudioHook {
   setEffectsVolume: (volume: number) => void;
 }
 
-// Ancient Egyptian themed background music URL (royalty-free)
-const EGYPTIAN_MUSIC_URL = 'https://www.soundjay.com/misc/sounds-961.mp3'; // Placeholder - we'll use procedural audio
+// Ancient Egyptian themed background music URL from Supabase
+const EGYPTIAN_MUSIC_URL = 'https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/behind%20the%20pyramids%20senet.mp3';
 
 export const useSenetAudio = (): SenetAudioHook => {
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -34,14 +34,14 @@ export const useSenetAudio = (): SenetAudioHook => {
   const [isMusicEnabled, setIsMusicEnabled] = useState<boolean>(true);
   const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(true);
   
-  // Background music using existing hook
+  // Background music using existing hook with the Egyptian music file
   const {
     isPlaying: isPlayingMusic,
     playMusic: startMusic,
     pauseMusic: stopMusic,
     setVolumeLevel: setMusicVolume,
     handleUserInteraction
-  } = useBackgroundMusic('', {
+  } = useBackgroundMusic(EGYPTIAN_MUSIC_URL, {
     autoPlay: false,
     loop: true,
     volume: 0.2
@@ -181,9 +181,11 @@ export const useSenetAudio = (): SenetAudioHook => {
     ];
     playSequence(fanfare, 0.2);
     
-    // Start background ambience after fanfare
-    setTimeout(() => playProceduralMusic(), 1500);
-  }, [playSequence, playProceduralMusic]);
+    // Start background music after fanfare
+    if (isMusicEnabled) {
+      setTimeout(() => startMusic(), 1500);
+    }
+  }, [playSequence, isMusicEnabled, startMusic]);
 
   const playGameWin = useCallback(() => {
     // Victorious Egyptian triumph
@@ -239,13 +241,13 @@ export const useSenetAudio = (): SenetAudioHook => {
     setIsMusicEnabled(prev => {
       const newState = !prev;
       if (newState && !isPlayingMusic) {
-        playProceduralMusic();
+        startMusic();
       } else if (!newState && isPlayingMusic) {
         stopMusic();
       }
       return newState;
     });
-  }, [isPlayingMusic, stopMusic]);
+  }, [isPlayingMusic, startMusic, stopMusic]);
 
   const toggleSoundEffects = useCallback(() => {
     setIsSoundEnabled(prev => !prev);
@@ -253,9 +255,9 @@ export const useSenetAudio = (): SenetAudioHook => {
 
   const playMusic = useCallback(() => {
     if (isMusicEnabled) {
-      playProceduralMusic();
+      startMusic();
     }
-  }, [isMusicEnabled, playProceduralMusic]);
+  }, [isMusicEnabled, startMusic]);
 
   const pauseMusic = useCallback(() => {
     stopMusic();
