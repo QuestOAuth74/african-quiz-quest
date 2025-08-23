@@ -7,11 +7,12 @@ import { ArrowLeft, RotateCcw, Trophy } from 'lucide-react';
 
 interface OwareGameInterfaceProps {
   gameMode: 'single-player' | 'multiplayer';
+  rules?: 'anan-anan' | 'abapa';
   onBack: () => void;
 }
 
-export const OwareGameInterface = ({ gameMode, onBack }: OwareGameInterfaceProps) => {
-  const { gameState, selectedPit, setSelectedPit, makeMove, startGame, resetGame } = useOwareGame(gameMode);
+export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: OwareGameInterfaceProps) => {
+  const { gameState, selectedPit, setSelectedPit, makeMove, startGame, resetGame } = useOwareGame(gameMode, rules);
   const [isPaused, setIsPaused] = useState(false);
 
   const handlePitClick = (pitIndex: number) => {
@@ -78,7 +79,7 @@ export const OwareGameInterface = ({ gameMode, onBack }: OwareGameInterfaceProps
         
         <div className="text-center">
           <h1 className="text-2xl font-bold">
-            {gameMode === 'single-player' ? 'vs AI' : 'Multiplayer'} Oware
+            {gameMode === 'single-player' ? 'vs AI' : 'Multiplayer'} Oware ({rules === 'anan-anan' ? 'Anan-Anan' : 'Abapa'})
           </h1>
           {gameState.isThinking && (
             <p className="text-sm text-muted-foreground mt-1">AI is thinking...</p>
@@ -140,11 +141,22 @@ export const OwareGameInterface = ({ gameMode, onBack }: OwareGameInterfaceProps
           <CardTitle className="text-lg">How to Play</CardTitle>
         </CardHeader>
         <CardContent className="text-sm space-y-2">
+          <p><strong>Rules:</strong> {rules === 'anan-anan' ? 'Anan-Anan (Four-Four)' : 'Abapa'}</p>
           <p>• <strong>Objective:</strong> Capture more stones than your opponent</p>
           <p>• <strong>Your Turn:</strong> Click one of your pits (bottom row) to sow stones</p>
           <p>• <strong>Sowing:</strong> Stones are distributed counter-clockwise, one per pit</p>
-          <p>• <strong>Capture:</strong> If your last stone lands in an opponent's pit with 2-3 stones, you capture them!</p>
-          <p>• <strong>Winning:</strong> Game ends when one side has no stones. Most stones wins!</p>
+          {rules === 'anan-anan' ? (
+            <>
+              <p>• <strong>Capture:</strong> When any pit reaches 4 stones during distribution, they are captured!</p>
+              <p>• <strong>Continue:</strong> Pick up from last pit and keep sowing until reaching an empty pit</p>
+              <p>• <strong>End Game:</strong> When 8 stones remain, last capturer takes all remaining stones</p>
+            </>
+          ) : (
+            <>
+              <p>• <strong>Capture:</strong> When last stone lands in opponent's pit with 2-3 stones, capture working backwards</p>
+              <p>• <strong>End Game:</strong> First player to capture more than 24 stones wins</p>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

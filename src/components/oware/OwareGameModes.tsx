@@ -1,12 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bot, Users, Trophy, Zap } from 'lucide-react';
 
 interface OwareGameModesProps {
   onSelectMode: (mode: 'single-player' | 'multiplayer' | 'tutorial') => void;
+  selectedRules: 'anan-anan' | 'abapa';
+  onRulesChange: (rules: 'anan-anan' | 'abapa') => void;
 }
 
-export const OwareGameModes = ({ onSelectMode }: OwareGameModesProps) => {
+export const OwareGameModes = ({ onSelectMode, selectedRules, onRulesChange }: OwareGameModesProps) => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="text-center mb-8">
@@ -23,6 +26,30 @@ export const OwareGameModes = ({ onSelectMode }: OwareGameModesProps) => {
           <span>𓄿</span>
           <span>𓅓</span>
         </div>
+        
+        {/* Rule Selection */}
+        <Card className="mt-6 max-w-md mx-auto">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Game Rules</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select value={selectedRules} onValueChange={onRulesChange}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="anan-anan">Anan-Anan (Four-Four) - Fast-paced</SelectItem>
+                <SelectItem value="abapa">Abapa - Strategic</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground mt-2">
+              {selectedRules === 'anan-anan' 
+                ? 'Capture when pits reach 4 stones, continue sowing until empty pit'
+                : 'Capture 2-3 stones from opponent\'s side, first to 25+ wins'
+              }
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -100,10 +127,21 @@ export const OwareGameModes = ({ onSelectMode }: OwareGameModesProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-amber-700 space-y-2">
+          <p><strong>Current Rules: {selectedRules === 'anan-anan' ? 'Anan-Anan (Four-Four)' : 'Abapa'}</strong></p>
           <p>• <strong>Objective:</strong> Capture more stones than your opponent</p>
           <p>• <strong>Sowing:</strong> Pick up all stones from one of your pits and distribute them counter-clockwise</p>
-          <p>• <strong>Capture:</strong> If your last stone lands in an opponent's pit with 2-3 stones, capture them</p>
-          <p>• <strong>Winning:</strong> Game ends when one side has no stones. Player with most stones wins!</p>
+          {selectedRules === 'anan-anan' ? (
+            <>
+              <p>• <strong>Capture:</strong> When any pit reaches 4 stones during distribution</p>
+              <p>• <strong>Continue:</strong> Keep sowing from last pit until reaching an empty pit</p>
+              <p>• <strong>End:</strong> When 8 stones remain, last capturer takes all</p>
+            </>
+          ) : (
+            <>
+              <p>• <strong>Capture:</strong> Last stone in opponent's pit with 2-3 stones</p>
+              <p>• <strong>End:</strong> First player to capture more than 24 stones wins</p>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
