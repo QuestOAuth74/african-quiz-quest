@@ -10,7 +10,7 @@ interface SenetBoardProps {
 
 export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
   const { board, availableMoves, currentPlayer } = gameState;
-  const { playSpecialSquare } = useSenetAudio();
+  const { playSpecialSquare, playCriticalSquare } = useSenetAudio();
 
   const getSquareStyle = (position: number) => {
     const specialSquare = SPECIAL_SQUARES.find(s => s.position === position);
@@ -102,7 +102,12 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
             onClick={() => {
               const specialSquare = SPECIAL_SQUARES.find(s => s.position === position);
               if (specialSquare) {
-                playSpecialSquare();
+                // Play different sounds for different square types
+                if (specialSquare.effect === 'restart' || specialSquare.effect === 'must_roll_exact') {
+                  playCriticalSquare();
+                } else {
+                  playSpecialSquare();
+                }
               }
               onSquareClick(position);
             }}
@@ -112,7 +117,12 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 const specialSquare = SPECIAL_SQUARES.find(s => s.position === position);
                 if (specialSquare) {
-                  playSpecialSquare();
+                  // Play different sounds for different square types
+                  if (specialSquare.effect === 'restart' || specialSquare.effect === 'must_roll_exact') {
+                    playCriticalSquare();
+                  } else {
+                    playSpecialSquare();
+                  }
                 }
                 onSquareClick(position);
               }

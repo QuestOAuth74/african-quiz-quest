@@ -1,14 +1,18 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import { useBackgroundMusic } from './useBackgroundMusic';
 
 interface SenetAudioHook {
   // Background music controls
   isPlayingMusic: boolean;
+  isMusicEnabled: boolean;
   playMusic: () => void;
   pauseMusic: () => void;
+  toggleMusic: () => void;
   setMusicVolume: (volume: number) => void;
   
   // Sound effects
+  isSoundEnabled: boolean;
+  toggleSoundEffects: () => void;
   playStickThrow: () => void;
   playPieceMove: () => void;
   playPieceCapture: () => void;
@@ -17,6 +21,7 @@ interface SenetAudioHook {
   playGameLose: () => void;
   playTurnChange: () => void;
   playSpecialSquare: () => void;
+  playCriticalSquare: () => void;
   setEffectsVolume: (volume: number) => void;
 }
 
@@ -26,12 +31,14 @@ const EGYPTIAN_MUSIC_URL = 'https://www.soundjay.com/misc/sounds-961.mp3'; // Pl
 export const useSenetAudio = (): SenetAudioHook => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const effectsVolumeRef = useRef<number>(0.3);
+  const [isMusicEnabled, setIsMusicEnabled] = useState<boolean>(true);
+  const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(true);
   
   // Background music using existing hook
   const {
     isPlaying: isPlayingMusic,
-    playMusic,
-    pauseMusic,
+    playMusic: startMusic,
+    pauseMusic: stopMusic,
     setVolumeLevel: setMusicVolume,
     handleUserInteraction
   } = useBackgroundMusic('', {
@@ -102,6 +109,8 @@ export const useSenetAudio = (): SenetAudioHook => {
   }, [createEgyptianAmbience]);
 
   const playTone = useCallback((frequency: number, duration: number, type: OscillatorType = 'sine', volume: number = 0.2) => {
+    if (!isSoundEnabled) return;
+    
     try {
       const audioContext = getAudioContext();
       const oscillator = audioContext.createOscillator();
@@ -122,9 +131,11 @@ export const useSenetAudio = (): SenetAudioHook => {
     } catch (error) {
       console.warn('Audio playback failed:', error);
     }
-  }, [getAudioContext]);
+  }, [getAudioContext, isSoundEnabled]);
 
   const playSequence = useCallback((notes: Array<{frequency: number, duration: number, delay?: number}>, volume: number = 0.2) => {
+    if (!isSoundEnabled) return;
+    
     let currentTime = 0;
     notes.forEach(note => {
       setTimeout(() => {
@@ -132,7 +143,7 @@ export const useSenetAudio = (): SenetAudioHook => {
       }, currentTime);
       currentTime += (note.delay || note.duration) * 1000;
     });
-  }, [playTone]);
+  }, [playTone, isSoundEnabled]);
 
   // Senet-specific sound effects
   const playStickThrow = useCallback(() => {
@@ -210,6 +221,46 @@ export const useSenetAudio = (): SenetAudioHook => {
     ], 0.2);
   }, [playSequence]);
 
+  // Enhanced critical square sound for important squares
+  const playCriticalSquare = useCallback(() => {
+    // More dramatic sound for truly critical squares (like House of Water, etc.)
+    playSequence([
+      { frequency: 220, duration: 0.2, delay: 0.1 },
+      { frequency: 330, duration: 0.2, delay: 0.1 },
+      { frequency: 440, duration: 0.2, delay: 0.1 },
+      { frequency: 550, duration: 0.3, delay: 0.2 },
+      { frequency: 440, duration: 0.2, delay: 0.1 },
+      { frequency: 330, duration: 0.3, delay: 0.1 },
+    ], 0.25);
+  }, [playSequence]);
+
+  // Control functions
+  const toggleMusic = useCallback(() => {
+    setIsMusicEnabled(prev => {
+      const newState = !prev;
+      if (newState && !isPlayingMusic) {
+        playProceduralMusic();
+      } else if (!newState && isPlayingMusic) {
+        stopMusic();
+      }
+      return newState;
+    });
+  }, [isPlayingMusic, stopMusic]);
+
+  const toggleSoundEffects = useCallback(() => {
+    setIsSoundEnabled(prev => !prev);
+  }, []);
+
+  const playMusic = useCallback(() => {
+    if (isMusicEnabled) {
+      playProceduralMusic();
+    }
+  }, [isMusicEnabled, playProceduralMusic]);
+
+  const pauseMusic = useCallback(() => {
+    stopMusic();
+  }, [stopMusic]);
+
   const setEffectsVolume = useCallback((volume: number) => {
     effectsVolumeRef.current = Math.max(0, Math.min(1, volume));
   }, []);
@@ -226,9 +277,13 @@ export const useSenetAudio = (): SenetAudioHook => {
 
   return {
     isPlayingMusic,
-    playMusic: playProceduralMusic,
+    isMusicEnabled,
+    playMusic,
     pauseMusic,
+    toggleMusic,
     setMusicVolume,
+    isSoundEnabled,
+    toggleSoundEffects,
     playStickThrow,
     playPieceMove,
     playPieceCapture,
@@ -237,6 +292,7 @@ export const useSenetAudio = (): SenetAudioHook => {
     playGameLose,
     playTurnChange,
     playSpecialSquare,
+    playCriticalSquare,
     setEffectsVolume
   };
 };

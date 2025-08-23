@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Volume2, VolumeX, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,15 +35,18 @@ export default function SenetPlay() {
   
   const {
     isPlayingMusic,
-    playMusic,
-    pauseMusic,
+    isMusicEnabled,
+    toggleMusic,
+    isSoundEnabled,
+    toggleSoundEffects,
     playStickThrow,
     playPieceMove,
     playPieceCapture,
     playGameStart,
     playGameWin,
     playGameLose,
-    playTurnChange
+    playTurnChange,
+    playCriticalSquare
   } = useSenetAudio();
 
   useEffect(() => {
@@ -123,11 +126,29 @@ export default function SenetPlay() {
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
-              onClick={isPlayingMusic ? pauseMusic : playMusic}
-              className="border-border hover:bg-accent"
+              size="sm"
+              onClick={toggleMusic}
+              className={cn(
+                "border-border hover:bg-accent",
+                !isMusicEnabled && "opacity-50"
+              )}
+              title={isMusicEnabled ? "Disable Background Music" : "Enable Background Music"}
             >
-              {isPlayingMusic ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              <Music className={cn("h-4 w-4", !isMusicEnabled && "line-through")} />
             </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={toggleSoundEffects}
+              className={cn(
+                "border-border hover:bg-accent",
+                !isSoundEnabled && "opacity-50"
+              )}
+              title={isSoundEnabled ? "Disable Sound Effects" : "Enable Sound Effects"}
+            >
+              {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </Button>
+            <Separator orientation="vertical" className="h-6" />
             <Button variant="outline" onClick={resetGame} className="border-border hover:bg-accent">
               <RotateCcw className="h-4 w-4 mr-2" />
               New Game
