@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { SenetBoard } from '@/components/senet/SenetBoard';
 import { ThrowingSticks } from '@/components/senet/ThrowingSticks';
+import { SenetFactsPopup } from '@/components/senet/SenetFactsPopup';
 import { FullscreenToggle } from '@/components/FullscreenToggle';
 import { useSenetGame } from '@/hooks/useSenetGame';
 import { useOnlineSenetGame } from '@/hooks/useOnlineSenetGame';
@@ -101,6 +102,7 @@ export default function SenetPlay() {
   
   const [musicVolume, setMusicVolumeState] = useState(20);
   const [effectsVolume, setEffectsVolumeState] = useState(30);
+  const [showFactsPopup, setShowFactsPopup] = useState(false);
   
   const handleMusicVolumeChange = (value: number[]) => {
     const vol = value[0];
@@ -505,6 +507,13 @@ export default function SenetPlay() {
           </div>
         </div>
       </div>
+      
+      {/* Senet Facts Popup */}
+      <SenetFactsPopup
+        gamePhase={gameState.gamePhase}
+        moveCount={gameState.moveHistory.length}
+        onClose={() => setShowFactsPopup(false)}
+      />
     </div>
   );
 }
