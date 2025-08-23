@@ -16,23 +16,27 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
     const piece = board[position];
     
     return cn(
-      "relative w-12 h-12 border border-primary/20 flex items-center justify-center",
-      "transition-all duration-200 cursor-pointer hover:bg-primary/5",
+      // Base square styling - larger and more visible
+      "relative w-16 h-16 border-2 flex items-center justify-center",
+      "transition-all duration-300 cursor-pointer shadow-inner",
+      "bg-gradient-to-br from-yellow-100 to-orange-200",
+      "border-yellow-800 dark:border-yellow-600",
+      "hover:shadow-md hover:scale-105",
       {
-        // Special squares styling
-        "bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30": specialSquare?.effect === 'safe',
-        "bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30": specialSquare?.effect === 'restart',
-        "bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30": specialSquare?.effect === 'must_roll_exact',
+        // Special squares with distinct Egyptian styling
+        "bg-gradient-to-br from-red-200 to-red-400 border-red-800 shadow-red-300/50": specialSquare?.effect === 'safe',
+        "bg-gradient-to-br from-blue-200 to-cyan-400 border-cyan-800 shadow-cyan-300/50": specialSquare?.effect === 'restart', 
+        "bg-gradient-to-br from-purple-200 to-violet-400 border-purple-800 shadow-purple-300/50": specialSquare?.effect === 'must_roll_exact',
         
-        // Available move highlighting
-        "ring-2 ring-primary ring-opacity-60 bg-primary/10": isAvailable && piece?.player === currentPlayer,
-        "hover:ring-1 hover:ring-primary/40": !isAvailable,
+        // Available move highlighting - bright and visible
+        "ring-4 ring-emerald-400 ring-opacity-80 bg-gradient-to-br from-emerald-100 to-emerald-300 animate-pulse": isAvailable && piece?.player === currentPlayer,
+        "hover:ring-2 hover:ring-yellow-400": !isAvailable,
         
-        // Board layout
-        "rounded-tl-lg": position === 0,
-        "rounded-tr-lg": position === 9,
-        "rounded-bl-lg": position === 29,
-        "rounded-br-lg": position === 20,
+        // Board corner styling for papyrus effect
+        "rounded-tl-2xl": position === 0,
+        "rounded-tr-2xl": position === 9, 
+        "rounded-bl-2xl": position === 29,
+        "rounded-br-2xl": position === 20,
       }
     );
   };
@@ -43,20 +47,36 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
     
     return (
       <>
+        {/* Background Egyptian pattern for all squares */}
+        <div className="absolute inset-1 opacity-10 bg-repeat bg-center" 
+             style={{ backgroundImage: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\"><rect width=\"20\" height=\"20\" fill=\"%23D97706\"/><path d=\"M10 5l3 3-3 3-3-3z\" fill=\"%23F59E0B\"/></svg>')" }}>
+        </div>
+        
+        {/* Special square symbols - larger and more prominent */}
         {specialSquare && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-lg opacity-30" title={specialSquare.description}>
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <span className="text-3xl font-bold drop-shadow-lg" 
+                  style={{ 
+                    color: specialSquare.effect === 'safe' ? '#991B1B' : 
+                           specialSquare.effect === 'restart' ? '#155E75' : '#581C87',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+                  }}
+                  title={specialSquare.description}>
               {specialSquare.symbol}
             </span>
           </div>
         )}
+        
+        {/* Game pieces */}
         {piece && (
           <SenetPiece 
             piece={piece} 
             isHighlighted={availableMoves.includes(position) && piece.player === currentPlayer}
           />
         )}
-        <div className="absolute bottom-0 right-0 text-xs opacity-40 text-foreground/60">
+        
+        {/* Square numbers - more visible */}
+        <div className="absolute bottom-1 right-1 text-xs font-bold bg-black/20 text-white px-1 rounded">
           {position + 1}
         </div>
       </>
@@ -71,7 +91,7 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
     if (reverse) positions.reverse();
     
     return (
-      <div className="grid grid-cols-10 gap-1">
+      <div className="grid grid-cols-10 gap-2">
         {positions.map(position => (
           <div
             key={position}
@@ -94,47 +114,71 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
   };
 
   return (
-    <div className="space-y-1 p-4 bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950/20 dark:to-orange-950/20 rounded-xl border border-amber-200 dark:border-amber-800">
-      <div className="text-center mb-4">
-        <h3 className="text-lg font-semibold text-foreground flex items-center justify-center gap-2">
-          <span className="text-amber-600">𓋹</span>
-          Ancient Senet Board
-          <span className="text-amber-600">𓋹</span>
-        </h3>
-        <p className="text-sm text-muted-foreground">Move your pieces to the afterlife</p>
+    <div className="relative p-8 rounded-3xl shadow-2xl"
+         style={{
+           background: 'linear-gradient(135deg, #FEF3C7 0%, #F59E0B 20%, #D97706 40%, #92400E 60%, #451A03 100%)',
+           boxShadow: 'inset 0 0 50px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.4)'
+         }}>
+      
+      {/* Papyrus texture overlay */}
+      <div className="absolute inset-0 rounded-3xl opacity-20"
+           style={{
+             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+             backgroundSize: '60px 60px'
+           }}>
       </div>
       
-      <div className="space-y-1">
-        {/* Row 1: Squares 1-10 */}
-        {renderBoardRow(0, 9)}
+      <div className="relative z-10">
+        <div className="text-center mb-6">
+          <h3 className="text-2xl font-bold text-yellow-900 flex items-center justify-center gap-3 drop-shadow-lg">
+            <span className="text-3xl">𓋹</span>
+            Sacred Senet Board of the Afterlife
+            <span className="text-3xl">𓋹</span>
+          </h3>
+          <p className="text-yellow-800 font-semibold mt-2 text-lg">Journey through the underworld to eternal life</p>
+        </div>
         
-        {/* Row 2: Squares 20-11 (reversed S-pattern) */}
-        {renderBoardRow(10, 19, true)}
+        {/* Ornamental border */}
+        <div className="mb-6 h-1 bg-gradient-to-r from-transparent via-yellow-800 to-transparent"></div>
         
-        {/* Row 3: Squares 21-30 */}
-        {renderBoardRow(20, 29)}
-      </div>
-      
-      <div className="mt-4 grid grid-cols-2 gap-4 text-xs text-muted-foreground">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30 rounded"></div>
-            <span>Safe Square</span>
+        <div className="space-y-3 p-4 bg-gradient-to-br from-yellow-50/80 to-orange-100/80 rounded-2xl border-4 border-yellow-700 shadow-inner">
+          {/* Row 1: Squares 1-10 */}
+          {renderBoardRow(0, 9)}
+          
+          {/* Row 2: Squares 20-11 (reversed S-pattern) */}
+          {renderBoardRow(10, 19, true)}
+          
+          {/* Row 3: Squares 21-30 */}
+          {renderBoardRow(20, 29)}
+        </div>
+        
+        {/* Egyptian-themed legend */}
+        <div className="mt-6 grid grid-cols-2 gap-6 text-sm font-medium text-yellow-900">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 bg-gradient-to-br from-red-200 to-red-400 border-2 border-red-800 rounded shadow-lg"></div>
+              <span className="font-bold">𓇳 Safe Square - Protected by gods</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 bg-gradient-to-br from-blue-200 to-cyan-400 border-2 border-cyan-800 rounded shadow-lg"></div>
+              <span className="font-bold">𓈖 House of Water - Return to start</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded"></div>
-            <span>House of Water</span>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 bg-gradient-to-br from-purple-200 to-violet-400 border-2 border-purple-800 rounded shadow-lg"></div>
+              <span className="font-bold">𓊨 Sacred Houses - Roll exact</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 bg-gradient-to-br from-emerald-100 to-emerald-300 ring-4 ring-emerald-400 rounded animate-pulse"></div>
+              <span className="font-bold">✨ Available Move</span>
+            </div>
           </div>
         </div>
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 rounded"></div>
-            <span>Sacred House</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-primary/20 rounded ring-2 ring-primary/40"></div>
-            <span>Available Move</span>
-          </div>
+        
+        {/* Decorative hieroglyphs */}
+        <div className="mt-4 text-center text-2xl text-yellow-800 opacity-60 space-x-4">
+          <span>𓀀</span><span>𓀁</span><span>𓊃</span><span>𓋹</span><span>𓇳</span><span>𓈖</span><span>𓊨</span>
         </div>
       </div>
     </div>

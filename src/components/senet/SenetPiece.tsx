@@ -12,25 +12,32 @@ export const SenetPiece = ({ piece, isHighlighted }: SenetPieceProps) => {
   return (
     <div
       className={cn(
-        "w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold",
-        "transition-all duration-200 z-10 relative",
+        "w-12 h-12 rounded-full border-3 flex items-center justify-center text-lg font-bold",
+        "transition-all duration-300 z-20 relative shadow-lg",
         {
-          // Player 1 (human) pieces - light/gold
-          "bg-gradient-to-br from-amber-400 to-amber-600 border-amber-700 text-amber-900": isPlayer1,
-          "shadow-lg shadow-amber-500/50": isPlayer1,
+          // Player 1 (human) pieces - bright gold/amber
+          "bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-amber-800 text-amber-900": isPlayer1,
+          "shadow-amber-500/60 drop-shadow-lg": isPlayer1,
           
-          // Player 2 (AI) pieces - dark/silver
-          "bg-gradient-to-br from-slate-400 to-slate-600 border-slate-700 text-slate-100": !isPlayer1,
-          "shadow-lg shadow-slate-500/50": !isPlayer1,
+          // Player 2 (AI) pieces - deep silver/slate
+          "bg-gradient-to-br from-slate-300 via-gray-400 to-slate-500 border-slate-800 text-slate-900": !isPlayer1,
+          "shadow-slate-500/60 drop-shadow-lg": !isPlayer1,
           
-          // Highlighted state for available moves
-          "ring-2 ring-primary ring-offset-1 scale-110": isHighlighted,
-          "animate-pulse": isHighlighted,
+          // Highlighted state for available moves - glowing effect
+          "ring-4 ring-emerald-300 ring-offset-2 scale-125 animate-bounce": isHighlighted,
+          "hover:scale-110": !isHighlighted,
         }
       )}
+      style={{
+        boxShadow: isPlayer1 
+          ? '0 8px 16px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3)'
+          : '0 8px 16px rgba(71, 85, 105, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3)'
+      }}
       aria-label={`${isPlayer1 ? 'Your' : 'Opponent'} piece`}
     >
-      {isPlayer1 ? '𓀀' : '𓀁'}
+      <span className="text-2xl drop-shadow-md">
+        {isPlayer1 ? '𓀀' : '𓀁'}
+      </span>
     </div>
   );
 };
