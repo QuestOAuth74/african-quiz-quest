@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { OwareBoard } from './OwareBoard';
 import { useAnimatedOwareGame } from '@/hooks/useAnimatedOwareGame';
+import { FullscreenToggle } from '@/components/FullscreenToggle';
 import { ArrowLeft, RotateCcw, Trophy } from 'lucide-react';
 
 interface OwareGameInterfaceProps {
@@ -108,6 +109,9 @@ export const OwareGameInterface = ({ gameMode, rules = 'abapa', onBack }: OwareG
           <Button variant="outline" size="sm" onClick={resetGame}>
             <RotateCcw className="w-4 h-4" />
           </Button>
+          <div className="bg-background/80 rounded-lg p-1 border border-border/50">
+            <FullscreenToggle />
+          </div>
         </div>
       </div>
 
