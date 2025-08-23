@@ -66,12 +66,14 @@ const SENET_FACTS = [
 export const SenetFactsPopup = ({ gamePhase, moveCount, onClose }: SenetFactsPopupProps) => {
   const [currentFact, setCurrentFact] = useState<typeof SENET_FACTS[0] | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [lastShownTime, setLastShownTime] = useState<number>(0);
 
   useEffect(() => {
-    // Show facts every 8-12 moves with some randomness
-    const shouldShow = moveCount > 0 && moveCount % (8 + Math.floor(Math.random() * 5)) === 0;
+    const now = Date.now();
+    const threeMinutes = 3 * 60 * 1000; // 3 minutes in milliseconds
     
-    if (shouldShow) {
+    // Show facts every 3 minutes, but only if the game has started (moveCount > 0)
+    if (moveCount > 0 && (now - lastShownTime) >= threeMinutes) {
       // Filter facts based on current game phase
       const relevantFacts = SENET_FACTS.filter(fact => 
         fact.phase === 'any' || fact.phase === gamePhase
@@ -81,6 +83,7 @@ export const SenetFactsPopup = ({ gamePhase, moveCount, onClose }: SenetFactsPop
         const randomFact = relevantFacts[Math.floor(Math.random() * relevantFacts.length)];
         setCurrentFact(randomFact);
         setIsVisible(true);
+        setLastShownTime(now);
         
         // Auto-hide after 8 seconds
         const timer = setTimeout(() => {
@@ -90,7 +93,7 @@ export const SenetFactsPopup = ({ gamePhase, moveCount, onClose }: SenetFactsPop
         return () => clearTimeout(timer);
       }
     }
-  }, [moveCount, gamePhase]);
+  }, [moveCount, gamePhase, lastShownTime]);
 
   const handleClose = () => {
     setIsVisible(false);
