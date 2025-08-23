@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { BlogCategoriesSidebar } from '@/components/blog/BlogCategoriesSidebar';
+import { BlogComments } from '@/components/blog/BlogComments';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -682,6 +683,9 @@ export const BlogPost: React.FC = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* Comments Section */}
+          <BlogComments postId={post.id} postTitle={post.title} />
 
           {/* Back to Blog */}
           <div className="mt-8 text-center">
