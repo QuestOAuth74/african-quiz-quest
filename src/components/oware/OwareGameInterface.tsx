@@ -15,7 +15,7 @@ export const OwareGameInterface = ({ gameMode, onBack }: OwareGameInterfaceProps
   const [isPaused, setIsPaused] = useState(false);
 
   const handlePitClick = (pitIndex: number) => {
-    if (gameState.gameStatus === 'playing' && !isPaused) {
+    if (gameState.gameStatus === 'playing' && !isPaused && !gameState.isThinking) {
       makeMove(pitIndex);
     }
   };

@@ -83,7 +83,7 @@ export default function Oware() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 dark:from-amber-950 dark:via-orange-950 dark:to-amber-900">
+      <div className="min-h-screen bg-gradient-to-br from-amber-900/20 via-stone-900/30 to-neutral-900/40 dark:from-amber-950 dark:via-stone-950 dark:to-neutral-950">
         <TopNavigation />
         <main className="container mx-auto px-4 py-8 pt-24">
           {renderContent()}
