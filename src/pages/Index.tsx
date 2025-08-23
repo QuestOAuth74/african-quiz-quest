@@ -24,6 +24,7 @@ import { OnlineGameInterface } from "@/components/OnlineGameInterface";
 import { QuizSection } from "@/components/QuizSection";
 import { CrosswordSection } from "@/components/CrosswordSection";
 import { WheelSection } from "@/components/WheelSection";
+import { SenetSection } from "@/components/SenetSection";
 
 interface Question {
   id: string;
@@ -703,6 +704,9 @@ const Index = () => {
 
         {/* Crossword Section - African History Puzzles */}
         <CrosswordSection />
+
+        {/* Senet Section - Ancient Egyptian Game */}
+        <SenetSection />
 
       </div>
     );
