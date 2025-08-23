@@ -774,3 +774,39 @@ All colors MUST be HSL.
     height: 3rem;
   }
 }
+
+/* Mobile throwing sticks positioning */
+@media screen and (max-width: 1023px) {
+  .senet-board-container {
+    position: relative;
+    overflow: visible;
+  }
+  
+  /* Ensure throwing sticks container is properly positioned */
+  .mobile-throwing-sticks {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 20;
+    max-width: 200px;
+  }
+  
+  /* Adjust throwing sticks size for mobile */
+  .mobile-throwing-sticks .throwing-sticks {
+    transform: scale(0.8);
+    transform-origin: bottom right;
+  }
+  
+  /* Make sure controls don't overlap with board */
+  .senet-board-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 220px;
+    height: 120px;
+    pointer-events: none;
+    background: linear-gradient(to top left, rgba(0,0,0,0.1) 0%, transparent 70%);
+    border-radius: 0.5rem;
+  }
+}
