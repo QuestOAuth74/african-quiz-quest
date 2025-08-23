@@ -154,25 +154,25 @@ export const SenetBoard = ({ gameState, onSquareClick }: SenetBoardProps) => {
         </div>
         
         {/* Egyptian-themed legend */}
-        <div className="mt-6 grid grid-cols-2 gap-6 text-sm font-medium text-yellow-900">
+        <div className="mt-6 grid grid-cols-2 gap-6 text-sm font-medium text-white">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 bg-gradient-to-br from-red-200 to-red-400 border-2 border-red-800 rounded shadow-lg"></div>
-              <span className="font-bold">𓇳 Safe Square - Protected by gods</span>
+              <span className="font-bold text-white">𓇳 Safe Square - Protected by gods</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 bg-gradient-to-br from-blue-200 to-cyan-400 border-2 border-cyan-800 rounded shadow-lg"></div>
-              <span className="font-bold">𓈖 House of Water - Return to start</span>
+              <span className="font-bold text-white">𓈖 House of Water - Return to start</span>
             </div>
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 bg-gradient-to-br from-purple-200 to-violet-400 border-2 border-purple-800 rounded shadow-lg"></div>
-              <span className="font-bold">𓊨 Sacred Houses - Roll exact</span>
+              <span className="font-bold text-white">𓊨 Sacred Houses - Roll exact</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 bg-gradient-to-br from-lime-200 to-green-400 ring-4 ring-lime-400 rounded animate-bounce shadow-lg"></div>
-              <span className="font-bold">✨ Available Move</span>
+              <span className="font-bold text-white">✨ Available Move</span>
             </div>
           </div>
         </div>
