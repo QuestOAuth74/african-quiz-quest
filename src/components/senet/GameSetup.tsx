@@ -56,7 +56,7 @@ export const GameSetup = ({ onStartGame }: GameSetupProps) => {
   ];
 
   if (gameMode === 'multiplayer') {
-    return <SenetMultiplayerLobby onBack={() => setGameMode('single')} />;
+    return <SenetMultiplayerLobby />;
   }
 
   return (

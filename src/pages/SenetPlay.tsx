@@ -15,7 +15,6 @@ import { useSenetAI } from '@/hooks/useSenetAI';
 import { useSenetAudio } from '@/hooks/useSenetAudio';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAuth } from '@/hooks/useAuth';
-import { useScreenOrientation } from '@/hooks/useScreenOrientation';
 import { cn } from '@/lib/utils';
 
 export default function SenetPlay() {
@@ -24,9 +23,6 @@ export default function SenetPlay() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
-  // Lock orientation to landscape for better mobile gameplay
-  useScreenOrientation('landscape', true);
   
   const difficulty = (searchParams.get('difficulty') as 'easy' | 'medium' | 'hard') || 'medium';
   const mode = searchParams.get('mode') || 'single';
@@ -350,7 +346,7 @@ export default function SenetPlay() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           
           {/* Game Board */}
-          <div className="lg:col-span-3 senet-board-container">
+          <div className="lg:col-span-3">
             <SenetBoard 
               gameState={gameState} 
               onSquareClick={handleSquareClick}
@@ -358,7 +354,7 @@ export default function SenetPlay() {
           </div>
 
           {/* Game Controls */}
-          <div className="space-y-4 senet-controls">
+          <div className="space-y-4">
             
             {/* Throwing Sticks */}
             <ThrowingSticks

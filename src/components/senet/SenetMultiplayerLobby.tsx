@@ -13,10 +13,9 @@ import { SenetLobbyPlayer } from '@/types/senet';
 interface SenetMultiplayerLobbyProps {
   onJoinGame?: (gameId: string) => void;
   onCreateGame?: () => void;
-  onBack?: () => void;
 }
 
-export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame, onBack }: SenetMultiplayerLobbyProps) => {
+export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultiplayerLobbyProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -194,11 +193,7 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame, onBack }: Sene
         <Button
           onClick={() => {
             console.log('Back button clicked, navigating to /senet');
-            if (onBack) {
-              onBack();
-            } else {
-              navigate('/senet');
-            }
+            navigate('/senet');
           }}
           variant="default"
           size="lg"
