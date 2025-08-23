@@ -240,6 +240,7 @@ export const useOwareGame = (
 
   // Start game
   const startGame = useCallback(() => {
+    console.log('startGame called!');
     setGameState(prev => ({
       ...prev,
       gameStatus: 'playing',

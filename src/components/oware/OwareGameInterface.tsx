@@ -108,7 +108,10 @@ export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: Ow
           <Card>
             <CardContent className="py-6">
               <p className="text-lg mb-4">Ready to play Oware?</p>
-              <Button onClick={startGame}>Start Game</Button>
+              <Button onClick={() => {
+                console.log('Start Game button clicked!');
+                startGame();
+              }}>Start Game</Button>
             </CardContent>
           </Card>
         </div>

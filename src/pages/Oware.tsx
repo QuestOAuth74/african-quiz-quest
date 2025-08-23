@@ -17,8 +17,10 @@ export default function Oware() {
   const [selectedRules, setSelectedRules] = useState<'anan-anan' | 'abapa'>('anan-anan');
 
   const handleSelectMode = (mode: 'single-player' | 'multiplayer' | 'tutorial') => {
+    console.log('handleSelectMode called with:', mode);
     if (mode === 'single-player') {
       // Navigate directly to single player game
+      console.log('Setting currentView to game');
       setCurrentView('game');
     } else {
       setCurrentView(mode);
@@ -38,6 +40,7 @@ export default function Oware() {
   };
 
   const renderContent = () => {
+    console.log('Current view:', currentView);
     switch (currentView) {
       case 'menu':
         return (
