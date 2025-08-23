@@ -204,9 +204,9 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-3">
-          <div className="text-4xl">𓋹</div>
-          <h1 className="text-3xl font-bold text-foreground">Senet Multiplayer</h1>
-          <div className="text-4xl">𓋹</div>
+          <div className="text-4xl text-amber-600 dark:text-amber-400">𓋹</div>
+          <h1 className="text-3xl font-bold text-amber-900 dark:text-amber-100">Senet Multiplayer</h1>
+          <div className="text-4xl text-amber-600 dark:text-amber-400">𓋹</div>
         </div>
         <p className="text-amber-700 dark:text-amber-200 text-lg">
           Challenge other players in the ancient Egyptian game of Senet
