@@ -22,6 +22,7 @@ import WheelOfDestiny from "./pages/WheelOfDestiny";
 import WheelPlay from "./pages/WheelPlay";
 import Senet from "./pages/Senet";
 import SenetPlay from "./pages/SenetPlay";
+import Oware from "./pages/Oware";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import ForumPost from "./pages/ForumPost";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/wheel/play/:sessionId" element={<ProtectedRoute><WheelPlay /></ProtectedRoute>} />
             <Route path="/senet" element={<Senet />} />
             <Route path="/senet/play/:gameId" element={<SenetPlay />} />
+            <Route path="/oware" element={<Oware />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/blog" element={<Blog />} />

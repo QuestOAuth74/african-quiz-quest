@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { PageTransition } from '@/components/PageTransition';
-import { TopNavigation } from '@/components/TopNavigation';
-import { Footer } from '@/components/Footer';
+import TopNavigation from '@/components/TopNavigation';
+import Footer from '@/components/Footer';
 import { OwareGameModes } from '@/components/oware/OwareGameModes';
 import { OwareMultiplayerLobby } from '@/components/oware/OwareMultiplayerLobby';
+import { OwareGameInterface } from '@/components/oware/OwareGameInterface';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 type GameView = 'menu' | 'single-player' | 'multiplayer' | 'tutorial' | 'game';
@@ -69,22 +70,10 @@ export default function Oware() {
       
       case 'game':
         return (
-          <div className="max-w-6xl mx-auto p-6">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold mb-4">
-                {currentView === 'single-player' ? 'Single Player Game' : 'Multiplayer Game'}
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                Game interface coming soon! The board and game logic are ready.
-              </p>
-              <button 
-                onClick={handleBackToMenu}
-                className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-              >
-                Back to Menu
-              </button>
-            </div>
-          </div>
+          <OwareGameInterface
+            gameMode={gameId ? 'multiplayer' : 'single-player'}
+            onBack={handleBackToMenu}
+          />
         );
       
       default:

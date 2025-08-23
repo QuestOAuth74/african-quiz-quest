@@ -1641,6 +1641,19 @@ export type Database = {
         Args: { user_email: string; user_password: string }
         Returns: string
       }
+      create_oware_game: {
+        Args: { p_game_state: Json; p_host_user_id: string }
+        Returns: {
+          created_at: string
+          game_state: Json
+          guest_user_id: string
+          host_user_id: string
+          id: string
+          status: string
+          updated_at: string
+          winner_user_id: string
+        }[]
+      }
       find_waiting_players: {
         Args: { exclude_user_id?: string }
         Returns: {
@@ -1726,6 +1739,19 @@ export type Database = {
         Args: Record<PropertyKey, never> | { user_uuid?: string }
         Returns: boolean
       }
+      join_oware_game: {
+        Args: { p_game_id: string; p_user_id: string }
+        Returns: {
+          created_at: string
+          game_state: Json
+          guest_user_id: string
+          host_user_id: string
+          id: string
+          status: string
+          updated_at: string
+          winner_user_id: string
+        }[]
+      }
       log_admin_action: {
         Args: {
           p_action_type: string
@@ -1734,6 +1760,14 @@ export type Database = {
           p_resource_type: string
         }
         Returns: string
+      }
+      make_oware_move: {
+        Args: {
+          p_game_id: string
+          p_game_state: Json
+          p_winner_user_id?: string
+        }
+        Returns: boolean
       }
       make_user_admin: {
         Args: { user_email: string }
