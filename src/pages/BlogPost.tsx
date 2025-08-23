@@ -9,6 +9,7 @@ import { BlogCategoriesSidebar } from '@/components/blog/BlogCategoriesSidebar';
 import { BlogComments } from '@/components/blog/BlogComments';
 import { useBlogData, BlogPost as BlogPostType } from '@/hooks/useBlogData';
 import { useAuth } from '@/hooks/useAuth';
+import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, Clock, Eye, ArrowLeft, Share2, Facebook, Twitter, File, LogIn, Quote, AlertCircle, CheckCircle, AlertTriangle, Info, Lightbulb, Hash } from 'lucide-react';
 import { format } from 'date-fns';
@@ -22,6 +23,8 @@ export const BlogPost: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [generatingPdfUrl, setGeneratingPdfUrl] = useState(false);
+  const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
+  const [hasTriggeredPopup, setHasTriggeredPopup] = useState(false);
   const { getPostBySlug, incrementViewCount } = useBlogData();
   const { user, isAuthenticated } = useAuth();
 
@@ -58,6 +61,25 @@ export const BlogPost: React.FC = () => {
       generatePdfUrl(post.pdf_attachment_url).then(setPdfUrl);
     }
   }, [isAuthenticated, post?.pdf_attachment_url, pdfUrl]);
+
+  // Scroll tracking for motivational popup
+  useEffect(() => {
+    const handleScroll = () => {
+      if (hasTriggeredPopup || !post) return;
+      
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercentage = (scrollTop / documentHeight) * 100;
+      
+      if (scrollPercentage >= 50) {
+        setShowMotivationalPopup(true);
+        setHasTriggeredPopup(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasTriggeredPopup, post]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -700,6 +722,12 @@ export const BlogPost: React.FC = () => {
       </main>
         </article>
       </div>
+      
+      {/* Motivational Popup */}
+      <MotivationalPopup 
+        isOpen={showMotivationalPopup}
+        onClose={() => setShowMotivationalPopup(false)}
+      />
     </SidebarProvider>
   );
 };
