@@ -1,10 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Crown, Copy, Share, Clock, Play } from 'lucide-react';
+import { Users, Crown, Copy, Share, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -19,7 +19,6 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [gameCode, setGameCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [onlinePlayers, setOnlinePlayers] = useState<SenetLobbyPlayer[]>([]);
   const [waitingGames, setWaitingGames] = useState<any[]>([]);
@@ -73,7 +72,7 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
     };
   }, [user]);
 
-  const createNewGame = async () => {
+  const challengePlayer = async (targetPlayer: SenetLobbyPlayer) => {
     if (!user) return;
 
     setIsLoading(true);
@@ -83,10 +82,10 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
         board: createInitialBoard(),
         players: [
           { id: 1, name: user.email || 'Player 1', pieces: [], isAI: false },
-          { id: 2, name: 'Waiting for opponent...', pieces: [], isAI: false }
+          { id: 2, name: targetPlayer.display_name || 'Player 2', pieces: [], isAI: false }
         ],
         currentPlayer: 1,
-        gamePhase: 'setup',
+        gamePhase: 'throwing',
         lastRoll: 0,
         availableMoves: [],
         moveHistory: [],
@@ -99,8 +98,10 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
         .from('senet_games')
         .insert({
           type: 'online_multiplayer',
-          status: 'waiting',
+          status: 'active',
           host_user_id: user.id,
+          guest_user_id: targetPlayer.user_id,
+          started_at: new Date().toISOString(),
           game_state: initialGameState
         })
         .select()
@@ -109,8 +110,8 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
       if (error) throw error;
 
       toast({
-        title: 'Game Created!',
-        description: 'Waiting for another player to join...',
+        title: 'Game Started!',
+        description: `Challenge sent to ${targetPlayer.display_name}!`,
       });
 
       navigate(`/senet/play/${data.id}?mode=multiplayer`);
@@ -118,39 +119,7 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
       console.error('Error creating game:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create game',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const joinGameByCode = async () => {
-    if (!gameCode.trim() || !user) return;
-
-    setIsLoading(true);
-    try {
-      const { data: game, error } = await supabase
-        .from('senet_games')
-        .select('*')
-        .eq('id', gameCode.trim())
-        .eq('status', 'waiting')
-        .single();
-
-      if (error) {
-        throw new Error('Game not found or no longer available');
-      }
-
-      if (game.host_user_id === user.id) {
-        throw new Error('You cannot join your own game');
-      }
-
-      await joinGame(game.id);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to join game',
+        description: 'Failed to start game',
         variant: 'destructive',
       });
     } finally {
@@ -231,89 +200,56 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Create or Join Game */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Play className="h-5 w-5" />
-              Start Playing
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button
-              onClick={createNewGame}
-              disabled={isLoading}
-              className="w-full"
-              size="lg"
-            >
-              <Crown className="h-4 w-4 mr-2" />
-              Create New Game
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or</span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Input
-                placeholder="Enter game ID..."
-                value={gameCode}
-                onChange={(e) => setGameCode(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && joinGameByCode()}
-              />
-              <Button
-                onClick={joinGameByCode}
-                disabled={!gameCode.trim() || isLoading}
-                variant="outline"
-                className="w-full"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Join Game
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Online Players */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Online Players ({onlinePlayers.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {onlinePlayers.length === 0 ? (
-                <p className="text-muted-foreground text-sm text-center py-4">
+      {/* Online Players */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Online Players ({onlinePlayers.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {onlinePlayers.length === 0 ? (
+              <div className="text-center py-8">
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground text-lg mb-2">
                   No other players online
                 </p>
-              ) : (
-                onlinePlayers.map((player) => (
-                  <div
-                    key={player.user_id}
-                    className="flex items-center justify-between p-2 rounded border"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      <span className="font-medium">{player.display_name}</span>
+                <p className="text-sm text-muted-foreground">
+                  Invite friends to play or wait for other players to join!
+                </p>
+              </div>
+            ) : (
+              onlinePlayers.map((player) => (
+                <div
+                  key={player.user_id}
+                  className="flex items-center justify-between p-3 rounded border hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                    <div>
+                      <span className="font-medium">{player.display_name || 'Anonymous Player'}</span>
+                      <div className="text-sm text-muted-foreground">
+                        Ready to play
+                      </div>
                     </div>
-                    <Badge variant="secondary" className="text-xs">
-                      Online
-                    </Badge>
                   </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                  <Button
+                    onClick={() => challengePlayer(player)}
+                    disabled={isLoading}
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    <Swords className="h-4 w-4 mr-2" />
+                    Challenge
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Available Games */}
       {waitingGames.length > 0 && (
