@@ -189,15 +189,15 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Back Button */}
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-6">
         <Button
           onClick={() => navigate('/senet')}
-          variant="ghost"
-          size="sm"
-          className="flex items-center gap-2"
+          variant="default"
+          size="lg"
+          className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Senet
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Back to Senet Main
         </Button>
       </div>
 
