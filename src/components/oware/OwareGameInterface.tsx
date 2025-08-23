@@ -16,7 +16,11 @@ export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: Ow
   const [isPaused, setIsPaused] = useState(false);
 
   const handlePitClick = (pitIndex: number) => {
-    if (gameState.gameStatus === 'playing' && !isPaused && !gameState.isThinking) {
+    if ((gameState.gameStatus === 'playing' || gameState.gameStatus === 'waiting') && !isPaused && !gameState.isThinking) {
+      if (gameState.gameStatus === 'waiting') {
+        console.log('Auto-starting game from pit click');
+        startGame();
+      }
       makeMove(pitIndex);
     }
   };
@@ -135,7 +139,7 @@ export const OwareGameInterface = ({ gameMode, rules = 'anan-anan', onBack }: Ow
         currentPlayer={gameState.currentPlayer}
         onPitClick={handlePitClick}
         selectedPit={selectedPit}
-        isGameActive={gameState.gameStatus === 'playing' && !isPaused}
+        isGameActive={(gameState.gameStatus === 'playing' || gameState.gameStatus === 'waiting') && !isPaused}
       />
 
       {/* Game Rules Card */}
