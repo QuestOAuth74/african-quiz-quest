@@ -45,14 +45,10 @@ export const useOwareMultiplayer = () => {
       };
 
       const { data, error } = await supabase
-        .from('oware_games')
-        .insert({
-          host_user_id: user.id,
-          game_state: initialGameState,
-          status: 'waiting',
-        })
-        .select()
-        .single();
+        .rpc('create_oware_game', {
+          p_host_user_id: user.id,
+          p_game_state: initialGameState
+        });
 
       if (error) throw error;
 
@@ -79,16 +75,10 @@ export const useOwareMultiplayer = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('oware_games')
-        .update({ 
-          guest_user_id: user.id, 
-          status: 'active',
-          'game_state.gameStatus': 'playing'
-        })
-        .eq('id', gameId)
-        .eq('status', 'waiting')
-        .select()
-        .single();
+        .rpc('join_oware_game', {
+          p_game_id: gameId,
+          p_user_id: user.id
+        });
 
       if (error) throw error;
 
@@ -111,16 +101,12 @@ export const useOwareMultiplayer = () => {
 
     try {
       const { error } = await supabase
-        .from('oware_games')
-        .update({ 
-          game_state: newGameState,
-          updated_at: new Date().toISOString(),
-          ...(newGameState.winner && { 
-            status: 'finished',
-            winner_user_id: newGameState.winner === 1 ? currentGame.host_user_id : currentGame.guest_user_id
-          })
-        })
-        .eq('id', currentGame.id);
+        .rpc('make_oware_move', {
+          p_game_id: currentGame.id,
+          p_game_state: newGameState,
+          p_winner_user_id: newGameState.winner === 1 ? currentGame.host_user_id : 
+                           newGameState.winner === 2 ? currentGame.guest_user_id : null
+        });
 
       if (error) throw error;
       return true;

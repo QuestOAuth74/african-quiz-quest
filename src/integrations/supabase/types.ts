@@ -888,6 +888,39 @@ export type Database = {
         }
         Relationships: []
       }
+      oware_games: {
+        Row: {
+          created_at: string
+          game_state: Json
+          guest_user_id: string | null
+          host_user_id: string
+          id: string
+          status: string
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          game_state?: Json
+          guest_user_id?: string | null
+          host_user_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          game_state?: Json
+          guest_user_id?: string | null
+          host_user_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: []
+      }
       private_messages: {
         Row: {
           content: string
