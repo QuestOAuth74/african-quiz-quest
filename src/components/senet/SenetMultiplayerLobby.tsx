@@ -187,7 +187,7 @@ export const SenetMultiplayerLobby = ({ onJoinGame, onCreateGame }: SenetMultipl
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pt-24 px-4">
       {/* Back Button */}
       <div className="flex items-center mb-6">
         <Button
