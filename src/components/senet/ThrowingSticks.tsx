@@ -48,12 +48,12 @@ export const ThrowingSticks = ({ onThrow, lastResult, disabled, currentPlayer }:
   return (
     <div className="flex flex-col items-center space-y-4 p-4 bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-950/20 dark:to-orange-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
       <div className="text-center">
-        <h3 className="font-semibold text-foreground flex items-center gap-2">
+        <h3 className="font-semibold text-black dark:text-white flex items-center gap-2">
           <span className="text-amber-600">𓊃</span>
           Throwing Sticks
           <span className="text-amber-600">𓊃</span>
         </h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-black dark:text-white">
           Cast the sacred sticks of fate
         </p>
       </div>
@@ -107,7 +107,7 @@ export const ThrowingSticks = ({ onThrow, lastResult, disabled, currentPlayer }:
       </Button>
 
       {/* Instructions */}
-      <div className="text-xs text-muted-foreground text-center max-w-64">
+      <div className="text-xs text-black dark:text-white text-center max-w-64">
         Ancient Egyptians used four two-sided sticks. The number of marked sides showing determines your move.
       </div>
     </div>
