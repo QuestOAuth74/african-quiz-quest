@@ -184,24 +184,48 @@ const Auth = () => {
   };
 
   const handleGoogleAuth = async () => {
+    console.log('🔐 Starting Google OAuth flow...');
     setIsLoading(true);
     
     try {
+      const redirectUrl = `${window.location.origin}/`;
+      console.log('🔗 Redirect URL configured as:', redirectUrl);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
         }
       });
 
       if (error) {
+        console.error('❌ Google OAuth error:', error);
+        let errorMessage = error.message;
+        
+        if (error.message.includes('popup')) {
+          errorMessage = 'Please allow popups for this site or try again.';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        }
+        
         toast({
           title: "Google Sign In Error",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
+        });
+      } else {
+        console.log('✅ Google OAuth initiated successfully');
+        toast({
+          title: "Redirecting...",
+          description: "Please complete the sign-in process in the popup window.",
         });
       }
     } catch (error) {
+      console.error('❌ Unexpected Google OAuth error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",

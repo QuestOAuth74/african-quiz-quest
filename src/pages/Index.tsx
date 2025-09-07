@@ -19,6 +19,7 @@ import { AIThinkingIndicator } from "@/components/AIThinkingIndicator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import WelcomeModal from "@/components/WelcomeModal";
+import UserAuth from "@/components/UserAuth";
 import { OnlineMultiplayerLobby } from "@/components/OnlineMultiplayerLobby";
 import { OnlineGameInterface } from "@/components/OnlineGameInterface";
 import { QuizSection } from "@/components/QuizSection";
@@ -692,6 +693,13 @@ const Index = () => {
         {/* Global Audio Controls */}
         <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50">
           <AudioControls />
+        </div>
+
+        {/* User Authentication Widget */}
+        <div className="container mx-auto px-4 pt-20 pb-8">
+          <div className="max-w-md mx-auto">
+            <UserAuth />
+          </div>
         </div>
 
         {/* Game Mode Selector */}
