@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { SenetGameState, SenetOnlineGame, SenetOnlineMove, ThrowingSticksResult } from '@/types/senet';
 import { useAuth } from './useAuth';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 export const useOnlineSenetGame = (gameId?: string) => {
   const { user } = useAuth();

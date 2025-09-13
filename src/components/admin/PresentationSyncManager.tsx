@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { GPTStatusChecker } from "./presentation/GPTStatusChecker";
 import { FileUploadArea } from "./presentation/FileUploadArea";
 import { AudioVisualization } from "./presentation/AudioVisualization";
 import { SlideTimeline } from "./presentation/SlideTimeline";
@@ -247,6 +248,106 @@ export const PresentationSyncManager = () => {
     ));
   };
 
+  // New seamless workflow state
+  const [isAutoProcessing, setIsAutoProcessing] = useState(false);
+  const [hasAudioAndSlides, setHasAudioAndSlides] = useState(false);
+
+  // Check if we have both audio and slides for auto-processing
+  useEffect(() => {
+    const shouldAutoProcess = audioUrl && slides.length > 0 && !hasAudioAndSlides;
+    if (shouldAutoProcess && !isAutoProcessing) {
+      setHasAudioAndSlides(true);
+      handleSeamlessAnalysis();
+    }
+  }, [audioUrl, slides.length]);
+
+  const handleSeamlessAnalysis = async () => {
+    if (!currentProject?.id || isAutoProcessing) return;
+
+    setIsAutoProcessing(true);
+    setIsProcessing(true);
+
+    try {
+      toast({
+        title: "🚀 Starting Seamless Processing",
+        description: "Analyzing PowerPoint and audio, then creating synchronized video...",
+      });
+
+      // Convert audio URL to base64 for API
+      const audioResponse = await fetch(audioUrl);
+      const audioBlob = await audioResponse.blob();
+      const audioBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result as string;
+          resolve(base64.split(',')[1]); // Remove data:audio/webm;base64, prefix
+        };
+        reader.readAsDataURL(audioBlob);
+      });
+
+      // Enhanced AI analysis with seamless processing
+      const { data, error } = await supabase.functions.invoke('presentation-ai-analysis', {
+        body: {
+          project_id: currentProject.id,
+          audio_data: audioBase64,
+          slides: slides,
+          analysis_type: 'seamless_workflow'
+        }
+      });
+
+      if (error) {
+        console.error('Seamless Analysis error:', error);
+        throw new Error(error.message || 'Seamless analysis failed');
+      }
+
+      // Update slides with AI analysis results
+      const analyzedSlides = slides.map((slide, index) => {
+        const analysis = data.slide_analysis?.find((a: any) => a.slide_number === index + 1);
+        if (analysis) {
+          return {
+            ...slide,
+            start_time: analysis.suggested_start_time,
+            end_time: analysis.suggested_end_time,
+            duration: analysis.suggested_end_time - analysis.suggested_start_time,
+            ai_suggestions: {
+              ...analysis.ai_suggestions,
+              content_match_score: analysis.content_match_score,
+              transcript_segment: data.segments?.find((s: any) => 
+                s.start <= analysis.suggested_start_time && s.end >= analysis.suggested_end_time
+              )?.text || '',
+              animations: data.animation_timeline?.find((a: any) => a.slide_number === index + 1)?.animations || []
+            }
+          };
+        }
+        return slide;
+      });
+      
+      setSlides(analyzedSlides);
+      setDuration(data.duration || duration);
+
+      toast({
+        title: "✅ Analysis Complete - Starting Video Export",
+        description: "Creating synchronized video with animations...",
+      });
+
+      // Auto-trigger video export
+      setTimeout(() => {
+        setShowVideoExportModal(true);
+      }, 1000);
+
+    } catch (error) {
+      console.error('Seamless processing error:', error);
+      toast({
+        title: "Processing failed",
+        description: error instanceof Error ? error.message : "Could not complete seamless processing",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAutoProcessing(false);
+      setIsProcessing(false);
+    }
+  };
+
   const handleAIAnalysis = async () => {
     if (!audioUrl || slides.length === 0) {
       toast({
@@ -403,12 +504,21 @@ export const PresentationSyncManager = () => {
         </div>
         <div className="flex gap-2">
           <Button 
+            onClick={handleSeamlessAnalysis} 
+            disabled={isAutoProcessing || !audioUrl || slides.length === 0}
+            className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+          >
+            <Zap className="h-4 w-4" />
+            {isAutoProcessing ? "🚀 Processing..." : "🎬 Create Video"}
+          </Button>
+          <Button 
             onClick={handleAIAnalysis} 
             disabled={isProcessing || !audioUrl || slides.length === 0}
+            variant="outline"
             className="gap-2"
           >
             <Zap className="h-4 w-4" />
-            {isProcessing ? "Analyzing..." : "AI Analysis"}
+            {isProcessing ? "Analyzing..." : "AI Analysis Only"}
           </Button>
           <Button onClick={handleSaveProject} disabled={!currentProject} variant="outline" className="gap-2">
             <Save className="h-4 w-4" />
@@ -418,9 +528,9 @@ export const PresentationSyncManager = () => {
             <Download className="h-4 w-4" />
             Export Data
           </Button>
-          <Button onClick={() => setShowVideoExportModal(true)} disabled={slides.length === 0} className="gap-2">
+          <Button onClick={() => setShowVideoExportModal(true)} disabled={slides.length === 0 || isAutoProcessing} className="gap-2">
             <Film className="h-4 w-4" />
-            Export Video
+            {isAutoProcessing ? "Auto-Export..." : "Manual Export"}
           </Button>
         </div>
       </div>
@@ -486,8 +596,22 @@ export const PresentationSyncManager = () => {
             <CardHeader>
               <CardTitle>File Manager</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <ProjectManager 
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4 border-l-4 border-primary">
+            <h3 className="font-semibold text-lg mb-2">🚀 Seamless Video Creation</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Upload your PowerPoint and audio files, then click <strong>"🎬 Create Video"</strong> for automatic processing:
+            </p>
+            <ul className="text-xs text-muted-foreground space-y-1">
+              <li>✅ PowerPoint slides extraction</li>
+              <li>✅ Audio transcription & analysis</li>
+              <li>✅ Automatic synchronization</li>
+              <li>✅ Animation timeline generation</li>
+              <li>✅ Video export ready</li>
+            </ul>
+          </div>
+
+          <ProjectManager
                 currentProject={currentProject}
                 onProjectChange={setCurrentProject}
               />
@@ -495,8 +619,12 @@ export const PresentationSyncManager = () => {
                 onFileUpload={handleFileUpload}
                 isProcessing={isProcessing}
               />
+              
+              <GPTStatusChecker />
             </CardContent>
           </Card>
+        </div>
+
         </div>
 
         {/* Center Panel - Timeline Editor */}
