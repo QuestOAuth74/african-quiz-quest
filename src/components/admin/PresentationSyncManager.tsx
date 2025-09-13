@@ -14,6 +14,7 @@ import { ProjectManager } from "./presentation/ProjectManager";
 import { ExportModal } from "./presentation/ExportModal";
 import { VideoPreview } from "./presentation/VideoPreview";
 import { VideoExportModal } from "./presentation/VideoExportModal";
+import { Progress } from "@/components/ui/progress";
 import { Play, Pause, Save, Download, Zap, Clock, FileText, Film } from "lucide-react";
 
 interface PresentationProject {
@@ -54,7 +55,11 @@ export const PresentationSyncManager = () => {
   const [selectedSlide, setSelectedSlide] = useState<Slide | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
-  const [showVideoExportModal, setShowVideoExportModal] = useState(false);
+const [showVideoExportModal, setShowVideoExportModal] = useState(false);
+  const [projectProgress, setProjectProgress] = useState(0);
+  const [projectStatus, setProjectStatus] = useState<'idle'|'processing'|'syncing'|'completed'|'error'|'ready'>('idle');
+  const [projectError, setProjectError] = useState<string | null>(null);
+  const [projectLog, setProjectLog] = useState<string[]>([]);
   const { toast } = useToast();
 
   const handleFileUpload = async (files: File[], type: 'powerpoint' | 'images' | 'audio' | 'document') => {
@@ -285,6 +290,47 @@ export const PresentationSyncManager = () => {
     }
   }, [audioUrl, audioStoragePath, slides.length, hasAudioAndSlides, isProcessing, isAutoProcessing]);
 
+  // Realtime project progress subscription
+  useEffect(() => {
+    if (!currentProject?.id) return;
+
+    // Fetch initial state
+    supabase
+      .from('presentation_projects')
+      .select('processing_status, processing_progress, processing_error, processing_log')
+      .eq('id', currentProject.id)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setProjectStatus((data as any).processing_status || 'idle');
+          setProjectProgress((data as any).processing_progress || 0);
+          setProjectError((data as any).processing_error || null);
+          setProjectLog(((data as any).processing_log || []) as string[]);
+        }
+      });
+
+    const channel = supabase
+      .channel(`project-progress-${currentProject.id}`)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'presentation_projects', filter: `id=eq.${currentProject.id}` }, (payload) => {
+        const d: any = payload.new;
+        setProjectStatus(d.processing_status || 'idle');
+        setProjectProgress(d.processing_progress || 0);
+        setProjectError(d.processing_error || null);
+        setProjectLog(d.processing_log || []);
+
+        if (d.processing_status === 'completed') {
+          toast({ title: 'Video sync complete', description: 'Slides synced with audio. Ready to export.' });
+        } else if (d.processing_status === 'error' && d.processing_error) {
+          toast({ title: 'Processing failed', description: d.processing_error, variant: 'destructive' });
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentProject?.id]);
+
   const handleSeamlessAnalysis = async () => {
     // Enhanced validation before processing
     if (!currentProject?.id) {
@@ -339,6 +385,12 @@ export const PresentationSyncManager = () => {
       });
 
       // Enhanced AI analysis with seamless processing (avoid large payloads)
+      // Mark project as processing before invoking the workflow
+      await supabase
+        .from('presentation_projects')
+        .update({ processing_status: 'processing', processing_progress: 10, processing_error: null, updated_at: new Date().toISOString() })
+        .eq('id', currentProject.id);
+
       const { data, error } = await supabase.functions.invoke('presentation-ai-analysis', {
         body: {
           project_id: currentProject.id,
@@ -577,7 +629,19 @@ export const PresentationSyncManager = () => {
           </Button>
         </div>
       </div>
-
+      {(projectStatus !== 'idle' || projectProgress > 0 || isAutoProcessing) && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-medium">Processing status: {projectStatus}</div>
+              <div className="text-sm text-muted-foreground">{projectProgress}%</div>
+            </div>
+            <Progress value={projectProgress} />
+            {projectError && <p className="mt-2 text-destructive text-sm">{projectError}</p>}
+          </CardContent>
+        </Card>
+      )}
+      
       {/* Project Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>

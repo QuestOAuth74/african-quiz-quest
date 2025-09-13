@@ -926,7 +926,7 @@ export type Database = {
           created_at: string
           duration: number | null
           file_name: string
-          file_url: string
+          file_url: string | null
           id: string
           processing_status: string
           project_id: string
@@ -938,7 +938,7 @@ export type Database = {
           created_at?: string
           duration?: number | null
           file_name: string
-          file_url: string
+          file_url?: string | null
           id?: string
           processing_status?: string
           project_id: string
@@ -950,7 +950,7 @@ export type Database = {
           created_at?: string
           duration?: number | null
           file_name?: string
-          file_url?: string
+          file_url?: string | null
           id?: string
           processing_status?: string
           project_id?: string
@@ -981,6 +981,10 @@ export type Database = {
           name: string
           powerpoint_file_name: string | null
           powerpoint_file_url: string | null
+          processing_error: string | null
+          processing_log: string[] | null
+          processing_progress: number | null
+          processing_status: string | null
           status: string
           total_duration: number | null
           total_slides: number
@@ -999,6 +1003,10 @@ export type Database = {
           name: string
           powerpoint_file_name?: string | null
           powerpoint_file_url?: string | null
+          processing_error?: string | null
+          processing_log?: string[] | null
+          processing_progress?: number | null
+          processing_status?: string | null
           status?: string
           total_duration?: number | null
           total_slides?: number
@@ -1017,6 +1025,10 @@ export type Database = {
           name?: string
           powerpoint_file_name?: string | null
           powerpoint_file_url?: string | null
+          processing_error?: string | null
+          processing_log?: string[] | null
+          processing_progress?: number | null
+          processing_status?: string | null
           status?: string
           total_duration?: number | null
           total_slides?: number

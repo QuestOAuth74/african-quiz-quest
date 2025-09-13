@@ -1059,7 +1059,8 @@ serve(async (req) => {
 
         console.log('✅ Seamless workflow validation passed');
 
-        console.log('Starting seamless workflow for project:', project_id);
+         await supabase.from('presentation_projects').update({ processing_status: 'processing', processing_progress: 10, updated_at: new Date().toISOString() }).eq('id', project_id);
+         console.log('Starting seamless workflow for project:', project_id);
         
         // Step 1: Transcribe audio with enhanced error handling
         let seamlessTranscriptData;
@@ -1092,11 +1093,13 @@ serve(async (req) => {
           } else {
             seamlessTranscriptData = await transcribeAudio(audio_data);
           }
+           await supabase.from('presentation_projects').update({ processing_status: 'processing', processing_progress: 30, updated_at: new Date().toISOString() }).eq('id', project_id);
           console.log('✅ Audio transcription completed');
-        } catch (transcribeError: any) {
-          console.error('❌ Audio transcription failed:', transcribeError);
-          throw new Error(`Audio transcription failed: ${transcribeError.message}`);
-        }
+         } catch (transcribeError: any) {
+           console.error('❌ Audio transcription failed:', transcribeError);
+           await supabase.from('presentation_projects').update({ processing_status: 'error', processing_error: `Audio transcription failed: ${transcribeError.message}`, processing_progress: 100, updated_at: new Date().toISOString() }).eq('id', project_id);
+           throw new Error(`Audio transcription failed: ${transcribeError.message}`);
+         }
         
         const seamlessSpeechPatterns = calculateSpeechPatterns(seamlessTranscriptData);
         
@@ -1104,16 +1107,19 @@ serve(async (req) => {
         let seamlessSlideAnalysis;
         try {
           seamlessSlideAnalysis = await analyzeSlideContent(slides, seamlessTranscriptData.text);
+           await supabase.from('presentation_projects').update({ processing_status: 'syncing', processing_progress: 60, updated_at: new Date().toISOString() }).eq('id', project_id);
           console.log('✅ Slide analysis completed');
-        } catch (analysisError) {
-          console.error('❌ Slide analysis failed:', analysisError);
-          throw new Error(`Slide analysis failed: ${analysisError.message}`);
-        }
+         } catch (analysisError) {
+           console.error('❌ Slide analysis failed:', analysisError);
+           await supabase.from('presentation_projects').update({ processing_status: 'error', processing_error: `Slide analysis failed: ${analysisError.message}`, processing_progress: 100, updated_at: new Date().toISOString() }).eq('id', project_id);
+           throw new Error(`Slide analysis failed: ${analysisError.message}`);
+         }
         
         // Step 3: Generate animation timeline
         let seamlessAnimationTimeline;
         try {
           seamlessAnimationTimeline = await generateAnimationTimeline(slides, seamlessTranscriptData.text, seamlessTranscriptData);
+           await supabase.from('presentation_projects').update({ processing_status: 'syncing', processing_progress: 80, updated_at: new Date().toISOString() }).eq('id', project_id);
           console.log('✅ Animation timeline generated');
         } catch (animationError) {
           console.error('❌ Animation generation failed:', animationError);
@@ -1160,6 +1166,7 @@ serve(async (req) => {
             }
           }
 
+           await supabase.from('presentation_projects').update({ processing_status: 'syncing', processing_progress: 90, updated_at: new Date().toISOString() }).eq('id', project_id);
           console.log('✅ Database updates completed');
         } catch (dbError) {
           console.error('❌ Database operations failed:', dbError);
@@ -1177,6 +1184,7 @@ serve(async (req) => {
           message: 'Seamless workflow completed successfully'
         };
         
+         await supabase.from('presentation_projects').update({ processing_status: 'completed', processing_progress: 100, updated_at: new Date().toISOString() }).eq('id', project_id);
         console.log('🎉 Seamless workflow completed successfully');
         break;
 
