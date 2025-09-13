@@ -47,6 +47,7 @@ export const PresentationSyncManager = () => {
   const [currentProject, setCurrentProject] = useState<PresentationProject | null>(null);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [audioUrl, setAudioUrl] = useState<string>("");
+  const [audioStoragePath, setAudioStoragePath] = useState<string>("");
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -72,7 +73,9 @@ export const PresentationSyncManager = () => {
 
         if (uploadError) throw uploadError;
 
-        // Get public URL
+        setAudioStoragePath(filePath);
+
+        // Get public URL (bucket may be private; used only for local preview)
         const { data: { publicUrl } } = supabase.storage
           .from('presentation-files')
           .getPublicUrl(filePath);
@@ -273,23 +276,12 @@ export const PresentationSyncManager = () => {
         description: "Analyzing PowerPoint and audio, then creating synchronized video...",
       });
 
-      // Convert audio URL to base64 for API
-      const audioResponse = await fetch(audioUrl);
-      const audioBlob = await audioResponse.blob();
-      const audioBase64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64 = reader.result as string;
-          resolve(base64.split(',')[1]); // Remove data:audio/webm;base64, prefix
-        };
-        reader.readAsDataURL(audioBlob);
-      });
-
-      // Enhanced AI analysis with seamless processing
+      // Enhanced AI analysis with seamless processing (avoid large payloads)
       const { data, error } = await supabase.functions.invoke('presentation-ai-analysis', {
         body: {
           project_id: currentProject.id,
-          audio_data: audioBase64,
+          audio_storage_path: audioStoragePath,
+          audio_bucket: 'presentation-files',
           slides: slides,
           analysis_type: 'seamless_workflow'
         }
@@ -369,28 +361,17 @@ export const PresentationSyncManager = () => {
 
     setIsProcessing(true);
     try {
-      // Convert audio URL to base64 for API
-      const audioResponse = await fetch(audioUrl);
-      const audioBlob = await audioResponse.blob();
-      const audioBase64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64 = reader.result as string;
-          resolve(base64.split(',')[1]); // Remove data:audio/webm;base64, prefix
-        };
-        reader.readAsDataURL(audioBlob);
-      });
-
       toast({
         title: "AI Analysis Starting",
         description: "Transcribing audio and analyzing content...",
       });
 
-      // Call the AI analysis edge function
+      // Call the AI analysis edge function without sending large audio payloads
       const { data, error } = await supabase.functions.invoke('presentation-ai-analysis', {
         body: {
           project_id: currentProject.id,
-          audio_data: audioBase64,
+          audio_storage_path: audioStoragePath,
+          audio_bucket: 'presentation-files',
           slides: slides,
           analysis_type: 'full_analysis'
         }

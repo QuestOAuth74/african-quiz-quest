@@ -568,7 +568,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({} as any));
-    const { project_id, audio_data, slides, analysis_type, powerpoint_url, powerpoint_name, topic } = body as any;
+    const { project_id, audio_data, audio_url, audio_storage_path, audio_bucket = 'presentation-files', slides, analysis_type, powerpoint_url, powerpoint_name, topic } = body as any;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
@@ -731,12 +731,48 @@ serve(async (req) => {
         if (!project_id) {
           throw new Error('Project ID is required');
         }
-        if (!audio_data) {
-          throw new Error('Audio data is required for transcription');
+        if (!audio_data && !audio_url && !audio_storage_path) {
+          throw new Error('Audio source is required for transcription');
         }
         
         console.log('Starting enhanced audio transcription with word-level timestamps...');
-        const transcriptData = await transcribeAudio(audio_data);
+        
+        // Helper to transcribe from a Blob
+        const transcribeFromBlob = async (blob: Blob) => {
+          const formData = new FormData();
+          formData.append('file', blob, 'audio');
+          formData.append('model', 'whisper-1');
+          formData.append('response_format', 'verbose_json');
+          formData.append('timestamp_granularities[]', 'word');
+          formData.append('timestamp_granularities[]', 'segment');
+          const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${openAIApiKey}` },
+            body: formData,
+          });
+          if (!response.ok) throw new Error(await response.text());
+          return await response.json();
+        };
+
+        let transcriptData: any;
+        if (audio_storage_path) {
+          console.log('Downloading audio from storage:', audio_bucket, audio_storage_path);
+          const { data: blobData, error: dlErr } = await supabase
+            .storage
+            .from(audio_bucket)
+            .download(audio_storage_path);
+          if (dlErr) throw dlErr;
+          transcriptData = await transcribeFromBlob(blobData as Blob);
+        } else if (audio_url) {
+          console.log('Fetching audio via URL');
+          const resp = await fetch(audio_url);
+          if (!resp.ok) throw new Error('Failed to fetch audio from URL');
+          const blob = await resp.blob();
+          transcriptData = await transcribeFromBlob(blob);
+        } else {
+          transcriptData = await transcribeAudio(audio_data);
+        }
+
         const speechPatterns = await calculateSpeechPatterns(transcriptData);
         
         // Enhanced waveform data with word-level timestamps
@@ -980,8 +1016,8 @@ serve(async (req) => {
 
       case 'seamless_workflow':
         if (!project_id) { throw new Error('Project ID is required'); }
-        if (!audio_data || !slides) {
-          throw new Error('Both audio data and slides are required for seamless workflow');
+        if ((!audio_data && !audio_url && !audio_storage_path) || !slides) {
+          throw new Error('Audio source and slides are required for seamless workflow');
         }
 
         console.log('Starting seamless workflow for project:', project_id);
@@ -989,9 +1025,36 @@ serve(async (req) => {
         // Step 1: Transcribe audio with enhanced error handling
         let seamlessTranscriptData;
         try {
-          seamlessTranscriptData = await transcribeAudio(audio_data);
+          if (audio_storage_path) {
+            const { data: blobData, error: dlErr } = await supabase.storage.from(audio_bucket).download(audio_storage_path);
+            if (dlErr) throw dlErr;
+            const formData = new FormData();
+            formData.append('file', blobData as Blob, 'audio');
+            formData.append('model', 'whisper-1');
+            formData.append('response_format', 'verbose_json');
+            formData.append('timestamp_granularities[]', 'word');
+            formData.append('timestamp_granularities[]', 'segment');
+            const r = await fetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { 'Authorization': `Bearer ${openAIApiKey}` }, body: formData });
+            if (!r.ok) throw new Error(await r.text());
+            seamlessTranscriptData = await r.json();
+          } else if (audio_url) {
+            const resp = await fetch(audio_url);
+            if (!resp.ok) throw new Error('Failed to fetch audio via URL');
+            const blob = await resp.blob();
+            const fd = new FormData();
+            fd.append('file', blob, 'audio');
+            fd.append('model', 'whisper-1');
+            fd.append('response_format', 'verbose_json');
+            fd.append('timestamp_granularities[]', 'word');
+            fd.append('timestamp_granularities[]', 'segment');
+            const r = await fetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { 'Authorization': `Bearer ${openAIApiKey}` }, body: fd });
+            if (!r.ok) throw new Error(await r.text());
+            seamlessTranscriptData = await r.json();
+          } else {
+            seamlessTranscriptData = await transcribeAudio(audio_data);
+          }
           console.log('✅ Audio transcription completed');
-        } catch (transcribeError) {
+        } catch (transcribeError: any) {
           console.error('❌ Audio transcription failed:', transcribeError);
           throw new Error(`Audio transcription failed: ${transcribeError.message}`);
         }
@@ -1080,12 +1143,40 @@ serve(async (req) => {
 
       case 'full_analysis':
         if (!project_id) { throw new Error('Project ID is required'); }
-        if (!audio_data || !slides) {
-          throw new Error('Both audio data and slides are required for full analysis');
+        if ((!audio_data && !audio_url && !audio_storage_path) || !slides) {
+          throw new Error('Audio source and slides are required for full analysis');
         }
 
         // Step 1: Transcribe audio
-        const fullTranscriptData = await transcribeAudio(audio_data);
+        let fullTranscriptData: any;
+        if (audio_storage_path) {
+          const { data: blobData, error: dlErr } = await supabase.storage.from(audio_bucket).download(audio_storage_path);
+          if (dlErr) throw dlErr;
+          const fd = new FormData();
+          fd.append('file', blobData as Blob, 'audio');
+          fd.append('model', 'whisper-1');
+          fd.append('response_format', 'verbose_json');
+          fd.append('timestamp_granularities[]', 'word');
+          fd.append('timestamp_granularities[]', 'segment');
+          const r = await fetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { 'Authorization': `Bearer ${openAIApiKey}` }, body: fd });
+          if (!r.ok) throw new Error(await r.text());
+          fullTranscriptData = await r.json();
+        } else if (audio_url) {
+          const resp = await fetch(audio_url);
+          if (!resp.ok) throw new Error('Failed to fetch audio via URL');
+          const blob = await resp.blob();
+          const fd = new FormData();
+          fd.append('file', blob, 'audio');
+          fd.append('model', 'whisper-1');
+          fd.append('response_format', 'verbose_json');
+          fd.append('timestamp_granularities[]', 'word');
+          fd.append('timestamp_granularities[]', 'segment');
+          const r = await fetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { 'Authorization': `Bearer ${openAIApiKey}` }, body: fd });
+          if (!r.ok) throw new Error(await r.text());
+          fullTranscriptData = await r.json();
+        } else {
+          fullTranscriptData = await transcribeAudio(audio_data);
+        }
         const fullSpeechPatterns = await calculateSpeechPatterns(fullTranscriptData);
         
         // Step 2: Analyze slides
