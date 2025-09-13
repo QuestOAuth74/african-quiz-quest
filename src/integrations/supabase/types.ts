@@ -974,6 +974,8 @@ export type Database = {
           audio_file_url: string | null
           created_at: string
           description: string | null
+          document_file_name: string | null
+          document_file_url: string | null
           export_data: Json | null
           id: string
           name: string
@@ -990,6 +992,8 @@ export type Database = {
           audio_file_url?: string | null
           created_at?: string
           description?: string | null
+          document_file_name?: string | null
+          document_file_url?: string | null
           export_data?: Json | null
           id?: string
           name: string
@@ -1006,6 +1010,8 @@ export type Database = {
           audio_file_url?: string | null
           created_at?: string
           description?: string | null
+          document_file_name?: string | null
+          document_file_url?: string | null
           export_data?: Json | null
           id?: string
           name?: string
