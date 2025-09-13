@@ -10,6 +10,7 @@ import LeaderboardPage from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AIPresentation from "./pages/AIPresentation";
 import { Blog } from "./pages/Blog";
 import { BlogPost } from "./pages/BlogPost";
 import Forum from "./pages/Forum";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/oware" element={<Oware />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/ai-presentation" element={<AIPresentation />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/about" element={<About />} />
