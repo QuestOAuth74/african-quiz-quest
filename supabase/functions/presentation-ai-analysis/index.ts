@@ -186,6 +186,85 @@ async function calculateSpeechPatterns(transcriptData: any): Promise<any> {
   }
 }
 
+// Generate animation timeline for slides
+async function generateAnimationTimeline(slides: any[], transcript: string, transcriptData: any): Promise<any[]> {
+  console.log('Generating animation timeline for slides...');
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-2025-04-14',
+        max_completion_tokens: 1500,
+        messages: [
+          {
+            role: 'system',
+            content: `You are an animation expert. Analyze the transcript and slides to create animation timelines.
+            
+            For each slide, identify:
+            1. Key words/phrases that should be highlighted when mentioned in audio
+            2. Timing for image slide-in animations
+            3. Duration and style of highlights
+            
+            Return a JSON array with this structure:
+            [
+              {
+                "slide_number": 1,
+                "animations": [
+                  {
+                    "type": "image_slide_in",
+                    "start_time": 5.2,
+                    "duration": 0.8,
+                    "direction": "right"
+                  },
+                  {
+                    "type": "keyword_highlight",
+                    "text": "important phrase",
+                    "start_time": 8.5,
+                    "duration": 2.0,
+                    "color": "#FFFF00"
+                  }
+                ]
+              }
+            ]`
+          },
+          {
+            role: 'user',
+            content: `Transcript: ${transcript.substring(0, 3000)}\n\nSlides: ${JSON.stringify(slides.map(s => ({ number: s.slide_number, title: s.title, content: s.content })))}`
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+    }
+
+    const animationContent = data.choices[0].message.content;
+    console.log('Animation timeline generated:', animationContent.substring(0, 200));
+    
+    // Parse JSON response
+    try {
+      const jsonMatch = animationContent.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+    } catch (parseError) {
+      console.error('Failed to parse animation JSON:', parseError);
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Animation timeline generation error:', error);
+    return [];
+  }
+}
+
 async function generatePowerPointSlides(slides: any[], topic?: string): Promise<string[]> {
   try {
     console.log('Starting PowerPoint slide generation...');
@@ -468,7 +547,10 @@ serve(async (req) => {
         // Step 2: Analyze slides
         const fullSlideAnalysis = await analyzeSlideContent(slides, fullTranscriptData.text);
         
-        // Step 3: Save everything to database
+        // Step 3: Generate animation timeline
+        const fullAnimationTimeline = await generateAnimationTimeline(slides, fullTranscriptData.text, fullTranscriptData);
+        
+        // Step 4: Save everything to database
         const { error: fullAudioError } = await supabase
           .from('presentation_audio')
           .upsert({
@@ -507,6 +589,7 @@ serve(async (req) => {
           duration: fullTranscriptData.duration,
           speech_patterns: fullSpeechPatterns,
           slide_analysis: fullSlideAnalysis,
+          animation_timeline: fullAnimationTimeline,
           segments: fullTranscriptData.segments || []
         };
         break;

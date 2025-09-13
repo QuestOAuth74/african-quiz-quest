@@ -55,7 +55,7 @@ export const PresentationSyncManager = () => {
   const [showVideoExportModal, setShowVideoExportModal] = useState(false);
   const { toast } = useToast();
 
-  const handleFileUpload = async (files: File[], type: 'powerpoint' | 'images' | 'audio') => {
+  const handleFileUpload = async (files: File[], type: 'powerpoint' | 'images' | 'audio' | 'document') => {
     setIsProcessing(true);
     try {
       if (type === 'audio' && files[0]) {
@@ -123,6 +123,40 @@ export const PresentationSyncManager = () => {
         toast({
           title: "Images uploaded",
           description: `Added ${files.length} image slides`,
+        });
+      } else if (type === 'document' && files[0]) {
+        const docFile = files[0];
+        
+        // Upload to storage
+        const filePath = `documents/${Date.now()}_${docFile.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('presentation-files')
+          .upload(filePath, docFile);
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('presentation-files')
+          .getPublicUrl(filePath);
+
+        // Update current project
+        if (currentProject) {
+          const { error } = await supabase
+            .from('presentation_projects')
+            .update({
+              document_file_url: publicUrl,
+              document_file_name: docFile.name,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', currentProject.id);
+
+          if (error) throw error;
+        }
+
+        toast({
+          title: "Document uploaded successfully",
+          description: "Ready to generate AI-powered slides",
         });
       }
     } catch (error) {
@@ -212,7 +246,8 @@ export const PresentationSyncManager = () => {
               content_match_score: analysis.content_match_score,
               transcript_segment: data.segments?.find((s: any) => 
                 s.start <= analysis.suggested_start_time && s.end >= analysis.suggested_end_time
-              )?.text || ''
+              )?.text || '',
+              animations: data.animation_timeline?.find((a: any) => a.slide_number === index + 1)?.animations || []
             }
           };
         }

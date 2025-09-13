@@ -221,44 +221,175 @@ export const VideoExportModal = ({
       mediaRecorder.start();
       setExportStatus("Rendering video frames...");
 
-      // Render function for slides
+      // Animation helper functions
+      const applyImageSlideIn = (animationData: any, slideProgress: number) => {
+        if (animationData.type !== 'image_slide_in') return { x: 0, opacity: 1 };
+        
+        const progress = Math.min(1, Math.max(0, slideProgress / animationData.duration));
+        const direction = animationData.direction || 'right';
+        
+        let translateX = 0;
+        if (direction === 'right') {
+          translateX = (1 - progress) * width * 0.5;
+        } else if (direction === 'left') {
+          translateX = -(1 - progress) * width * 0.5;
+        }
+        
+        return {
+          x: translateX,
+          opacity: progress
+        };
+      };
+
+      const shouldHighlightKeyword = (animationData: any, timeInSeconds: number) => {
+        if (animationData.type !== 'keyword_highlight') return false;
+        
+        const animStart = animationData.start_time;
+        const animEnd = animStart + animationData.duration;
+        
+        return timeInSeconds >= animStart && timeInSeconds <= animEnd;
+      };
+
+      // Render function for slides with animations
       const renderSlide = (slide: Slide | undefined, timeInSeconds: number) => {
-        // Clear canvas with dark background
-        ctx.fillStyle = '#0f0f0f';
+        // Clear canvas with presentation background
+        ctx.fillStyle = '#F5F5F5';
         ctx.fillRect(0, 0, width, height);
 
         if (!slide) return;
+
+        // Calculate slide-relative time
+        const slideStartTime = slide.start_time || 0;
+        const slideProgress = timeInSeconds - slideStartTime;
+        
+        // Get animations for this slide
+        const animations = slide.ai_suggestions?.animations || [];
 
         // Set text properties based on resolution
         const baseFontSize = height * 0.04;
         const titleFontSize = baseFontSize * 2;
         const contentFontSize = baseFontSize * 1.2;
-        
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
 
-        // Title
+        // Apply image slide-in animation if present
+        let imageTransform = { x: 0, opacity: 1 };
+        const imageAnimation = animations.find((a: any) => a.type === 'image_slide_in');
+        if (imageAnimation && slideProgress >= 0) {
+          imageTransform = applyImageSlideIn(imageAnimation, slideProgress);
+        }
+
+        // Save context for transformations
+        ctx.save();
+        
+        // Apply image transformation
+        ctx.globalAlpha = imageTransform.opacity;
+        ctx.translate(imageTransform.x, 0);
+
+        // Title with potential highlighting
         if (slide.title) {
-          ctx.font = `bold ${titleFontSize}px Arial`;
+          ctx.font = `bold ${titleFontSize}px Georgia`;
+          ctx.fillStyle = '#3C1518';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          
+          // Check for keyword highlighting
+          const titleHighlight = animations.find((a: any) => 
+            a.type === 'keyword_highlight' && 
+            slide.title?.toLowerCase().includes(a.text?.toLowerCase()) &&
+            shouldHighlightKeyword(a, timeInSeconds)
+          );
+          
+          if (titleHighlight) {
+            // Draw highlight background
+            const textMetrics = ctx.measureText(slide.title);
+            const highlightWidth = textMetrics.width + 20;
+            const highlightHeight = titleFontSize + 10;
+            
+            ctx.fillStyle = titleHighlight.color || '#FFFF00';
+            ctx.globalAlpha = 0.7;
+            ctx.fillRect(
+              (width / 2) - (highlightWidth / 2), 
+              (height * 0.25) - (highlightHeight / 2),
+              highlightWidth,
+              highlightHeight
+            );
+            ctx.globalAlpha = imageTransform.opacity;
+          }
+          
+          ctx.fillStyle = '#3C1518';
           ctx.fillText(slide.title, width / 2, height * 0.25);
         }
 
-        // Content
+        // Content with potential highlighting
         if (slide.content) {
-          ctx.font = `${contentFontSize}px Arial`;
+          ctx.font = `${contentFontSize}px Calibri`;
+          ctx.fillStyle = '#2D2D2A';
           const lines = slide.content.split('\n');
           const lineHeight = contentFontSize * 1.4;
           const startY = height * 0.45;
           
           lines.forEach((line, index) => {
-            ctx.fillText(line, width / 2, startY + (index * lineHeight));
+            const currentY = startY + (index * lineHeight);
+            
+            // Check for keyword highlighting in this line
+            const lineHighlight = animations.find((a: any) => 
+              a.type === 'keyword_highlight' && 
+              line.toLowerCase().includes(a.text?.toLowerCase()) &&
+              shouldHighlightKeyword(a, timeInSeconds)
+            );
+            
+            if (lineHighlight) {
+              // Find the keyword position in the line
+              const keywordIndex = line.toLowerCase().indexOf(lineHighlight.text.toLowerCase());
+              if (keywordIndex !== -1) {
+                const beforeText = line.substring(0, keywordIndex);
+                const keyword = line.substring(keywordIndex, keywordIndex + lineHighlight.text.length);
+                const afterText = line.substring(keywordIndex + lineHighlight.text.length);
+                
+                // Measure text widths
+                const beforeWidth = ctx.measureText(beforeText).width;
+                const keywordWidth = ctx.measureText(keyword).width;
+                
+                // Calculate positions
+                const lineWidth = ctx.measureText(line).width;
+                const lineStartX = (width / 2) - (lineWidth / 2);
+                const keywordStartX = lineStartX + beforeWidth;
+                
+                // Draw highlight background
+                ctx.fillStyle = lineHighlight.color || '#FFFF00';
+                ctx.globalAlpha = 0.7;
+                ctx.fillRect(
+                  keywordStartX - 5,
+                  currentY - (contentFontSize / 2) - 5,
+                  keywordWidth + 10,
+                  contentFontSize + 10
+                );
+                ctx.globalAlpha = imageTransform.opacity;
+                
+                // Draw text parts
+                ctx.fillStyle = '#2D2D2A';
+                ctx.textAlign = 'left';
+                ctx.fillText(beforeText, lineStartX, currentY);
+                ctx.fillStyle = '#000000'; // Darker for highlighted text
+                ctx.fillText(keyword, keywordStartX, currentY);
+                ctx.fillStyle = '#2D2D2A';
+                ctx.fillText(afterText, keywordStartX + keywordWidth, currentY);
+                ctx.textAlign = 'center';
+              }
+            } else {
+              // Normal text rendering
+              ctx.fillStyle = '#2D2D2A';
+              ctx.textAlign = 'center';
+              ctx.fillText(line, width / 2, currentY);
+            }
           });
         }
 
+        // Restore context
+        ctx.restore();
+
         // Slide number
-        ctx.font = `${baseFontSize}px Arial`;
-        ctx.fillStyle = '#888888';
+        ctx.font = `${baseFontSize}px Calibri`;
+        ctx.fillStyle = '#666666';
         ctx.textAlign = 'right';
         ctx.fillText(`Slide ${slide.slide_number}`, width - 40, height - 40);
 
@@ -269,25 +400,42 @@ export const VideoExportModal = ({
         const progressY = height - 80;
         
         // Background
-        ctx.fillStyle = '#333333';
+        ctx.fillStyle = '#DDDDDD';
         ctx.fillRect(progressX, progressY, progressWidth, progressHeight);
         
         // Progress
         const progress = duration > 0 ? (timeInSeconds / duration) : 0;
-        ctx.fillStyle = '#3b82f6';
+        ctx.fillStyle = '#8B5D33';
         ctx.fillRect(progressX, progressY, progressWidth * progress, progressHeight);
 
-        // AI confidence indicator (if available)
+        // AI confidence indicator and animation info (if available)
         if (slide.ai_suggestions?.content_match_score) {
           const confidence = slide.ai_suggestions.content_match_score;
           ctx.fillStyle = confidence > 0.7 ? '#10b981' : confidence > 0.4 ? '#f59e0b' : '#ef4444';
-          ctx.font = `${baseFontSize * 0.8}px Arial`;
+          ctx.font = `${baseFontSize * 0.8}px Calibri`;
           ctx.textAlign = 'left';
           ctx.fillText(
             `AI Match: ${Math.round(confidence * 100)}%`, 
             40, 
             height - 40
           );
+          
+          // Show active animations
+          const activeAnimations = animations.filter((a: any) => {
+            if (a.type === 'keyword_highlight') {
+              return shouldHighlightKeyword(a, timeInSeconds);
+            }
+            return false;
+          });
+          
+          if (activeAnimations.length > 0) {
+            ctx.fillStyle = '#FFAA00';
+            ctx.fillText(
+              `🎬 ${activeAnimations.length} active`,
+              40,
+              height - 20
+            );
+          }
         }
       };
 
