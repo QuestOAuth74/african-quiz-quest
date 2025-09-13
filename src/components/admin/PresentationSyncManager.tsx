@@ -672,6 +672,35 @@ export const PresentationSyncManager = () => {
 
         {/* Main Content - Integrated Timeline and Slide Preview */}
         <div className="xl:col-span-9">
+          {/* Video Export Section - Moved to Top */}
+          <div className="mb-6">
+            <Card className="overflow-hidden">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  Video Export Preview
+                  <Badge variant="outline">
+                    Canvas Rendering
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="overflow-hidden">
+                <div className="max-w-full overflow-hidden">
+                  <VideoPreview
+                    slides={slides}
+                    audioUrl={audioUrl}
+                    duration={duration}
+                    currentTime={currentTime}
+                    isPlaying={isPlaying}
+                    onPlayChange={setIsPlaying}
+                    onTimeUpdate={setCurrentTime}
+                    onExportVideo={(resolution) => {
+                      setShowVideoExportModal(true);
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
             {/* Timeline Editor Section */}
             <div className="min-w-0">
@@ -738,35 +767,6 @@ export const PresentationSyncManager = () => {
             </div>
           </div>
 
-          {/* Video Export Section Below */}
-          <div className="mt-6">
-            <Card className="overflow-hidden">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Video Export Preview
-                  <Badge variant="outline">
-                    Canvas Rendering
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="overflow-hidden">
-                <div className="max-w-full overflow-hidden">
-                  <VideoPreview
-                    slides={slides}
-                    audioUrl={audioUrl}
-                    duration={duration}
-                    currentTime={currentTime}
-                    isPlaying={isPlaying}
-                    onPlayChange={setIsPlaying}
-                    onTimeUpdate={setCurrentTime}
-                    onExportVideo={(resolution) => {
-                      setShowVideoExportModal(true);
-                    }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
 
