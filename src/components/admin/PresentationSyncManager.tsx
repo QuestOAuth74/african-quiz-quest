@@ -596,35 +596,35 @@ export const PresentationSyncManager = () => {
             <CardHeader>
               <CardTitle>File Manager</CardTitle>
             </CardHeader>
-        <div className="space-y-4">
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4 border-l-4 border-primary">
-            <h3 className="font-semibold text-lg mb-2">🚀 Seamless Video Creation</h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              Upload your PowerPoint and audio files, then click <strong>"🎬 Create Video"</strong> for automatic processing:
-            </p>
-            <ul className="text-xs text-muted-foreground space-y-1">
-              <li>✅ PowerPoint slides extraction</li>
-              <li>✅ Audio transcription & analysis</li>
-              <li>✅ Automatic synchronization</li>
-              <li>✅ Animation timeline generation</li>
-              <li>✅ Video export ready</li>
-            </ul>
-          </div>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4 border-l-4 border-primary">
+                  <h3 className="font-semibold text-lg mb-2">🚀 Seamless Video Creation</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Upload your PowerPoint and audio files, then click <strong>"🎬 Create Video"</strong> for automatic processing:
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>✅ PowerPoint slides extraction</li>
+                    <li>✅ Audio transcription & analysis</li>
+                    <li>✅ Automatic synchronization</li>
+                    <li>✅ Animation timeline generation</li>
+                    <li>✅ Video export ready</li>
+                  </ul>
+                </div>
 
-          <ProjectManager
-                currentProject={currentProject}
-                onProjectChange={setCurrentProject}
-              />
-              <FileUploadArea 
-                onFileUpload={handleFileUpload}
-                isProcessing={isProcessing}
-              />
-              
-              <GPTStatusChecker />
+                <ProjectManager
+                  currentProject={currentProject}
+                  onProjectChange={setCurrentProject}
+                />
+                <FileUploadArea 
+                  onFileUpload={handleFileUpload}
+                  isProcessing={isProcessing}
+                />
+                
+                <GPTStatusChecker />
+              </div>
             </CardContent>
           </Card>
-        </div>
-
         </div>
 
         {/* Center Panel - Timeline Editor */}
