@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.sitemap]
 verify_jwt = false
+
+[functions.presentation-ai-analysis]
+verify_jwt = true

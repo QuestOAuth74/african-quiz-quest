@@ -1,0 +1,363 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+// Process base64 in chunks to prevent memory issues
+function processBase64Chunks(base64String: string, chunkSize = 32768) {
+  const chunks: Uint8Array[] = [];
+  let position = 0;
+  
+  while (position < base64String.length) {
+    const chunk = base64String.slice(position, position + chunkSize);
+    const binaryChunk = atob(chunk);
+    const bytes = new Uint8Array(binaryChunk.length);
+    
+    for (let i = 0; i < binaryChunk.length; i++) {
+      bytes[i] = binaryChunk.charCodeAt(i);
+    }
+    
+    chunks.push(bytes);
+    position += chunkSize;
+  }
+
+  const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return result;
+}
+
+async function transcribeAudio(audioData: string): Promise<string> {
+  try {
+    console.log('Starting audio transcription...');
+    
+    // Process audio in chunks
+    const binaryAudio = processBase64Chunks(audioData);
+    
+    // Prepare form data
+    const formData = new FormData();
+    const blob = new Blob([binaryAudio], { type: 'audio/webm' });
+    formData.append('file', blob, 'audio.webm');
+    formData.append('model', 'whisper-1');
+    formData.append('response_format', 'verbose_json');
+    formData.append('timestamp_granularities[]', 'segment');
+
+    // Send to OpenAI Whisper API
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI Whisper API error:', errorText);
+      throw new Error(`OpenAI Whisper API error: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('Transcription completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Transcription error:', error);
+    throw error;
+  }
+}
+
+async function analyzeSlideContent(slides: any[], transcript: string): Promise<any[]> {
+  try {
+    console.log('Starting slide content analysis...');
+    
+    const prompt = `Analyze these presentation slides and audio transcript to provide intelligent synchronization suggestions.
+
+SLIDES:
+${slides.map((slide, i) => `Slide ${i + 1}: ${slide.title || 'Untitled'}\n${slide.content || 'No content'}`).join('\n\n')}
+
+AUDIO TRANSCRIPT:
+${transcript}
+
+Please provide a JSON response with:
+1. Optimal timing suggestions for each slide based on the audio content
+2. Content matching scores (0-1) between each slide and audio segments
+3. Suggested slide transitions and improvements
+4. Overall presentation flow assessment
+
+Format the response as a JSON array where each element corresponds to a slide with this structure:
+{
+  "slide_number": number,
+  "suggested_start_time": number (in seconds),
+  "suggested_end_time": number (in seconds),
+  "content_match_score": number (0-1),
+  "ai_suggestions": {
+    "timing_confidence": number (0-1),
+    "content_relevance": "high" | "medium" | "low",
+    "suggested_improvements": string[],
+    "transition_notes": string
+  }
+}`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-2025-04-14',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert presentation analyst specializing in synchronizing slides with audio content. Provide precise, actionable timing and content suggestions.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_completion_tokens: 2000,
+        response_format: { type: "json_object" }
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI GPT API error:', errorText);
+      throw new Error(`OpenAI GPT API error: ${errorText}`);
+    }
+
+    const result = await response.json();
+    const analysis = JSON.parse(result.choices[0].message.content);
+    
+    console.log('Slide content analysis completed');
+    return analysis.slides || [];
+  } catch (error) {
+    console.error('Slide analysis error:', error);
+    throw error;
+  }
+}
+
+async function calculateSpeechPatterns(transcriptData: any): Promise<any> {
+  try {
+    const segments = transcriptData.segments || [];
+    const totalDuration = transcriptData.duration || 0;
+    
+    // Calculate speech patterns
+    const speechRate = transcriptData.text.split(' ').length / (totalDuration / 60); // words per minute
+    const pauseCount = segments.filter((s: any) => s.end - s.start > 2).length; // pauses longer than 2 seconds
+    const avgSegmentLength = segments.reduce((acc: number, s: any) => acc + (s.end - s.start), 0) / segments.length;
+    
+    return {
+      speech_rate_wpm: Math.round(speechRate),
+      pause_count: pauseCount,
+      avg_segment_length: Math.round(avgSegmentLength * 100) / 100,
+      total_duration: totalDuration,
+      segments: segments.map((s: any) => ({
+        start: s.start,
+        end: s.end,
+        text: s.text,
+        confidence: s.avg_logprob || 0
+      }))
+    };
+  } catch (error) {
+    console.error('Speech pattern calculation error:', error);
+    return {
+      speech_rate_wpm: 150,
+      pause_count: 0,
+      avg_segment_length: 3,
+      total_duration: 0,
+      segments: []
+    };
+  }
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { project_id, audio_data, slides, analysis_type } = await req.json();
+
+    if (!project_id) {
+      throw new Error('Project ID is required');
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    console.log(`Starting AI analysis for project: ${project_id}, type: ${analysis_type}`);
+
+    let result: any = {};
+
+    switch (analysis_type) {
+      case 'transcribe_audio':
+        if (!audio_data) {
+          throw new Error('Audio data is required for transcription');
+        }
+        
+        const transcriptData = await transcribeAudio(audio_data);
+        const speechPatterns = await calculateSpeechPatterns(transcriptData);
+        
+        // Save transcript to database
+        const { error: audioError } = await supabase
+          .from('presentation_audio')
+          .upsert({
+            project_id,
+            transcript: transcriptData.text,
+            duration: transcriptData.duration,
+            processing_status: 'completed',
+            waveform_data: speechPatterns,
+            updated_at: new Date().toISOString()
+          });
+
+        if (audioError) {
+          console.error('Database error saving transcript:', audioError);
+          throw new Error('Failed to save transcript to database');
+        }
+
+        result = {
+          transcript: transcriptData.text,
+          duration: transcriptData.duration,
+          speech_patterns: speechPatterns,
+          segments: transcriptData.segments || []
+        };
+        break;
+
+      case 'analyze_slides':
+        if (!slides || !Array.isArray(slides)) {
+          throw new Error('Slides data is required for analysis');
+        }
+
+        // Get transcript from database
+        const { data: audioData, error: fetchError } = await supabase
+          .from('presentation_audio')
+          .select('transcript, duration')
+          .eq('project_id', project_id)
+          .single();
+
+        if (fetchError || !audioData?.transcript) {
+          throw new Error('Audio transcript not found. Please transcribe audio first.');
+        }
+
+        const slideAnalysis = await analyzeSlideContent(slides, audioData.transcript);
+        
+        // Update slides in database with AI suggestions
+        for (const analysis of slideAnalysis) {
+          const { error: slideError } = await supabase
+            .from('presentation_slides')
+            .upsert({
+              project_id,
+              slide_number: analysis.slide_number,
+              start_time: analysis.suggested_start_time,
+              end_time: analysis.suggested_end_time,
+              duration: analysis.suggested_end_time - analysis.suggested_start_time,
+              ai_suggestions: analysis.ai_suggestions,
+              updated_at: new Date().toISOString()
+            });
+
+          if (slideError) {
+            console.error('Database error saving slide analysis:', slideError);
+          }
+        }
+
+        result = {
+          slide_analysis: slideAnalysis,
+          total_duration: audioData.duration
+        };
+        break;
+
+      case 'full_analysis':
+        if (!audio_data || !slides) {
+          throw new Error('Both audio data and slides are required for full analysis');
+        }
+
+        // Step 1: Transcribe audio
+        const fullTranscriptData = await transcribeAudio(audio_data);
+        const fullSpeechPatterns = await calculateSpeechPatterns(fullTranscriptData);
+        
+        // Step 2: Analyze slides
+        const fullSlideAnalysis = await analyzeSlideContent(slides, fullTranscriptData.text);
+        
+        // Step 3: Save everything to database
+        const { error: fullAudioError } = await supabase
+          .from('presentation_audio')
+          .upsert({
+            project_id,
+            transcript: fullTranscriptData.text,
+            duration: fullTranscriptData.duration,
+            processing_status: 'completed',
+            waveform_data: fullSpeechPatterns,
+            updated_at: new Date().toISOString()
+          });
+
+        if (fullAudioError) {
+          console.error('Database error in full analysis:', fullAudioError);
+        }
+
+        for (const analysis of fullSlideAnalysis) {
+          const { error: fullSlideError } = await supabase
+            .from('presentation_slides')
+            .upsert({
+              project_id,
+              slide_number: analysis.slide_number,
+              start_time: analysis.suggested_start_time,
+              end_time: analysis.suggested_end_time,
+              duration: analysis.suggested_end_time - analysis.suggested_start_time,
+              ai_suggestions: analysis.ai_suggestions,
+              updated_at: new Date().toISOString()
+            });
+
+          if (fullSlideError) {
+            console.error('Database error in full slide analysis:', fullSlideError);
+          }
+        }
+
+        result = {
+          transcript: fullTranscriptData.text,
+          duration: fullTranscriptData.duration,
+          speech_patterns: fullSpeechPatterns,
+          slide_analysis: fullSlideAnalysis,
+          segments: fullTranscriptData.segments || []
+        };
+        break;
+
+      default:
+        throw new Error('Invalid analysis type. Use: transcribe_audio, analyze_slides, or full_analysis');
+    }
+
+    console.log(`AI analysis completed successfully for project: ${project_id}`);
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('AI analysis error:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+  }
+});

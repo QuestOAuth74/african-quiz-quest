@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Play, Pause, SkipBack, SkipForward, Volume2, FileText, Activity, Clock, Mic } from "lucide-react";
 
 interface AudioVisualizationProps {
   audioUrl: string;
@@ -10,6 +12,18 @@ interface AudioVisualizationProps {
   onPlayChange: (playing: boolean) => void;
   onTimeUpdate: (time: number) => void;
   onLoadedMetadata: (duration: number) => void;
+  transcript?: string;
+  speechPatterns?: {
+    speech_rate_wpm?: number;
+    pause_count?: number;
+    segments?: Array<{
+      start: number;
+      end: number;
+      text: string;
+      confidence?: number;
+    }>;
+  };
+  isProcessing?: boolean;
 }
 
 export const AudioVisualization = ({
@@ -17,7 +31,10 @@ export const AudioVisualization = ({
   isPlaying,
   onPlayChange,
   onTimeUpdate,
-  onLoadedMetadata
+  onLoadedMetadata,
+  transcript,
+  speechPatterns,
+  isProcessing = false
 }: AudioVisualizationProps) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -247,6 +264,129 @@ export const AudioVisualization = ({
           </div>
         </div>
       </div>
+
+      {/* AI Analysis Section */}
+      {(transcript || speechPatterns || isProcessing) && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              AI Audio Analysis
+              {isProcessing && (
+                <Badge variant="outline" className="animate-pulse">
+                  <Mic className="h-3 w-3 mr-1" />
+                  Processing
+                </Badge>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Speech Statistics */}
+            {speechPatterns && (
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                {speechPatterns.speech_rate_wpm && (
+                  <div className="text-center">
+                    <div className="font-medium">Speaking Rate</div>
+                    <div className="text-muted-foreground">
+                      {speechPatterns.speech_rate_wpm} WPM
+                    </div>
+                  </div>
+                )}
+                {speechPatterns.pause_count !== undefined && (
+                  <div className="text-center">
+                    <div className="font-medium">Pauses</div>
+                    <div className="text-muted-foreground">
+                      {speechPatterns.pause_count}
+                    </div>
+                  </div>
+                )}
+                <div className="text-center">
+                  <div className="font-medium">Duration</div>
+                  <div className="text-muted-foreground">
+                    {formatTime(duration)}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {speechPatterns && transcript && <Separator />}
+
+            {/* Transcript Section */}
+            {transcript && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span className="font-medium">Transcript</span>
+                  <Badge variant="secondary">
+                    {transcript.split(' ').length} words
+                  </Badge>
+                </div>
+                <div className="bg-muted p-4 rounded-lg max-h-40 overflow-y-auto">
+                  <p className="text-sm leading-relaxed">
+                    {transcript}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Speech Segments */}
+            {speechPatterns?.segments && speechPatterns.segments.length > 0 && (
+              <>
+                <Separator />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span className="font-medium">Speech Segments</span>
+                    <Badge variant="secondary">
+                      {speechPatterns.segments.length} segments
+                    </Badge>
+                  </div>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {speechPatterns.segments.slice(0, 5).map((segment, index) => (
+                      <div 
+                        key={index} 
+                        className="flex items-start gap-3 p-2 bg-muted rounded text-sm cursor-pointer hover:bg-muted/80"
+                        onClick={() => handleSeek(segment.start)}
+                      >
+                        <div className="text-xs text-muted-foreground min-w-16">
+                          {formatTime(segment.start)}
+                        </div>
+                        <div className="flex-1">
+                          {segment.text}
+                        </div>
+                        {segment.confidence !== undefined && (
+                          <Badge 
+                            variant="outline" 
+                            className={`text-xs ${
+                              segment.confidence > 0 ? 'border-green-500 text-green-500' : 'border-yellow-500 text-yellow-500'
+                            }`}
+                          >
+                            {Math.round(Math.abs(segment.confidence * 100))}%
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                    {speechPatterns.segments.length > 5 && (
+                      <div className="text-xs text-muted-foreground text-center py-2">
+                        ... and {speechPatterns.segments.length - 5} more segments
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {isProcessing && !transcript && (
+              <div className="text-center py-8">
+                <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-sm text-muted-foreground">
+                  Transcribing audio and analyzing speech patterns...
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

@@ -152,32 +152,91 @@ export const PresentationSyncManager = () => {
       return;
     }
 
+    if (!currentProject?.id) {
+      toast({
+        title: "No project selected",
+        description: "Please save your project first",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsProcessing(true);
     try {
-      // Mock AI analysis - in real implementation, this would call an edge function
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const analyzedSlides = slides.map((slide, index) => ({
-        ...slide,
-        start_time: (duration / slides.length) * index,
-        end_time: (duration / slides.length) * (index + 1),
-        ai_suggestions: {
-          optimal_timing: true,
-          content_match: Math.random() > 0.5 ? 'high' : 'medium',
-          suggested_adjustments: []
+      // Convert audio URL to base64 for API
+      const audioResponse = await fetch(audioUrl);
+      const audioBlob = await audioResponse.blob();
+      const audioBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result as string;
+          resolve(base64.split(',')[1]); // Remove data:audio/webm;base64, prefix
+        };
+        reader.readAsDataURL(audioBlob);
+      });
+
+      toast({
+        title: "AI Analysis Starting",
+        description: "Transcribing audio and analyzing content...",
+      });
+
+      // Call the AI analysis edge function
+      const { data, error } = await supabase.functions.invoke('presentation-ai-analysis', {
+        body: {
+          project_id: currentProject.id,
+          audio_data: audioBase64,
+          slides: slides,
+          analysis_type: 'full_analysis'
         }
-      }));
+      });
+
+      if (error) {
+        console.error('AI Analysis error:', error);
+        throw new Error(error.message || 'AI analysis failed');
+      }
+
+      // Update slides with AI analysis results
+      const analyzedSlides = slides.map((slide, index) => {
+        const analysis = data.slide_analysis?.find((a: any) => a.slide_number === index + 1);
+        if (analysis) {
+          return {
+            ...slide,
+            start_time: analysis.suggested_start_time,
+            end_time: analysis.suggested_end_time,
+            duration: analysis.suggested_end_time - analysis.suggested_start_time,
+            ai_suggestions: {
+              ...analysis.ai_suggestions,
+              content_match_score: analysis.content_match_score,
+              transcript_segment: data.segments?.find((s: any) => 
+                s.start <= analysis.suggested_start_time && s.end >= analysis.suggested_end_time
+              )?.text || ''
+            }
+          };
+        }
+        return slide;
+      });
       
       setSlides(analyzedSlides);
+      setDuration(data.duration || duration);
+
+      // Store transcript for reference
+      if (data.transcript) {
+        setCurrentProject(prev => prev ? {
+          ...prev,
+          transcript: data.transcript,
+          speech_patterns: data.speech_patterns
+        } : null);
+      }
       
       toast({
         title: "AI Analysis Complete",
-        description: "Slide timing suggestions have been generated",
+        description: `Processed ${data.transcript?.split(' ').length || 0} words and ${slides.length} slides`,
       });
     } catch (error) {
+      console.error('AI Analysis error:', error);
       toast({
         title: "Analysis failed",
-        description: "Could not complete AI analysis",
+        description: error instanceof Error ? error.message : "Could not complete AI analysis",
         variant: "destructive",
       });
     } finally {
@@ -379,11 +438,12 @@ export const PresentationSyncManager = () => {
               <CardTitle>Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              <SlidePreview
-                slide={selectedSlide}
-                currentTime={currentTime}
-                slides={slides}
-              />
+        <SlidePreview 
+          slide={selectedSlide} 
+          currentTime={currentTime} 
+          slides={slides}
+          isProcessing={isProcessing}
+        />
             </CardContent>
           </Card>
         </div>

@@ -15,9 +15,12 @@ interface Slide {
   end_time?: number;
   duration?: number;
   ai_suggestions?: {
-    optimal_timing?: boolean;
-    content_match?: 'high' | 'medium' | 'low';
-    suggested_adjustments?: string[];
+    timing_confidence?: number;
+    content_relevance?: 'high' | 'medium' | 'low';
+    suggested_improvements?: string[];
+    transition_notes?: string;
+    content_match_score?: number;
+    transcript_segment?: string;
   };
 }
 
@@ -25,9 +28,10 @@ interface SlidePreviewProps {
   slide: Slide | null;
   currentTime: number;
   slides: Slide[];
+  isProcessing?: boolean;
 }
 
-export const SlidePreview = ({ slide, currentTime, slides }: SlidePreviewProps) => {
+export const SlidePreview = ({ slide, currentTime, slides, isProcessing = false }: SlidePreviewProps) => {
   // Find currently active slide based on timeline
   const activeSlide = slides.find(s => 
     s.start_time !== undefined && 
@@ -155,33 +159,68 @@ export const SlidePreview = ({ slide, currentTime, slides }: SlidePreviewProps) 
 
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span>Timing:</span>
+                  <span>Timing Confidence:</span>
                   <Badge 
-                    variant={displaySlide.ai_suggestions.optimal_timing ? "default" : "secondary"}
+                    variant={displaySlide.ai_suggestions.timing_confidence && displaySlide.ai_suggestions.timing_confidence > 0.7 ? "default" : "secondary"}
                     className="text-xs"
                   >
-                    {displaySlide.ai_suggestions.optimal_timing ? "Optimal" : "Needs Work"}
+                    {displaySlide.ai_suggestions.timing_confidence 
+                      ? `${Math.round(displaySlide.ai_suggestions.timing_confidence * 100)}%`
+                      : "Not Analyzed"
+                    }
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Content Match:</span>
                   <Badge 
                     variant="outline" 
-                    className={cn("text-xs", getContentMatchColor(displaySlide.ai_suggestions.content_match))}
+                    className={cn("text-xs", getContentMatchColor(displaySlide.ai_suggestions.content_relevance))}
                   >
-                    {getContentMatchText(displaySlide.ai_suggestions.content_match)}
+                    {getContentMatchText(displaySlide.ai_suggestions.content_relevance)}
                   </Badge>
                 </div>
               </div>
 
-              {displaySlide.ai_suggestions.suggested_adjustments && displaySlide.ai_suggestions.suggested_adjustments.length > 0 && (
+              {/* Content Match Score */}
+              {displaySlide.ai_suggestions.content_match_score !== undefined && (
+                <div className="text-xs">
+                  <div className="flex items-center justify-between mb-1">
+                    <span>Match Score:</span>
+                    <span>{Math.round(displaySlide.ai_suggestions.content_match_score * 100)}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-1">
+                    <div 
+                      className="bg-primary h-1 rounded-full transition-all duration-300"
+                      style={{ width: `${displaySlide.ai_suggestions.content_match_score * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Transcript Segment */}
+              {displaySlide.ai_suggestions.transcript_segment && (
+                <div className="bg-muted p-2 rounded text-xs">
+                  <div className="font-medium mb-1">Matching Audio:</div>
+                  <div className="italic">"{displaySlide.ai_suggestions.transcript_segment}"</div>
+                </div>
+              )}
+
+              {/* Transition Notes */}
+              {displaySlide.ai_suggestions.transition_notes && (
+                <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-xs">
+                  <div className="font-medium mb-1">Transition Notes:</div>
+                  <div>{displaySlide.ai_suggestions.transition_notes}</div>
+                </div>
+              )}
+
+              {displaySlide.ai_suggestions.suggested_improvements && displaySlide.ai_suggestions.suggested_improvements.length > 0 && (
                 <Alert>
                   <Lightbulb className="h-4 w-4" />
                   <AlertDescription>
                     <div className="space-y-1">
                       <div className="font-medium text-sm">Suggestions:</div>
                       <ul className="list-disc list-inside text-xs space-y-1">
-                        {displaySlide.ai_suggestions.suggested_adjustments.map((suggestion, index) => (
+                        {displaySlide.ai_suggestions.suggested_improvements.map((suggestion, index) => (
                           <li key={index}>{suggestion}</li>
                         ))}
                       </ul>
