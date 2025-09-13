@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Download, 
   FileText, 
@@ -145,11 +146,41 @@ export const ExportModal = ({ isOpen, onClose, project, slides }: ExportModalPro
           break;
 
         case 'powerpoint':
-          // Placeholder for PowerPoint export
+          // Generate PowerPoint slides using AI
+          if (!project?.id) {
+            throw new Error('Project ID is required for PowerPoint generation');
+          }
+
+          // Call the edge function to generate PowerPoint slides
+          const { data: aiResponse, error: aiError } = await supabase.functions.invoke('presentation-ai-analysis', {
+            body: {
+              project_id: project.id,
+              slides: slides.map(slide => ({
+                title: slide.title,
+                content: slide.content,
+                slide_number: slide.slide_number
+              })),
+              topic: project.name,
+              analysis_type: 'generate_powerpoint'
+            }
+          });
+
+          if (aiError || !aiResponse?.generated_slides) {
+            throw new Error('Failed to generate PowerPoint slides');
+          }
+
+          // Download each slide as an HTML file
+          aiResponse.generated_slides.forEach((slideHtml: string, index: number) => {
+            downloadFile(
+              slideHtml,
+              `${project.name || 'presentation'}_slide_${index + 1}.html`,
+              'text/html'
+            );
+          });
+
           toast({
-            title: "PowerPoint export",
-            description: "PowerPoint export feature coming soon",
-            variant: "destructive",
+            title: "PowerPoint slides generated",
+            description: `${aiResponse.generated_slides.length} HTML slides have been downloaded`,
           });
           break;
       }
@@ -308,19 +339,19 @@ export const ExportModal = ({ isOpen, onClose, project, slides }: ExportModalPro
             </Card>
 
             <Card 
-              className={`cursor-pointer transition-colors opacity-50 ${exportType === 'powerpoint' ? 'border-primary' : 'hover:border-accent'}`}
+              className={`cursor-pointer transition-colors ${exportType === 'powerpoint' ? 'border-primary' : 'hover:border-accent'}`}
               onClick={() => setExportType('powerpoint')}
             >
               <CardContent className="flex items-center gap-4 pt-6">
                 <FileDown className="h-8 w-8 text-accent" />
                 <div className="flex-1">
-                  <h3 className="font-medium">PowerPoint Export</h3>
+                  <h3 className="font-medium">AI PowerPoint Generator</h3>
                   <p className="text-sm text-muted-foreground">
-                    Create a new PowerPoint file with timing notes (Coming Soon)
+                    Generate enhanced HTML slides with AI-powered content and professional styling
                   </p>
                 </div>
-                <Badge variant="secondary">
-                  Soon
+                <Badge variant={exportType === 'powerpoint' ? 'default' : 'outline'}>
+                  HTML
                 </Badge>
               </CardContent>
             </Card>

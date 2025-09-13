@@ -186,6 +186,166 @@ async function calculateSpeechPatterns(transcriptData: any): Promise<any> {
   }
 }
 
+async function generatePowerPointSlides(slides: any[], topic?: string): Promise<string[]> {
+  try {
+    console.log('Starting PowerPoint slide generation...');
+    
+    const slidePromises = slides.map(async (slide, index) => {
+      const prompt = `Generate rich, professional presentation content for this slide using the provided context:
+
+SLIDE CONTEXT:
+- Slide ${index + 1} of ${slides.length}
+- Title: ${slide.title || 'Untitled'}
+- Content: ${slide.content || 'No content provided'}
+- Topic: ${topic || 'General presentation'}
+
+Please generate enhanced content including:
+1. A compelling main title
+2. 2-3 key bullet points with highlighted terms
+3. Supporting explanatory text
+4. Suggest an appropriate image description for this slide
+5. Academic or professional citation if applicable
+
+Format your response as JSON with this structure:
+{
+  "title": "Enhanced slide title",
+  "bullet_points": [
+    "Point 1 with <highlighted terms>",
+    "Point 2 with <highlighted terms>", 
+    "Point 3 with <highlighted terms>"
+  ],
+  "explanatory_text": "Additional context and explanation",
+  "image_description": "Detailed description of appropriate image",
+  "citation": "Source or reference if applicable"
+}`;
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert presentation designer who creates engaging, professional slide content with clear structure and compelling visuals.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_completion_tokens: 800,
+          response_format: { type: "json_object" }
+        }),
+      });
+
+      if (!response.ok) {
+        console.error(`Failed to generate content for slide ${index + 1}`);
+        throw new Error(`OpenAI API error for slide ${index + 1}`);
+      }
+
+      const result = await response.json();
+      const slideContent = JSON.parse(result.choices[0].message.content);
+      
+      // Generate HTML using the specified template
+      return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${slideContent.title}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Calibri, sans-serif;
+      }
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        background: #F5F5F5;
+        color: #2D2D2A;
+        padding: 40px;
+        box-sizing: border-box;
+      }
+      h1 {
+        font-family: Georgia, serif;
+        font-size: 36px;
+        color: #3C1518;
+        margin-bottom: 20px;
+      }
+      h2 {
+        font-family: Georgia, serif;
+        font-size: 24px;
+        color: #3C1518;
+        margin-bottom: 12px;
+      }
+      .content {
+        font-size: 20px;
+        line-height: 1.5;
+      }
+      .accent {
+        color: #8B5D33;
+        font-weight: bold;
+      }
+      .citation {
+        font-size: 14px;
+        color: #666;
+        margin-top: 15px;
+      }
+      .evidence-box {
+        background: rgba(139, 93, 51, 0.1);
+        border-left: 4px solid #8B5D33;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container grid grid-cols-2 gap-8">
+      <div class="content">
+        <h1>${slideContent.title}</h1>
+        
+        <div class="evidence-box">
+          <h2>Key Points</h2>
+          <ul class="list-disc pl-6">
+            ${slideContent.bullet_points.map(point => 
+              `<li>${point.replace(/<([^>]+)>/g, '<span class="accent">$1</span>')}</li>`
+            ).join('\n            ')}
+          </ul>
+        </div>
+        
+        <p class="mb-3">${slideContent.explanatory_text}</p>
+      </div>
+      
+      <div class="flex flex-col items-center justify-center">
+        <div class="w-full h-80 bg-gray-200 rounded-lg flex items-center justify-center text-gray-600">
+          <div class="text-center">
+            <i class="fas fa-image text-4xl mb-2"></i>
+            <p class="text-sm">${slideContent.image_description}</p>
+          </div>
+        </div>
+        ${slideContent.citation ? `<p class="citation">Source: ${slideContent.citation}</p>` : ''}
+      </div>
+    </div>
+  </body>
+</html>`;
+    });
+
+    const generatedSlides = await Promise.all(slidePromises);
+    console.log(`Generated ${generatedSlides.length} PowerPoint slides`);
+    return generatedSlides;
+  } catch (error) {
+    console.error('PowerPoint generation error:', error);
+    throw error;
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -282,6 +442,20 @@ serve(async (req) => {
         };
         break;
 
+      case 'generate_powerpoint':
+        if (!slides || !Array.isArray(slides)) {
+          throw new Error('Slides data is required for PowerPoint generation');
+        }
+
+        const { topic } = await req.json();
+        const generatedSlides = await generatePowerPointSlides(slides, topic);
+        
+        result = {
+          generated_slides: generatedSlides,
+          slide_count: generatedSlides.length
+        };
+        break;
+
       case 'full_analysis':
         if (!audio_data || !slides) {
           throw new Error('Both audio data and slides are required for full analysis');
@@ -338,7 +512,7 @@ serve(async (req) => {
         break;
 
       default:
-        throw new Error('Invalid analysis type. Use: transcribe_audio, analyze_slides, or full_analysis');
+        throw new Error('Invalid analysis type. Use: transcribe_audio, analyze_slides, generate_powerpoint, or full_analysis');
     }
 
     console.log(`AI analysis completed successfully for project: ${project_id}`);
