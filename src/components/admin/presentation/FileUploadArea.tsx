@@ -194,10 +194,10 @@ export const FileUploadArea = ({ onFileUpload, isProcessing }: FileUploadAreaPro
         <AlertDescription>
           <strong>Supported Formats:</strong>
           <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
-            <li><strong>Word Documents:</strong> .docx files for AI slide generation (max 10MB)</li>
-            <li><strong>PowerPoint:</strong> .pptx files (Office 2007+)</li>
-            <li><strong>Images:</strong> .jpg, .png, .gif, .webp (max 10MB each)</li>
-            <li><strong>Audio:</strong> .mp3, .wav, .m4a, .aac (max 50MB)</li>
+            <li><strong>Word Documents:</strong> .docx files for AI slide generation (max 100MB)</li>
+            <li><strong>PowerPoint:</strong> .pptx files (Office 2007+) (max 100MB)</li>
+            <li><strong>Images:</strong> .jpg, .png, .gif, .webp (max 100MB each)</li>
+            <li><strong>Audio:</strong> .mp3, .wav, .m4a, .aac (max 100MB)</li>
           </ul>
         </AlertDescription>
       </Alert>
