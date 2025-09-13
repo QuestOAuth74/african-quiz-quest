@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Upload, File, Image, Music, AlertCircle } from "lucide-react";
+import { Upload, File, Image, Music, FileText, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FileUploadAreaProps {
-  onFileUpload: (files: File[], type: 'powerpoint' | 'images' | 'audio') => void;
+  onFileUpload: (files: File[], type: 'powerpoint' | 'images' | 'audio' | 'document') => void;
   isProcessing: boolean;
 }
 
@@ -18,6 +18,7 @@ export const FileUploadArea = ({ onFileUpload, isProcessing }: FileUploadAreaPro
   const powerpointRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLInputElement>(null);
+  const documentRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -42,6 +43,8 @@ export const FileUploadArea = ({ onFileUpload, isProcessing }: FileUploadAreaPro
 
     if (extension === 'pptx') {
       onFileUpload([file], 'powerpoint');
+    } else if (['docx', 'doc'].includes(extension || '')) {
+      onFileUpload([file], 'document');
     } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
       onFileUpload(files, 'images');
     } else if (['mp3', 'wav', 'm4a', 'aac', 'ogg'].includes(extension || '')) {
@@ -49,15 +52,16 @@ export const FileUploadArea = ({ onFileUpload, isProcessing }: FileUploadAreaPro
     }
   };
 
-  const handleFileSelect = (type: 'powerpoint' | 'images' | 'audio') => {
+  const handleFileSelect = (type: 'powerpoint' | 'images' | 'audio' | 'document') => {
     const input = type === 'powerpoint' ? powerpointRef.current 
                  : type === 'images' ? imageRef.current 
-                 : audioRef.current;
+                 : type === 'audio' ? audioRef.current
+                 : documentRef.current;
                  
     input?.click();
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'powerpoint' | 'images' | 'audio') => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'powerpoint' | 'images' | 'audio' | 'document') => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
       onFileUpload(files, type);
@@ -82,13 +86,26 @@ export const FileUploadArea = ({ onFileUpload, isProcessing }: FileUploadAreaPro
           <Upload className="h-8 w-8 text-muted-foreground mb-2" />
           <p className="text-sm font-medium mb-1">Drop files here</p>
           <p className="text-xs text-muted-foreground text-center">
-            PowerPoint (.pptx), Images (jpg, png, gif), Audio (mp3, wav, m4a)
+            Word (.docx), PowerPoint (.pptx), Images (jpg, png, gif), Audio (mp3, wav, m4a)
           </p>
         </CardContent>
       </Card>
 
       {/* File Type Buttons */}
       <div className="grid grid-cols-1 gap-3">
+        <Button
+          variant="outline"
+          onClick={() => handleFileSelect('document')}
+          disabled={isProcessing}
+          className="w-full justify-start gap-2 h-auto p-3"
+        >
+          <FileText className="h-4 w-4" />
+          <div className="text-left">
+            <div className="font-medium">Word Document Outline</div>
+            <div className="text-xs text-muted-foreground">.docx files for AI slide generation</div>
+          </div>
+        </Button>
+
         <Button
           variant="outline"
           onClick={() => handleFileSelect('powerpoint')}
@@ -131,6 +148,13 @@ export const FileUploadArea = ({ onFileUpload, isProcessing }: FileUploadAreaPro
 
       {/* Hidden File Inputs */}
       <input
+        ref={documentRef}
+        type="file"
+        accept=".docx,.doc"
+        onChange={(e) => handleInputChange(e, 'document')}
+        className="hidden"
+      />
+      <input
         ref={powerpointRef}
         type="file"
         accept=".pptx"
@@ -170,6 +194,7 @@ export const FileUploadArea = ({ onFileUpload, isProcessing }: FileUploadAreaPro
         <AlertDescription>
           <strong>Supported Formats:</strong>
           <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
+            <li><strong>Word Documents:</strong> .docx files for AI slide generation (max 10MB)</li>
             <li><strong>PowerPoint:</strong> .pptx files (Office 2007+)</li>
             <li><strong>Images:</strong> .jpg, .png, .gif, .webp (max 10MB each)</li>
             <li><strong>Audio:</strong> .mp3, .wav, .m4a, .aac (max 50MB)</li>
