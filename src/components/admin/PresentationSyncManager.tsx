@@ -11,7 +11,9 @@ import { SlideTimeline } from "./presentation/SlideTimeline";
 import { SlidePreview } from "./presentation/SlidePreview";
 import { ProjectManager } from "./presentation/ProjectManager";
 import { ExportModal } from "./presentation/ExportModal";
-import { Play, Pause, Save, Download, Zap, Clock, FileText } from "lucide-react";
+import { VideoPreview } from "./presentation/VideoPreview";
+import { VideoExportModal } from "./presentation/VideoExportModal";
+import { Play, Pause, Save, Download, Zap, Clock, FileText, Film } from "lucide-react";
 
 interface PresentationProject {
   id: string;
@@ -50,6 +52,7 @@ export const PresentationSyncManager = () => {
   const [selectedSlide, setSelectedSlide] = useState<Slide | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showVideoExportModal, setShowVideoExportModal] = useState(false);
   const { toast } = useToast();
 
   const handleFileUpload = async (files: File[], type: 'powerpoint' | 'images' | 'audio') => {
@@ -308,9 +311,13 @@ export const PresentationSyncManager = () => {
             <Save className="h-4 w-4" />
             Save Project
           </Button>
-          <Button onClick={() => setShowExportModal(true)} disabled={slides.length === 0} className="gap-2">
+          <Button onClick={() => setShowExportModal(true)} disabled={slides.length === 0} variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
-            Export
+            Export Data
+          </Button>
+          <Button onClick={() => setShowVideoExportModal(true)} disabled={slides.length === 0} className="gap-2">
+            <Film className="h-4 w-4" />
+            Export Video
           </Button>
         </div>
       </div>
@@ -368,10 +375,10 @@ export const PresentationSyncManager = () => {
         </Card>
       </div>
 
-      {/* Three-panel layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px]">
+      {/* Four-panel layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-16 lg:grid-cols-12 gap-6 min-h-[600px]">
         {/* Left Panel - File Manager */}
-        <div className="lg:col-span-3">
+        <div className="xl:col-span-3 lg:col-span-3">
           <Card className="h-full">
             <CardHeader>
               <CardTitle>File Manager</CardTitle>
@@ -390,7 +397,7 @@ export const PresentationSyncManager = () => {
         </div>
 
         {/* Center Panel - Timeline Editor */}
-        <div className="lg:col-span-6">
+        <div className="xl:col-span-5 lg:col-span-6">
           <Card className="h-full">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -431,22 +438,54 @@ export const PresentationSyncManager = () => {
           </Card>
         </div>
 
-        {/* Right Panel - Preview */}
-        <div className="lg:col-span-3">
+        {/* Right Panel - Slide Preview */}
+        <div className="xl:col-span-3 lg:col-span-3">
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Preview</CardTitle>
+              <CardTitle>Slide Preview</CardTitle>
             </CardHeader>
             <CardContent>
-        <SlidePreview 
-          slide={selectedSlide} 
-          currentTime={currentTime} 
-          slides={slides}
-          isProcessing={isProcessing}
-        />
+              <SlidePreview 
+                slide={selectedSlide} 
+                currentTime={currentTime} 
+                slides={slides}
+                isProcessing={isProcessing}
+              />
             </CardContent>
           </Card>
         </div>
+
+        {/* Video Preview Panel (visible on XL screens) */}
+        <div className="xl:col-span-5 hidden xl:block">
+          <VideoPreview
+            slides={slides}
+            audioUrl={audioUrl}
+            duration={duration}
+            currentTime={currentTime}
+            isPlaying={isPlaying}
+            onPlayChange={setIsPlaying}
+            onTimeUpdate={setCurrentTime}
+            onExportVideo={(resolution) => {
+              setShowVideoExportModal(true);
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Mobile/Medium Screen Video Preview */}
+      <div className="xl:hidden">
+        <VideoPreview
+          slides={slides}
+          audioUrl={audioUrl}
+          duration={duration}
+          currentTime={currentTime}
+          isPlaying={isPlaying}
+          onPlayChange={setIsPlaying}
+          onTimeUpdate={setCurrentTime}
+          onExportVideo={(resolution) => {
+            setShowVideoExportModal(true);
+          }}
+        />
       </div>
 
       <ExportModal
@@ -454,6 +493,15 @@ export const PresentationSyncManager = () => {
         onClose={() => setShowExportModal(false)}
         project={currentProject}
         slides={slides}
+      />
+
+      <VideoExportModal
+        isOpen={showVideoExportModal}
+        onClose={() => setShowVideoExportModal(false)}
+        project={currentProject}
+        slides={slides}
+        audioUrl={audioUrl}
+        duration={duration}
       />
     </div>
   );
