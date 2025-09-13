@@ -921,6 +921,157 @@ export type Database = {
         }
         Relationships: []
       }
+      presentation_audio: {
+        Row: {
+          created_at: string
+          duration: number | null
+          file_name: string
+          file_url: string
+          id: string
+          processing_status: string
+          project_id: string
+          transcript: string | null
+          updated_at: string
+          waveform_data: Json | null
+        }
+        Insert: {
+          created_at?: string
+          duration?: number | null
+          file_name: string
+          file_url: string
+          id?: string
+          processing_status?: string
+          project_id: string
+          transcript?: string | null
+          updated_at?: string
+          waveform_data?: Json | null
+        }
+        Update: {
+          created_at?: string
+          duration?: number | null
+          file_name?: string
+          file_url?: string
+          id?: string
+          processing_status?: string
+          project_id?: string
+          transcript?: string | null
+          updated_at?: string
+          waveform_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presentation_audio_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "presentation_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      presentation_projects: {
+        Row: {
+          audio_file_name: string | null
+          audio_file_url: string | null
+          created_at: string
+          description: string | null
+          export_data: Json | null
+          id: string
+          name: string
+          powerpoint_file_name: string | null
+          powerpoint_file_url: string | null
+          status: string
+          total_duration: number | null
+          total_slides: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_file_name?: string | null
+          audio_file_url?: string | null
+          created_at?: string
+          description?: string | null
+          export_data?: Json | null
+          id?: string
+          name: string
+          powerpoint_file_name?: string | null
+          powerpoint_file_url?: string | null
+          status?: string
+          total_duration?: number | null
+          total_slides?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_file_name?: string | null
+          audio_file_url?: string | null
+          created_at?: string
+          description?: string | null
+          export_data?: Json | null
+          id?: string
+          name?: string
+          powerpoint_file_name?: string | null
+          powerpoint_file_url?: string | null
+          status?: string
+          total_duration?: number | null
+          total_slides?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      presentation_slides: {
+        Row: {
+          ai_suggestions: Json | null
+          content: string | null
+          created_at: string
+          duration: number | null
+          end_time: number | null
+          id: string
+          image_url: string | null
+          project_id: string
+          slide_number: number
+          start_time: number | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_suggestions?: Json | null
+          content?: string | null
+          created_at?: string
+          duration?: number | null
+          end_time?: number | null
+          id?: string
+          image_url?: string | null
+          project_id: string
+          slide_number: number
+          start_time?: number | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_suggestions?: Json | null
+          content?: string | null
+          created_at?: string
+          duration?: number | null
+          end_time?: number | null
+          id?: string
+          image_url?: string | null
+          project_id?: string
+          slide_number?: number
+          start_time?: number | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presentation_slides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "presentation_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       private_messages: {
         Row: {
           content: string

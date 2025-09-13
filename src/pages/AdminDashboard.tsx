@@ -15,7 +15,8 @@ import FlaggedQuestionsManager from "@/components/admin/FlaggedQuestionsManager"
 import UserManager from "@/components/admin/UserManager";
 import { SecurityMonitor } from "@/components/admin/SecurityMonitor";
 import { CrosswordAdminPanel } from "@/components/admin/CrosswordAdminPanel";
-import { LogOut, Users, FileQuestion, FolderOpen, Upload, AlertTriangle, UserCheck, Activity, Shield, Puzzle } from "lucide-react";
+import { PresentationSyncManager } from "@/components/admin/PresentationSyncManager";
+import { LogOut, Users, FileQuestion, FolderOpen, Upload, AlertTriangle, UserCheck, Activity, Shield, Puzzle, Play } from "lucide-react";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
@@ -190,7 +191,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="questions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9 bg-card">
+          <TabsList className="grid w-full grid-cols-10 bg-card">
             <TabsTrigger value="questions" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Questions
             </TabsTrigger>
@@ -222,6 +223,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="crossword" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               <Puzzle className="h-4 w-4 mr-2" />
               Crossword
+            </TabsTrigger>
+            <TabsTrigger value="presentation" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              <Play className="h-4 w-4 mr-2" />
+              AI Presentation
             </TabsTrigger>
           </TabsList>
           
@@ -259,6 +264,10 @@ const AdminDashboard = () => {
           
           <TabsContent value="crossword">
             <CrosswordAdminPanel />
+          </TabsContent>
+          
+          <TabsContent value="presentation">
+            <PresentationSyncManager />
           </TabsContent>
         </Tabs>
       </div>
