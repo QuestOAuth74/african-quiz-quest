@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import { Film, Download, Monitor, Tv, Clock, HardDrive } from "lucide-react";
+import { Film, Download, Monitor, Tv, Clock, Files } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Slide {
@@ -364,7 +364,7 @@ export const VideoExportModal = ({
               <CardContent className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-2">
-                    <HardDrive className="h-4 w-4" />
+                    <Files className="h-4 w-4" />
                     Slides: {slides.length}
                   </span>
                   <span className="flex items-center gap-2">
