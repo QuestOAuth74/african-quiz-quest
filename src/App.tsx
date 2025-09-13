@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -32,6 +32,43 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  const location = useLocation();
+  const hideFooterRoutes = ['/admin/ai-presentation'];
+  
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
+        <Route path="/forum/:postId" element={<ProtectedRoute><ForumPost /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
+        <Route path="/quiz-setup" element={<ProtectedRoute><QuizSetup /></ProtectedRoute>} />
+        <Route path="/crossword" element={<ProtectedRoute><Crossword /></ProtectedRoute>} />
+        <Route path="/crossword/play/:puzzleId" element={<ProtectedRoute><CrosswordPlay /></ProtectedRoute>} />
+        <Route path="/wheel" element={<ProtectedRoute><WheelOfDestiny /></ProtectedRoute>} />
+        <Route path="/wheel/play/:sessionId" element={<ProtectedRoute><WheelPlay /></ProtectedRoute>} />
+        <Route path="/senet" element={<Senet />} />
+        <Route path="/senet/play/:gameId" element={<SenetPlay />} />
+        <Route path="/oware" element={<Oware />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/ai-presentation" element={<AIPresentation />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/privacy" element={<Privacy />} />
+        {/* Catch-all route must be last */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {!hideFooterRoutes.includes(location.pathname) && <Footer />}
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
@@ -40,33 +77,7 @@ const App = () => (
         <Sonner />
         <div className="min-h-screen flex flex-col transition-colors duration-500">
           <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/leaderboard" element={<LeaderboardPage />} />
-            <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
-            <Route path="/forum/:postId" element={<ProtectedRoute><ForumPost /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
-            <Route path="/quiz-setup" element={<ProtectedRoute><QuizSetup /></ProtectedRoute>} />
-            <Route path="/crossword" element={<ProtectedRoute><Crossword /></ProtectedRoute>} />
-            <Route path="/crossword/play/:puzzleId" element={<ProtectedRoute><CrosswordPlay /></ProtectedRoute>} />
-            <Route path="/wheel" element={<ProtectedRoute><WheelOfDestiny /></ProtectedRoute>} />
-            <Route path="/wheel/play/:sessionId" element={<ProtectedRoute><WheelPlay /></ProtectedRoute>} />
-            <Route path="/senet" element={<Senet />} />
-            <Route path="/senet/play/:gameId" element={<SenetPlay />} />
-            <Route path="/oware" element={<Oware />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/ai-presentation" element={<AIPresentation />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
-            {/* Catch-all route must be last */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-            <Footer />
+            <AppContent />
           </BrowserRouter>
         </div>
       </TooltipProvider>
