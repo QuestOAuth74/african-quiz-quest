@@ -740,7 +740,7 @@ export const PresentationSyncManager = () => {
 
           {/* Video Export Section Below */}
           <div className="mt-6">
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   Video Export Preview
@@ -749,19 +749,21 @@ export const PresentationSyncManager = () => {
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <VideoPreview
-                  slides={slides}
-                  audioUrl={audioUrl}
-                  duration={duration}
-                  currentTime={currentTime}
-                  isPlaying={isPlaying}
-                  onPlayChange={setIsPlaying}
-                  onTimeUpdate={setCurrentTime}
-                  onExportVideo={(resolution) => {
-                    setShowVideoExportModal(true);
-                  }}
-                />
+              <CardContent className="overflow-hidden">
+                <div className="max-w-full overflow-hidden">
+                  <VideoPreview
+                    slides={slides}
+                    audioUrl={audioUrl}
+                    duration={duration}
+                    currentTime={currentTime}
+                    isPlaying={isPlaying}
+                    onPlayChange={setIsPlaying}
+                    onTimeUpdate={setCurrentTime}
+                    onExportVideo={(resolution) => {
+                      setShowVideoExportModal(true);
+                    }}
+                  />
+                </div>
               </CardContent>
             </Card>
           </div>

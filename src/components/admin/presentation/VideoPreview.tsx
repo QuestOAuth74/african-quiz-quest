@@ -302,7 +302,7 @@ export const VideoPreview = ({
   const currentSlide = getCurrentSlide();
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-full overflow-hidden">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -314,16 +314,18 @@ export const VideoPreview = ({
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 overflow-hidden max-w-full">
         {/* Canvas for video rendering */}
-        <div className="relative bg-gray-900 rounded-lg overflow-hidden">
-          <canvas
-            ref={canvasRef}
-            width={640}
-            height={360}
-            className="w-full h-auto"
-            style={{ aspectRatio: '16/9' }}
-          />
+        <div className="relative bg-gray-900 rounded-lg overflow-hidden max-w-full">
+          <div className="w-full max-w-full" style={{ aspectRatio: '16/9' }}>
+            <canvas
+              ref={canvasRef}
+              width={640}
+              height={360}
+              className="w-full h-full object-contain max-w-full max-h-full"
+              style={{ display: 'block' }}
+            />
+          </div>
           
           {/* Audio element */}
           {audioUrl && (
