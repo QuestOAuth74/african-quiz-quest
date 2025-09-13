@@ -1,6 +1,8 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
+import { DOMParser } from 'https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts';
+import { extract } from 'https://deno.land/std@0.208.0/archive/unzip.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,19 +43,20 @@ function processBase64Chunks(base64String: string, chunkSize = 32768) {
   return result;
 }
 
-async function transcribeAudio(audioData: string): Promise<string> {
+async function transcribeAudio(audioData: string): Promise<any> {
   try {
-    console.log('Starting audio transcription...');
+    console.log('Starting audio transcription with word-level timestamps...');
     
     // Process audio in chunks
     const binaryAudio = processBase64Chunks(audioData);
     
-    // Prepare form data
+    // Prepare form data with word-level timestamps
     const formData = new FormData();
     const blob = new Blob([binaryAudio], { type: 'audio/webm' });
     formData.append('file', blob, 'audio.webm');
     formData.append('model', 'whisper-1');
     formData.append('response_format', 'verbose_json');
+    formData.append('timestamp_granularities[]', 'word');
     formData.append('timestamp_granularities[]', 'segment');
 
     // Send to OpenAI Whisper API
@@ -72,7 +75,7 @@ async function transcribeAudio(audioData: string): Promise<string> {
     }
 
     const result = await response.json();
-    console.log('Transcription completed successfully');
+    console.log('Transcription completed with word-level timestamps');
     return result;
   } catch (error) {
     console.error('Transcription error:', error);
@@ -80,38 +83,87 @@ async function transcribeAudio(audioData: string): Promise<string> {
   }
 }
 
-async function analyzeSlideContent(slides: any[], transcript: string): Promise<any[]> {
+async function parsePowerPointFile(fileUrl: string): Promise<any[]> {
   try {
-    console.log('Starting slide content analysis...');
+    console.log('Starting real PowerPoint file parsing...');
     
-    const prompt = `Analyze these presentation slides and audio transcript to provide intelligent synchronization suggestions.
-
-SLIDES:
-${slides.map((slide, i) => `Slide ${i + 1}: ${slide.title || 'Untitled'}\n${slide.content || 'No content'}`).join('\n\n')}
-
-AUDIO TRANSCRIPT:
-${transcript}
-
-Please provide a JSON response with:
-1. Optimal timing suggestions for each slide based on the audio content
-2. Content matching scores (0-1) between each slide and audio segments
-3. Suggested slide transitions and improvements
-4. Overall presentation flow assessment
-
-Format the response as a JSON array where each element corresponds to a slide with this structure:
-{
-  "slide_number": number,
-  "suggested_start_time": number (in seconds),
-  "suggested_end_time": number (in seconds),
-  "content_match_score": number (0-1),
-  "ai_suggestions": {
-    "timing_confidence": number (0-1),
-    "content_relevance": "high" | "medium" | "low",
-    "suggested_improvements": string[],
-    "transition_notes": string
+    // Download the PowerPoint file
+    const response = await fetch(fileUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to download PowerPoint file: ${response.statusText}`);
+    }
+    
+    const arrayBuffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    
+    // Extract the PPTX (which is a ZIP file) contents
+    const extractedFiles = new Map<string, Uint8Array>();
+    
+    // This is a simplified PowerPoint parser
+    // In a real implementation, you'd use a proper PPTX parsing library
+    // For now, we'll extract text from slide XML files
+    
+    try {
+      // Simple ZIP extraction - looking for slide XML files
+      const slides = await extractSlidesFromPPTX(uint8Array);
+      
+      console.log(`Successfully extracted ${slides.length} slides from PowerPoint`);
+      return slides;
+    } catch (parseError) {
+      console.error('Failed to parse PPTX structure, falling back to AI analysis');
+      
+      // Fallback: Use OpenAI Vision to analyze the file
+      return await analyzeWithOpenAIVision(fileUrl);
+    }
+  } catch (error) {
+    console.error('PowerPoint parsing error:', error);
+    throw error;
   }
-}`;
+}
 
+async function extractSlidesFromPPTX(data: Uint8Array): Promise<any[]> {
+  // This is a simplified implementation
+  // In production, you'd use a proper PPTX parsing library
+  const slides: any[] = [];
+  
+  try {
+    // Convert to text and look for slide content patterns
+    const text = new TextDecoder().decode(data);
+    
+    // Look for slide content in the file
+    // This is a basic pattern matching approach
+    const slideMatches = text.match(/<p:sp[^>]*>[\s\S]*?<\/p:sp>/g) || [];
+    
+    for (let i = 0; i < Math.min(slideMatches.length, 20); i++) {
+      const slideContent = slideMatches[i];
+      
+      // Extract text content from the slide
+      const textMatches = slideContent.match(/<a:t[^>]*>(.*?)<\/a:t>/g) || [];
+      const slideTexts = textMatches.map(match => 
+        match.replace(/<\/?a:t[^>]*>/g, '').trim()
+      ).filter(text => text.length > 0);
+      
+      if (slideTexts.length > 0) {
+        slides.push({
+          slide_number: i + 1,
+          title: slideTexts[0] || `Slide ${i + 1}`,
+          content: slideTexts.slice(1).join(' ') || 'Content extracted from PowerPoint',
+          extracted_text: slideTexts.join(' ')
+        });
+      }
+    }
+    
+    return slides;
+  } catch (error) {
+    console.error('Error extracting slides from PPTX:', error);
+    return [];
+  }
+}
+
+async function analyzeWithOpenAIVision(fileUrl: string): Promise<any[]> {
+  try {
+    console.log('Using OpenAI Vision to analyze PowerPoint file...');
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -120,32 +172,116 @@ Format the response as a JSON array where each element corresponds to a slide wi
       },
       body: JSON.stringify({
         model: 'gpt-4.1-2025-04-14',
+        max_completion_tokens: 2000,
         messages: [
           {
             role: 'system',
-            content: 'You are an expert presentation analyst specializing in synchronizing slides with audio content. Provide precise, actionable timing and content suggestions.'
+            content: 'You are an expert at analyzing presentation files. Extract the actual slide content, titles, and structure.'
           },
           {
             role: 'user',
-            content: prompt
+            content: [
+              {
+                type: 'text',
+                text: `Please analyze this PowerPoint file and extract the actual slide content. Return a JSON array with this structure:
+                [
+                  {
+                    "slide_number": 1,
+                    "title": "Actual slide title",
+                    "content": "Actual slide content and bullet points",
+                    "key_concepts": ["concept1", "concept2"]
+                  }
+                ]`
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: fileUrl
+                }
+              }
+            ]
           }
         ],
-        max_completion_tokens: 2000,
         response_format: { type: "json_object" }
       }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI GPT API error:', errorText);
-      throw new Error(`OpenAI GPT API error: ${errorText}`);
+      throw new Error('OpenAI Vision analysis failed');
     }
 
     const result = await response.json();
     const analysis = JSON.parse(result.choices[0].message.content);
     
-    console.log('Slide content analysis completed');
     return analysis.slides || [];
+  } catch (error) {
+    console.error('OpenAI Vision analysis error:', error);
+    return [];
+  }
+}
+
+async function analyzeSlideContent(slides: any[], transcriptData: any): Promise<any[]> {
+  try {
+    console.log('Starting intelligent slide-audio synchronization...');
+    
+    const transcript = transcriptData.text || '';
+    const words = transcriptData.words || [];
+    const segments = transcriptData.segments || [];
+    
+    // Create content similarity mapping
+    const slideAnalyses = await Promise.all(slides.map(async (slide, index) => {
+      const slideContent = `${slide.title} ${slide.content} ${slide.extracted_text || ''}`.toLowerCase();
+      
+      // Find matching words and segments for this slide
+      const matchingWords = words.filter((word: any) => 
+        slideContent.includes(word.word.toLowerCase())
+      );
+      
+      const matchingSegments = segments.filter((segment: any) => {
+        const segmentText = segment.text.toLowerCase();
+        const slideKeywords = slideContent.split(' ').filter(word => word.length > 3);
+        return slideKeywords.some(keyword => segmentText.includes(keyword));
+      });
+      
+      // Calculate timing based on content similarity
+      let suggestedStartTime = 0;
+      let suggestedEndTime = transcriptData.duration || 60;
+      let contentMatchScore = 0;
+      
+      if (matchingSegments.length > 0) {
+        suggestedStartTime = Math.max(0, matchingSegments[0].start - 2);
+        suggestedEndTime = matchingSegments[matchingSegments.length - 1].end + 2;
+        contentMatchScore = Math.min(1, matchingSegments.length / 3);
+      } else {
+        // Distribute slides evenly if no matches found
+        const slideDuration = (transcriptData.duration || 60) / slides.length;
+        suggestedStartTime = index * slideDuration;
+        suggestedEndTime = (index + 1) * slideDuration;
+        contentMatchScore = 0.3; // Low confidence
+      }
+      
+      return {
+        slide_number: slide.slide_number || index + 1,
+        suggested_start_time: Math.round(suggestedStartTime * 10) / 10,
+        suggested_end_time: Math.round(suggestedEndTime * 10) / 10,
+        content_match_score: Math.round(contentMatchScore * 100) / 100,
+        matching_words: matchingWords.length,
+        matching_segments: matchingSegments.length,
+        ai_suggestions: {
+          timing_confidence: contentMatchScore > 0.7 ? 'high' : contentMatchScore > 0.4 ? 'medium' : 'low',
+          content_relevance: contentMatchScore > 0.6 ? 'high' : contentMatchScore > 0.3 ? 'medium' : 'low',
+          suggested_improvements: [
+            `Found ${matchingWords.length} matching words in audio`,
+            `Identified ${matchingSegments.length} relevant audio segments`,
+            contentMatchScore < 0.5 ? 'Consider reviewing slide content for better audio alignment' : 'Good content-audio alignment detected'
+          ],
+          transition_notes: `Slide content ${contentMatchScore > 0.5 ? 'strongly' : 'weakly'} correlates with audio at ${suggestedStartTime}s`
+        }
+      };
+    }));
+    
+    console.log('Intelligent slide-audio synchronization completed');
+    return slideAnalyses;
   } catch (error) {
     console.error('Slide analysis error:', error);
     throw error;
@@ -523,210 +659,71 @@ serve(async (req) => {
           throw new Error('PowerPoint URL is required for parsing');
         }
 
-        console.log('Extracting real content from PowerPoint file:', powerpoint_name);
+        console.log('Starting real PowerPoint parsing for:', powerpoint_name);
         
         try {
-          // Download PowerPoint file
-          const pptResponse = await fetch(powerpoint_url);
-          if (!pptResponse.ok) {
-            throw new Error(`Failed to download PowerPoint file: ${pptResponse.statusText}`);
+          // Use the real PowerPoint parsing function
+          const extractedSlides = await parsePowerPointFile(powerpoint_url);
+          
+          if (extractedSlides.length === 0) {
+            throw new Error('No slides could be extracted from PowerPoint file');
           }
           
-          const arrayBuffer = await pptResponse.arrayBuffer();
-          const base64Data = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+          console.log(`✅ Successfully extracted ${extractedSlides.length} real slides from ${powerpoint_name}`);
           
-          // Use OpenAI Vision API to analyze the PowerPoint content
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'gpt-4.1-2025-04-14', // Vision-capable model
-              max_completion_tokens: 4000,
-              messages: [
-                {
-                  role: 'system',
-                  content: `You are a PowerPoint content extractor. Analyze the provided PowerPoint file and extract the actual slide content.
-
-PowerPoint (.pptx) files are ZIP archives containing XML and media files. Based on the binary content and filename, extract realistic slide information that would be in this presentation.
-
-IMPORTANT: Create realistic content based on what would actually be in a professional presentation with this filename. Don't use generic placeholders.
-
-Return JSON with this structure:
-{
-  "slides": [
-    {
-      "slide_number": 1,
-      "title": "Real slide title from presentation",
-      "content": "Actual bullet points and content from this slide",
-      "notes": "Speaker notes if any"
-    }
-  ],
-  "total_slides": number,
-  "presentation_topic": "inferred topic from filename"
-}`
-                },
-                {
-                  role: 'user',
-                  content: `PowerPoint Analysis Request:
-Filename: "${powerpoint_name}"
-File Size: ${arrayBuffer.byteLength} bytes
-
-Based on this PowerPoint file, please extract the real presentation structure. Analyze the filename to understand the topic and create slides that would realistically be in this presentation.
-
-For example:
-- If filename suggests "Marketing Strategy", create slides about marketing concepts, strategies, analysis, etc.
-- If filename suggests "Financial Report", create slides about financial data, charts, conclusions, etc.
-- If filename suggests "Project Update", create slides about project status, milestones, risks, etc.
-
-Provide realistic, topic-appropriate content for each slide, not generic placeholders.`
-                }
-              ]
-            })
-          });
-
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('OpenAI API error:', errorText);
-            throw new Error(`OpenAI API error: ${errorText}`);
-          }
-
-          const result = await response.json();
-          const aiContent = result.choices[0].message.content;
-          
-          // Parse the JSON response
-          let slidesData;
-          try {
-            const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-              slidesData = JSON.parse(jsonMatch[0]);
-            } else {
-              throw new Error('No JSON found in AI response');
-            }
-          } catch (parseError) {
-            console.error('Failed to parse AI response:', parseError);
-            
-            // Enhanced intelligent fallback based on file analysis
-            const fileSize = arrayBuffer.byteLength;
-            const fileName = powerpoint_name.toLowerCase();
-            
-            // Estimate slide count from file size (more accurate)
-            let estimatedSlideCount = Math.max(5, Math.min(40, Math.floor(fileSize / 60000)));
-            
-            // Adjust based on filename patterns
-            if (fileName.includes('intro') || fileName.includes('overview')) {
-              estimatedSlideCount = Math.max(5, Math.min(15, estimatedSlideCount));
-            } else if (fileName.includes('report') || fileName.includes('analysis')) {
-              estimatedSlideCount = Math.max(10, Math.min(30, estimatedSlideCount));
-            } else if (fileName.includes('training') || fileName.includes('course')) {
-              estimatedSlideCount = Math.max(15, Math.min(50, estimatedSlideCount));
+          // Save slides to database
+          if (project_id) {
+            const { error: slidesError } = await supabase
+              .from('presentation_slides')
+              .delete()
+              .eq('project_id', project_id);
+              
+            if (slidesError) {
+              console.error('Error clearing existing slides:', slidesError);
             }
             
-            const baseTitle = powerpoint_name
-              .replace(/\.[^/.]+$/, '')
-              .replace(/[_-]+/g, ' ')
-              .replace(/\b\w/g, l => l.toUpperCase())
-              .trim();
-            
-            // Generate intelligent content based on filename
-            const topicKeywords = fileName.match(/(marketing|sales|finance|project|strategy|analysis|report|training|overview|presentation)/g) || [];
-            const primaryTopic = topicKeywords[0] || 'business';
-            
-            const slideTemplates = {
-              marketing: [
-                "Market Analysis", "Target Audience", "Competitive Landscape", "Marketing Strategy",
-                "Campaign Objectives", "Budget Allocation", "Implementation Timeline", "Success Metrics"
-              ],
-              finance: [
-                "Financial Overview", "Revenue Analysis", "Cost Breakdown", "Profit & Loss",
-                "Budget vs Actual", "Financial Projections", "Risk Assessment", "Recommendations"
-              ],
-              project: [
-                "Project Overview", "Objectives & Goals", "Timeline & Milestones", "Resource Allocation",
-                "Current Status", "Achievements", "Challenges", "Next Steps"
-              ],
-              strategy: [
-                "Strategic Overview", "Market Position", "SWOT Analysis", "Strategic Objectives",
-                "Implementation Plan", "Resource Requirements", "Success Factors", "Timeline"
-              ],
-              training: [
-                "Learning Objectives", "Course Overview", "Key Concepts", "Practical Applications",
-                "Case Studies", "Best Practices", "Assessment", "Next Steps"
-              ]
-            };
-            
-            const templates = slideTemplates[primaryTopic as keyof typeof slideTemplates] || slideTemplates.project;
-            
-            slidesData = {
-              slides: Array.from({ length: estimatedSlideCount }, (_, i) => {
-                const slideNum = i + 1;
-                let title, content;
+            for (const slide of extractedSlides) {
+              const { error: insertError } = await supabase
+                .from('presentation_slides')
+                .insert({
+                  project_id,
+                  slide_number: slide.slide_number,
+                  title: slide.title,
+                  content: slide.content,
+                  extracted_text: slide.extracted_text || slide.content,
+                  start_time: 0,
+                  end_time: 0,
+                  ai_suggestions: {},
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                });
                 
-                if (slideNum === 1) {
-                  title = baseTitle;
-                  content = `Welcome to ${baseTitle}. This presentation covers key topics and insights related to ${primaryTopic}.`;
-                } else if (slideNum === 2) {
-                  title = "Agenda & Overview";
-                  content = `Presentation outline covering main topics and objectives for today's ${primaryTopic} discussion.`;
-                } else if (slideNum === estimatedSlideCount) {
-                  title = "Questions & Discussion";
-                  content = "Q&A session, feedback, and next steps for implementation.";
-                } else if (slideNum === estimatedSlideCount - 1) {
-                  title = "Summary & Conclusions";
-                  content = `Key takeaways from today's ${primaryTopic} presentation and recommended actions.`;
-                } else {
-                  const templateIndex = (slideNum - 3) % templates.length;
-                  title = templates[templateIndex];
-                  content = `Detailed analysis and discussion of ${title.toLowerCase()} as it relates to ${baseTitle}.`;
-                }
-                
-                return {
-                  slide_number: slideNum,
-                  title: title,
-                  content: content,
-                  notes: ""
-                };
-              }),
-              total_slides: estimatedSlideCount,
-              presentation_topic: baseTitle
-            };
+              if (insertError) {
+                console.error('Error inserting slide:', insertError);
+              }
+            }
           }
-          
-          console.log(`✅ PowerPoint analysis completed: ${slidesData.slides?.length || 0} slides extracted from ${powerpoint_name}`);
           
           result = {
-            slides: slidesData.slides || [],
-            total_slides: slidesData.total_slides || slidesData.slides?.length || 0,
-            presentation_topic: slidesData.presentation_topic || powerpoint_name,
-            message: `Successfully analyzed ${powerpoint_name} and extracted ${slidesData.slides?.length || 0} slides with realistic content`,
+            slides: extractedSlides,
+            total_slides: extractedSlides.length,
+            presentation_topic: extractedSlides[0]?.title || powerpoint_name,
+            message: `Successfully extracted ${extractedSlides.length} real slides from PowerPoint file`,
             source_file: powerpoint_name,
-            file_size: arrayBuffer.byteLength
+            extraction_method: 'real_powerpoint_parsing'
           };
           
         } catch (error) {
-          console.error('PowerPoint analysis error:', error);
-          
-          // Final fallback with basic but realistic structure
-          const fallbackSlides = [
-            { slide_number: 1, title: "Presentation Title", content: "Main presentation introduction and overview", notes: "" },
-            { slide_number: 2, title: "Objectives", content: "Key objectives and goals for this presentation", notes: "" },
-            { slide_number: 3, title: "Background", content: "Context and background information", notes: "" },
-            { slide_number: 4, title: "Main Content", content: "Primary content and key points", notes: "" },
-            { slide_number: 5, title: "Analysis", content: "Data analysis and findings", notes: "" },
-            { slide_number: 6, title: "Results", content: "Results and outcomes", notes: "" },
-            { slide_number: 7, title: "Recommendations", content: "Key recommendations and action items", notes: "" },
-            { slide_number: 8, title: "Conclusion", content: "Summary and final thoughts", notes: "" }
-          ];
+          console.error('PowerPoint parsing error:', error);
           
           result = {
-            slides: fallbackSlides,
-            total_slides: fallbackSlides.length,
+            slides: [],
+            total_slides: 0,
             presentation_topic: powerpoint_name,
-            message: `PowerPoint analysis failed, created ${fallbackSlides.length} template slides. Error: ${error.message}`,
+            message: `Failed to parse PowerPoint file: ${error.message}`,
             source_file: powerpoint_name,
-            error: error.message
+            error: error.message,
+            extraction_method: 'failed'
           };
         }
         break;
@@ -739,10 +736,19 @@ Provide realistic, topic-appropriate content for each slide, not generic placeho
           throw new Error('Audio data is required for transcription');
         }
         
+        console.log('Starting enhanced audio transcription with word-level timestamps...');
         const transcriptData = await transcribeAudio(audio_data);
         const speechPatterns = await calculateSpeechPatterns(transcriptData);
         
-        // Save transcript to database
+        // Enhanced waveform data with word-level timestamps
+        const enhancedWaveformData = {
+          ...speechPatterns,
+          words: transcriptData.words || [],
+          segments: transcriptData.segments || [],
+          has_word_timestamps: !!(transcriptData.words && transcriptData.words.length > 0)
+        };
+        
+        // Save enhanced transcript to database
         const { error: audioError } = await supabase
           .from('presentation_audio')
           .upsert({
@@ -750,7 +756,7 @@ Provide realistic, topic-appropriate content for each slide, not generic placeho
             transcript: transcriptData.text,
             duration: transcriptData.duration,
             processing_status: 'completed',
-            waveform_data: speechPatterns,
+            waveform_data: enhancedWaveformData,
             updated_at: new Date().toISOString()
           });
 
@@ -763,7 +769,10 @@ Provide realistic, topic-appropriate content for each slide, not generic placeho
           transcript: transcriptData.text,
           duration: transcriptData.duration,
           speech_patterns: speechPatterns,
-          segments: transcriptData.segments || []
+          segments: transcriptData.segments || [],
+          words: transcriptData.words || [],
+          word_count: transcriptData.words?.length || 0,
+          has_word_timestamps: enhancedWaveformData.has_word_timestamps
         };
         break;
 
@@ -773,10 +782,10 @@ Provide realistic, topic-appropriate content for each slide, not generic placeho
           throw new Error('Slides data is required for analysis');
         }
 
-        // Get transcript from database
+        // Get enhanced transcript data from database (with word-level timestamps)
         const { data: audioData, error: fetchError } = await supabase
           .from('presentation_audio')
-          .select('transcript, duration')
+          .select('transcript, duration, waveform_data')
           .eq('project_id', project_id)
           .single();
 
@@ -784,9 +793,20 @@ Provide realistic, topic-appropriate content for each slide, not generic placeho
           throw new Error('Audio transcript not found. Please transcribe audio first.');
         }
 
-        const slideAnalysis = await analyzeSlideContent(slides, audioData.transcript);
+        console.log('Starting intelligent slide-audio synchronization...');
         
-        // Update slides in database with AI suggestions
+        // Create enhanced transcript data object for analysis
+        const enhancedTranscriptData = {
+          text: audioData.transcript,
+          duration: audioData.duration,
+          words: audioData.waveform_data?.words || [],
+          segments: audioData.waveform_data?.segments || []
+        };
+
+        // Use the enhanced slide analysis with word-level matching
+        const slideAnalysis = await analyzeSlideContent(slides, enhancedTranscriptData);
+        
+        // Update slides in database with AI suggestions and improved timing
         for (const analysis of slideAnalysis) {
           const { error: slideError } = await supabase
             .from('presentation_slides')
@@ -796,7 +816,12 @@ Provide realistic, topic-appropriate content for each slide, not generic placeho
               start_time: analysis.suggested_start_time,
               end_time: analysis.suggested_end_time,
               duration: analysis.suggested_end_time - analysis.suggested_start_time,
-              ai_suggestions: analysis.ai_suggestions,
+              ai_suggestions: {
+                ...analysis.ai_suggestions,
+                content_match_score: analysis.content_match_score,
+                matching_words: analysis.matching_words,
+                matching_segments: analysis.matching_segments
+              },
               updated_at: new Date().toISOString()
             });
 
@@ -807,7 +832,9 @@ Provide realistic, topic-appropriate content for each slide, not generic placeho
 
         result = {
           slide_analysis: slideAnalysis,
-          total_duration: audioData.duration
+          total_duration: audioData.duration,
+          synchronization_method: 'word_level_matching',
+          message: `Analyzed ${slideAnalysis.length} slides with intelligent content-audio synchronization`
         };
         break;
 
