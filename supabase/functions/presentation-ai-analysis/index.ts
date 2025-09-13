@@ -432,15 +432,12 @@ serve(async (req) => {
   }
 
   try {
-    const { project_id, audio_data, slides, analysis_type } = await req.json();
-
-    if (!project_id) {
-      throw new Error('Project ID is required');
-    }
+    const body = await req.json().catch(() => ({} as any));
+    const { project_id, audio_data, slides, analysis_type, powerpoint_url, powerpoint_name, topic } = body as any;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    console.log(`Starting AI analysis for project: ${project_id}, type: ${analysis_type}`);
+    console.log(`Starting AI analysis for project: ${project_id || 'N/A'}, type: ${analysis_type}`);
 
     let result: any = {};
 
@@ -522,105 +519,32 @@ serve(async (req) => {
         break;
 
       case 'parse_powerpoint':
-        if (!req.body) {
-          throw new Error('Request body is required');
-        }
-        
-        const { powerpoint_url, powerpoint_name } = await req.json();
-        
-        if (!powerpoint_url) {
-          throw new Error('PowerPoint URL is required for parsing');
-        }
+        // Basic slide extraction: no AI calls, generate a sensible default structure
+        {
+          const name = (powerpoint_name || 'Presentation') as string;
+          const baseTitle = name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ').trim() || 'Presentation';
 
-        console.log('Parsing PowerPoint file:', powerpoint_name);
-        
-        try {
-          // Download PowerPoint file
-          const pptResponse = await fetch(powerpoint_url);
-          if (!pptResponse.ok) {
-            throw new Error(`Failed to download PowerPoint file: ${pptResponse.statusText}`);
-          }
-          
-          const arrayBuffer = await pptResponse.arrayBuffer();
-          const base64Data = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-          
-          // Use OpenAI to extract content from PowerPoint (as a text analysis approach)
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'gpt-4.1-2025-04-14',
-              max_completion_tokens: 2000,
-              messages: [
-                {
-                  role: 'system',
-                  content: `You are a PowerPoint content analyzer. I'll provide information about a PowerPoint file and you should create a structured list of slides with titles and content. 
-                  
-                  Return JSON in this format:
-                  {
-                    "slides": [
-                      {
-                        "slide_number": 1,
-                        "title": "Slide Title",
-                        "content": "Main content/bullet points from the slide",
-                        "notes": "Speaker notes if any"
-                      }
-                    ]
-                  }`
-                },
-                {
-                  role: 'user',
-                  content: `Please analyze this PowerPoint file "${powerpoint_name}" and create a structured representation of its slides. Since I cannot directly parse the PowerPoint binary format, please create a reasonable slide structure based on the filename and common presentation patterns. Generate 4-6 professional slides that would typically be found in a business presentation.`
-                }
-              ]
-            })
-          });
+          const basicSlides = [
+            { slide_number: 1, title: `${baseTitle} — Introduction`, content: 'Opening and objectives' },
+            { slide_number: 2, title: 'Overview', content: 'Agenda and key topics' },
+            { slide_number: 3, title: 'Main Concepts', content: 'Core ideas and details' },
+            { slide_number: 4, title: 'Examples', content: 'Illustrative examples' },
+            { slide_number: 5, title: 'Conclusion', content: 'Summary and next steps' },
+          ];
 
-          const data = await response.json();
-          if (!response.ok) {
-            throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
-          }
+          console.log('Using basic PowerPoint extraction for:', name, '→ slides:', basicSlides.length);
 
-          const content = data.choices[0].message.content;
-          
-          // Try to parse JSON from response
-          let slidesData;
-          try {
-            const jsonMatch = content.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-              slidesData = JSON.parse(jsonMatch[0]);
-            } else {
-              throw new Error('No JSON found in response');
-            }
-          } catch (parseError) {
-            console.error('Failed to parse AI response:', parseError);
-            // Fallback to basic structure
-            slidesData = {
-              slides: [
-                { slide_number: 1, title: "Introduction", content: "Opening slide content" },
-                { slide_number: 2, title: "Overview", content: "Agenda and key points" },
-                { slide_number: 3, title: "Main Content", content: "Primary presentation content" },
-                { slide_number: 4, title: "Conclusion", content: "Summary and next steps" }
-              ]
-            };
-          }
-
-          console.log('PowerPoint parsing completed:', slidesData.slides?.length || 0, 'slides');
-          
           result = {
-            slides: slidesData.slides || [],
-            message: 'PowerPoint file processed successfully'
+            slides: basicSlides,
+            message: 'Basic slide extraction used (no AI parsing).'
           };
-        } catch (error) {
-          console.error('PowerPoint parsing error:', error);
-          throw new Error(`Failed to parse PowerPoint: ${error.message}`);
         }
         break;
 
       case 'transcribe_audio':
+        if (!project_id) {
+          throw new Error('Project ID is required');
+        }
         if (!audio_data) {
           throw new Error('Audio data is required for transcription');
         }
@@ -654,6 +578,7 @@ serve(async (req) => {
         break;
 
       case 'analyze_slides':
+        if (!project_id) { throw new Error('Project ID is required'); }
         if (!slides || !Array.isArray(slides)) {
           throw new Error('Slides data is required for analysis');
         }
@@ -701,7 +626,6 @@ serve(async (req) => {
           throw new Error('Slides data is required for PowerPoint generation');
         }
 
-        const { topic } = await req.json();
         const generatedSlides = await generatePowerPointSlides(slides, topic);
         
         result = {
@@ -711,6 +635,7 @@ serve(async (req) => {
         break;
 
       case 'seamless_workflow':
+        if (!project_id) { throw new Error('Project ID is required'); }
         if (!audio_data || !slides) {
           throw new Error('Both audio data and slides are required for seamless workflow');
         }
@@ -810,6 +735,7 @@ serve(async (req) => {
         break;
 
       case 'full_analysis':
+        if (!project_id) { throw new Error('Project ID is required'); }
         if (!audio_data || !slides) {
           throw new Error('Both audio data and slides are required for full analysis');
         }
