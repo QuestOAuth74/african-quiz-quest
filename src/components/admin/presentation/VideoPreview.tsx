@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Play, Pause, RotateCcw, Film, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface Slide {
   id: string;
@@ -316,16 +317,15 @@ export const VideoPreview = ({
       </CardHeader>
       <CardContent className="space-y-4 overflow-hidden max-w-full">
         {/* Canvas for video rendering */}
-        <div className="relative bg-gray-900 rounded-lg overflow-hidden max-w-full">
-          <div className="w-full max-w-full" style={{ aspectRatio: '16/9' }}>
+        <div className="relative bg-muted rounded-lg overflow-hidden max-w-full">
+          <AspectRatio ratio={16 / 9} className="w-full">
             <canvas
               ref={canvasRef}
               width={640}
               height={360}
-              className="w-full h-full object-contain max-w-full max-h-full"
-              style={{ display: 'block' }}
+              className="w-full h-full block"
             />
-          </div>
+          </AspectRatio>
           
           {/* Audio element */}
           {audioUrl && (

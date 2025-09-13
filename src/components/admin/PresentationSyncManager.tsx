@@ -674,7 +674,7 @@ export const PresentationSyncManager = () => {
         <div className="xl:col-span-9">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
             {/* Timeline Editor Section */}
-            <div>
+            <div className="min-w-0">
               <Card className="h-full">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -716,7 +716,7 @@ export const PresentationSyncManager = () => {
             </div>
 
             {/* PowerPoint Slide Preview Section */}
-            <div>
+            <div className="min-w-0">
               <Card className="h-full">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
