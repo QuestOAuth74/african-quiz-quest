@@ -125,17 +125,19 @@ export const PresentationSyncManager = () => {
             body: {
               project_id: currentProject?.id,
               analysis_type: 'parse_powerpoint',
-              powerpoint_url: publicUrl,
+              powerpoint_storage_path: filePath,
+              powerpoint_bucket: 'presentation-files',
               powerpoint_name: file.name
             }
           });
 
-          if (parseError || !parseData?.slides) {
-            throw new Error(parseError?.message || 'Failed to parse PowerPoint file');
+          const slideArray = parseData?.slides as any[] | undefined;
+          if (parseError || !slideArray || slideArray.length === 0) {
+            throw new Error(parseError?.message || 'No slides could be extracted from the PowerPoint');
           }
 
           // Convert parsed data to slide format
-          const extractedSlides: Slide[] = parseData.slides.map((slide: any, index: number) => ({
+          const extractedSlides: Slide[] = slideArray.map((slide: any, index: number) => ({
             id: `ppt_${index + 1}`,
             slide_number: index + 1,
             title: slide.title || `Slide ${index + 1}`,
@@ -144,6 +146,7 @@ export const PresentationSyncManager = () => {
           }));
 
           setSlides(extractedSlides);
+          setSelectedSlide(extractedSlides[0] || null);
 
           // Update project with PowerPoint info
           if (currentProject) {
@@ -181,6 +184,7 @@ export const PresentationSyncManager = () => {
             { id: '3', slide_number: 3, title: 'Slide 3', content: 'Content from uploaded PowerPoint' },
           ];
           setSlides(basicSlides);
+          setSelectedSlide(basicSlides[0]);
         }
       } else if (type === 'images') {
         // Process uploaded images

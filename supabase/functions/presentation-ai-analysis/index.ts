@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
-
+import { BlobReader, ZipReader, TextWriter } from 'https://deno.land/x/zipjs@v2.7.72/index.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -121,40 +121,47 @@ async function parsePowerPointFile(fileUrl: string): Promise<any[]> {
 }
 
 async function extractSlidesFromPPTX(data: Uint8Array): Promise<any[]> {
-  // This is a simplified implementation
-  // In production, you'd use a proper PPTX parsing library
   const slides: any[] = [];
-  
   try {
-    // Convert to text and look for slide content patterns
-    const text = new TextDecoder().decode(data);
-    
-    // Look for slide content in the file
-    // This is a basic pattern matching approach
-    const slideMatches = text.match(/<p:sp[^>]*>[\s\S]*?<\/p:sp>/g) || [];
-    
-    for (let i = 0; i < Math.min(slideMatches.length, 20); i++) {
-      const slideContent = slideMatches[i];
-      
-      // Extract text content from the slide
-      const textMatches = slideContent.match(/<a:t[^>]*>(.*?)<\/a:t>/g) || [];
-      const slideTexts = textMatches.map(match => 
-        match.replace(/<\/?a:t[^>]*>/g, '').trim()
-      ).filter(text => text.length > 0);
-      
-      if (slideTexts.length > 0) {
-        slides.push({
-          slide_number: i + 1,
-          title: slideTexts[0] || `Slide ${i + 1}`,
-          content: slideTexts.slice(1).join(' ') || 'Content extracted from PowerPoint',
-          extracted_text: slideTexts.join(' ')
-        });
-      }
+    // Use zip.js to read the PPTX (ZIP) entries
+    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+    const zipReader = new ZipReader(new BlobReader(blob));
+    const entries = await zipReader.getEntries();
+
+    // Filter slide XML files
+    const slideEntries = entries
+      .filter((e: any) => e?.filename?.startsWith('ppt/slides/slide') && e?.filename?.endsWith('.xml'))
+      // Ensure natural order: slide1.xml, slide2.xml, ...
+      .sort((a: any, b: any) => {
+        const na = parseInt(a.filename.match(/slide(\d+)\.xml/)?.[1] || '0', 10);
+        const nb = parseInt(b.filename.match(/slide(\d+)\.xml/)?.[1] || '0', 10);
+        return na - nb;
+      });
+
+    for (let i = 0; i < slideEntries.length; i++) {
+      const entry = slideEntries[i];
+      // Read XML content as text
+      const xmlText: string = await entry.getData!(new TextWriter());
+
+      // Extract all <a:t> text nodes (PowerPoint text runs)
+      const texts = Array.from(xmlText.matchAll(/<a:t[^>]*>([\s\S]*?)<\/a:t>/g)).map(m => m[1].trim()).filter(Boolean);
+
+      // Heuristic: title is often the first text run; rest as content
+      const title = texts[0] || `Slide ${i + 1}`;
+      const content = texts.slice(1).join(' ').replace(/\s+/g, ' ').trim();
+
+      slides.push({
+        slide_number: i + 1,
+        title,
+        content,
+        extracted_text: texts.join(' ')
+      });
     }
-    
+
+    await zipReader.close();
     return slides;
   } catch (error) {
-    console.error('Error extracting slides from PPTX:', error);
+    console.error('Error extracting slides from PPTX via zipjs:', error);
     return [];
   }
 }
@@ -568,7 +575,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({} as any));
-    const { project_id, audio_data, audio_url, audio_storage_path, audio_bucket = 'presentation-files', slides, analysis_type, powerpoint_url, powerpoint_name, topic } = body as any;
+    const { project_id, audio_data, audio_url, audio_storage_path, audio_bucket = 'presentation-files', slides, analysis_type, powerpoint_url, powerpoint_storage_path, powerpoint_bucket = 'presentation-files', powerpoint_name, topic } = body as any;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
@@ -654,15 +661,29 @@ serve(async (req) => {
         break;
 
       case 'parse_powerpoint':
-        if (!powerpoint_url) {
-          throw new Error('PowerPoint URL is required for parsing');
+        if (!powerpoint_url && !powerpoint_storage_path) {
+          throw new Error('PowerPoint source is required for parsing');
         }
 
         console.log('Starting real PowerPoint parsing for:', powerpoint_name);
         
         try {
+          let pptArrayBuffer: ArrayBuffer;
+          if (powerpoint_storage_path) {
+            const { data: pptBlob, error: pptErr } = await supabase.storage.from(powerpoint_bucket).download(powerpoint_storage_path);
+            if (pptErr) throw pptErr;
+            pptArrayBuffer = await (pptBlob as Blob).arrayBuffer();
+          } else {
+            // Download via URL (requires public or signed URL)
+            const pptResponse = await fetch(powerpoint_url);
+            if (!pptResponse.ok) {
+              throw new Error(`Failed to download PowerPoint file: ${pptResponse.statusText}`);
+            }
+            pptArrayBuffer = await pptResponse.arrayBuffer();
+          }
+
           // Use the real PowerPoint parsing function
-          const extractedSlides = await parsePowerPointFile(powerpoint_url);
+          const extractedSlides = await extractSlidesFromPPTX(new Uint8Array(pptArrayBuffer));
           
           if (extractedSlides.length === 0) {
             throw new Error('No slides could be extracted from PowerPoint file');
