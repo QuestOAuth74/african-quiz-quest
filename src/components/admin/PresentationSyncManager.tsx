@@ -569,10 +569,10 @@ export const PresentationSyncManager = () => {
         </Card>
       </div>
 
-      {/* Four-panel layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-16 lg:grid-cols-12 gap-6 min-h-[600px]">
+      {/* Integrated Timeline and Video Layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 min-h-[700px]">
         {/* Left Panel - File Manager */}
-        <div className="xl:col-span-3 lg:col-span-3">
+        <div className="xl:col-span-3">
           <Card className="h-full">
             <CardHeader>
               <CardTitle>File Manager</CardTitle>
@@ -608,96 +608,95 @@ export const PresentationSyncManager = () => {
           </Card>
         </div>
 
-        {/* Center Panel - Timeline Editor */}
-        <div className="xl:col-span-5 lg:col-span-6">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Timeline Editor
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    disabled={!audioUrl}
-                  >
-                    {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    {Math.round(currentTime)}s / {Math.round(duration)}s
-                  </span>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <AudioVisualization
-                  audioUrl={audioUrl}
-                  isPlaying={isPlaying}
-                  onPlayChange={setIsPlaying}
-                  onTimeUpdate={setCurrentTime}
-                  onLoadedMetadata={setDuration}
-                />
-                <SlideTimeline
-                  slides={slides}
-                  duration={duration}
-                  currentTime={currentTime}
-                  onSlideTimeUpdate={handleSlideTimeUpdate}
-                  onSlideSelect={setSelectedSlide}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Main Content - Integrated Timeline and Video */}
+        <div className="xl:col-span-9">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+            {/* Timeline Editor Section */}
+            <div className="space-y-4">
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    Timeline Editor
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setIsPlaying(!isPlaying)}
+                        disabled={!audioUrl}
+                      >
+                        {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        {Math.round(currentTime)}s / {Math.round(duration)}s
+                      </span>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <AudioVisualization
+                      audioUrl={audioUrl}
+                      isPlaying={isPlaying}
+                      onPlayChange={setIsPlaying}
+                      onTimeUpdate={setCurrentTime}
+                      onLoadedMetadata={setDuration}
+                    />
+                    <SlideTimeline
+                      slides={slides}
+                      duration={duration}
+                      currentTime={currentTime}
+                      onSlideTimeUpdate={handleSlideTimeUpdate}
+                      onSlideSelect={setSelectedSlide}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
-        {/* Right Panel - Slide Preview */}
-        <div className="xl:col-span-3 lg:col-span-3">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Slide Preview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SlidePreview 
-                slide={selectedSlide} 
-                currentTime={currentTime} 
-                slides={slides}
-                isProcessing={isProcessing}
-              />
-            </CardContent>
-          </Card>
-        </div>
+              {/* Slide Preview Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Current Slide Preview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SlidePreview 
+                    slide={selectedSlide} 
+                    currentTime={currentTime} 
+                    slides={slides}
+                    isProcessing={isProcessing}
+                  />
+                </CardContent>
+              </Card>
+            </div>
 
-        {/* Video Preview Panel (visible on XL screens) */}
-        <div className="xl:col-span-5 hidden xl:block">
-          <VideoPreview
-            slides={slides}
-            audioUrl={audioUrl}
-            duration={duration}
-            currentTime={currentTime}
-            isPlaying={isPlaying}
-            onPlayChange={setIsPlaying}
-            onTimeUpdate={setCurrentTime}
-            onExportVideo={(resolution) => {
-              setShowVideoExportModal(true);
-            }}
-          />
+            {/* Video Preview Section */}
+            <div>
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    Video Preview
+                    <Badge variant="outline">
+                      Live Sync
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-full">
+                  <VideoPreview
+                    slides={slides}
+                    audioUrl={audioUrl}
+                    duration={duration}
+                    currentTime={currentTime}
+                    isPlaying={isPlaying}
+                    onPlayChange={setIsPlaying}
+                    onTimeUpdate={setCurrentTime}
+                    onExportVideo={(resolution) => {
+                      setShowVideoExportModal(true);
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Mobile/Medium Screen Video Preview */}
-      <div className="xl:hidden">
-        <VideoPreview
-          slides={slides}
-          audioUrl={audioUrl}
-          duration={duration}
-          currentTime={currentTime}
-          isPlaying={isPlaying}
-          onPlayChange={setIsPlaying}
-          onTimeUpdate={setCurrentTime}
-          onExportVideo={(resolution) => {
-            setShowVideoExportModal(true);
-          }}
-        />
       </div>
 
       <ExportModal
