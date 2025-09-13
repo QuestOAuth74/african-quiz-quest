@@ -1037,9 +1037,27 @@ serve(async (req) => {
 
       case 'seamless_workflow':
         if (!project_id) { throw new Error('Project ID is required'); }
-        if ((!audio_data && !audio_url && !audio_storage_path) || !slides) {
-          throw new Error('Audio source and slides are required for seamless workflow');
+        // Enhanced validation with detailed error messages
+        console.log('🔍 Validating seamless workflow inputs:', {
+          hasAudioData: !!audio_data,
+          hasAudioUrl: !!audio_url,
+          hasAudioStoragePath: !!audio_storage_path,
+          hasSlides: !!slides,
+          slidesLength: slides?.length || 0,
+          projectId: project_id
+        });
+
+        if (!audio_data && !audio_url && !audio_storage_path) {
+          console.error('❌ No audio source provided');
+          throw new Error('Audio source is required for seamless workflow. Please ensure audio is uploaded and storage path is available.');
         }
+
+        if (!slides || slides.length === 0) {
+          console.error('❌ No slides provided');
+          throw new Error('Slides are required for seamless workflow. Please ensure PowerPoint is processed and slides are extracted.');
+        }
+
+        console.log('✅ Seamless workflow validation passed');
 
         console.log('Starting seamless workflow for project:', project_id);
         

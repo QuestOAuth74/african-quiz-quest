@@ -259,17 +259,75 @@ export const PresentationSyncManager = () => {
   const [isAutoProcessing, setIsAutoProcessing] = useState(false);
   const [hasAudioAndSlides, setHasAudioAndSlides] = useState(false);
 
-  // Check if we have both audio and slides for auto-processing
+  // Check if we have both audio and slides for auto-processing with enhanced validation
   useEffect(() => {
-    const shouldAutoProcess = audioUrl && slides.length > 0 && !hasAudioAndSlides;
-    if (shouldAutoProcess && !isAutoProcessing) {
+    // Enhanced validation: Need both audioStoragePath AND slides, not just audioUrl
+    const hasValidAudio = audioStoragePath && audioUrl;
+    const hasValidSlides = slides.length > 0;
+    const shouldAutoProcess = hasValidAudio && hasValidSlides && !hasAudioAndSlides && !isProcessing && !isAutoProcessing;
+    
+    console.log('Auto-processing check:', {
+      hasValidAudio,
+      hasValidSlides,
+      audioStoragePath,
+      audioUrl: !!audioUrl,
+      slidesCount: slides.length,
+      hasAudioAndSlides,
+      isProcessing,
+      isAutoProcessing,
+      shouldAutoProcess
+    });
+
+    if (shouldAutoProcess) {
+      console.log('✅ Triggering seamless analysis with valid data');
       setHasAudioAndSlides(true);
       handleSeamlessAnalysis();
     }
-  }, [audioUrl, slides.length]);
+  }, [audioUrl, audioStoragePath, slides.length, hasAudioAndSlides, isProcessing, isAutoProcessing]);
 
   const handleSeamlessAnalysis = async () => {
-    if (!currentProject?.id || isAutoProcessing) return;
+    // Enhanced validation before processing
+    if (!currentProject?.id) {
+      console.error('❌ No project ID available');
+      toast({
+        title: "No project available",
+        description: "Please save your project first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!audioStoragePath) {
+      console.error('❌ No audio storage path available');
+      toast({
+        title: "Audio not ready",
+        description: "Please wait for audio upload to complete",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (slides.length === 0) {
+      console.error('❌ No slides available');
+      toast({
+        title: "Slides not ready",
+        description: "Please wait for PowerPoint processing to complete",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isAutoProcessing || isProcessing) {
+      console.log('⏳ Processing already in progress, skipping...');
+      return;
+    }
+
+    console.log('🚀 Starting seamless analysis with validated data:', {
+      projectId: currentProject.id,
+      audioStoragePath,
+      slidesCount: slides.length,
+      audioUrl: !!audioUrl
+    });
 
     setIsAutoProcessing(true);
     setIsProcessing(true);
@@ -292,7 +350,7 @@ export const PresentationSyncManager = () => {
       });
 
       if (error) {
-        console.error('Seamless Analysis error:', error);
+        console.error('❌ Seamless Analysis error:', error);
         throw new Error(error.message || 'Seamless analysis failed');
       }
 
