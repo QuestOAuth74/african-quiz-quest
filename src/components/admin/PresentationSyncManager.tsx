@@ -612,11 +612,11 @@ export const PresentationSyncManager = () => {
           </Card>
         </div>
 
-        {/* Main Content - Integrated Timeline and Video */}
+        {/* Main Content - Integrated Timeline and Slide Preview */}
         <div className="xl:col-span-9">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
             {/* Timeline Editor Section */}
-            <div className="space-y-4">
+            <div>
               <Card className="h-full">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -655,13 +655,20 @@ export const PresentationSyncManager = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
 
-              {/* Slide Preview Card */}
-              <Card>
+            {/* PowerPoint Slide Preview Section */}
+            <div>
+              <Card className="h-full">
                 <CardHeader>
-                  <CardTitle>Current Slide Preview</CardTitle>
+                  <CardTitle className="flex items-center justify-between">
+                    PowerPoint Preview
+                    <Badge variant="outline">
+                      {slides.length > 0 ? `${slides.length} Slides` : 'No Slides'}
+                    </Badge>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="h-full p-6">
                   <SlidePreview 
                     slide={selectedSlide} 
                     currentTime={currentTime} 
@@ -671,34 +678,34 @@ export const PresentationSyncManager = () => {
                 </CardContent>
               </Card>
             </div>
+          </div>
 
-            {/* Video Preview Section */}
-            <div>
-              <Card className="h-full">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    Video Preview
-                    <Badge variant="outline">
-                      Live Sync
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-full">
-                  <VideoPreview
-                    slides={slides}
-                    audioUrl={audioUrl}
-                    duration={duration}
-                    currentTime={currentTime}
-                    isPlaying={isPlaying}
-                    onPlayChange={setIsPlaying}
-                    onTimeUpdate={setCurrentTime}
-                    onExportVideo={(resolution) => {
-                      setShowVideoExportModal(true);
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            </div>
+          {/* Video Export Section Below */}
+          <div className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  Video Export Preview
+                  <Badge variant="outline">
+                    Canvas Rendering
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <VideoPreview
+                  slides={slides}
+                  audioUrl={audioUrl}
+                  duration={duration}
+                  currentTime={currentTime}
+                  isPlaying={isPlaying}
+                  onPlayChange={setIsPlaying}
+                  onTimeUpdate={setCurrentTime}
+                  onExportVideo={(resolution) => {
+                    setShowVideoExportModal(true);
+                  }}
+                />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
