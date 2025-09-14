@@ -44,6 +44,8 @@ export const VideoPreview = ({
   const animationRef = useRef<number>();
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+  const prevSlideRef = useRef<Slide | null>(null);
+  const transitionStartRef = useRef<number>(0);
   const { toast } = useToast();
 
   // Get current slide based on time
@@ -56,13 +58,12 @@ export const VideoPreview = ({
     }) || slides[0];
   };
 
-  // Render slide on canvas
-  const renderSlide = (ctx: CanvasRenderingContext2D, slide: Slide | undefined, width: number, height: number) => {
-    // Clear canvas
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(0, 0, width, height);
-
+  // Draw individual slide content
+  const drawSlideContent = (ctx: CanvasRenderingContext2D, slide: Slide, width: number, height: number, alpha: number = 1) => {
     if (!slide) return;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
 
     // Set text properties
     ctx.fillStyle = '#ffffff';
@@ -90,7 +91,60 @@ export const VideoPreview = ({
     ctx.textAlign = 'right';
     ctx.fillText(`${slide.slide_number}`, width - 20, height - 20);
 
-    // Progress bar
+    ctx.restore();
+  };
+
+  // Easing function for smooth transitions
+  const easeInOutCubic = (t: number): number => {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  };
+
+  // Render slide with transitions
+  const renderSlide = (ctx: CanvasRenderingContext2D, slide: Slide | undefined, width: number, height: number) => {
+    // Clear canvas
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, width, height);
+
+    if (!slide) return;
+
+    const currentSlide = slide;
+    const previousSlide = prevSlideRef.current;
+    
+    // Check if we're transitioning to a new slide
+    if (previousSlide && previousSlide.id !== currentSlide.id) {
+      transitionStartRef.current = currentTime;
+    }
+
+    // Calculate transition progress (0.5 second transition)
+    const transitionDuration = 0.5;
+    const timeSinceTransition = currentTime - transitionStartRef.current;
+    const transitionProgress = Math.min(timeSinceTransition / transitionDuration, 1);
+    const easedProgress = easeInOutCubic(transitionProgress);
+
+    // If we're in transition and have a previous slide
+    if (transitionProgress < 1 && previousSlide && previousSlide.id !== currentSlide.id) {
+      // Fade transition
+      const fadeOutAlpha = 1 - easedProgress;
+      const fadeInAlpha = easedProgress;
+
+      // Draw previous slide fading out
+      drawSlideContent(ctx, previousSlide, width, height, fadeOutAlpha);
+      
+      // Draw current slide fading in
+      drawSlideContent(ctx, currentSlide, width, height, fadeInAlpha);
+    } else {
+      // No transition, just draw current slide
+      drawSlideContent(ctx, currentSlide, width, height, 1);
+    }
+
+    // Update previous slide reference
+    if (prevSlideRef.current?.id !== currentSlide.id) {
+      prevSlideRef.current = currentSlide;
+    }
+
+    // Progress bar (always visible)
+    ctx.save();
+    ctx.globalAlpha = 1;
     const progressWidth = width * 0.8;
     const progressHeight = 4;
     const progressX = (width - progressWidth) / 2;
@@ -104,6 +158,7 @@ export const VideoPreview = ({
     const progress = duration > 0 ? (currentTime / duration) : 0;
     ctx.fillStyle = '#3b82f6';
     ctx.fillRect(progressX, progressY, progressWidth * progress, progressHeight);
+    ctx.restore();
   };
 
   // Animation loop
