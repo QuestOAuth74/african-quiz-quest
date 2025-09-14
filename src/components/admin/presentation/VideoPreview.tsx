@@ -58,37 +58,103 @@ export const VideoPreview = ({
     }) || slides[0];
   };
 
-  // Draw individual slide content
+  const [slideImages, setSlideImages] = useState<Map<string, HTMLImageElement>>(new Map());
+
+  // Load slide image
+  const loadSlideImage = (slide: Slide): Promise<HTMLImageElement | null> => {
+    return new Promise((resolve) => {
+      if (!slide.image_url) {
+        resolve(null);
+        return;
+      }
+      
+      if (slideImages.has(slide.image_url)) {
+        resolve(slideImages.get(slide.image_url)!);
+        return;
+      }
+      
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        setSlideImages(prev => new Map(prev.set(slide.image_url!, img)));
+        resolve(img);
+      };
+      img.onerror = () => resolve(null);
+      img.src = slide.image_url;
+    });
+  };
+
+  // Preload all slide images
+  useEffect(() => {
+    const loadAllImages = async () => {
+      const promises = slides.map(slide => loadSlideImage(slide));
+      await Promise.all(promises);
+    };
+    loadAllImages();
+  }, [slides]);
+
+  // Draw individual slide content with image support
   const drawSlideContent = (ctx: CanvasRenderingContext2D, slide: Slide, width: number, height: number, alpha: number = 1) => {
     if (!slide) return;
 
     ctx.save();
     ctx.globalAlpha = alpha;
 
-    // Set text properties
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    // Try to render slide image first
+    const slideImage = slide.image_url ? slideImages.get(slide.image_url) : null;
+    
+    if (slideImage) {
+      // Calculate dimensions to fit slide image while maintaining aspect ratio
+      const imageAspect = slideImage.width / slideImage.height;
+      const canvasAspect = width / height;
+      
+      let drawWidth, drawHeight, drawX, drawY;
+      
+      if (imageAspect > canvasAspect) {
+        // Image is wider than canvas
+        drawWidth = width * 0.95;
+        drawHeight = drawWidth / imageAspect;
+        drawX = width * 0.025;
+        drawY = (height - drawHeight) / 2;
+      } else {
+        // Image is taller than canvas
+        drawHeight = height * 0.9;
+        drawWidth = drawHeight * imageAspect;
+        drawX = (width - drawWidth) / 2;
+        drawY = height * 0.05;
+      }
+      
+      ctx.drawImage(slideImage, drawX, drawY, drawWidth, drawHeight);
+    } else {
+      // Fallback to text rendering if no image
+      // Set text properties
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-    // Title
-    if (slide.title) {
-      ctx.font = `bold ${Math.floor(height * 0.08)}px Arial`;
-      ctx.fillText(slide.title, width / 2, height * 0.2);
+      // Title
+      if (slide.title) {
+        ctx.font = `bold ${Math.floor(height * 0.08)}px Arial`;
+        ctx.fillText(slide.title, width / 2, height * 0.2);
+      }
+
+      // Content
+      if (slide.content) {
+        ctx.font = `${Math.floor(height * 0.04)}px Arial`;
+        const lines = slide.content.split('\n');
+        lines.forEach((line, index) => {
+          ctx.fillText(line, width / 2, height * 0.4 + (index * height * 0.06));
+        });
+      }
     }
 
-    // Content
-    if (slide.content) {
-      ctx.font = `${Math.floor(height * 0.04)}px Arial`;
-      const lines = slide.content.split('\n');
-      lines.forEach((line, index) => {
-        ctx.fillText(line, width / 2, height * 0.4 + (index * height * 0.06));
-      });
-    }
-
-    // Slide number
+    // Slide number (always visible)
     ctx.font = `${Math.floor(height * 0.03)}px Arial`;
-    ctx.fillStyle = '#888888';
+    ctx.fillStyle = slideImage ? '#ffffff' : '#888888';
+    ctx.strokeStyle = slideImage ? '#000000' : 'transparent';
+    ctx.lineWidth = slideImage ? 1 : 0;
     ctx.textAlign = 'right';
+    if (slideImage) ctx.strokeText(`${slide.slide_number}`, width - 20, height - 20);
     ctx.fillText(`${slide.slide_number}`, width - 20, height - 20);
 
     ctx.restore();
@@ -253,14 +319,47 @@ export const VideoPreview = ({
         }
       };
 
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
+      mediaRecorder.onstop = async () => {
+        const webmBlob = new Blob(chunks, { type: 'video/webm' });
+        
+        // Convert to MP4 by default for better compatibility
+        let finalBlob = webmBlob;
+        let fileExtension = 'webm';
+        
+        try {
+          const { FFmpeg } = await import('@ffmpeg/ffmpeg');
+          const { fetchFile, toBlobURL } = await import('@ffmpeg/util');
+          
+          const ffmpeg = new FFmpeg();
+          
+          // Load FFmpeg
+          const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+          await ffmpeg.load({
+            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+          });
+          
+          // Write input file
+          await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
+          
+          // Convert to MP4
+          await ffmpeg.exec(['-i', 'input.webm', '-c:v', 'libx264', '-c:a', 'aac', 'output.mp4']);
+          
+          // Read output file
+          const data = await ffmpeg.readFile('output.mp4');
+          finalBlob = new Blob([data], { type: 'video/mp4' });
+          fileExtension = 'mp4';
+          
+        } catch (conversionError) {
+          console.warn('MP4 conversion failed, using WebM:', conversionError);
+        }
+        
+        const url = URL.createObjectURL(finalBlob);
         
         // Download the video
         const a = document.createElement('a');
         a.href = url;
-        a.download = `presentation_${resolution}_${Date.now()}.webm`;
+        a.download = `presentation_${resolution}_${Date.now()}.${fileExtension}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -269,7 +368,7 @@ export const VideoPreview = ({
         setIsExporting(false);
         toast({
           title: "Export complete",
-          description: `Video exported in ${resolution} resolution`
+          description: `Video exported in ${resolution} resolution as ${fileExtension.toUpperCase()}`
         });
       };
 

@@ -185,16 +185,62 @@ export const VideoExportModal = ({
         }
       };
 
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         setExportStatus("Finalizing video...");
         
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
+        const webmBlob = new Blob(chunks, { type: 'video/webm' });
+        
+        // Convert format if needed
+        let finalBlob = webmBlob;
+        let fileExtension = 'webm';
+        
+        if (selectedFormat !== 'webm') {
+          try {
+            setExportStatus("Converting video format...");
+            const { FFmpeg } = await import('@ffmpeg/ffmpeg');
+            const { fetchFile, toBlobURL } = await import('@ffmpeg/util');
+            
+            const ffmpeg = new FFmpeg();
+            
+            // Load FFmpeg
+            const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+            await ffmpeg.load({
+              coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+              wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+            });
+            
+            // Write input file
+            await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
+            
+            // Convert based on selected format
+            const outputFormat = selectedFormat === 'mp4' ? 'mp4' : 'mov';
+            const codecArgs = selectedFormat === 'mp4' ? 
+              ['-c:v', 'libx264', '-c:a', 'aac'] : 
+              ['-c:v', 'libx264', '-c:a', 'aac'];
+            
+            await ffmpeg.exec(['-i', 'input.webm', ...codecArgs, `output.${outputFormat}`]);
+            
+            // Read output file
+            const data = await ffmpeg.readFile(`output.${outputFormat}`);
+            finalBlob = new Blob([data], { type: `video/${outputFormat}` });
+            fileExtension = outputFormat;
+            
+          } catch (conversionError) {
+            console.warn('Format conversion failed, using WebM:', conversionError);
+            toast({
+              title: "Format conversion failed",
+              description: "Downloading as WebM instead",
+              variant: "default"
+            });
+          }
+        }
+        
+        const url = URL.createObjectURL(finalBlob);
         
         // Download the video
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${project.name}_${selectedResolution}_${Date.now()}.webm`;
+        a.download = `${project.name}_${selectedResolution}_${Date.now()}.${fileExtension}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -206,7 +252,7 @@ export const VideoExportModal = ({
         
         toast({
           title: "Video exported successfully",
-          description: `${project.name} exported in ${selectedResolution} quality`
+          description: `${project.name} exported in ${selectedResolution} quality as ${fileExtension.toUpperCase()}`
         });
 
         // Close modal after short delay
@@ -250,6 +296,36 @@ export const VideoExportModal = ({
         return timeInSeconds >= animStart && timeInSeconds <= animEnd;
       };
 
+      // Preload all slide images
+      const loadedImages = new Map<string, HTMLImageElement>();
+      const loadSlideImage = (slide: Slide): Promise<HTMLImageElement | null> => {
+        return new Promise((resolve) => {
+          if (!slide.image_url) {
+            resolve(null);
+            return;
+          }
+          
+          if (loadedImages.has(slide.image_url)) {
+            resolve(loadedImages.get(slide.image_url)!);
+            return;
+          }
+          
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => {
+            loadedImages.set(slide.image_url!, img);
+            resolve(img);
+          };
+          img.onerror = () => resolve(null);
+          img.src = slide.image_url;
+        });
+      };
+
+      // Load all slide images first
+      setExportStatus("Loading slide images...");
+      const imagePromises = slides.map(slide => loadSlideImage(slide));
+      await Promise.all(imagePromises);
+
       // Render function for slides with animations
       const renderSlide = (slide: Slide | undefined, timeInSeconds: number) => {
         // Clear canvas with presentation background
@@ -284,10 +360,41 @@ export const VideoExportModal = ({
         ctx.globalAlpha = imageTransform.opacity;
         ctx.translate(imageTransform.x, 0);
 
-        // Title with potential highlighting
-        if (slide.title) {
+        // Render slide image if available
+        const slideImage = slide.image_url ? loadedImages.get(slide.image_url) : null;
+        if (slideImage) {
+          // Calculate dimensions to fit slide image while maintaining aspect ratio
+          const imageAspect = slideImage.width / slideImage.height;
+          const canvasAspect = width / height;
+          
+          let drawWidth, drawHeight, drawX, drawY;
+          
+          if (imageAspect > canvasAspect) {
+            // Image is wider than canvas
+            drawWidth = width * 0.9; // Leave some margin
+            drawHeight = drawWidth / imageAspect;
+            drawX = width * 0.05;
+            drawY = (height - drawHeight) / 2;
+          } else {
+            // Image is taller than canvas
+            drawHeight = height * 0.8; // Leave some margin
+            drawWidth = drawHeight * imageAspect;
+            drawX = (width - drawWidth) / 2;
+            drawY = height * 0.1;
+          }
+          
+          ctx.drawImage(slideImage, drawX, drawY, drawWidth, drawHeight);
+        }
+
+        // Only render text overlays if no slide image or as overlay
+        const hasSlideImage = slideImage !== null;
+        
+        // Title with potential highlighting (overlay on image or standalone)
+        if (slide.title && (!hasSlideImage || animations.some((a: any) => a.type === 'title_overlay'))) {
           ctx.font = `bold ${titleFontSize}px Georgia`;
-          ctx.fillStyle = '#3C1518';
+          ctx.fillStyle = hasSlideImage ? '#FFFFFF' : '#3C1518';
+          ctx.strokeStyle = hasSlideImage ? '#000000' : 'transparent';
+          ctx.lineWidth = hasSlideImage ? 2 : 0;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           
@@ -315,17 +422,22 @@ export const VideoExportModal = ({
             ctx.globalAlpha = imageTransform.opacity;
           }
           
-          ctx.fillStyle = '#3C1518';
-          ctx.fillText(slide.title, width / 2, height * 0.25);
+          ctx.fillStyle = hasSlideImage ? '#FFFFFF' : '#3C1518';
+          if (hasSlideImage) {
+            ctx.strokeText(slide.title, width / 2, height * 0.15);
+          }
+          ctx.fillText(slide.title, width / 2, hasSlideImage ? height * 0.15 : height * 0.25);
         }
 
-        // Content with potential highlighting
-        if (slide.content) {
+        // Content with potential highlighting (only if no slide image or as overlay)
+        if (slide.content && (!hasSlideImage || animations.some((a: any) => a.type === 'content_overlay'))) {
           ctx.font = `${contentFontSize}px Calibri`;
-          ctx.fillStyle = '#2D2D2A';
+          ctx.fillStyle = hasSlideImage ? '#FFFFFF' : '#2D2D2A';
+          ctx.strokeStyle = hasSlideImage ? '#000000' : 'transparent';
+          ctx.lineWidth = hasSlideImage ? 1 : 0;
           const lines = slide.content.split('\n');
           const lineHeight = contentFontSize * 1.4;
-          const startY = height * 0.45;
+          const startY = hasSlideImage ? height * 0.85 : height * 0.45;
           
           lines.forEach((line, index) => {
             const currentY = startY + (index * lineHeight);
@@ -366,19 +478,23 @@ export const VideoExportModal = ({
                 ctx.globalAlpha = imageTransform.opacity;
                 
                 // Draw text parts
-                ctx.fillStyle = '#2D2D2A';
+                ctx.fillStyle = hasSlideImage ? '#FFFFFF' : '#2D2D2A';
                 ctx.textAlign = 'left';
+                if (hasSlideImage) ctx.strokeText(beforeText, lineStartX, currentY);
                 ctx.fillText(beforeText, lineStartX, currentY);
                 ctx.fillStyle = '#000000'; // Darker for highlighted text
+                if (hasSlideImage) ctx.strokeText(keyword, keywordStartX, currentY);
                 ctx.fillText(keyword, keywordStartX, currentY);
-                ctx.fillStyle = '#2D2D2A';
+                ctx.fillStyle = hasSlideImage ? '#FFFFFF' : '#2D2D2A';
+                if (hasSlideImage) ctx.strokeText(afterText, keywordStartX + keywordWidth, currentY);
                 ctx.fillText(afterText, keywordStartX + keywordWidth, currentY);
                 ctx.textAlign = 'center';
               }
             } else {
               // Normal text rendering
-              ctx.fillStyle = '#2D2D2A';
+              ctx.fillStyle = hasSlideImage ? '#FFFFFF' : '#2D2D2A';
               ctx.textAlign = 'center';
+              if (hasSlideImage) ctx.strokeText(line, width / 2, currentY);
               ctx.fillText(line, width / 2, currentY);
             }
           });
