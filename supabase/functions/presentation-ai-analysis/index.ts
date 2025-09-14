@@ -42,44 +42,171 @@ function processBase64Chunks(base64String: string, chunkSize = 32768) {
   return result;
 }
 
-async function transcribeAudio(audioData: string): Promise<any> {
+// Utility function for exponential backoff delay
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 4,
+  baseDelay: 1000, // 1 second
+  maxDelay: 16000, // 16 seconds
+};
+
+// Parse OpenAI error response to extract meaningful message
+function parseOpenAIError(errorResponse: any): { message: string; isRetryable: boolean; type: string } {
   try {
-    console.log('Starting audio transcription with word-level timestamps...');
+    let errorData = errorResponse;
     
-    // Process audio in chunks
-    const binaryAudio = processBase64Chunks(audioData);
-    
-    // Prepare form data with word-level timestamps
-    const formData = new FormData();
-    const blob = new Blob([binaryAudio], { type: 'audio/webm' });
-    formData.append('file', blob, 'audio.webm');
-    formData.append('model', 'whisper-1');
-    formData.append('response_format', 'verbose_json');
-    formData.append('timestamp_granularities[]', 'word');
-    formData.append('timestamp_granularities[]', 'segment');
-
-    // Send to OpenAI Whisper API
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI Whisper API error:', errorText);
-      throw new Error(`OpenAI Whisper API error: ${errorText}`);
+    // If it's a string, try to parse as JSON
+    if (typeof errorResponse === 'string') {
+      try {
+        errorData = JSON.parse(errorResponse);
+      } catch {
+        return {
+          message: errorResponse,
+          isRetryable: errorResponse.includes('server') || errorResponse.includes('timeout'),
+          type: 'unknown'
+        };
+      }
     }
 
-    const result = await response.json();
-    console.log('Transcription completed with word-level timestamps');
-    return result;
-  } catch (error) {
-    console.error('Transcription error:', error);
-    throw error;
+    // Extract error information
+    const error = errorData?.error || errorData;
+    const message = error?.message || 'Unknown error occurred';
+    const type = error?.type || 'unknown';
+    const code = error?.code || '';
+
+    // Determine if error is retryable
+    const retryableTypes = ['server_error', 'timeout', 'rate_limit_exceeded'];
+    const retryableMessages = ['server had an error', 'timeout', 'rate limit', 'temporarily unavailable'];
+    
+    const isRetryable = retryableTypes.includes(type) || 
+                       retryableMessages.some(msg => message.toLowerCase().includes(msg)) ||
+                       code === 'server_error';
+
+    return { message, isRetryable, type };
+  } catch {
+    return {
+      message: 'Failed to parse error response',
+      isRetryable: true,
+      type: 'parse_error'
+    };
   }
+}
+
+async function transcribeAudio(audioData: string, supabase?: any, projectId?: string): Promise<any> {
+  console.log('Starting audio transcription with word-level timestamps and retry logic...');
+  
+  // Process audio in chunks once
+  const binaryAudio = processBase64Chunks(audioData);
+  
+  // Prepare form data with word-level timestamps once
+  const formData = new FormData();
+  const blob = new Blob([binaryAudio], { type: 'audio/webm' });
+  formData.append('file', blob, 'audio.webm');
+  formData.append('model', 'whisper-1');
+  formData.append('response_format', 'verbose_json');
+  formData.append('timestamp_granularities[]', 'word');
+  formData.append('timestamp_granularities[]', 'segment');
+
+  let lastError: any = null;
+  
+  for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        const delay = Math.min(
+          RETRY_CONFIG.baseDelay * Math.pow(2, attempt - 1),
+          RETRY_CONFIG.maxDelay
+        );
+        console.log(`Retry attempt ${attempt}/${RETRY_CONFIG.maxRetries} after ${delay}ms delay...`);
+        
+        // Update progress with retry info
+        if (supabase && projectId) {
+          await supabase
+            .from('presentation_projects')
+            .update({
+              progress_log: `Audio transcription retry ${attempt}/${RETRY_CONFIG.maxRetries}...`,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', projectId);
+        }
+        
+        await sleep(delay);
+      }
+
+      // Send to OpenAI Whisper API
+      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        const errorInfo = parseOpenAIError(errorText);
+        
+        console.error(`OpenAI Whisper API error (attempt ${attempt + 1}):`, errorInfo);
+        
+        // If this is our last attempt or error is not retryable, throw
+        if (attempt === RETRY_CONFIG.maxRetries || !errorInfo.isRetryable) {
+          throw new Error(`Audio transcription failed: ${errorInfo.message}`);
+        }
+        
+        lastError = new Error(`Audio transcription failed: ${errorInfo.message}`);
+        continue; // Try again
+      }
+
+      const result = await response.json();
+      console.log(`Transcription completed successfully on attempt ${attempt + 1}`);
+      
+      // Update progress with success
+      if (supabase && projectId) {
+        await supabase
+          .from('presentation_projects')
+          .update({
+            progress_log: 'Audio transcription completed successfully',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', projectId);
+      }
+      
+      return result;
+      
+    } catch (error) {
+      console.error(`Transcription attempt ${attempt + 1} failed:`, error);
+      lastError = error;
+      
+      // If this is our last attempt, update the database with final error
+      if (attempt === RETRY_CONFIG.maxRetries) {
+        if (supabase && projectId) {
+          await supabase
+            .from('presentation_projects')
+            .update({
+              status: 'error',
+              error_message: `Audio transcription failed after ${RETRY_CONFIG.maxRetries + 1} attempts: ${error.message}`,
+              progress_log: `Final attempt failed: ${error.message}`,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', projectId);
+        }
+        throw error;
+      }
+      
+      // Check if error is retryable
+      const errorInfo = parseOpenAIError(error.message);
+      if (!errorInfo.isRetryable && attempt < RETRY_CONFIG.maxRetries) {
+        console.log('Error is not retryable, throwing immediately');
+        throw error;
+      }
+    }
+  }
+  
+  // This should never be reached, but just in case
+  throw lastError || new Error('Audio transcription failed after all retry attempts');
 }
 
 async function parsePowerPointFile(fileUrl: string): Promise<any[]> {
@@ -791,7 +918,7 @@ serve(async (req) => {
           const blob = await resp.blob();
           transcriptData = await transcribeFromBlob(blob);
         } else {
-          transcriptData = await transcribeAudio(audio_data);
+          transcriptData = await transcribeAudio(audio_data, supabase, project_id);
         }
 
         const speechPatterns = await calculateSpeechPatterns(transcriptData);
@@ -1091,7 +1218,7 @@ serve(async (req) => {
             if (!r.ok) throw new Error(await r.text());
             seamlessTranscriptData = await r.json();
           } else {
-            seamlessTranscriptData = await transcribeAudio(audio_data);
+            seamlessTranscriptData = await transcribeAudio(audio_data, supabase, project_id);
           }
            await supabase.from('presentation_projects').update({ processing_status: 'processing', processing_progress: 30, updated_at: new Date().toISOString() }).eq('id', project_id);
           console.log('✅ Audio transcription completed');
@@ -1222,7 +1349,7 @@ serve(async (req) => {
           if (!r.ok) throw new Error(await r.text());
           fullTranscriptData = await r.json();
         } else {
-          fullTranscriptData = await transcribeAudio(audio_data);
+          fullTranscriptData = await transcribeAudio(audio_data, supabase, project_id);
         }
         const fullSpeechPatterns = await calculateSpeechPatterns(fullTranscriptData);
         

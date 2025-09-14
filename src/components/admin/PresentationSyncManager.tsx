@@ -15,7 +15,7 @@ import { ExportModal } from "./presentation/ExportModal";
 import { VideoPreview } from "./presentation/VideoPreview";
 import { VideoExportModal } from "./presentation/VideoExportModal";
 import { Progress } from "@/components/ui/progress";
-import { Play, Pause, Save, Download, Zap, Clock, FileText, Film } from "lucide-react";
+import { Play, Pause, Save, Download, Zap, Clock, FileText, Film, RefreshCw } from "lucide-react";
 
 interface PresentationProject {
   id: string;
@@ -546,6 +546,37 @@ const [showVideoExportModal, setShowVideoExportModal] = useState(false);
     }
   };
 
+  const handleRetryTranscription = async () => {
+    if (!audioUrl) {
+      toast({
+        title: "No Audio File",
+        description: "Please upload an audio file first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      setCurrentProject(prev => prev ? { ...prev, status: 'processing', error_message: null } : null);
+      
+      // Re-trigger transcription
+      await handleAIAnalysis();
+      
+      toast({
+        title: "Retry Started",
+        description: "Audio transcription retry in progress",
+      });
+    } catch (error) {
+      console.error('Retry failed:', error);
+      toast({
+        title: "Retry Failed",
+        description: "Failed to retry transcription",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSaveProject = async () => {
     if (!currentProject) {
       toast({
@@ -637,7 +668,23 @@ const [showVideoExportModal, setShowVideoExportModal] = useState(false);
               <div className="text-sm text-muted-foreground">{projectProgress}%</div>
             </div>
             <Progress value={projectProgress} />
-            {projectError && <p className="mt-2 text-destructive text-sm">{projectError}</p>}
+            {projectError && (
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-destructive text-sm flex-1">{projectError}</p>
+                {projectError.toLowerCase().includes('transcription') && (
+                  <Button
+                    onClick={handleRetryTranscription}
+                    disabled={isProcessing}
+                    size="sm" 
+                    variant="outline"
+                    className="ml-2 gap-1"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    Retry
+                  </Button>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -852,3 +899,5 @@ const [showVideoExportModal, setShowVideoExportModal] = useState(false);
     </div>
   );
 };
+
+export default PresentationSyncManager;
