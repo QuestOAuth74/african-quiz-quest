@@ -921,63 +921,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pharaoh_timeline: {
-        Row: {
-          achievements: string | null
-          burial_location: string | null
-          created_at: string | null
-          created_by: string | null
-          dynasty: string
-          id: string
-          image_caption: string | null
-          image_url: string | null
-          is_active: boolean | null
-          name: string
-          period: string
-          reign_end: number | null
-          reign_start: number | null
-          significance: string | null
-          sort_order: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          achievements?: string | null
-          burial_location?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          dynasty: string
-          id?: string
-          image_caption?: string | null
-          image_url?: string | null
-          is_active?: boolean | null
-          name: string
-          period: string
-          reign_end?: number | null
-          reign_start?: number | null
-          significance?: string | null
-          sort_order?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          achievements?: string | null
-          burial_location?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          dynasty?: string
-          id?: string
-          image_caption?: string | null
-          image_url?: string | null
-          is_active?: boolean | null
-          name?: string
-          period?: string
-          reign_end?: number | null
-          reign_start?: number | null
-          significance?: string | null
-          sort_order?: number | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       presentation_audio: {
         Row: {
           created_at: string
