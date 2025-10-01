@@ -35,7 +35,7 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
-  const hideFooterRoutes = ['/admin/ai-presentation'];
+  const hideFooterRoutes = ['/admin/ai-presentation', '/pharaoh-timeline'];
   
   return (
     <>
