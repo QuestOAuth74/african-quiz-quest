@@ -27,6 +27,7 @@ import Oware from "./pages/Oware";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import ForumPost from "./pages/ForumPost";
+import PharaohTimeline from "./pages/PharaohTimeline";
 import Footer from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -61,6 +62,7 @@ const AppContent = () => {
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/pharaoh-timeline" element={<PharaohTimeline />} />
         {/* Catch-all route must be last */}
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -68,6 +68,13 @@ const TopNavigation = () => {
             Blog
           </Link>
           
+          <Link
+            to="/pharaoh-timeline"
+            className="text-theme-yellow-light hover:text-theme-yellow hover:bg-white/10 transition-colors px-3 py-2 text-sm rounded-md"
+          >
+            Pharaoh Timeline
+          </Link>
+          
           <Button
             variant="ghost"
             size="sm"
@@ -194,6 +201,14 @@ const TopNavigation = () => {
                     className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
                   >
                     <span>Blog</span>
+                  </Link>
+                  
+                  <Link
+                    to="/pharaoh-timeline"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 text-theme-yellow-light hover:text-theme-yellow transition-colors p-3 rounded-md hover:bg-white/10"
+                  >
+                    <span>Pharaoh Timeline</span>
                   </Link>
                   
                   <button
