@@ -38,6 +38,7 @@ export const PharaohTimelineManager = () => {
   const [open, setOpen] = useState(false);
   const [editingPharaoh, setEditingPharaoh] = useState<Pharaoh | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [importing, setImporting] = useState(false);
   
   const [formData, setFormData] = useState<Partial<Pharaoh>>({
     name: "",
@@ -187,6 +188,64 @@ export const PharaohTimelineManager = () => {
     saveMutation.mutate(formData);
   };
 
+  const handleImportFromHTML = async () => {
+    try {
+      setImporting(true);
+      // Optionally clear existing rows
+      const shouldReplace = pharaohs && pharaohs.length > 0 ? window.confirm('Replace existing timeline entries with imported data? This will delete current entries.') : true;
+      if (shouldReplace) {
+        await supabase.from('pharaoh_timeline').delete().not('id', 'is', null);
+      }
+
+      const res = await fetch('/raw-pharaoh-timeline.html');
+      const html = await res.text();
+      const match = html.match(/const\s+pharaohsData\s*=\s*\[([\s\S]*?)\];/);
+      if (!match) throw new Error('Could not find pharaohsData array in HTML');
+      const arrayLiteral = `[${match[1]}]`;
+      // eslint-disable-next-line no-new-func
+      const data: any[] = new Function(`return ${arrayLiteral}`)();
+
+      const parseDates = (str?: string) => {
+        if (!str) return { start: null as number | null, end: null as number | null };
+        const nums = (str.match(/\d{3,4}/g) || []).map((n) => parseInt(n));
+        if (nums.length === 1) return { start: nums[0], end: nums[0] };
+        if (nums.length >= 2) return { start: nums[0], end: nums[1] };
+        return { start: null, end: null };
+      };
+
+      const rows = data.map((p, idx) => {
+        const { start, end } = parseDates(p.dates);
+        return {
+          name: p.name,
+          dynasty: p.dynasty,
+          period: p.period,
+          reign_start: start,
+          reign_end: end,
+          achievements: Array.isArray(p.achievements) ? p.achievements.join(' • ') : p.achievements || null,
+          significance: p.significance || null,
+          burial_location: p.burial || null,
+          image_url: null,
+          image_caption: null,
+          sort_order: idx,
+          is_active: true,
+        };
+      });
+
+      // Insert in chunks to avoid payload limits
+      for (let i = 0; i < rows.length; i += 100) {
+        const chunk = rows.slice(i, i + 100);
+        const { error } = await supabase.from('pharaoh_timeline').insert(chunk as any);
+        if (error) throw error;
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["pharaohs", "pharaohs-public"] });
+      toast({ title: 'Import complete', description: `Imported ${rows.length} pharaohs from HTML.` });
+    } catch (err: any) {
+      toast({ title: 'Import failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setImporting(false);
+    }
+  };
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -194,12 +253,18 @@ export const PharaohTimelineManager = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Pharaoh Timeline Manager</h2>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setEditingPharaoh(null)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Pharaoh
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" onClick={handleImportFromHTML} disabled={importing}>
+              <Upload className="w-4 h-4 mr-2" />
+              {importing ? 'Importing...' : 'Import from HTML'}
             </Button>
-          </DialogTrigger>
+            <DialogTrigger asChild>
+              <Button onClick={() => setEditingPharaoh(null)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Pharaoh
+              </Button>
+            </DialogTrigger>
+          </div>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>

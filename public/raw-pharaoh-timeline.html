@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Ancient Egypt Pharaohs Timeline - All Major Rulers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1410 0%, #2d1f1a 100%);
+            color: #d4af37;
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #d4af37;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            background: linear-gradient(45deg, #ffd700, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            font-style: italic;
+            color: #f0d98b;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 1.1em;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid #d4af37;
+            border-radius: 25px;
+            color: #f0d98b;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        #searchInput::placeholder {
+            color: #8b7355;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #d4af37;
+            font-size: 1.2em;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .stat-label {
+            color: #f0d98b;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .period-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .period-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8b6914 0%, #d4af37 100%);
+            border: none;
+            border-radius: 8px;
+            color: #1a1410;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .period-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .period-btn:hover::before {
+            left: 100%;
+        }
+
+        .period-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+
+        .timeline-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .period-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(0,0,0,0.3);
+            border-left: 4px solid #d4af37;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .period-section:hover {
+            background: rgba(0,0,0,0.4);
+            border-left-width: 6px;
+        }
+
+        .period-title {
+            font-size: 2.2em;
+            color: #ffd700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d4af37;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .period-dates {
+            font-size: 1.1em;
+            color: #f0d98b;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .pharaoh-card {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #8b6914;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pharaoh-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .pharaoh-card:hover::before {
+            left: 100%;
+        }
+
+        .pharaoh-card:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: #d4af37;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .pharaoh-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .pharaoh-name {
+            font-size: 1.5em;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .pharaoh-dates {
+            color: #f0d98b;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        .pharaoh-dynasty {
+            display: inline-block;
+            background: linear-gradient(135deg, #8b6914, #d4af37);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+            color: #1a1410;
+            font-weight: bold;
+        }
+
+        .pharaoh-summary {
+            color: #d4af37;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .pharaoh-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .pharaoh-details.expanded {
+            max-height: 5000px;
+            transition: max-height 0.8s ease-in;
+        }
+
+        .detail-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid #8b6914;
+            border-radius: 5px;
+        }
+
+        .detail-title {
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .achievement-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .achievement-list li {
+            padding: 5px 0 5px 20px;
+            position: relative;
+            color: #f0d98b;
+            font-size: 0.9em;
+            transition: color 0.3s ease;
+        }
+
+        .achievement-list li:hover {
+            color: #ffd700;
+        }
+
+        .achievement-list li:before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #d4af37;
+            transition: transform 0.3s ease;
+        }
+
+        .achievement-list li:hover:before {
+            transform: translateX(3px);
+        }
+
+        .expand-icon {
+            color: #d4af37;
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+
+        .expand-icon.rotated {
+            transform: rotate(90deg);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.3em;
+            color: #8b7355;
+        }
+
+        .significance-text {
+            color: #f0d98b;
+            font-style: italic;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #d4af37, #ffd700);
+            color: #1a1410;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .scroll-to-top.visible {
+            opacity: 1;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .period-nav {
+                gap: 5px;
+            }
+
+            .period-btn {
+                padding: 10px 15px;
+                font-size: 0.85em;
+            }
+
+            .pharaoh-name {
+                font-size: 1.2em;
+            }
+
+            .pharaoh-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #d4af37;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d4af37;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .period-summary {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 3px solid #ffd700;
+        }
+
+        .period-summary-text {
+            color: #f0d98b;
+            font-style: italic;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Complete Ancient Egypt Pharaohs Timeline</h1>
+        <p>All Major Rulers from 3150 BCE to 30 BCE | Over 3000 Years of Pharaonic Civilization</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search all pharaohs by name, dynasty, period, or achievement...">
+        <span class="search-icon">🔍</span>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number" id="totalPharaohs">Loading...</div>
+            <div class="stat-label">Pharaohs</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">3000+</div>
+            <div class="stat-label">Years</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">31</div>
+            <div class="stat-label">Dynasties</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">10</div>
+            <div class="stat-label">Periods</div>
+        </div>
+    </div>
+
+    <div class="period-nav">
+        <button class="period-btn active" onclick="filterPeriod('all')">All Periods</button>
+        <button class="period-btn" onclick="filterPeriod('early')">Early Dynastic</button>
+        <button class="period-btn" onclick="filterPeriod('old')">Old Kingdom</button>
+        <button class="period-btn" onclick="filterPeriod('first-intermediate')">1st Intermediate</button>
+        <button class="period-btn" onclick="filterPeriod('middle')">Middle Kingdom</button>
+        <button class="period-btn" onclick="filterPeriod('second-intermediate')">2nd Intermediate</button>
+        <button class="period-btn" onclick="filterPeriod('new')">New Kingdom</button>
+        <button class="period-btn" onclick="filterPeriod('third-intermediate')">3rd Intermediate</button>
+        <button class="period-btn" onclick="filterPeriod('late')">Late Period</button>
+        <button class="period-btn" onclick="filterPeriod('ptolemaic')">Ptolemaic</button>
+    </div>
+
+    <div class="timeline-container" id="timelineContainer">
+        <div class="loading">Loading pharaohs data...</div>
+    </div>
+
+    <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        // COMPLETE PHARAOH DATABASE
+        const pharaohsData = [
+            // EARLY DYNASTIC PERIOD (c. 3150-2686 BCE)
+            
+            // Dynasty 1
+            {
+                name: "Narmer (Menes)",
+                dynasty: "Dynasty 1",
+                period: "early",
+                dates: "c. 3150 BCE",
+                summary: "Unifier of Upper and Lower Egypt, founding first dynasty.",
+                burial: "Tomb B17/18, Umm el-Qa'ab, Abydos",
+                achievements: [
+                    "Unification of Egypt - brought Upper and Lower Egypt under single rule",
+                    "Established Memphis as capital of unified Egypt",
+                    "Narmer Palette - masterpiece depicting unification",
+                    "Divine kingship concept - foundation of pharaonic ideology"
+                ],
+                significance: "Credited as the unifier of Upper and Lower Egypt, marking the beginning of the First Dynasty and establishment of the world's first nation-state. His reign laid the foundation for over 3,000 years of pharaonic civilization."
+            },
+            {
+                name: "Hor-Aha",
+                dynasty: "Dynasty 1",
+                period: "early",
+                dates: "c. 3050 BCE",
+                summary: "Consolidated newly unified Egypt through military campaigns.",
+                burial: "Tombs B10, B15, B19, Umm el-Qa'ab, Abydos",
+                achievements: [
+                    "State consolidation - strengthened administrative structures",
+                    "Nubian campaign - secured southern border",
+                    "Large tomb complex - architectural advancement",
+                    "Worship of Neith - religious developments"
+                ],
+                significance: "Continued the process of state-building initiated by Narmer, crucial for consolidating the newly unified Egypt and establishing administrative and military foundations."
+            },
+            {
+                name: "Djer",
+                dynasty: "Dynasty 1",
+                period: "early",
+                dates: "c. 3000 BCE",
+                summary: "40+ year stabilizing reign with military expansion.",
+                burial: "Tomb O, Umm el-Qa'ab, Abydos",
+                achievements: [
+                    "First foreign campaign - into Sinai and Canaan",
+                    "Exquisite jewelry - four gold, turquoise and lapis lazuli bracelets",
+                    "Medical patronage - credited as physician in later traditions",
+                    "Architectural innovation - single large burial chamber"
+                ],
+                significance: "Long and prosperous 40+ year reign crucial for stabilizing the newly unified Egyptian state. His tomb became mistakenly identified as Osiris's burial place, becoming a pilgrimage center."
+            },
+            {
+                name: "Djet",
+                dynasty: "Dynasty 1",
+                period: "early",
+                dates: "c. 2980 BCE",
+                summary: "Artistic high point of Early Dynastic Period.",
+                burial: "Tomb Z, Umm el-Qa'ab, Abydos",
+                achievements: [
+                    "Artistic patronage - funerary stela masterpiece",
+                    "174 subsidiary burials - demonstration of absolute power",
+                    "Levant trade - continued foreign relations",
+                    "Power consolidation - divine authority establishment"
+                ],
+                significance: "Renowned for artistic achievements representing a high point in the Early Dynastic Period. His funerary stela is considered one of the earliest masterpieces of ancient Egyptian art."
+            },
+            {
+                name: "Den",
+                dynasty: "Dynasty 1",
+                period: "early",
+                dates: "c. 2950 BCE",
+                summary: "Most important First Dynasty ruler with 50-year reign.",
+                burial: "Tomb T, Umm el-Qa'ab, Abydos",
+                achievements: [
+                    "First 'King of Upper and Lower Egypt' title",
+                    "First staircase tomb - architectural innovation",
+                    "Sinai campaigns - military expeditions east",
+                    "First Sed festival - royal jubilee celebration"
+                ],
+                significance: "Considered one of the most important First Dynasty rulers. First to use the title 'King of Upper and Lower Egypt' and be depicted wearing the double crown, symbolizing full unification."
+            },
+            {
+                name: "Anedjib",
+                dynasty: "Dynasty 1",
+                period: "early",
+                dates: "c. 2930 BCE",
+                summary: "Period of political difficulty and dynastic struggle.",
+                burial: "Tomb X, Umm el-Qa'ab, Abydos",
+                achievements: [
+                    "Introduced Nebty name - 'Two Ladies' in royal titulary",
+                    "64 subsidiary graves - continued burial traditions",
+                    "Evidence of instability - smaller, poorer quality tomb"
+                ],
+                significance: "Reign considered a period of political difficulty. First to introduce the Nebty name into royal titulary, but his successor erased his name from inscriptions, indicating dynastic struggle."
+            },
+            {
+                name: "Semerkhet",
+                dynasty: "Dynasty 1",
+                period: "early",
+                dates: "c. 2920 BCE",
+                summary: "Controversial usurper who erased predecessor's memory.",
+                burial: "Tomb U, Umm el-Qa'ab, Abydos",
+                achievements: [
+                    "Seized throne - act of usurpation",
+                    "First simultaneous burials - retainers sacrificed at death",
+                    "Sinai expedition - continued resource acquisition",
+                    "Religious legitimation - participated in festivals"
+                ],
+                significance: "Widely regarded as a usurper who systematically erased Anedjib's name from monuments. His own name was later omitted from king lists, indicating his rule was considered illegitimate."
+            },
+            {
+                name: "Qa'a",
+                dynasty: "Dynasty 1",
+                period: "early",
+                dates: "c. 2910 BCE",
+                summary: "Last First Dynasty pharaoh, restored stability.",
+                burial: "Tomb Q, Umm el-Qa'ab, Abydos",
+                achievements: [
+                    "Restored stability - 33+ year peaceful reign",
+                    "Sophisticated tomb - large and complex structure",
+                    "Religious patronage - celebrated festivals, founded buildings",
+                    "Smooth transition - ensured legitimate succession"
+                ],
+                significance: "Last pharaoh of the First Dynasty. His long reign brought renewed stability after political turmoil, allowing resurgence in art, architecture, and trade."
+            },
+
+            // Dynasty 2
+            {
+                name: "Hotepsekhemwy",
+                dynasty: "Dynasty 2",
+                period: "early",
+                dates: "c. 2890 BCE",
+                summary: "Second Dynasty founder, reunified Egypt.",
+                burial: "Gallery Tomb B, Saqqara",
+                achievements: [
+                    "Reunified Egypt - ended dynastic strife",
+                    "Founded Second Dynasty - established new royal line",
+                    "Moved to Saqqara - new royal necropolis",
+                    "Legitimized rule - arranged predecessor's burial"
+                ],
+                significance: "Founder of the Second Dynasty. His name 'The Two Powers are at Peace' suggests he took throne after political turmoil and reunified Egypt by reconciling opposing factions."
+            },
+            {
+                name: "Raneb (Nebra)",
+                dynasty: "Dynasty 2",
+                period: "early",
+                dates: "c. 2850 BCE",
+                summary: "First pharaoh to formally link with sun god Ra.",
+                burial: "Gallery Tomb B, Saqqara",
+                achievements: [
+                    "First Ra link - formal connection with sun god",
+                    "Consolidated power - stabilized new dynasty",
+                    "Continued Saqqara - royal burial ground",
+                    "Carved stela - artistic legacy at Mit Rahina"
+                ],
+                significance: "First pharaoh to formally link his reign and identity with the sun god Ra, a foundational step in the development of Egyptian solar theology and divine kingship."
+            },
+            {
+                name: "Nynetjer",
+                dynasty: "Dynasty 2",
+                period: "early",
+                dates: "c. 2810 BCE",
+                summary: "Best-documented early ruler with 40+ year reign.",
+                burial: "Gallery Tomb, Saqqara",
+                achievements: [
+                    "Palermo Stone annals - detailed royal records",
+                    "Organized bureaucracy - administrative consolidation",
+                    "Massive tomb - underground gallery complex",
+                    "Division decision - controversial kingdom split"
+                ],
+                significance: "Best-documented ruler of early Second Dynasty thanks to Palermo Stone records. His long reign showed stability but ended with controversial decision to divide the kingdom."
+            },
+            {
+                name: "Peribsen",
+                dynasty: "Dynasty 2",
+                period: "early",
+                dates: "c. 2760 BCE",
+                summary: "Revolutionary ruler who replaced Horus with Seth.",
+                burial: "Tomb P, Abydos",
+                achievements: [
+                    "Replaced Horus with Seth - religious revolution",
+                    "Southern power base - returned to Abydos",
+                    "First cartouche - royal name enclosure",
+                    "Religious revolution - challenged traditional theology"
+                ],
+                significance: "Revolutionary ruler who replaced the traditional Horus falcon with the Seth animal in his royal serekh, representing a major religious and political upheaval."
+            },
+            {
+                name: "Khasekhemwy",
+                dynasty: "Dynasty 2",
+                period: "early",
+                dates: "c. 2690 BCE",
+                summary: "Ended civil war, reunified Egypt with both Horus and Seth.",
+                burial: "Tomb V, Abydos",
+                achievements: [
+                    "Reunified Egypt - ended Second Dynasty civil war",
+                    "Both Horus and Seth - religious reconciliation",
+                    "Shunet El Zebib - massive mud-brick enclosure",
+                    "First stone use - architectural innovation"
+                ],
+                significance: "Successfully ended the civil war that had divided Egypt during the Second Dynasty, reunifying the country and reconciling the Horus-Seth religious conflict."
+            },
+
+            // OLD KINGDOM (c. 2686-2181 BCE)
+            
+            // Dynasty 3
+            {
+                name: "Djoser (Netjerikhet)",
+                dynasty: "Dynasty 3",
+                period: "old",
+                dates: "c. 2670-2650 BCE",
+                summary: "Built first stone pyramid, architectural revolution.",
+                burial: "Step Pyramid, Saqqara",
+                achievements: [
+                    "First stone structure over 200 feet - Step Pyramid",
+                    "Architectural revolution - transition from mastaba to pyramid",
+                    "37-acre complex - vast funerary complex",
+                    "Sinai expeditions - continued resource acquisition"
+                ],
+                significance: "Commissioned the first monumental stone building in history - the Step Pyramid at Saqqara. This architectural revolution marked the beginning of the pyramid age and Old Kingdom."
+            },
+
+            // Dynasty 4
+            {
+                name: "Sneferu",
+                dynasty: "Dynasty 4",
+                period: "old",
+                dates: "c. 2613-2589 BCE",
+                summary: "Built three pyramids, most stone moved in history.",
+                burial: "Red Pyramid, Dahshur",
+                achievements: [
+                    "Three pyramids total - Meidum, Bent, and Red Pyramids",
+                    "Most stone moved ever - more than any other pharaoh",
+                    "Foreign expeditions - Lebanon cedar, Nubian gold",
+                    "Benevolent reputation - beloved by later generations"
+                ],
+                significance: "Built three pyramids and moved more stone than any other pharaoh in history. His architectural experiments led directly to the perfection achieved at Giza."
+            },
+            {
+                name: "Khufu (Cheops)",
+                dynasty: "Dynasty 4",
+                period: "old",
+                dates: "c. 2589-2566 BCE",
+                summary: "Built Great Pyramid of Giza, ancient wonder.",
+                burial: "Great Pyramid, Giza",
+                achievements: [
+                    "Great Pyramid 2.3 million blocks - ancient wonder of the world",
+                    "Supreme organization - massive workforce coordination",
+                    "Solar barques - ceremonial boats for afterlife journey",
+                    "Old Kingdom zenith - peak of pyramid building"
+                ],
+                significance: "Builder of the Great Pyramid of Giza, the only surviving ancient wonder of the world. His pyramid represents the zenith of Old Kingdom architectural achievement."
+            },
+            {
+                name: "Khafre (Chephren)",
+                dynasty: "Dynasty 4",
+                period: "old",
+                dates: "c. 2558-2532 BCE",
+                summary: "Built second Giza pyramid and Great Sphinx.",
+                burial: "Pyramid of Khafre, Giza",
+                achievements: [
+                    "Second Giza pyramid - appears larger due to higher ground",
+                    "Great Sphinx - colossal limestone statue with his face",
+                    "Valley Temple - perfectly fitted granite blocks",
+                    "Diorite statue - masterpiece of royal sculpture"
+                ],
+                significance: "Built the second pyramid at Giza and the Great Sphinx. His valley temple showcases the pinnacle of Old Kingdom stone masonry with perfectly fitted granite blocks."
+            },
+            {
+                name: "Menkaure (Mykerinos)",
+                dynasty: "Dynasty 4",
+                period: "old",
+                dates: "c. 2532-2503 BCE",
+                summary: "Third Giza pyramid builder, artistic golden age.",
+                burial: "Pyramid of Menkaure, Giza",
+                achievements: [
+                    "Granite-cased pyramid - smallest but most luxurious Giza pyramid",
+                    "Magnificent sculpture - artistic golden age",
+                    "Benevolent reputation - remembered as just ruler",
+                    "Artistic golden age - peak of Old Kingdom sculpture"
+                ],
+                significance: "Built the third and smallest pyramid at Giza, but his reign marked an artistic golden age with some of the finest sculpture ever produced in ancient Egypt."
+            },
+
+            // Dynasty 5
+            {
+                name: "Unas",
+                dynasty: "Dynasty 5",
+                period: "old",
+                dates: "c. 2375-2345 BCE",
+                summary: "First Pyramid Texts, oldest religious writings.",
+                burial: "Pyramid of Unas, Saqqara",
+                achievements: [
+                    "First Pyramid Texts - 283 spells for afterlife",
+                    "Oldest religious writings - foundation of Egyptian theology",
+                    "Causeway reliefs - scenes of famine and abundance",
+                    "Starred ceiling - astronomical decoration"
+                ],
+                significance: "First pharaoh to inscribe Pyramid Texts in his burial chamber - the oldest religious writings in the world and foundation of all later Egyptian funerary literature."
+            },
+
+            // Dynasty 6
+            {
+                name: "Pepi II",
+                dynasty: "Dynasty 6",
+                period: "old",
+                dates: "c. 2278-2184 BCE",
+                summary: "Longest reign in history at 94 years.",
+                burial: "Pyramid of Pepi II, Saqqara",
+                achievements: [
+                    "94-year reign - longest in recorded history",
+                    "Dancing dwarf letter - charming childhood correspondence",
+                    "Last major pyramid - end of pyramid age",
+                    "Longevity caused collapse - too long reign weakened state"
+                ],
+                significance: "Ruled for 94 years, the longest reign in recorded history. His extreme longevity ultimately weakened the state and contributed to the collapse of the Old Kingdom."
+            },
+
+            // FIRST INTERMEDIATE PERIOD (c. 2181-2055 BCE)
+            
+            // Dynasty 11
+            {
+                name: "Mentuhotep II",
+                dynasty: "Dynasty 11",
+                period: "first-intermediate",
+                dates: "c. 2061-2010 BCE",
+                summary: "Reunified Egypt, founded Middle Kingdom.",
+                burial: "Mortuary Temple, Deir el-Bahri",
+                achievements: [
+                    "Reunified Egypt - ended First Intermediate Period",
+                    "Founded Middle Kingdom - new era of prosperity",
+                    "Terraced temple - innovative architecture at Deir el-Bahri",
+                    "Governmental reforms - restored central authority"
+                ],
+                significance: "Successfully reunified Egypt after the chaos of the First Intermediate Period, founding the Middle Kingdom and ushering in a new era of prosperity and cultural achievement."
+            },
+
+            // MIDDLE KINGDOM (c. 2055-1650 BCE)
+            
+            // Dynasty 12
+            {
+                name: "Amenemhat I",
+                dynasty: "Dynasty 12",
+                period: "middle",
+                dates: "c. 1991-1962 BCE",
+                summary: "Founded greatest Middle Kingdom dynasty.",
+                burial: "Pyramid at Lisht",
+                achievements: [
+                    "Founded 12th Dynasty - greatest Middle Kingdom dynasty",
+                    "New capital Itj-tawy - 'Seizer of the Two Lands'",
+                    "Administrative reforms - efficient government",
+                    "Restored trade - economic prosperity"
+                ],
+                significance: "Founded the 12th Dynasty, considered the greatest of the Middle Kingdom. Established a new capital and implemented administrative reforms that brought unprecedented prosperity."
+            },
+            {
+                name: "Senusret I",
+                dynasty: "Dynasty 12",
+                period: "middle",
+                dates: "c. 1971-1926 BCE",
+                summary: "Classical peak of Middle Kingdom culture.",
+                burial: "Pyramid at Lisht",
+                achievements: [
+                    "Prolific building - temples throughout Egypt",
+                    "White Chapel Karnak - architectural masterpiece",
+                    "67-foot obelisk - tallest of Middle Kingdom",
+                    "13 Nubian fortresses - secured southern border"
+                ],
+                significance: "Reign marked the classical peak of Middle Kingdom culture. His building program was the most extensive since the Old Kingdom, including the beautiful White Chapel at Karnak."
+            },
+            {
+                name: "Senusret III",
+                dynasty: "Dynasty 12",
+                period: "middle",
+                dates: "c. 1878-1839 BCE",
+                summary: "Most powerful Middle Kingdom pharaoh.",
+                burial: "Pyramid at Dahshur",
+                achievements: [
+                    "Four Nubian campaigns - extended border to Second Cataract",
+                    "Abolished nomarchs - centralized government",
+                    "Care-worn portraiture - realistic royal art",
+                    "First Cataract canal - improved navigation"
+                ],
+                significance: "Most powerful pharaoh of the Middle Kingdom. His military campaigns secured Nubia and his administrative reforms centralized power by abolishing the provincial governors (nomarchs)."
+            },
+            {
+                name: "Amenemhat III",
+                dynasty: "Dynasty 12",
+                period: "middle",
+                dates: "c. 1860-1814 BCE",
+                summary: "Final great 12th Dynasty reign, built the Labyrinth.",
+                burial: "Pyramid at Hawara",
+                achievements: [
+                    "Two pyramids built - Dahshur and Hawara",
+                    "The Labyrinth wonder - massive funerary complex",
+                    "Completed Faiyum project - agricultural development",
+                    "Extensive mining - Sinai turquoise and gold"
+                ],
+                significance: "Final great ruler of the 12th Dynasty. Built the famous 'Labyrinth' funerary complex at Hawara, considered one of the wonders of the ancient world."
+            },
+            {
+                name: "Sobekneferu",
+                dynasty: "Dynasty 12",
+                period: "middle",
+                dates: "c. 1806-1802 BCE",
+                summary: "First confirmed female pharaoh.",
+                burial: "Possibly Northern Pyramid at Mazghuna",
+                achievements: [
+                    "First female pharaoh - adopted full royal titulary",
+                    "Innovative iconography - combined male and female elements",
+                    "Building at Hawara - additions to father's complex",
+                    "Peaceful dynasty end - orderly transition"
+                ],
+                significance: "First fully attested female pharaoh to rule Egypt in her own right. Her unique iconography combined traditional male royal regalia with female elements, setting precedent for future female rulers."
+            },
+
+            // SECOND INTERMEDIATE PERIOD (c. 1650-1550 BCE)
+            
+            // Dynasty 13
+            {
+                name: "Neferhotep I",
+                dynasty: "Dynasty 13",
+                period: "second-intermediate",
+                dates: "c. 1751-1740 BCE",
+                summary: "Peak of 13th Dynasty power.",
+                burial: "Likely Abydos",
+                achievements: [
+                    "11-year stable reign - longest of 13th Dynasty",
+                    "Great Abydos Stela - important historical document",
+                    "Widespread authority - controlled most of Egypt",
+                    "Brother succession - Sobekhotep IV"
+                ],
+                significance: "Represented the peak of 13th Dynasty power with the longest stable reign of the dynasty. His Great Abydos Stela provides crucial historical information about the period."
+            },
+            {
+                name: "Sobekhotep IV",
+                dynasty: "Dynasty 13",
+                period: "second-intermediate",
+                dates: "c. 1740-1730 BCE",
+                summary: "Brother of Neferhotep I, continued strong rule.",
+                burial: "Likely Abydos",
+                achievements: [
+                    "8-year reign - continued brother's policies",
+                    "Final unified strength - last powerful 13th Dynasty king",
+                    "Administrative continuity - maintained government",
+                    "Peaceful succession - stable transition"
+                ],
+                significance: "Brother and successor of Neferhotep I, continued the strong rule of the late 13th Dynasty. His reign marked the final period of unified strength before the Hyksos takeover."
+            },
+
+            // Dynasty 15 (Hyksos)
+            {
+                name: "Hyksos Kings",
+                dynasty: "Dynasty 15",
+                period: "second-intermediate",
+                dates: "c. 1650-1550 BCE",
+                summary: "Foreign rulers from Avaris who modernized Egypt.",
+                burial: "Avaris",
+                achievements: [
+                    "Horse and chariot introduction - military revolution",
+                    "Composite bow - advanced archery technology",
+                    "Extensive trade - Mediterranean connections",
+                    "Forced innovation - technological advancement"
+                ],
+                significance: "Foreign rulers who controlled northern Egypt from Avaris. Despite being invaders, they introduced crucial military technologies like horses, chariots, and composite bows that later enabled Egyptian empire."
+            },
+
+            // Dynasty 17 (Theban)
+            {
+                name: "Seqenenre Tao",
+                dynasty: "Dynasty 17",
+                period: "second-intermediate",
+                dates: "c. 1560 BCE",
+                summary: "Initiated war of liberation against Hyksos.",
+                burial: "Thebes",
+                achievements: [
+                    "Started liberation war - first military action against Hyksos",
+                    "Died in battle - martyr for Egyptian independence",
+                    "Martyr symbol - inspired resistance movement",
+                    "Inspired sons - Kamose and Ahmose continued fight"
+                ],
+                significance: "Initiated the war of liberation against the Hyksos rulers. His violent death in battle, evidenced by his mummy's head wounds, made him a martyr who inspired his sons to continue the fight."
+            },
+            {
+                name: "Kamose",
+                dynasty: "Dynasty 17",
+                period: "second-intermediate",
+                dates: "c. 1555-1550 BCE",
+                summary: "Continued liberation war, nearly expelled Hyksos.",
+                burial: "Thebes",
+                achievements: [
+                    "Continued liberation war - advanced against Hyksos",
+                    "Nearly expelled Hyksos - pushed them to Delta",
+                    "Military innovations - adopted Hyksos technology",
+                    "Prepared final victory - set stage for Ahmose"
+                ],
+                significance: "Continued his father's war against the Hyksos, pushing them back to the Delta region. His campaigns set the stage for his brother Ahmose to complete the liberation of Egypt."
+            },
+
+            // NEW KINGDOM (c. 1550-1077 BCE)
+            
+            // Dynasty 18
+            {
+                name: "Ahmose I",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1550-1525 BCE",
+                summary: "Expelled Hyksos, founded New Kingdom and Egyptian Empire.",
+                burial: "Thebes",
+                achievements: [
+                    "Expelled Hyksos - completed liberation of Egypt",
+                    "Founded New Kingdom - new era of imperial power",
+                    "Founded Egyptian Empire - first foreign conquests",
+                    "Military reforms - professional army creation"
+                ],
+                significance: "Completed the expulsion of the Hyksos and founded the New Kingdom. His reign marked the beginning of Egypt's imperial age and transformation into a major international power."
+            },
+            {
+                name: "Amenhotep I",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1525-1504 BCE",
+                summary: "Consolidated New Kingdom, patron of artisans.",
+                burial: "Valley of the Kings (first)",
+                achievements: [
+                    "Consolidated New Kingdom - strengthened royal power",
+                    "First Valley of Kings burial - new royal necropolis",
+                    "Patron of artisans - supported Deir el-Medina",
+                    "Nubian campaigns - secured southern border"
+                ],
+                significance: "Consolidated the New Kingdom and was the first pharaoh buried in the Valley of the Kings. Became patron saint of the royal tomb builders at Deir el-Medina."
+            },
+            {
+                name: "Thutmose I",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1504-1492 BCE",
+                summary: "First pharaoh to reach Euphrates River.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Reached Euphrates River - greatest territorial expansion",
+                    "Nubian conquest to Fourth Cataract - southern empire",
+                    "Karnak expansion - massive temple building",
+                    "Military innovations - professional officer corps"
+                ],
+                significance: "First pharaoh to campaign beyond the traditional borders, reaching the Euphrates River and establishing Egypt as a major imperial power in the ancient Near East."
+            },
+            {
+                name: "Hatshepsut",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1479-1458 BCE",
+                summary: "Most successful female pharaoh, 22-year peaceful reign.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "22-year peaceful reign - longest female rule",
+                    "Deir el-Bahri temple - architectural masterpiece",
+                    "Punt expedition - exotic trade mission",
+                    "Economic prosperity - focus on trade and building"
+                ],
+                significance: "Most successful female pharaoh in Egyptian history. Her 22-year reign was marked by peace, prosperity, and magnificent building projects, especially her mortuary temple at Deir el-Bahri."
+            },
+            {
+                name: "Thutmose III",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1479-1425 BCE",
+                summary: "Egypt's Napoleon, greatest military pharaoh.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "17 military campaigns - created vast empire",
+                    "Battle of Megiddo - first recorded battle in history",
+                    "Greatest territorial extent - from Nubia to Euphrates",
+                    "Military genius - innovative tactics and strategy"
+                ],
+                significance: "Known as 'Egypt's Napoleon' for his military genius. Conducted 17 campaigns and created the largest empire in Egyptian history, stretching from Nubia to the Euphrates River."
+            },
+            {
+                name: "Amenhotep II",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1427-1400 BCE",
+                summary: "Athletic pharaoh, maintained empire through strength.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Athletic prowess - legendary physical strength",
+                    "Maintained empire - secured borders through force",
+                    "Asiatic campaigns - continued father's policies",
+                    "Royal mummy intact - one of best preserved"
+                ],
+                significance: "Renowned for his athletic abilities and physical strength. Successfully maintained the empire created by his father Thutmose III through decisive military action."
+            },
+            {
+                name: "Thutmose IV",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1400-1390 BCE",
+                summary: "Dream Stela pharaoh, diplomatic innovations.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Dream Stela - famous Sphinx restoration story",
+                    "Diplomatic marriage - Mitannian princess",
+                    "Peace through diplomacy - reduced military campaigns",
+                    "Sphinx restoration - cleared sand from monument"
+                ],
+                significance: "Famous for the Dream Stela between the paws of the Great Sphinx. Pioneered diplomatic marriages as a tool of foreign policy, marrying a Mitannian princess."
+            },
+            {
+                name: "Amenhotep III",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1390-1352 BCE",
+                summary: "Magnificent pharaoh, peak of Egyptian wealth and art.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Peak of Egyptian wealth - golden age of prosperity",
+                    "Magnificent building program - temples throughout empire",
+                    "Diplomatic correspondence - Amarna Letters",
+                    "Artistic golden age - finest sculpture and painting"
+                ],
+                significance: "Ruled during the peak of Egyptian wealth and power. His reign marked a golden age of art, architecture, and diplomacy, with Egypt as the dominant power in the ancient world."
+            },
+            {
+                name: "Akhenaten (Amenhotep IV)",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1352-1336 BCE",
+                summary: "Heretic pharaoh, monotheistic revolution.",
+                burial: "Amarna (original), later moved",
+                achievements: [
+                    "Monotheistic revolution - worship of Aten only",
+                    "Founded Amarna - new capital city",
+                    "Artistic revolution - naturalistic Amarna style",
+                    "Religious upheaval - abandoned traditional gods"
+                ],
+                significance: "Revolutionary pharaoh who attempted to transform Egypt into a monotheistic state worshipping only the sun disk Aten. Founded a new capital at Amarna and created a new artistic style."
+            },
+            {
+                name: "Tutankhamun",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1332-1323 BCE",
+                summary: "Boy king, restored traditional religion, intact tomb.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Restored traditional religion - abandoned Atenism",
+                    "Intact tomb discovery - greatest archaeological find",
+                    "Religious restoration - rebuilt damaged temples",
+                    "Young death - died at approximately 19 years old"
+                ],
+                significance: "The 'boy king' who restored traditional Egyptian religion after Akhenaten's revolution. Famous today primarily for his intact tomb, the greatest archaeological discovery in Egypt."
+            },
+            {
+                name: "Ay",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1323-1319 BCE",
+                summary: "Elderly advisor who became pharaoh.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Elderly succession - became pharaoh in old age",
+                    "Tutankhamun's burial - oversaw boy king's funeral",
+                    "Short reign - 4-year transitional rule",
+                    "Court official background - rose from advisor"
+                ],
+                significance: "Elderly court official who became pharaoh after Tutankhamun's death. His brief reign served as a transition between the end of the Amarna period and the military rule of Horemheb."
+            },
+            {
+                name: "Horemheb",
+                dynasty: "Dynasty 18",
+                period: "new",
+                dates: "c. 1319-1292 BCE",
+                summary: "Military strongman, restored order after Amarna period.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Restored order - ended Amarna period chaos",
+                    "Military background - general who became pharaoh",
+                    "Administrative reforms - rebuilt government",
+                    "Erased Amarna - attempted to remove heretic period"
+                ],
+                significance: "Military general who became pharaoh and restored order after the chaos of the Amarna period. His reforms and administrative reorganization prepared Egypt for the glories of the 19th Dynasty."
+            },
+
+            // Dynasty 19
+            {
+                name: "Ramesses I",
+                dynasty: "Dynasty 19",
+                period: "new",
+                dates: "c. 1295-1294 BCE",
+                summary: "Founded 19th Dynasty, brief transitional reign.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Founded 19th Dynasty - established new royal line",
+                    "Military background - career soldier",
+                    "Brief reign - 16 months only",
+                    "Chosen by Horemheb - selected as successor"
+                ],
+                significance: "Founded the 19th Dynasty after being chosen as successor by Horemheb. His brief reign served as a transition to the glorious reigns of his son and grandson."
+            },
+            {
+                name: "Seti I",
+                dynasty: "Dynasty 19",
+                period: "new",
+                dates: "c. 1294-1279 BCE",
+                summary: "Restored Egyptian empire, magnificent tomb.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Restored Egyptian empire - reconquered lost territories",
+                    "Magnificent tomb - finest in Valley of the Kings",
+                    "Abydos temple - beautiful reliefs and king list",
+                    "Military campaigns - Syria, Palestine, Libya"
+                ],
+                significance: "Restored the Egyptian empire to its former glory through successful military campaigns. His tomb in the Valley of the Kings is considered the finest ever constructed."
+            },
+            {
+                name: "Ramesses II (the Great)",
+                dynasty: "Dynasty 19",
+                period: "new",
+                dates: "c. 1279-1213 BCE",
+                summary: "Greatest pharaoh, 66-year reign, Abu Simbel builder.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "66-year reign - second longest in Egyptian history",
+                    "Abu Simbel temples - colossal rock-cut monuments",
+                    "Battle of Kadesh - famous military campaign",
+                    "Peace treaty with Hittites - first known peace treaty"
+                ],
+                significance: "Known as 'Ramesses the Great,' he ruled for 66 years and built more monuments than any other pharaoh. His reign marked the last great period of Egyptian imperial power."
+            },
+            {
+                name: "Merenptah",
+                dynasty: "Dynasty 19",
+                period: "new",
+                dates: "c. 1213-1203 BCE",
+                summary: "Defended Egypt against Sea Peoples invasion.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Defeated Sea Peoples - repelled major invasion",
+                    "Israel Stela - first mention of Israel in Egyptian records",
+                    "Defended borders - protected Egyptian territory",
+                    "Elderly succession - became pharaoh at advanced age"
+                ],
+                significance: "Successfully defended Egypt against the invasion of the Sea Peoples. His victory stela contains the first known mention of 'Israel' in ancient records."
+            },
+
+            // Dynasty 20
+            {
+                name: "Ramesses III",
+                dynasty: "Dynasty 20",
+                period: "new",
+                dates: "c. 1184-1153 BCE",
+                summary: "Last great pharaoh, defeated Sea Peoples.",
+                burial: "Valley of the Kings",
+                achievements: [
+                    "Defeated Sea Peoples - final victory over invaders",
+                    "Last great pharaoh - final period of Egyptian strength",
+                    "Medinet Habu temple - magnificent mortuary complex",
+                    "Assassination plot - survived palace conspiracy"
+                ],
+                significance: "Last of the great pharaohs, successfully defended Egypt against the Sea Peoples and other invaders. His reign marked the end of Egypt's imperial age."
+            },
+
+            // THIRD INTERMEDIATE PERIOD (c. 1077-664 BCE)
+            
+            // Dynasty 21
+            {
+                name: "Smendes I",
+                dynasty: "Dynasty 21",
+                period: "third-intermediate",
+                dates: "c. 1077-1051 BCE",
+                summary: "Founded 21st Dynasty at Tanis.",
+                burial: "Tanis",
+                achievements: [
+                    "Founded 21st Dynasty - new royal line in north",
+                    "Ruled from Tanis - northern capital",
+                    "Divided rule - shared power with Theban priests",
+                    "Peaceful transition - avoided civil war"
+                ],
+                significance: "Founded the 21st Dynasty and ruled from Tanis in the north while Theban high priests controlled the south, beginning the Third Intermediate Period's divided rule."
+            },
+            {
+                name: "Psusennes I",
+                dynasty: "Dynasty 21",
+                period: "third-intermediate",
+                dates: "c. 1047-1001 BCE",
+                summary: "Silver pharaoh, intact royal burial at Tanis.",
+                burial: "Tanis",
+                achievements: [
+                    "Intact royal burial - silver coffin and mask",
+                    "46-year reign - longest of 21st Dynasty",
+                    "Tanis capital - developed northern royal city",
+                    "Peaceful rule - maintained stability"
+                ],
+                significance: "Known as the 'Silver Pharaoh' for his intact burial with silver coffin and mask discovered at Tanis. His 46-year reign brought stability during the Third Intermediate Period."
+            },
+
+            // Dynasty 22 (Libyan)
+            {
+                name: "Shoshenq I",
+                dynasty: "Dynasty 22",
+                period: "third-intermediate",
+                dates: "c. 945-924 BCE",
+                summary: "Libyan pharaoh, biblical Shishak, reunified Egypt.",
+                burial: "Tanis",
+                achievements: [
+                    "Reunified Egypt - ended divided rule",
+                    "Biblical Shishak - invaded Jerusalem",
+                    "Libyan dynasty founder - foreign rulers",
+                    "Military campaigns - Palestine and Judah"
+                ],
+                significance: "Libyan pharaoh who reunified Egypt and founded the 22nd Dynasty. Identified with biblical Shishak who invaded Jerusalem during the reign of King Rehoboam."
+            },
+
+            // Dynasty 25 (Nubian/Kushite)
+            {
+                name: "Piye (Piankhi)",
+                dynasty: "Dynasty 25",
+                period: "third-intermediate",
+                dates: "c. 747-716 BCE",
+                summary: "Nubian pharaoh, conquered Egypt from the south.",
+                burial: "El-Kurru, Sudan",
+                achievements: [
+                    "Conquered Egypt - Nubian invasion from south",
+                    "Victory Stela - detailed account of conquest",
+                    "Restored Egyptian culture - revived ancient traditions",
+                    "Founded Kushite dynasty - foreign rule from Nubia"
+                ],
+                significance: "Nubian king who conquered Egypt from the south, founding the 25th Dynasty. His victory stela provides a detailed account of his conquest and restoration of Egyptian traditions."
+            },
+            {
+                name: "Taharqa",
+                dynasty: "Dynasty 25",
+                period: "third-intermediate",
+                dates: "c. 690-664 BCE",
+                summary: "Greatest Nubian pharaoh, biblical ally, fought Assyrians.",
+                burial: "Nuri, Sudan",
+                achievements: [
+                    "Greatest Nubian pharaoh - peak of 25th Dynasty",
+                    "Biblical ally - supported Judah against Assyria",
+                    "Fought Assyrians - defended Egypt against invasion",
+                    "Building program - temples in Egypt and Nubia"
+                ],
+                significance: "Greatest of the Nubian pharaohs, mentioned in the Bible as an ally of Judah against Assyria. His reign marked the peak of the 25th Dynasty before the Assyrian conquest."
+            },
+
+            // LATE PERIOD (c. 664-332 BCE)
+            
+            // Dynasty 26 (Saite)
+            {
+                name: "Psamtik I",
+                dynasty: "Dynasty 26",
+                period: "late",
+                dates: "c. 664-610 BCE",
+                summary: "Reunified Egypt, founded Saite Renaissance.",
+                burial: "Sais",
+                achievements: [
+                    "Reunified Egypt - expelled Assyrians and rivals",
+                    "Founded Saite Renaissance - cultural revival",
+                    "54-year reign - longest of Late Period",
+                    "Greek mercenaries - employed foreign soldiers"
+                ],
+                significance: "Reunified Egypt after expelling the Assyrians and rival claimants, founding the 26th Dynasty and initiating the Saite Renaissance, a period of cultural revival."
+            },
+            {
+                name: "Necho II",
+                dynasty: "Dynasty 26",
+                period: "late",
+                dates: "c. 610-595 BCE",
+                summary: "Ambitious pharaoh, attempted Suez Canal, circumnavigated Africa.",
+                burial: "Sais",
+                achievements: [
+                    "Attempted Suez Canal - connected Red Sea to Nile",
+                    "Circumnavigated Africa - Phoenician expedition",
+                    "Battle of Carchemish - defeated by Babylonians",
+                    "Naval innovations - developed Egyptian fleet"
+                ],
+                significance: "Ambitious pharaoh who attempted to build a canal connecting the Red Sea to the Nile and sponsored the first recorded circumnavigation of Africa by Phoenician sailors."
+            },
+
+            // Dynasty 27 (First Persian Period)
+            {
+                name: "Cambyses II",
+                dynasty: "Dynasty 27",
+                period: "late",
+                dates: "c. 525-522 BCE",
+                summary: "Persian conqueror of Egypt.",
+                burial: "Persia",
+                achievements: [
+                    "Conquered Egypt - Persian invasion",
+                    "Battle of Pelusium - decisive victory",
+                    "Foreign rule - Persian administration",
+                    "Cultural conflicts - tensions with Egyptian traditions"
+                ],
+                significance: "Persian king who conquered Egypt at the Battle of Pelusium, ending native Egyptian rule and beginning the first period of Persian domination."
+            },
+            {
+                name: "Darius I",
+                dynasty: "Dynasty 27",
+                period: "late",
+                dates: "c. 522-486 BCE",
+                summary: "Persian Great King, completed Suez Canal.",
+                burial: "Persia",
+                achievements: [
+                    "Completed Suez Canal - finished Necho's project",
+                    "Administrative reforms - efficient Persian rule",
+                    "Respected Egyptian culture - tolerant policies",
+                    "Building projects - temples and infrastructure"
+                ],
+                significance: "Persian Great King who completed the Suez Canal begun by Necho II and implemented efficient administrative reforms while respecting Egyptian religious traditions."
+            },
+
+            // Dynasty 30 (Last Native Dynasty)
+            {
+                name: "Nectanebo I",
+                dynasty: "Dynasty 30",
+                period: "late",
+                dates: "c. 380-362 BCE",
+                summary: "Founded last native Egyptian dynasty.",
+                burial: "Egypt",
+                achievements: [
+                    "Founded last native dynasty - expelled Persians",
+                    "18-year reign - restored Egyptian independence",
+                    "Building program - temples throughout Egypt",
+                    "Military reforms - strengthened defenses"
+                ],
+                significance: "Founded the 30th and last native Egyptian dynasty after expelling the Persians. His reign marked a brief restoration of Egyptian independence."
+            },
+            {
+                name: "Nectanebo II",
+                dynasty: "Dynasty 30",
+                period: "late",
+                dates: "c. 360-343 BCE",
+                summary: "Last native Egyptian pharaoh.",
+                burial: "Egypt",
+                achievements: [
+                    "Last native pharaoh - end of Egyptian rule",
+                    "Defeated by Persians - second Persian conquest",
+                    "Building projects - continued temple construction",
+                    "End of independence - final native dynasty"
+                ],
+                significance: "Last native Egyptian pharaoh. His defeat by the Persians in 343 BCE ended over 3,000 years of native Egyptian rule and began the second Persian period."
+            },
+
+            // PTOLEMAIC PERIOD (332-30 BCE)
+            
+            // Macedonian Dynasty
+            {
+                name: "Alexander the Great",
+                dynasty: "Macedonian",
+                period: "ptolemaic",
+                dates: "332-323 BCE",
+                summary: "Macedonian conqueror, founded Alexandria.",
+                burial: "Alexandria (lost)",
+                achievements: [
+                    "Conquered Egypt - ended Persian rule",
+                    "Founded Alexandria - greatest ancient city",
+                    "Visited Siwa Oasis - declared son of Amun",
+                    "Hellenistic period - Greek influence in Egypt"
+                ],
+                significance: "Macedonian conqueror who liberated Egypt from Persian rule and founded Alexandria. His visit to Siwa Oasis, where he was declared son of Amun, legitimized his rule."
+            },
+
+            // Ptolemaic Dynasty
+            {
+                name: "Ptolemy I Soter",
+                dynasty: "Ptolemaic",
+                period: "ptolemaic",
+                dates: "305-282 BCE",
+                summary: "Founded Ptolemaic dynasty, built Library of Alexandria.",
+                burial: "Alexandria",
+                achievements: [
+                    "Founded Ptolemaic dynasty - Greek rule in Egypt",
+                    "Library of Alexandria - greatest ancient library",
+                    "Museum of Alexandria - center of learning",
+                    "Stable rule - established lasting dynasty"
+                ],
+                significance: "Alexander's general who founded the Ptolemaic dynasty and made Alexandria the intellectual center of the ancient world with its famous Library and Museum."
+            },
+            {
+                name: "Ptolemy II Philadelphus",
+                dynasty: "Ptolemaic",
+                period: "ptolemaic",
+                dates: "282-246 BCE",
+                summary: "Golden age of Ptolemaic Egypt, Lighthouse of Alexandria.",
+                burial: "Alexandria",
+                achievements: [
+                    "Golden age - peak of Ptolemaic prosperity",
+                    "Lighthouse of Alexandria - ancient wonder",
+                    "Septuagint translation - Greek Old Testament",
+                    "Cultural patronage - supported arts and sciences"
+                ],
+                significance: "Presided over the golden age of Ptolemaic Egypt. Built the Lighthouse of Alexandria (one of the Seven Wonders) and sponsored the Septuagint translation of the Hebrew Bible."
+            },
+            {
+                name: "Cleopatra VII",
+                dynasty: "Ptolemaic",
+                period: "ptolemaic",
+                dates: "51-30 BCE",
+                summary: "Last pharaoh of Egypt, lover of Caesar and Antony.",
+                burial: "Alexandria (lost)",
+                achievements: [
+                    "Last pharaoh - end of pharaonic Egypt",
+                    "Relationships with Caesar and Antony - political alliances",
+                    "Spoke Egyptian - first Ptolemy to learn native language",
+                    "Battle of Actium - final defeat by Octavian"
+                ],
+                significance: "Last active pharaoh of Egypt. Her relationships with Julius Caesar and Mark Antony were attempts to preserve Egyptian independence, but her defeat at Actium ended pharaonic rule forever."
+            }
+        ];
+
+        // Period information
+        const periodInfo = {
+            'early': {
+                title: 'Early Dynastic Period',
+                dates: 'c. 3150-2686 BCE',
+                summary: 'The foundation of pharaonic civilization, beginning with the unification of Upper and Lower Egypt under Narmer. This period saw the establishment of divine kingship, the development of hieroglyphic writing, and the creation of the basic governmental and religious structures that would define Egypt for millennia.'
+            },
+            'old': {
+                title: 'Old Kingdom',
+                dates: 'c. 2686-2181 BCE',
+                summary: 'The "Pyramid Age" when Egypt reached its first golden age. Marked by the construction of the great pyramids at Giza, the development of sophisticated art and architecture, and the establishment of Egypt as a unified, powerful state with a complex bureaucracy and extensive trade networks.'
+            },
+            'first-intermediate': {
+                title: 'First Intermediate Period',
+                dates: 'c. 2181-2055 BCE',
+                summary: 'A period of political fragmentation and civil war following the collapse of the Old Kingdom. Central authority broke down, leading to competing dynasties and regional rulers. This era ended with the reunification of Egypt under Mentuhotep II of Thebes.'
+            },
+            'middle': {
+                title: 'Middle Kingdom',
+                dates: 'c. 2055-1650 BCE',
+                summary: 'Egypt\'s classical age, characterized by political stability, cultural renaissance, and territorial expansion into Nubia. The 12th Dynasty represents the peak of Middle Kingdom achievement, with sophisticated literature, art, and administrative systems that became models for later periods.'
+            },
+            'second-intermediate': {
+                title: 'Second Intermediate Period',
+                dates: 'c. 1650-1550 BCE',
+                summary: 'A time of foreign rule and political division, most notably the Hyksos occupation of northern Egypt. This period saw the introduction of new military technologies like horses and chariots, which would later enable Egypt\'s imperial expansion in the New Kingdom.'
+            },
+            'new': {
+                title: 'New Kingdom',
+                dates: 'c. 1550-1077 BCE',
+                summary: 'Egypt\'s imperial age, when it became the dominant power in the ancient Near East. This period saw the greatest territorial expansion, the most famous pharaohs (including Hatshepsut, Akhenaten, Tutankhamun, and Ramesses II), and the height of Egyptian wealth and international influence.'
+            },
+            'third-intermediate': {
+                title: 'Third Intermediate Period',
+                dates: 'c. 1077-664 BCE',
+                summary: 'An era of political fragmentation with competing dynasties ruling different parts of Egypt. Notable for the rule of Libyan and Nubian dynasties, demonstrating Egypt\'s continued cultural influence even as political power was divided among various foreign and native rulers.'
+            },
+            'late': {
+                title: 'Late Period',
+                dates: 'c. 664-332 BCE',
+                summary: 'The final period of native Egyptian rule, interrupted by Persian conquests. The Saite Renaissance saw a revival of Old Kingdom art and culture, while later periods struggled against Persian domination until Alexander the Great\'s conquest ended native pharaonic rule forever.'
+            },
+            'ptolemaic': {
+                title: 'Ptolemaic Period',
+                dates: '332-30 BCE',
+                summary: 'The final chapter of pharaonic Egypt under Greek Macedonian rule. Beginning with Alexander the Great and ending with Cleopatra VII, this period saw Alexandria become the intellectual center of the ancient world, though Egypt gradually lost its independence to Rome.'
+            }
+        };
+
+        let currentFilter = 'all';
+        let searchTerm = '';
+
+        // Initialize the timeline
+        function initializeTimeline() {
+            updateStats();
+            renderTimeline();
+            setupEventListeners();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalPharaohs').textContent = pharaohsData.length;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                renderTimeline();
+            });
+
+            // Scroll to top button
+            window.addEventListener('scroll', () => {
+                const scrollButton = document.getElementById('scrollToTop');
+                if (window.pageYOffset > 300) {
+                    scrollButton.classList.add('visible');
+                } else {
+                    scrollButton.classList.remove('visible');
+                }
+            });
+        }
+
+        // Filter by period
+        function filterPeriod(period) {
+            currentFilter = period;
+            
+            // Update active button
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderTimeline();
+        }
+
+        // Render the timeline
+        function renderTimeline() {
+            const container = document.getElementById('timelineContainer');
+            
+            // Filter pharaohs
+            let filteredPharaohs = pharaohsData;
+            
+            if (currentFilter !== 'all') {
+                filteredPharaohs = pharaohsData.filter(pharaoh => pharaoh.period === currentFilter);
+            }
+            
+            if (searchTerm) {
+                filteredPharaohs = filteredPharaohs.filter(pharaoh => {
+                    return pharaoh.name.toLowerCase().includes(searchTerm) ||
+                           pharaoh.dynasty.toLowerCase().includes(searchTerm) ||
+                           pharaoh.summary.toLowerCase().includes(searchTerm) ||
+                           pharaoh.achievements.some(achievement => 
+                               achievement.toLowerCase().includes(searchTerm)
+                           );
+                });
+            }
+            
+            if (filteredPharaohs.length === 0) {
+                container.innerHTML = '<div class="no-results">No pharaohs found matching your search criteria.</div>';
+                return;
+            }
+            
+            // Group by period
+            const groupedPharaohs = {};
+            filteredPharaohs.forEach(pharaoh => {
+                if (!groupedPharaohs[pharaoh.period]) {
+                    groupedPharaohs[pharaoh.period] = [];
+                }
+                groupedPharaohs[pharaoh.period].push(pharaoh);
+            });
+            
+            // Render periods in chronological order
+            const periodOrder = ['early', 'old', 'first-intermediate', 'middle', 'second-intermediate', 'new', 'third-intermediate', 'late', 'ptolemaic'];
+            
+            let html = '';
+            periodOrder.forEach(period => {
+                if (groupedPharaohs[period]) {
+                    const info = periodInfo[period];
+                    html += `
+                        <div class="period-section" data-period="${period}">
+                            <h2 class="period-title">${info.title}</h2>
+                            <div class="period-dates">${info.dates}</div>
+                            <div class="period-summary">
+                                <div class="period-summary-text">${info.summary}</div>
+                            </div>
+                            ${groupedPharaohs[period].map(pharaoh => createPharaohCard(pharaoh)).join('')}
+                        </div>
+                    `;
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Create pharaoh card HTML
+        function createPharaohCard(pharaoh) {
+            return `
+                <div class="pharaoh-card" onclick="toggleDetails(this)">
+                    <div class="pharaoh-header">
+                        <div>
+                            <div class="pharaoh-name">${pharaoh.name}</div>
+                            <div class="pharaoh-dynasty">${pharaoh.dynasty}</div>
+                        </div>
+                        <div>
+                            <div class="pharaoh-dates">${pharaoh.dates}</div>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="pharaoh-summary">${pharaoh.summary}</div>
+                    <div class="pharaoh-details">
+                        <div class="detail-section">
+                            <div class="detail-title">Historical Significance</div>
+                            <div class="significance-text">${pharaoh.significance}</div>
+                        </div>
+                        <div class="detail-section">
+                            <div class="detail-title">Major Achievements</div>
+                            <ul class="achievement-list">
+                                ${pharaoh.achievements.map(achievement => `<li>${achievement}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <div class="detail-title">Burial Location</div>
+                            <div class="significance-text">${pharaoh.burial}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle pharaoh details
+        function toggleDetails(card) {
+            const details = card.querySelector('.pharaoh-details');
+            const icon = card.querySelector('.expand-icon');
+            
+            if (details.classList.contains('expanded')) {
+                details.classList.remove('expanded');
+                icon.classList.remove('rotated');
+            } else {
+                details.classList.add('expanded');
+                icon.classList.add('rotated');
+            }
+        }
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeTimeline);
+
+        // Make functions global for onclick handlers
+        window.filterPeriod = filterPeriod;
+        window.toggleDetails = toggleDetails;
+        window.scrollToTop = scrollToTop;
+    </script>
+</body>
+</html>
