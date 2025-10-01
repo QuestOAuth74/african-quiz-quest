@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import TopNavigation from "@/components/TopNavigation";
 
 const PharaohTimeline = () => {
   usePageTitle("Ancient Egyptian Pharaohs Timeline - Historia Africana");
@@ -11,12 +12,15 @@ const PharaohTimeline = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <iframe
-        src="/pharaoh-timeline.html"
-        className="w-full h-screen border-0"
-        title="Ancient Egyptian Pharaohs Timeline"
-        style={{ minHeight: '100vh' }}
-      />
+      <TopNavigation />
+      <div className="pt-16">
+        <iframe
+          src="/pharaoh-timeline.html"
+          className="w-full border-0"
+          title="Ancient Egyptian Pharaohs Timeline"
+          style={{ height: 'calc(100vh - 4rem)' }}
+        />
+      </div>
     </div>
   );
 };
