@@ -921,6 +921,63 @@ export type Database = {
         }
         Relationships: []
       }
+      pharaoh_timeline: {
+        Row: {
+          achievements: string | null
+          burial_location: string | null
+          created_at: string | null
+          created_by: string | null
+          dynasty: string
+          id: string
+          image_caption: string | null
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          period: string
+          reign_end: number | null
+          reign_start: number | null
+          significance: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          achievements?: string | null
+          burial_location?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          dynasty: string
+          id?: string
+          image_caption?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          period: string
+          reign_end?: number | null
+          reign_start?: number | null
+          significance?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          achievements?: string | null
+          burial_location?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          dynasty?: string
+          id?: string
+          image_caption?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          period?: string
+          reign_end?: number | null
+          reign_start?: number | null
+          significance?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       presentation_audio: {
         Row: {
           created_at: string
@@ -1774,18 +1831,9 @@ export type Database = {
       }
     }
     Functions: {
-      advance_room_turn: {
-        Args: { p_room_id: string }
-        Returns: string
-      }
-      calculate_reading_time: {
-        Args: { content: Json }
-        Returns: number
-      }
-      calculate_user_orbs: {
-        Args: { p_user_id: string }
-        Returns: undefined
-      }
+      advance_room_turn: { Args: { p_room_id: string }; Returns: string }
+      calculate_reading_time: { Args: { content: Json }; Returns: number }
+      calculate_user_orbs: { Args: { p_user_id: string }; Returns: undefined }
       check_admin_rate_limit: {
         Args: {
           p_action_type: string
@@ -1798,14 +1846,8 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
-      cleanup_expired_requests: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_expired_wheel_challenges: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_expired_requests: { Args: never; Returns: undefined }
+      cleanup_expired_wheel_challenges: { Args: never; Returns: undefined }
       create_admin_user: {
         Args: { user_email: string; user_password: string }
         Returns: string
@@ -1832,18 +1874,9 @@ export type Database = {
           user_id: string
         }[]
       }
-      fix_room_player_counts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      generate_room_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_slug: {
-        Args: { title: string }
-        Returns: string
-      }
+      fix_room_player_counts: { Args: never; Returns: undefined }
+      generate_room_code: { Args: never; Returns: string }
+      generate_slug: { Args: { title: string }; Returns: string }
       get_forum_author_info: {
         Args: { author_user_id: string }
         Returns: {
@@ -1853,7 +1886,7 @@ export type Database = {
         }[]
       }
       get_online_players: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           display_name: string
           is_online: boolean
@@ -1862,10 +1895,7 @@ export type Database = {
           user_id: string
         }[]
       }
-      get_or_create_thread: {
-        Args: { other_user_id: string }
-        Returns: string
-      }
+      get_or_create_thread: { Args: { other_user_id: string }; Returns: string }
       get_recent_admin_activity: {
         Args: { p_limit?: number }
         Returns: {
@@ -1879,7 +1909,7 @@ export type Database = {
         }[]
       }
       get_single_player_stats: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           best_category_name: string
           best_category_points: number
@@ -1900,14 +1930,10 @@ export type Database = {
         }
         Returns: boolean
       }
-      increment_view_count: {
-        Args: { post_id: string }
-        Returns: undefined
-      }
-      is_admin: {
-        Args: Record<PropertyKey, never> | { user_uuid?: string }
-        Returns: boolean
-      }
+      increment_view_count: { Args: { post_id: string }; Returns: undefined }
+      is_admin:
+        | { Args: never; Returns: boolean }
+        | { Args: { user_uuid?: string }; Returns: boolean }
       join_oware_game: {
         Args: { p_game_id: string; p_user_id: string }
         Returns: {
@@ -1938,18 +1964,12 @@ export type Database = {
         }
         Returns: boolean
       }
-      make_user_admin: {
-        Args: { user_email: string }
-        Returns: undefined
-      }
+      make_user_admin: { Args: { user_email: string }; Returns: undefined }
       make_user_admin_by_email: {
         Args: { user_email: string }
         Returns: string
       }
-      update_player_status: {
-        Args: { new_status: string }
-        Returns: undefined
-      }
+      update_player_status: { Args: { new_status: string }; Returns: undefined }
       update_question_rating_stats: {
         Args: { question_uuid: string }
         Returns: undefined
