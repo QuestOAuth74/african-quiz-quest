@@ -18,7 +18,7 @@ import GameCompletionModal from "@/components/GameCompletionModal";
 import { AIThinkingIndicator } from "@/components/AIThinkingIndicator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import WelcomeModal from "@/components/WelcomeModal";
+
 import UserAuth from "@/components/UserAuth";
 import { OnlineMultiplayerLobby } from "@/components/OnlineMultiplayerLobby";
 import { OnlineGameInterface } from "@/components/OnlineGameInterface";
@@ -78,41 +78,12 @@ const Index = () => {
   const [aiCooldownUntil, setAiCooldownUntil] = useState<number | null>(null);
   const [aiIsThinking, setAiIsThinking] = useState(false);
   const [aiIsSelectingQuestion, setAiIsSelectingQuestion] = useState(false);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  
   const [answeringPlayer, setAnsweringPlayer] = useState<string | null>(null);
 
   // Set page title
   usePageTitle("African History Games & Quizzes");
 
-  // Helper functions for welcome modal timing
-  const shouldShowWelcomeModal = (): boolean => {
-    const lastSeenTimestamp = localStorage.getItem('welcomeModalLastSeen');
-    if (!lastSeenTimestamp) {
-      return true; // First visit
-    }
-    
-    const lastSeen = parseInt(lastSeenTimestamp, 10);
-    const now = Date.now();
-    const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-    
-    return (now - lastSeen) >= twentyFourHours;
-  };
-
-  const markWelcomeModalSeen = () => {
-    localStorage.setItem('welcomeModalLastSeen', Date.now().toString());
-  };
-
-  // Check if user should see the welcome modal (first visit or 24+ hours since last viewing)
-  useEffect(() => {
-    if (shouldShowWelcomeModal()) {
-      setShowWelcomeModal(true);
-    }
-  }, []);
-
-  const handleCloseWelcome = () => {
-    setShowWelcomeModal(false);
-    markWelcomeModalSeen();
-  };
 
   // Redirect to auth if not authenticated and trying to access admin
   useEffect(() => {
@@ -684,8 +655,6 @@ const Index = () => {
   if (!gameMode) {
     return (
       <div className="min-h-screen overflow-hidden relative">
-        {/* Welcome Modal */}
-        <WelcomeModal isOpen={showWelcomeModal} onClose={handleCloseWelcome} />
         
         {/* Top Navigation */}
           <TopNavigation />
