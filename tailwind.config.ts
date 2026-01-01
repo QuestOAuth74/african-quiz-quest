@@ -18,10 +18,12 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				'orbitron': ['Orbitron', 'monospace'],
-				'exo': ['Exo 2', 'sans-serif'],
-			},
+		fontFamily: {
+			'display': ['Space Grotesk', 'sans-serif'],
+			'mono': ['Space Mono', 'monospace'],
+			'orbitron': ['Space Grotesk', 'sans-serif'],
+			'exo': ['Space Grotesk', 'sans-serif'],
+		},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
