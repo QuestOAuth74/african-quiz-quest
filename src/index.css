@@ -2,106 +2,120 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Definition of the design system - Neobrutalism with African concept
+   All colors MUST be HSL.
+   
+   Neobrutalism characteristics:
+   - Hard black borders (3-4px)
+   - Bold, high-contrast colors
+   - No blur shadows - only solid offset shadows
+   - Minimal or no border radius
+   - Raw, bold typography
+   
+   African color palette:
+   - Terracotta (warm earth red-orange)
+   - Ochre/Gold (warm yellow)
+   - Deep green (nature)
+   - Cream/Sand (neutral background)
+   - Rich black (borders and text)
 */
 
-/* Brown-Gold Theme (Default) */
+/* Neobrutalism African Theme (Default) */
 :root.theme-brown-gold {
-  /* Core semantic colors */
-  --background: 35 20% 8%;
-  --foreground: 45 95% 88%;
-  --card: 35 25% 12%;
-  --card-foreground: 45 95% 88%;
-  --popover: 35 25% 10%;
-  --popover-foreground: 45 95% 88%;
-  --primary: 45 95% 75%;
-  --primary-foreground: 35 30% 12%;
-  --secondary: 45 85% 65%;
-  --secondary-foreground: 35 30% 12%;
-  --muted: 35 15% 25%;
-  --muted-foreground: 45 95% 85%;
+  /* Core semantic colors - African Neobrutalism */
+  --background: 45 30% 94%;
+  --foreground: 20 10% 10%;
+  --card: 45 40% 98%;
+  --card-foreground: 20 10% 10%;
+  --popover: 45 40% 98%;
+  --popover-foreground: 20 10% 10%;
+  --primary: 16 80% 50%;
+  --primary-foreground: 45 40% 98%;
+  --secondary: 145 60% 32%;
+  --secondary-foreground: 45 40% 98%;
+  --muted: 45 20% 88%;
+  --muted-foreground: 20 10% 40%;
   --accent: 45 95% 55%;
-  --accent-foreground: 35 30% 12%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 35 20% 30%;
-  --input: 35 20% 25%;
-  --ring: 45 95% 55%;
-  --radius: 0.75rem;
+  --accent-foreground: 20 10% 10%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 45 40% 98%;
+  --border: 20 10% 10%;
+  --input: 45 30% 94%;
+  --ring: 16 80% 50%;
+  --radius: 0px;
 
-  /* Brown and yellow theme colors */
-  --theme-brown: 35 30% 18%;
-  --theme-brown-light: 35 25% 28%;
-  --theme-brown-dark: 35 35% 10%;
+  /* African theme colors */
+  --theme-brown: 16 80% 50%;
+  --theme-brown-light: 16 75% 60%;
+  --theme-brown-dark: 16 85% 40%;
   --theme-yellow: 45 95% 55%;
-  --theme-yellow-light: 45 95% 70%;
-  --theme-yellow-dark: 45 95% 40%;
+  --theme-yellow-light: 45 95% 65%;
+  --theme-yellow-dark: 45 95% 45%;
 
   /* Theme gold for special effects */
   --theme-gold: 45 95% 55%;
-  --theme-gold-light: 45 95% 70%;
-  --theme-gold-dark: 45 95% 40%;
+  --theme-gold-light: 45 95% 65%;
+  --theme-gold-dark: 45 95% 45%;
 
-  /* Professional Gradients */
-  --gradient-primary: linear-gradient(135deg, hsl(var(--theme-brown)), hsl(var(--theme-brown-light)));
-  --gradient-yellow: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
-  --gradient-card: linear-gradient(145deg, hsl(var(--theme-brown-light)), hsl(var(--theme-brown-dark)));
-  --gradient-background: radial-gradient(ellipse at center, hsl(var(--theme-brown-dark)), hsl(var(--background)));
-  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  /* Neobrutalism Gradients - mostly solid colors */
+  --gradient-primary: linear-gradient(135deg, hsl(16 80% 50%), hsl(16 75% 55%));
+  --gradient-yellow: linear-gradient(135deg, hsl(45 95% 55%), hsl(45 95% 60%));
+  --gradient-card: hsl(45 40% 98%);
+  --gradient-background: hsl(45 30% 94%);
+  --gradient-glass: hsl(45 40% 98%);
+  --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(45 95% 55% / 0.3) 50%, transparent 100%);
 
-  /* Professional Shadows */
-  --shadow-card: 0 8px 32px -8px hsl(var(--theme-brown-dark) / 0.4);
-  --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.3);
-  --shadow-inset: inset 0 2px 4px hsl(var(--theme-brown-dark) / 0.3);
-  --shadow-soft: 0 2px 8px -1px hsl(var(--theme-brown-dark) / 0.1), 0 1px 3px -1px hsl(var(--theme-brown-dark) / 0.06);
-  --shadow-medium: 0 4px 16px -2px hsl(var(--theme-brown-dark) / 0.15), 0 2px 6px -1px hsl(var(--theme-brown-dark) / 0.08);
-  --shadow-large: 0 8px 32px -4px hsl(var(--theme-brown-dark) / 0.2), 0 4px 12px -2px hsl(var(--theme-brown-dark) / 0.1);
-  --shadow-glow: 0 0 20px hsl(var(--theme-yellow) / 0.15);
-  --shadow-elegant: 0 10px 30px -10px hsl(var(--theme-brown-dark) / 0.25);
+  /* Neobrutalism Shadows - Hard offset, no blur */
+  --shadow-card: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-yellow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-inset: none;
+  --shadow-soft: 2px 2px 0px hsl(20 10% 10%);
+  --shadow-medium: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-large: 6px 6px 0px hsl(20 10% 10%);
+  --shadow-glow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-elegant: 5px 5px 0px hsl(20 10% 10%);
 
   /* Transitions */
-  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --transition-fast: all 0.1s ease;
+  --transition-smooth: all 0.2s ease;
+  --transition-elegant: all 0.3s ease;
+  --transition-bounce: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --sidebar-background: 35 25% 10%;
-  --sidebar-foreground: 45 95% 88%;
-  --sidebar-primary: 45 95% 55%;
-  --sidebar-primary-foreground: 35 30% 12%;
-  --sidebar-accent: 35 20% 18%;
-  --sidebar-accent-foreground: 45 95% 88%;
-  --sidebar-border: 35 20% 30%;
-  --sidebar-ring: 45 95% 55%;
+  --sidebar-background: 45 40% 98%;
+  --sidebar-foreground: 20 10% 10%;
+  --sidebar-primary: 16 80% 50%;
+  --sidebar-primary-foreground: 45 40% 98%;
+  --sidebar-accent: 45 95% 55%;
+  --sidebar-accent-foreground: 20 10% 10%;
+  --sidebar-border: 20 10% 10%;
+  --sidebar-ring: 16 80% 50%;
 }
 
 /* Professional Clean Theme - Calm & Minimal */
 :root.theme-lake {
   /* Core semantic colors - Professional clean palette */
-  --background: 0 0% 100%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 15%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 15%;
+  --background: 45 30% 94%;
+  --foreground: 20 10% 10%;
+  --card: 45 40% 98%;
+  --card-foreground: 20 10% 10%;
+  --popover: 45 40% 98%;
+  --popover-foreground: 20 10% 10%;
   --primary: 210 100% 45%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 95%;
-  --secondary-foreground: 210 10% 25%;
-  --muted: 210 40% 98%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 40% 94%;
-  --accent-foreground: 210 10% 25%;
+  --primary-foreground: 45 40% 98%;
+  --secondary: 145 60% 32%;
+  --secondary-foreground: 45 40% 98%;
+  --muted: 45 20% 88%;
+  --muted-foreground: 20 10% 40%;
+  --accent: 210 100% 55%;
+  --accent-foreground: 20 10% 10%;
   --destructive: 0 85% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 91%;
-  --input: 0 0% 100%;
+  --destructive-foreground: 45 40% 98%;
+  --border: 20 10% 10%;
+  --input: 45 30% 94%;
   --ring: 210 100% 45%;
-  --radius: 0.5rem;
+  --radius: 0px;
 
-  /* Professional theme colors - Subtle and clean */
+  /* Professional theme colors */
   --theme-brown: 210 10% 25%;
   --theme-brown-light: 210 10% 40%;
   --theme-brown-dark: 210 10% 15%;
@@ -109,114 +123,114 @@ All colors MUST be HSL.
   --theme-yellow-light: 210 100% 55%;
   --theme-yellow-dark: 210 100% 35%;
 
-  /* Theme gold for special effects - Subtle blue accent */
+  /* Theme gold for special effects */
   --theme-gold: 210 100% 45%;
   --theme-gold-light: 210 100% 55%;
   --theme-gold-dark: 210 100% 35%;
 
-  /* Professional Gradients - Subtle and clean */
-  --gradient-primary: linear-gradient(135deg, hsl(210 100% 45%) 0%, hsl(210 100% 40%) 100%);
-  --gradient-yellow: linear-gradient(135deg, hsl(210 100% 45%) 0%, hsl(210 100% 40%) 100%);
-  --gradient-card: linear-gradient(0deg, hsl(0 0% 100%) 0%, hsl(210 40% 99%) 100%);
-  --gradient-background: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 99%) 100%);
-  --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.8) 0%, hsla(0, 0%, 100%, 0.6) 100%);
-  --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(210 100% 45% / 0.1) 50%, transparent 100%);
+  /* Neobrutalism Gradients */
+  --gradient-primary: hsl(210 100% 45%);
+  --gradient-yellow: hsl(210 100% 45%);
+  --gradient-card: hsl(45 40% 98%);
+  --gradient-background: hsl(45 30% 94%);
+  --gradient-glass: hsl(45 40% 98%);
+  --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(210 100% 45% / 0.2) 50%, transparent 100%);
 
-  /* Professional Shadows - Subtle and elegant */
-  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-yellow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-inset: inset 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-soft: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-glow: 0 0 0 1px hsl(210 100% 45% / 0.2);
-  --shadow-elegant: 0 8px 16px -4px rgb(0 0 0 / 0.1), 0 4px 8px -4px rgb(0 0 0 / 0.1);
+  /* Neobrutalism Shadows */
+  --shadow-card: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-yellow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-inset: none;
+  --shadow-soft: 2px 2px 0px hsl(20 10% 10%);
+  --shadow-medium: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-large: 6px 6px 0px hsl(20 10% 10%);
+  --shadow-glow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-elegant: 5px 5px 0px hsl(20 10% 10%);
 
-  /* Professional Transitions - Smooth and polished */
-  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  /* Transitions */
+  --transition-fast: all 0.1s ease;
+  --transition-smooth: all 0.2s ease;
+  --transition-elegant: all 0.3s ease;
+  --transition-bounce: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --sidebar-background: 240 100% 90%;
-  --sidebar-foreground: 0 0% 0%;
-  --sidebar-primary: 0 100% 50%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 120 100% 25%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 0 0% 0%;
-  --sidebar-ring: 0 100% 50%;
+  --sidebar-background: 45 40% 98%;
+  --sidebar-foreground: 20 10% 10%;
+  --sidebar-primary: 210 100% 45%;
+  --sidebar-primary-foreground: 45 40% 98%;
+  --sidebar-accent: 210 100% 55%;
+  --sidebar-accent-foreground: 20 10% 10%;
+  --sidebar-border: 20 10% 10%;
+  --sidebar-ring: 210 100% 45%;
 }
 
-/* Root fallback (defaults to brown-gold) */
+/* Root fallback (defaults to neobrutalism african) */
 :root {
-  /* Core semantic colors */
-  --background: 35 20% 8%;
-  --foreground: 45 95% 88%;
-  --card: 35 25% 12%;
-  --card-foreground: 45 95% 88%;
-  --popover: 35 25% 10%;
-  --popover-foreground: 45 95% 88%;
-  --primary: 45 95% 75%;
-  --primary-foreground: 35 30% 12%;
-  --secondary: 45 85% 65%;
-  --secondary-foreground: 35 30% 12%;
-  --muted: 35 15% 25%;
-  --muted-foreground: 45 95% 85%;
+  /* Core semantic colors - African Neobrutalism */
+  --background: 45 30% 94%;
+  --foreground: 20 10% 10%;
+  --card: 45 40% 98%;
+  --card-foreground: 20 10% 10%;
+  --popover: 45 40% 98%;
+  --popover-foreground: 20 10% 10%;
+  --primary: 16 80% 50%;
+  --primary-foreground: 45 40% 98%;
+  --secondary: 145 60% 32%;
+  --secondary-foreground: 45 40% 98%;
+  --muted: 45 20% 88%;
+  --muted-foreground: 20 10% 40%;
   --accent: 45 95% 55%;
-  --accent-foreground: 35 30% 12%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 35 20% 30%;
-  --input: 35 20% 25%;
-  --ring: 45 95% 55%;
-  --radius: 0.75rem;
+  --accent-foreground: 20 10% 10%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 45 40% 98%;
+  --border: 20 10% 10%;
+  --input: 45 30% 94%;
+  --ring: 16 80% 50%;
+  --radius: 0px;
 
-  /* Brown and yellow theme colors */
-  --theme-brown: 35 30% 18%;
-  --theme-brown-light: 35 25% 28%;
-  --theme-brown-dark: 35 35% 10%;
+  /* African theme colors */
+  --theme-brown: 16 80% 50%;
+  --theme-brown-light: 16 75% 60%;
+  --theme-brown-dark: 16 85% 40%;
   --theme-yellow: 45 95% 55%;
-  --theme-yellow-light: 45 95% 70%;
-  --theme-yellow-dark: 45 95% 40%;
+  --theme-yellow-light: 45 95% 65%;
+  --theme-yellow-dark: 45 95% 45%;
 
   /* Theme gold for special effects */
   --theme-gold: 45 95% 55%;
-  --theme-gold-light: 45 95% 70%;
-  --theme-gold-dark: 45 95% 40%;
+  --theme-gold-light: 45 95% 65%;
+  --theme-gold-dark: 45 95% 45%;
 
-  /* Professional Gradients */
-  --gradient-primary: linear-gradient(135deg, hsl(var(--theme-brown)), hsl(var(--theme-brown-light)));
-  --gradient-yellow: linear-gradient(135deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)));
-  --gradient-card: linear-gradient(145deg, hsl(var(--theme-brown-light)), hsl(var(--theme-brown-dark)));
-  --gradient-background: radial-gradient(ellipse at center, hsl(var(--theme-brown-dark)), hsl(var(--background)));
-  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  --gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  /* Neobrutalism Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(16 80% 50%), hsl(16 75% 55%));
+  --gradient-yellow: linear-gradient(135deg, hsl(45 95% 55%), hsl(45 95% 60%));
+  --gradient-card: hsl(45 40% 98%);
+  --gradient-background: hsl(45 30% 94%);
+  --gradient-glass: hsl(45 40% 98%);
+  --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(45 95% 55% / 0.3) 50%, transparent 100%);
 
-  /* Professional Shadows */
-  --shadow-card: 0 8px 32px -8px hsl(var(--theme-brown-dark) / 0.4);
-  --shadow-yellow: 0 4px 20px hsl(var(--theme-yellow) / 0.3);
-  --shadow-inset: inset 0 2px 4px hsl(var(--theme-brown-dark) / 0.3);
-  --shadow-soft: 0 2px 8px -1px hsl(var(--theme-brown-dark) / 0.1), 0 1px 3px -1px hsl(var(--theme-brown-dark) / 0.06);
-  --shadow-medium: 0 4px 16px -2px hsl(var(--theme-brown-dark) / 0.15), 0 2px 6px -1px hsl(var(--theme-brown-dark) / 0.08);
-  --shadow-large: 0 8px 32px -4px hsl(var(--theme-brown-dark) / 0.2), 0 4px 12px -2px hsl(var(--theme-brown-dark) / 0.1);
-  --shadow-glow: 0 0 20px hsl(var(--theme-yellow) / 0.15);
-  --shadow-elegant: 0 10px 30px -10px hsl(var(--theme-brown-dark) / 0.25);
+  /* Neobrutalism Shadows */
+  --shadow-card: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-yellow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-inset: none;
+  --shadow-soft: 2px 2px 0px hsl(20 10% 10%);
+  --shadow-medium: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-large: 6px 6px 0px hsl(20 10% 10%);
+  --shadow-glow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-elegant: 5px 5px 0px hsl(20 10% 10%);
 
   /* Transitions */
-  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-elegant: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --transition-fast: all 0.1s ease;
+  --transition-smooth: all 0.2s ease;
+  --transition-elegant: all 0.3s ease;
+  --transition-bounce: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --sidebar-background: 35 25% 10%;
-  --sidebar-foreground: 45 95% 88%;
-  --sidebar-primary: 45 95% 55%;
-  --sidebar-primary-foreground: 35 30% 12%;
-  --sidebar-accent: 35 20% 18%;
-  --sidebar-accent-foreground: 45 95% 88%;
-  --sidebar-border: 35 20% 30%;
-  --sidebar-ring: 45 95% 55%;
+  --sidebar-background: 45 40% 98%;
+  --sidebar-foreground: 20 10% 10%;
+  --sidebar-primary: 16 80% 50%;
+  --sidebar-primary-foreground: 45 40% 98%;
+  --sidebar-accent: 45 95% 55%;
+  --sidebar-accent-foreground: 20 10% 10%;
+  --sidebar-border: 20 10% 10%;
+  --sidebar-ring: 16 80% 50%;
 }
 
 @layer base {
@@ -299,48 +313,48 @@ All colors MUST be HSL.
     -webkit-line-clamp: 3;
   }
 
-  /* Modern shadows */
+  /* Neobrutalism shadow */
   .shadow-3xl {
-    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: 6px 6px 0px hsl(20 10% 10%);
   }
 
   .dark {
-    --background: 35 25% 5%;
-    --foreground: 45 95% 92%;
+    --background: 20 15% 12%;
+    --foreground: 45 30% 92%;
 
-    --card: 35 30% 8%;
-    --card-foreground: 45 95% 92%;
+    --card: 20 15% 16%;
+    --card-foreground: 45 30% 92%;
 
-    --popover: 35 30% 6%;
-    --popover-foreground: 45 95% 92%;
+    --popover: 20 15% 14%;
+    --popover-foreground: 45 30% 92%;
 
-    --primary: 45 95% 80%;
-    --primary-foreground: 35 30% 10%;
+    --primary: 16 80% 55%;
+    --primary-foreground: 20 10% 10%;
 
-    --secondary: 45 85% 70%;
-    --secondary-foreground: 35 30% 10%;
+    --secondary: 145 55% 45%;
+    --secondary-foreground: 20 10% 10%;
 
-    --muted: 35 20% 20%;
-    --muted-foreground: 45 95% 90%;
+    --muted: 20 10% 25%;
+    --muted-foreground: 45 20% 70%;
 
     --accent: 45 95% 60%;
-    --accent-foreground: 35 35% 10%;
+    --accent-foreground: 20 10% 10%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 45 30% 92%;
 
-    --border: 35 25% 25%;
-    --input: 35 25% 20%;
-    --ring: 45 95% 60%;
+    --border: 45 30% 80%;
+    --input: 20 15% 20%;
+    --ring: 16 80% 55%;
 
-    --sidebar-background: 35 30% 6%;
-    --sidebar-foreground: 45 95% 92%;
-    --sidebar-primary: 45 95% 60%;
-    --sidebar-primary-foreground: 35 35% 10%;
-    --sidebar-accent: 35 25% 15%;
-    --sidebar-accent-foreground: 45 95% 92%;
-    --sidebar-border: 35 25% 25%;
-    --sidebar-ring: 45 95% 60%;
+    --sidebar-background: 20 15% 14%;
+    --sidebar-foreground: 45 30% 92%;
+    --sidebar-primary: 16 80% 55%;
+    --sidebar-primary-foreground: 20 10% 10%;
+    --sidebar-accent: 45 95% 60%;
+    --sidebar-accent-foreground: 20 10% 10%;
+    --sidebar-border: 45 30% 80%;
+    --sidebar-ring: 16 80% 55%;
   }
 }
 
@@ -350,41 +364,43 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply text-foreground;
-    background: var(--gradient-background);
+    @apply text-foreground font-display;
+    background: hsl(var(--background));
     min-height: 100vh;
   }
 
-  /* Custom utility classes */
+  /* Neobrutalism utility classes */
   .jeopardy-card {
-    background: var(--gradient-card);
-    box-shadow: var(--shadow-card), var(--shadow-inset);
-    border: 1px solid hsl(var(--theme-brown-light) / 0.3);
+    background: hsl(var(--card));
+    box-shadow: var(--shadow-card);
+    border: 3px solid hsl(var(--border));
   }
 
   .jeopardy-gold {
-    background: var(--gradient-yellow);
-    color: hsl(35 35% 10%); /* Dark brown for better contrast on yellow */
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
     box-shadow: var(--shadow-yellow);
+    border: 3px solid hsl(var(--border));
   }
 
   .jeopardy-button {
-    background: var(--gradient-card);
-    border: 2px solid hsl(var(--theme-yellow) / 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: hsl(var(--card));
+    border: 3px solid hsl(var(--border));
+    transition: var(--transition-fast);
     box-shadow: var(--shadow-card);
-    color: white;
+    color: hsl(var(--foreground));
   }
 
   .jeopardy-button:hover {
-    border-color: hsl(var(--theme-yellow));
-    box-shadow: var(--shadow-card), 0 0 20px hsl(var(--theme-yellow) / 0.4);
-    transform: translateY(-2px);
-    color: white;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px hsl(var(--border));
   }
 
   .jeopardy-text-glow {
-    text-shadow: 0 0 10px hsl(var(--theme-yellow) / 0.5);
+    /* Neobrutalism - no text glow, use bold text instead */
+    font-weight: 700;
   }
 }
 
@@ -395,127 +411,96 @@ All colors MUST be HSL.
 
   @keyframes pulse-yellow {
     0%, 100% {
-      text-shadow: 0 0 10px hsl(var(--theme-yellow) / 0.5);
+      transform: scale(1);
     }
     50% {
-      text-shadow: 0 0 20px hsl(var(--theme-yellow) / 0.8), 0 0 30px hsl(var(--theme-yellow) / 0.4);
-    }
-  }
-
-  @keyframes quiz-image-glow {
-    0% {
-      box-shadow: 
-        0 0 20px hsl(var(--theme-yellow) / 0.4),
-        inset 0 2px 4px hsl(var(--theme-yellow-light) / 0.3),
-        0 8px 32px hsl(var(--theme-yellow) / 0.2);
-    }
-    100% {
-      box-shadow: 
-        0 0 25px hsl(var(--theme-yellow) / 0.6),
-        inset 0 2px 4px hsl(var(--theme-yellow-light) / 0.4),
-        0 10px 40px hsl(var(--theme-yellow) / 0.3);
-    }
-  }
-
-  @keyframes crystal-twinkle {
-    0% {
-      opacity: 0.6;
-      transform: scale(0.8) rotate(0deg);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1.2) rotate(180deg);
+      transform: scale(1.02);
     }
   }
 
   .gradient-text {
-    background: var(--gradient-yellow);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: hsl(var(--primary));
+    font-weight: 700;
   }
 
-  /* Quiz Image Frame with Gold Rim and Crystal Effects */
+  /* Neobrutalism Image Frame */
   .quiz-image-frame {
     position: relative;
     display: inline-block;
-    padding: 8px;
-    background: linear-gradient(45deg, hsl(var(--theme-yellow)), hsl(var(--theme-yellow-light)), hsl(var(--theme-yellow)));
-    border-radius: 12px;
-    box-shadow: 
-      0 0 20px hsl(var(--theme-yellow) / 0.4),
-      inset 0 2px 4px hsl(var(--theme-yellow-light) / 0.3),
-      0 8px 32px hsl(var(--theme-yellow) / 0.2);
-    animation: quiz-image-glow 3s ease-in-out infinite alternate;
+    padding: 6px;
+    background: hsl(var(--accent));
+    border: 3px solid hsl(var(--border));
+    box-shadow: 4px 4px 0px hsl(var(--border));
   }
 
   .quiz-image-frame::before,
   .quiz-image-frame::after {
-    content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: hsl(var(--theme-yellow));
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    box-shadow: 0 0 6px hsl(var(--theme-yellow) / 0.8);
-    animation: crystal-twinkle 1.5s ease-in-out infinite alternate;
-  }
-
-  .quiz-image-frame::before {
-    top: -4px;
-    left: -4px;
-    animation-delay: 0s;
-  }
-
-  .quiz-image-frame::after {
-    top: -4px;
-    right: -4px;
-    animation-delay: 0.5s;
-  }
-
-  .quiz-image-frame .quiz-crystal-bottom-left,
-  .quiz-image-frame .quiz-crystal-bottom-right {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: hsl(var(--theme-yellow));
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    box-shadow: 0 0 6px hsl(var(--theme-yellow) / 0.8);
-    animation: crystal-twinkle 1.5s ease-in-out infinite alternate;
-  }
-
-  .quiz-image-frame .quiz-crystal-bottom-left {
-    bottom: -4px;
-    left: -4px;
-    animation-delay: 1s;
-  }
-
-  .quiz-image-frame .quiz-crystal-bottom-right {
-    bottom: -4px;
-    right: -4px;
-    animation-delay: 1.5s;
+    display: none;
   }
 
   .quiz-image-frame:hover {
-    box-shadow: 
-      0 0 30px hsl(var(--theme-yellow) / 0.6),
-      inset 0 2px 4px hsl(var(--theme-yellow-light) / 0.4),
-      0 12px 40px hsl(var(--theme-yellow) / 0.3);
-    transform: scale(1.02);
-  }
-
-  .quiz-image-frame:hover::before,
-  .quiz-image-frame:hover::after,
-  .quiz-image-frame:hover .quiz-crystal-bottom-left,
-  .quiz-image-frame:hover .quiz-crystal-bottom-right {
-    animation-duration: 0.8s;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px hsl(var(--border));
   }
 
   .quiz-image-content {
     display: block;
-    border-radius: 8px;
     overflow: hidden;
     background: hsl(var(--card));
+  }
+
+  /* Neobrutalism Button Style */
+  .neo-button {
+    background: hsl(var(--card));
+    border: 3px solid hsl(var(--border));
+    box-shadow: 4px 4px 0px hsl(var(--border));
+    transition: var(--transition-fast);
+    font-weight: 600;
+  }
+
+  .neo-button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px hsl(var(--border));
+  }
+
+  .neo-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px hsl(var(--border));
+  }
+
+  /* Neobrutalism Card */
+  .neo-card {
+    background: hsl(var(--card));
+    border: 3px solid hsl(var(--border));
+    box-shadow: 4px 4px 0px hsl(var(--border));
+  }
+
+  .neo-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px hsl(var(--border));
+  }
+
+  /* African Pattern Accent */
+  .african-accent {
+    position: relative;
+  }
+
+  .african-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(
+      90deg,
+      hsl(var(--primary)) 0px,
+      hsl(var(--primary)) 20px,
+      hsl(var(--accent)) 20px,
+      hsl(var(--accent)) 40px,
+      hsl(var(--secondary)) 40px,
+      hsl(var(--secondary)) 60px
+    );
   }
 }
 

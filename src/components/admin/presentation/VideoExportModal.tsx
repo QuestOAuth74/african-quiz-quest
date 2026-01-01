@@ -222,7 +222,7 @@ export const VideoExportModal = ({
             
             // Read output file
             const data = await ffmpeg.readFile(`output.${outputFormat}`);
-            finalBlob = new Blob([data], { type: `video/${outputFormat}` });
+            finalBlob = new Blob([data as BlobPart], { type: `video/${outputFormat}` });
             fileExtension = outputFormat;
             
           } catch (conversionError) {

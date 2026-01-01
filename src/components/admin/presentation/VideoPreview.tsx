@@ -347,7 +347,7 @@ export const VideoPreview = ({
           
           // Read output file
           const data = await ffmpeg.readFile('output.mp4');
-          finalBlob = new Blob([data], { type: 'video/mp4' });
+          finalBlob = new Blob([data as BlobPart], { type: 'video/mp4' });
           fileExtension = 'mp4';
           
         } catch (conversionError) {
