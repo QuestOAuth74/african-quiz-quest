@@ -12,68 +12,67 @@
    - Minimal or no border radius
    - Raw, bold typography
    
-   African color palette:
-   - Terracotta (warm earth red-orange)
-   - Ochre/Gold (warm yellow)
-   - Deep green (nature)
-   - Cream/Sand (neutral background)
-   - Rich black (borders and text)
+   African color palette - Brown concept:
+   - Rich brown (primary)
+   - Light brown / tan (accents)
+   - Warm cream (background)
+   - Dark chocolate (borders and text)
 */
 
 /* Neobrutalism African Theme (Default) */
 :root.theme-brown-gold {
-  /* Core semantic colors - African Neobrutalism */
-  --background: 45 30% 94%;
-  --foreground: 20 10% 10%;
-  --card: 45 40% 98%;
-  --card-foreground: 20 10% 10%;
-  --popover: 45 40% 98%;
-  --popover-foreground: 20 10% 10%;
-  --primary: 16 80% 50%;
-  --primary-foreground: 45 40% 98%;
-  --secondary: 145 60% 32%;
-  --secondary-foreground: 45 40% 98%;
-  --muted: 45 20% 88%;
-  --muted-foreground: 20 10% 40%;
-  --accent: 45 95% 55%;
-  --accent-foreground: 20 10% 10%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 45 40% 98%;
-  --border: 20 10% 10%;
-  --input: 45 30% 94%;
-  --ring: 16 80% 50%;
+  /* Core semantic colors - Brown Neobrutalism */
+  --background: 30 25% 92%; /* Warm cream */
+  --foreground: 25 40% 15%; /* Dark chocolate */
+  --card: 35 30% 96%; /* Light tan */
+  --card-foreground: 25 40% 15%;
+  --popover: 35 30% 96%;
+  --popover-foreground: 25 40% 15%;
+  --primary: 25 50% 35%; /* Rich brown */
+  --primary-foreground: 35 30% 96%;
+  --secondary: 30 40% 50%; /* Medium brown */
+  --secondary-foreground: 35 30% 96%;
+  --muted: 30 20% 85%; /* Muted tan */
+  --muted-foreground: 25 30% 40%;
+  --accent: 35 55% 45%; /* Warm amber brown */
+  --accent-foreground: 35 30% 96%;
+  --destructive: 0 55% 45%;
+  --destructive-foreground: 35 30% 96%;
+  --border: 25 40% 20%; /* Dark brown border */
+  --input: 30 25% 88%;
+  --ring: 25 50% 35%;
   --radius: 0px;
 
-  /* African theme colors */
-  --theme-brown: 16 80% 50%;
-  --theme-brown-light: 16 75% 60%;
-  --theme-brown-dark: 16 85% 40%;
-  --theme-yellow: 45 95% 55%;
-  --theme-yellow-light: 45 95% 65%;
-  --theme-yellow-dark: 45 95% 45%;
+  /* Brown theme colors */
+  --theme-brown: 25 50% 35%;
+  --theme-brown-light: 30 40% 55%;
+  --theme-brown-dark: 25 55% 25%;
+  --theme-yellow: 35 55% 45%; /* Amber brown accent */
+  --theme-yellow-light: 35 50% 60%;
+  --theme-yellow-dark: 30 60% 35%;
 
   /* Theme gold for special effects */
-  --theme-gold: 45 95% 55%;
-  --theme-gold-light: 45 95% 65%;
-  --theme-gold-dark: 45 95% 45%;
+  --theme-gold: 30 50% 45%;
+  --theme-gold-light: 35 45% 58%;
+  --theme-gold-dark: 25 55% 35%;
 
   /* Neobrutalism - Solid colors only, no gradients */
-  --gradient-primary: hsl(16 80% 50%);
-  --gradient-yellow: hsl(45 95% 55%);
-  --gradient-card: hsl(45 40% 98%);
-  --gradient-background: hsl(45 30% 94%);
-  --gradient-glass: hsl(45 40% 98%);
-  --gradient-shimmer: hsl(45 95% 55%);
+  --gradient-primary: hsl(25 50% 35%);
+  --gradient-yellow: hsl(35 55% 45%);
+  --gradient-card: hsl(35 30% 96%);
+  --gradient-background: hsl(30 25% 92%);
+  --gradient-glass: hsl(35 30% 96%);
+  --gradient-shimmer: hsl(35 55% 45%);
 
   /* Neobrutalism Shadows - Hard offset, no blur */
-  --shadow-card: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-yellow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-card: 4px 4px 0px hsl(25 40% 15%);
+  --shadow-yellow: 4px 4px 0px hsl(25 40% 15%);
   --shadow-inset: none;
-  --shadow-soft: 2px 2px 0px hsl(20 10% 10%);
-  --shadow-medium: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-large: 6px 6px 0px hsl(20 10% 10%);
-  --shadow-glow: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-elegant: 5px 5px 0px hsl(20 10% 10%);
+  --shadow-soft: 2px 2px 0px hsl(25 40% 15%);
+  --shadow-medium: 4px 4px 0px hsl(25 40% 15%);
+  --shadow-large: 6px 6px 0px hsl(25 40% 15%);
+  --shadow-glow: 4px 4px 0px hsl(25 40% 15%);
+  --shadow-elegant: 5px 5px 0px hsl(25 40% 15%);
 
   /* Transitions */
   --transition-fast: all 0.1s ease;
@@ -81,70 +80,70 @@
   --transition-elegant: all 0.3s ease;
   --transition-bounce: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --sidebar-background: 45 40% 98%;
-  --sidebar-foreground: 20 10% 10%;
-  --sidebar-primary: 16 80% 50%;
-  --sidebar-primary-foreground: 45 40% 98%;
-  --sidebar-accent: 45 95% 55%;
-  --sidebar-accent-foreground: 20 10% 10%;
-  --sidebar-border: 20 10% 10%;
-  --sidebar-ring: 16 80% 50%;
+  --sidebar-background: 35 30% 96%;
+  --sidebar-foreground: 25 40% 15%;
+  --sidebar-primary: 25 50% 35%;
+  --sidebar-primary-foreground: 35 30% 96%;
+  --sidebar-accent: 35 55% 45%;
+  --sidebar-accent-foreground: 25 40% 15%;
+  --sidebar-border: 25 40% 20%;
+  --sidebar-ring: 25 50% 35%;
 }
 
-/* Professional Clean Theme - Calm & Minimal */
+/* Alternative Theme - Lighter Brown */
 :root.theme-lake {
-  /* Core semantic colors - Professional clean palette */
-  --background: 45 30% 94%;
-  --foreground: 20 10% 10%;
-  --card: 45 40% 98%;
-  --card-foreground: 20 10% 10%;
-  --popover: 45 40% 98%;
-  --popover-foreground: 20 10% 10%;
-  --primary: 210 100% 45%;
-  --primary-foreground: 45 40% 98%;
-  --secondary: 145 60% 32%;
-  --secondary-foreground: 45 40% 98%;
-  --muted: 45 20% 88%;
-  --muted-foreground: 20 10% 40%;
-  --accent: 210 100% 55%;
-  --accent-foreground: 20 10% 10%;
-  --destructive: 0 85% 60%;
-  --destructive-foreground: 45 40% 98%;
-  --border: 20 10% 10%;
-  --input: 45 30% 94%;
-  --ring: 210 100% 45%;
+  /* Core semantic colors - Light brown palette */
+  --background: 32 28% 94%;
+  --foreground: 25 35% 18%;
+  --card: 34 32% 97%;
+  --card-foreground: 25 35% 18%;
+  --popover: 34 32% 97%;
+  --popover-foreground: 25 35% 18%;
+  --primary: 28 45% 42%;
+  --primary-foreground: 34 32% 97%;
+  --secondary: 32 35% 55%;
+  --secondary-foreground: 34 32% 97%;
+  --muted: 32 22% 86%;
+  --muted-foreground: 25 28% 45%;
+  --accent: 30 48% 50%;
+  --accent-foreground: 25 35% 18%;
+  --destructive: 0 50% 50%;
+  --destructive-foreground: 34 32% 97%;
+  --border: 25 35% 22%;
+  --input: 32 28% 90%;
+  --ring: 28 45% 42%;
   --radius: 0px;
 
-  /* Professional theme colors */
-  --theme-brown: 210 10% 25%;
-  --theme-brown-light: 210 10% 40%;
-  --theme-brown-dark: 210 10% 15%;
-  --theme-yellow: 210 100% 45%;
-  --theme-yellow-light: 210 100% 55%;
-  --theme-yellow-dark: 210 100% 35%;
+  /* Light brown theme colors */
+  --theme-brown: 28 45% 42%;
+  --theme-brown-light: 30 38% 58%;
+  --theme-brown-dark: 25 48% 32%;
+  --theme-yellow: 30 48% 50%;
+  --theme-yellow-light: 32 42% 62%;
+  --theme-yellow-dark: 28 52% 40%;
 
   /* Theme gold for special effects */
-  --theme-gold: 210 100% 45%;
-  --theme-gold-light: 210 100% 55%;
-  --theme-gold-dark: 210 100% 35%;
+  --theme-gold: 30 48% 50%;
+  --theme-gold-light: 32 42% 62%;
+  --theme-gold-dark: 28 52% 40%;
 
   /* Neobrutalism - Solid colors only */
-  --gradient-primary: hsl(210 100% 45%);
-  --gradient-yellow: hsl(210 100% 45%);
-  --gradient-card: hsl(45 40% 98%);
-  --gradient-background: hsl(45 30% 94%);
-  --gradient-glass: hsl(45 40% 98%);
-  --gradient-shimmer: hsl(210 100% 45%);
+  --gradient-primary: hsl(28 45% 42%);
+  --gradient-yellow: hsl(30 48% 50%);
+  --gradient-card: hsl(34 32% 97%);
+  --gradient-background: hsl(32 28% 94%);
+  --gradient-glass: hsl(34 32% 97%);
+  --gradient-shimmer: hsl(30 48% 50%);
 
   /* Neobrutalism Shadows */
-  --shadow-card: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-yellow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-card: 4px 4px 0px hsl(25 35% 18%);
+  --shadow-yellow: 4px 4px 0px hsl(25 35% 18%);
   --shadow-inset: none;
-  --shadow-soft: 2px 2px 0px hsl(20 10% 10%);
-  --shadow-medium: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-large: 6px 6px 0px hsl(20 10% 10%);
-  --shadow-glow: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-elegant: 5px 5px 0px hsl(20 10% 10%);
+  --shadow-soft: 2px 2px 0px hsl(25 35% 18%);
+  --shadow-medium: 4px 4px 0px hsl(25 35% 18%);
+  --shadow-large: 6px 6px 0px hsl(25 35% 18%);
+  --shadow-glow: 4px 4px 0px hsl(25 35% 18%);
+  --shadow-elegant: 5px 5px 0px hsl(25 35% 18%);
 
   /* Transitions */
   --transition-fast: all 0.1s ease;
@@ -152,70 +151,70 @@
   --transition-elegant: all 0.3s ease;
   --transition-bounce: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --sidebar-background: 45 40% 98%;
-  --sidebar-foreground: 20 10% 10%;
-  --sidebar-primary: 210 100% 45%;
-  --sidebar-primary-foreground: 45 40% 98%;
-  --sidebar-accent: 210 100% 55%;
-  --sidebar-accent-foreground: 20 10% 10%;
-  --sidebar-border: 20 10% 10%;
-  --sidebar-ring: 210 100% 45%;
+  --sidebar-background: 34 32% 97%;
+  --sidebar-foreground: 25 35% 18%;
+  --sidebar-primary: 28 45% 42%;
+  --sidebar-primary-foreground: 34 32% 97%;
+  --sidebar-accent: 30 48% 50%;
+  --sidebar-accent-foreground: 25 35% 18%;
+  --sidebar-border: 25 35% 22%;
+  --sidebar-ring: 28 45% 42%;
 }
 
-/* Root fallback (defaults to neobrutalism african) */
+/* Root fallback (defaults to brown neobrutalism) */
 :root {
-  /* Core semantic colors - African Neobrutalism */
-  --background: 45 30% 94%;
-  --foreground: 20 10% 10%;
-  --card: 45 40% 98%;
-  --card-foreground: 20 10% 10%;
-  --popover: 45 40% 98%;
-  --popover-foreground: 20 10% 10%;
-  --primary: 16 80% 50%;
-  --primary-foreground: 45 40% 98%;
-  --secondary: 145 60% 32%;
-  --secondary-foreground: 45 40% 98%;
-  --muted: 45 20% 88%;
-  --muted-foreground: 20 10% 40%;
-  --accent: 45 95% 55%;
-  --accent-foreground: 20 10% 10%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 45 40% 98%;
-  --border: 20 10% 10%;
-  --input: 45 30% 94%;
-  --ring: 16 80% 50%;
+  /* Core semantic colors - Brown Neobrutalism */
+  --background: 30 25% 92%;
+  --foreground: 25 40% 15%;
+  --card: 35 30% 96%;
+  --card-foreground: 25 40% 15%;
+  --popover: 35 30% 96%;
+  --popover-foreground: 25 40% 15%;
+  --primary: 25 50% 35%;
+  --primary-foreground: 35 30% 96%;
+  --secondary: 30 40% 50%;
+  --secondary-foreground: 35 30% 96%;
+  --muted: 30 20% 85%;
+  --muted-foreground: 25 30% 40%;
+  --accent: 35 55% 45%;
+  --accent-foreground: 35 30% 96%;
+  --destructive: 0 55% 45%;
+  --destructive-foreground: 35 30% 96%;
+  --border: 25 40% 20%;
+  --input: 30 25% 88%;
+  --ring: 25 50% 35%;
   --radius: 0px;
 
-  /* African theme colors */
-  --theme-brown: 16 80% 50%;
-  --theme-brown-light: 16 75% 60%;
-  --theme-brown-dark: 16 85% 40%;
-  --theme-yellow: 45 95% 55%;
-  --theme-yellow-light: 45 95% 65%;
-  --theme-yellow-dark: 45 95% 45%;
+  /* Brown theme colors */
+  --theme-brown: 25 50% 35%;
+  --theme-brown-light: 30 40% 55%;
+  --theme-brown-dark: 25 55% 25%;
+  --theme-yellow: 35 55% 45%;
+  --theme-yellow-light: 35 50% 60%;
+  --theme-yellow-dark: 30 60% 35%;
 
   /* Theme gold for special effects */
-  --theme-gold: 45 95% 55%;
-  --theme-gold-light: 45 95% 65%;
-  --theme-gold-dark: 45 95% 45%;
+  --theme-gold: 30 50% 45%;
+  --theme-gold-light: 35 45% 58%;
+  --theme-gold-dark: 25 55% 35%;
 
   /* Neobrutalism - Solid colors only */
-  --gradient-primary: hsl(16 80% 50%);
-  --gradient-yellow: hsl(45 95% 55%);
-  --gradient-card: hsl(45 40% 98%);
-  --gradient-background: hsl(45 30% 94%);
-  --gradient-glass: hsl(45 40% 98%);
-  --gradient-shimmer: hsl(45 95% 55%);
+  --gradient-primary: hsl(25 50% 35%);
+  --gradient-yellow: hsl(35 55% 45%);
+  --gradient-card: hsl(35 30% 96%);
+  --gradient-background: hsl(30 25% 92%);
+  --gradient-glass: hsl(35 30% 96%);
+  --gradient-shimmer: hsl(35 55% 45%);
 
   /* Neobrutalism Shadows */
-  --shadow-card: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-yellow: 4px 4px 0px hsl(20 10% 10%);
+  --shadow-card: 4px 4px 0px hsl(25 40% 15%);
+  --shadow-yellow: 4px 4px 0px hsl(25 40% 15%);
   --shadow-inset: none;
-  --shadow-soft: 2px 2px 0px hsl(20 10% 10%);
-  --shadow-medium: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-large: 6px 6px 0px hsl(20 10% 10%);
-  --shadow-glow: 4px 4px 0px hsl(20 10% 10%);
-  --shadow-elegant: 5px 5px 0px hsl(20 10% 10%);
+  --shadow-soft: 2px 2px 0px hsl(25 40% 15%);
+  --shadow-medium: 4px 4px 0px hsl(25 40% 15%);
+  --shadow-large: 6px 6px 0px hsl(25 40% 15%);
+  --shadow-glow: 4px 4px 0px hsl(25 40% 15%);
+  --shadow-elegant: 5px 5px 0px hsl(25 40% 15%);
 
   /* Transitions */
   --transition-fast: all 0.1s ease;
@@ -223,14 +222,14 @@
   --transition-elegant: all 0.3s ease;
   --transition-bounce: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --sidebar-background: 45 40% 98%;
-  --sidebar-foreground: 20 10% 10%;
-  --sidebar-primary: 16 80% 50%;
-  --sidebar-primary-foreground: 45 40% 98%;
-  --sidebar-accent: 45 95% 55%;
-  --sidebar-accent-foreground: 20 10% 10%;
-  --sidebar-border: 20 10% 10%;
-  --sidebar-ring: 16 80% 50%;
+  --sidebar-background: 35 30% 96%;
+  --sidebar-foreground: 25 40% 15%;
+  --sidebar-primary: 25 50% 35%;
+  --sidebar-primary-foreground: 35 30% 96%;
+  --sidebar-accent: 35 55% 45%;
+  --sidebar-accent-foreground: 25 40% 15%;
+  --sidebar-border: 25 40% 20%;
+  --sidebar-ring: 25 50% 35%;
 }
 
 @layer base {
@@ -315,46 +314,46 @@
 
   /* Neobrutalism shadow */
   .shadow-3xl {
-    box-shadow: 6px 6px 0px hsl(20 10% 10%);
+    box-shadow: 6px 6px 0px hsl(25 40% 15%);
   }
 
   .dark {
-    --background: 20 15% 12%;
-    --foreground: 45 30% 92%;
+    --background: 25 30% 12%;
+    --foreground: 35 25% 90%;
 
-    --card: 20 15% 16%;
-    --card-foreground: 45 30% 92%;
+    --card: 25 25% 16%;
+    --card-foreground: 35 25% 90%;
 
-    --popover: 20 15% 14%;
-    --popover-foreground: 45 30% 92%;
+    --popover: 25 25% 14%;
+    --popover-foreground: 35 25% 90%;
 
-    --primary: 16 80% 55%;
-    --primary-foreground: 20 10% 10%;
+    --primary: 35 50% 50%;
+    --primary-foreground: 25 30% 12%;
 
-    --secondary: 145 55% 45%;
-    --secondary-foreground: 20 10% 10%;
+    --secondary: 30 40% 45%;
+    --secondary-foreground: 25 30% 12%;
 
-    --muted: 20 10% 25%;
-    --muted-foreground: 45 20% 70%;
+    --muted: 25 20% 22%;
+    --muted-foreground: 30 22% 65%;
 
-    --accent: 45 95% 60%;
-    --accent-foreground: 20 10% 10%;
+    --accent: 32 48% 52%;
+    --accent-foreground: 25 30% 12%;
 
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 45 30% 92%;
+    --destructive: 0 55% 50%;
+    --destructive-foreground: 35 25% 90%;
 
-    --border: 45 30% 80%;
-    --input: 20 15% 20%;
-    --ring: 16 80% 55%;
+    --border: 35 35% 45%;
+    --input: 25 22% 20%;
+    --ring: 35 50% 50%;
 
-    --sidebar-background: 20 15% 14%;
-    --sidebar-foreground: 45 30% 92%;
-    --sidebar-primary: 16 80% 55%;
-    --sidebar-primary-foreground: 20 10% 10%;
-    --sidebar-accent: 45 95% 60%;
-    --sidebar-accent-foreground: 20 10% 10%;
-    --sidebar-border: 45 30% 80%;
-    --sidebar-ring: 16 80% 55%;
+    --sidebar-background: 25 25% 14%;
+    --sidebar-foreground: 35 25% 90%;
+    --sidebar-primary: 35 50% 50%;
+    --sidebar-primary-foreground: 25 30% 12%;
+    --sidebar-accent: 32 48% 52%;
+    --sidebar-accent-foreground: 25 30% 12%;
+    --sidebar-border: 35 35% 45%;
+    --sidebar-ring: 35 50% 50%;
   }
 }
 
