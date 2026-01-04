@@ -174,7 +174,7 @@ export function Crossword() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full shadow-xl">
           <CardHeader className="text-center">
             <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
@@ -197,7 +197,7 @@ export function Crossword() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-lg font-medium">Loading crossword puzzles...</p>
@@ -207,9 +207,9 @@ export function Crossword() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+    <div className="min-h-screen bg-background">
       {/* Top Navigation */}
-      <header className="bg-background/80 backdrop-blur-md border-b sticky top-0 z-50">
+      <header className="bg-card border-b-4 border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -251,9 +251,9 @@ export function Crossword() {
             alt="African History Crosswords" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70" />
-          
-          {/* Crossword Grid Overlay Pattern */}
+              <div className="absolute inset-0 bg-black/60" />
+              
+              {/* Crossword Grid Overlay Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="h-full w-full bg-repeat" 
                  style={{

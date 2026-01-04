@@ -231,10 +231,10 @@ export default function SenetPlay() {
   // Return loading state if no game state
   if (!gameState) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950 dark:to-orange-950 flex items-center justify-center">
-        <Card>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="neo-card">
           <CardContent className="p-6">
-            <p className="text-center">Loading game...</p>
+            <p className="text-center font-bold">Loading game...</p>
           </CardContent>
         </Card>
       </div>
@@ -246,7 +246,7 @@ export default function SenetPlay() {
   const aiPieces = gameState.board.filter(p => p?.player === 2).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950 dark:to-orange-950 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-4">
         
         {/* Header */}
