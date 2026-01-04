@@ -68,8 +68,8 @@ export function ParallaxBanner({ imageSrc, alt, children }: ParallaxBannerProps)
           }}
         />
         
-        {/* Overlay Gradient for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10 z-30" />
+        {/* Solid overlay for better text readability - no gradient */}
+        <div className="absolute inset-0 bg-black/20 z-30" />
       </div>
 
 
