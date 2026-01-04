@@ -12,13 +12,7 @@ export const QuizSection = () => {
   };
 
   return (
-    <section className="w-full py-16 bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-theme-yellow/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-theme-yellow-light/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-theme-yellow-dark/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
+    <section className="w-full py-16 bg-background relative overflow-hidden border-y-4 border-border">
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
@@ -44,8 +38,8 @@ export const QuizSection = () => {
           {/* Feature Card 1 */}
           <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
-                <BookOpen size={40} className="text-theme-brown" />
+              <div className="mx-auto mb-4 p-4 bg-primary border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <BookOpen size={40} className="text-primary-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-theme-yellow">
                 COMPREHENSIVE
@@ -65,8 +59,8 @@ export const QuizSection = () => {
           {/* Feature Card 2 */}
           <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20" style={{ animationDelay: '0.1s' }}>
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow-light to-theme-yellow rounded-xl w-fit shadow-lg">
-                <Target size={40} className="text-theme-brown" />
+              <div className="mx-auto mb-4 p-4 bg-accent border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <Target size={40} className="text-accent-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-theme-yellow">
                 ADAPTIVE LEARNING
@@ -86,8 +80,8 @@ export const QuizSection = () => {
           {/* Feature Card 3 */}
           <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20" style={{ animationDelay: '0.2s' }}>
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow-dark to-theme-yellow rounded-xl w-fit shadow-lg">
-                <Award size={40} className="text-theme-brown" />
+              <div className="mx-auto mb-4 p-4 bg-secondary border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <Award size={40} className="text-secondary-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-theme-yellow">
                 EXPERT CONTENT
@@ -107,7 +101,7 @@ export const QuizSection = () => {
 
         {/* Quiz Highlights */}
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
-          <div className="p-6 bg-gradient-to-br from-theme-yellow/20 to-theme-yellow-dark/20 rounded-xl border border-theme-yellow/30 backdrop-blur-sm jeopardy-card">
+          <div className="p-6 bg-card border-4 border-border shadow-[4px_4px_0px_0px_hsl(var(--border))]">
             <h3 className="text-2xl font-bold text-theme-yellow mb-4 flex items-center gap-2">
               <Sparkles className="w-6 h-6" />
               Quiz Highlights
@@ -132,7 +126,7 @@ export const QuizSection = () => {
             </ul>
           </div>
 
-          <div className="p-6 bg-gradient-to-br from-theme-brown-light/40 to-theme-brown-dark/40 rounded-xl border border-theme-yellow/30 backdrop-blur-sm jeopardy-card">
+          <div className="p-6 bg-muted border-4 border-border shadow-[4px_4px_0px_0px_hsl(var(--border))]">
             <h3 className="text-2xl font-bold text-theme-yellow mb-4 flex items-center gap-2">
               <Brain className="w-6 h-6" />
               Learning Features
@@ -160,7 +154,7 @@ export const QuizSection = () => {
 
         {/* Book Reward Section */}
         <div className="mb-12">
-          <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto p-6 bg-gradient-to-r from-theme-yellow/10 via-theme-yellow-light/10 to-theme-yellow-dark/10 rounded-2xl border border-theme-yellow/30 backdrop-blur-sm jeopardy-card">
+          <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto p-6 bg-card border-4 border-border shadow-[4px_4px_0px_0px_hsl(var(--border))]">
             <div className="order-2 md:order-1">
               <h3 className="text-3xl font-bold text-theme-yellow mb-4 flex items-center gap-2">
                 <Gift className="w-8 h-8" />
@@ -189,7 +183,7 @@ export const QuizSection = () => {
 
         {/* CTA Section */}
         <div className="text-center">
-          <div className="p-8 bg-gradient-to-r from-theme-brown/60 via-theme-brown-light/60 to-theme-brown-dark/60 rounded-2xl border border-theme-yellow/30 backdrop-blur-sm max-w-2xl mx-auto shadow-[0_0_30px_rgba(255,215,0,0.3)] jeopardy-card">
+          <div className="p-8 bg-primary border-4 border-border max-w-2xl mx-auto shadow-[4px_4px_0px_0px_hsl(var(--border))]">
             <Button 
               onClick={handleStartQuiz}
               size="lg"
