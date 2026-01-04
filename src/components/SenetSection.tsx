@@ -7,27 +7,20 @@ export const SenetSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="w-full py-16 bg-gradient-to-br from-background via-background/95 to-secondary/20 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-secondary/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
+    <section className="w-full py-16 bg-muted relative overflow-hidden border-y-4 border-border">
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="text-4xl animate-pulse text-primary">𓋹</div>
-            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <div className="text-4xl text-primary">𓋹</div>
+            <h2 className="text-5xl md:text-6xl font-bold text-primary">
               ANCIENT SENET
             </h2>
-            <div className="text-4xl animate-pulse text-primary">𓋹</div>
+            <div className="text-4xl text-primary">𓋹</div>
           </div>
           <div className="text-xl md:text-2xl text-primary mb-4 font-light tracking-wide">
             PHARAOH'S SACRED GAME
           </div>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-4 font-medium">
+          <p className="text-lg md:text-xl text-foreground max-w-3xl mx-auto mb-4 font-medium">
             Journey through the underworld in this ancient Egyptian board game
           </p>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto">
@@ -37,9 +30,9 @@ export const SenetSection = () => {
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
           {/* Single Player vs AI */}
-          <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-primary/20">
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-primary to-primary/80 rounded-xl w-fit shadow-lg">
+              <div className="mx-auto mb-4 p-4 bg-primary border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
                 <Bot className="h-8 w-8 text-primary-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-primary">
@@ -52,22 +45,22 @@ export const SenetSection = () => {
               </p>
               <Button 
                 onClick={() => navigate('/senet')}
-                className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                className="neo-button w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
               >
                 <Gamepad2 className="h-4 w-4 mr-2" />
                 Play vs AI
               </Button>
-              <div className="flex items-center justify-center gap-2 text-primary/70 mt-3">
+              <div className="flex items-center justify-center gap-2 text-primary mt-3">
                 <Star className="w-4 h-4" />
-                <span className="text-sm">Learn Ancient Rules</span>
+                <span className="text-sm font-semibold">Learn Ancient Rules</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Local Multiplayer */}
-          <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-primary/20" style={{ animationDelay: '0.1s' }}>
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-secondary to-secondary/80 rounded-xl w-fit shadow-lg">
+              <div className="mx-auto mb-4 p-4 bg-secondary border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
                 <Crown className="h-8 w-8 text-secondary-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-primary">
@@ -80,22 +73,22 @@ export const SenetSection = () => {
               </p>
               <Button 
                 onClick={() => navigate('/senet')}
-                className="w-full bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70"
+                className="neo-button w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Local Match
               </Button>
-              <div className="flex items-center justify-center gap-2 text-primary/70 mt-3">
+              <div className="flex items-center justify-center gap-2 text-primary mt-3">
                 <Crown className="w-4 h-4" />
-                <span className="text-sm">Pass & Play</span>
+                <span className="text-sm font-semibold">Pass & Play</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Online Multiplayer */}
-          <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-primary/20 md:col-span-3 lg:col-span-1" style={{ animationDelay: '0.2s' }}>
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer md:col-span-3 lg:col-span-1">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-accent to-accent/80 rounded-xl w-fit shadow-lg">
+              <div className="mx-auto mb-4 p-4 bg-accent border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
                 <Users className="h-8 w-8 text-accent-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-primary">
@@ -108,14 +101,14 @@ export const SenetSection = () => {
               </p>
               <Button 
                 onClick={() => navigate('/senet')}
-                className="w-full bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70"
+                className="neo-button w-full bg-accent text-accent-foreground hover:bg-accent/90 font-bold"
               >
                 <Crown className="h-4 w-4 mr-2" />
                 Join Arena
               </Button>
-              <div className="flex items-center justify-center gap-2 text-primary/70 mt-3">
+              <div className="flex items-center justify-center gap-2 text-primary mt-3">
                 <Users className="w-4 h-4" />
-                <span className="text-sm">Global Competition</span>
+                <span className="text-sm font-semibold">Global Competition</span>
               </div>
             </CardContent>
           </Card>
@@ -123,8 +116,8 @@ export const SenetSection = () => {
 
         {/* CTA Section */}
         <div className="text-center">
-          <div className="p-8 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 rounded-2xl border border-primary/30 backdrop-blur-sm max-w-2xl mx-auto shadow-[0_0_30px_rgba(var(--primary),0.3)] jeopardy-card">
-            <p className="text-primary text-lg font-medium mb-2">
+          <div className="p-8 bg-card border-4 border-border max-w-2xl mx-auto shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+            <p className="text-primary text-lg font-bold mb-2">
               Experience the game that guided pharaohs through the afterlife
             </p>
             <p className="text-sm text-muted-foreground">

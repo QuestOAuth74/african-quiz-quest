@@ -12,27 +12,20 @@ export const CrosswordSection = () => {
   };
 
   return (
-    <section className="w-full py-16 bg-gradient-to-br from-primary/10 via-background to-secondary/10 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-accent/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
+    <section className="w-full py-16 bg-muted relative overflow-hidden border-y-4 border-border">
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-6">
-            <Grid3X3 className="text-primary animate-pulse" size={32} />
-            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-pulse">
+            <Grid3X3 className="text-primary" size={32} />
+            <h2 className="text-5xl md:text-6xl font-bold text-primary">
               AFRICAN HISTORY CROSSWORDS
             </h2>
-            <Puzzle className="text-primary animate-pulse" size={32} />
+            <Puzzle className="text-primary" size={32} />
           </div>
           <div className="text-xl md:text-2xl text-primary mb-4 font-light tracking-wide">
             WORD PUZZLE CHALLENGE
           </div>
-          <p className="text-lg md:text-xl text-primary/80 max-w-3xl mx-auto mb-4 font-medium">
+          <p className="text-lg md:text-xl text-foreground max-w-3xl mx-auto mb-4 font-medium">
             Test your knowledge with thoughtfully crafted crossword puzzles
           </p>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto">
@@ -42,10 +35,10 @@ export const CrosswordSection = () => {
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
           {/* Feature Card 1 */}
-          <Card className="hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-primary/20 bg-card/50 backdrop-blur-sm">
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-primary to-secondary rounded-xl w-fit shadow-lg">
-                <Puzzle size={40} className="text-white" />
+              <div className="mx-auto mb-4 p-4 bg-primary border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <Puzzle size={40} className="text-primary-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-primary">
                 INTERACTIVE PUZZLES
@@ -55,18 +48,18 @@ export const CrosswordSection = () => {
               <p className="text-card-foreground mb-6 text-base leading-relaxed">
                 Engaging crossword puzzles spanning ancient civilizations to modern African achievements
               </p>
-              <div className="flex items-center justify-center gap-2 text-primary/80">
+              <div className="flex items-center justify-center gap-2 text-primary">
                 <Star className="w-4 h-4" />
-                <span className="text-sm">Multiple Difficulty Levels</span>
+                <span className="text-sm font-semibold">Multiple Difficulty Levels</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Feature Card 2 */}
-          <Card className="hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-primary/20 bg-card/50 backdrop-blur-sm" style={{ animationDelay: '0.1s' }}>
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-secondary to-accent rounded-xl w-fit shadow-lg">
-                <Brain size={40} className="text-white" />
+              <div className="mx-auto mb-4 p-4 bg-secondary border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <Brain size={40} className="text-secondary-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-primary">
                 EDUCATIONAL FUN
@@ -76,18 +69,18 @@ export const CrosswordSection = () => {
               <p className="text-card-foreground mb-6 text-base leading-relaxed">
                 Learn while you play with hints, clues, and historical context for each puzzle
               </p>
-              <div className="flex items-center justify-center gap-2 text-primary/80">
+              <div className="flex items-center justify-center gap-2 text-primary">
                 <Lightbulb className="w-4 h-4" />
-                <span className="text-sm">Smart Hint System</span>
+                <span className="text-sm font-semibold">Smart Hint System</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Feature Card 3 */}
-          <Card className="hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-primary/20 bg-card/50 backdrop-blur-sm" style={{ animationDelay: '0.2s' }}>
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-accent to-primary rounded-xl w-fit shadow-lg">
-                <Trophy size={40} className="text-white" />
+              <div className="mx-auto mb-4 p-4 bg-accent border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <Trophy size={40} className="text-accent-foreground" />
               </div>
               <CardTitle className="text-2xl font-bold text-primary">
                 TRACK PROGRESS
@@ -97,9 +90,9 @@ export const CrosswordSection = () => {
               <p className="text-card-foreground mb-6 text-base leading-relaxed">
                 Monitor your solving time, completion rate, and unlock achievements as you progress
               </p>
-              <div className="flex items-center justify-center gap-2 text-primary/80">
+              <div className="flex items-center justify-center gap-2 text-primary">
                 <Clock className="w-4 h-4" />
-                <span className="text-sm">Performance Analytics</span>
+                <span className="text-sm font-semibold">Performance Analytics</span>
               </div>
             </CardContent>
           </Card>
@@ -107,51 +100,51 @@ export const CrosswordSection = () => {
 
         {/* Crossword Features */}
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
-          <div className="p-6 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl border border-primary/30 backdrop-blur-sm">
+          <div className="p-6 bg-card border-4 border-border shadow-[4px_4px_0px_0px_hsl(var(--border))]">
             <h3 className="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
               <Sparkles className="w-6 h-6" />
               Puzzle Categories
             </h3>
             <ul className="space-y-3 text-card-foreground">
               <li className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full" />
+                <div className="w-3 h-3 bg-primary" />
                 <span>Ancient African kingdoms and civilizations</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-secondary rounded-full" />
+                <div className="w-3 h-3 bg-secondary" />
                 <span>Historical figures and leaders</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-accent rounded-full" />
+                <div className="w-3 h-3 bg-accent" />
                 <span>Cultural traditions and heritage</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full" />
+                <div className="w-3 h-3 bg-primary" />
                 <span>Geography and landmarks</span>
               </li>
             </ul>
           </div>
 
-          <div className="p-6 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-xl border border-primary/30 backdrop-blur-sm">
+          <div className="p-6 bg-card border-4 border-border shadow-[4px_4px_0px_0px_hsl(var(--border))]">
             <h3 className="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
               <Grid3X3 className="w-6 h-6" />
               Game Features
             </h3>
             <ul className="space-y-3 text-card-foreground">
               <li className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-secondary rounded-full" />
+                <div className="w-3 h-3 bg-secondary" />
                 <span>Auto-save progress functionality</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full" />
+                <div className="w-3 h-3 bg-primary" />
                 <span>Cross-device synchronization</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-accent rounded-full" />
+                <div className="w-3 h-3 bg-accent" />
                 <span>Responsive design for all devices</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-secondary rounded-full" />
+                <div className="w-3 h-3 bg-secondary" />
                 <span>Comprehensive statistics tracking</span>
               </li>
             </ul>
@@ -160,21 +153,21 @@ export const CrosswordSection = () => {
 
         {/* Visual Preview Section */}
         <div className="mb-12">
-          <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto p-6 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 rounded-2xl border border-primary/30 backdrop-blur-sm">
+          <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto p-6 bg-card border-4 border-border shadow-[4px_4px_0px_0px_hsl(var(--border))]">
             <div className="order-2 md:order-1">
               <h3 className="text-3xl font-bold text-primary mb-4 flex items-center gap-2">
                 <Target className="w-8 h-8" />
                 CHALLENGE YOURSELF
               </h3>
-              <h4 className="text-xl font-semibold text-primary/80 mb-3">
+              <h4 className="text-xl font-semibold text-foreground mb-3">
                 From Beginner to Expert
               </h4>
               <p className="text-card-foreground mb-4 text-lg">
                 Start with easy puzzles and progress to challenging crosswords that will test even the most knowledgeable history enthusiasts.
               </p>
-              <div className="flex items-center gap-2 text-primary/80">
+              <div className="flex items-center gap-2 text-primary">
                 <Star className="w-5 h-5" />
-                <span className="text-sm">Progressive difficulty system with personalized recommendations</span>
+                <span className="text-sm font-semibold">Progressive difficulty system with personalized recommendations</span>
               </div>
             </div>
             <div className="order-1 md:order-2 flex justify-center">
@@ -182,18 +175,18 @@ export const CrosswordSection = () => {
                 <img 
                   src={baobabHeaderImage} 
                   alt="African History Crosswords"
-                  className="max-w-full h-auto max-h-64 object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
+                  className="max-w-full h-auto max-h-64 object-cover border-4 border-border shadow-[4px_4px_0px_0px_hsl(var(--border))]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent rounded-lg flex items-center justify-center">
-                  <div className="bg-white/90 p-4 rounded-lg shadow-lg">
+                <div className="absolute inset-0 bg-background/80 border-4 border-border flex items-center justify-center">
+                  <div className="bg-card p-4 border-4 border-border shadow-[4px_4px_0px_0px_hsl(var(--border))]">
                     <div className="grid grid-cols-5 gap-1">
                       {Array.from({ length: 25 }, (_, i) => (
                         <div
                           key={i}
-                          className={`w-6 h-6 border border-gray-300 flex items-center justify-center text-xs font-bold ${
+                          className={`w-6 h-6 border-2 border-border flex items-center justify-center text-xs font-bold ${
                             [0, 1, 2, 5, 6, 7, 10, 11, 12].includes(i)
                               ? 'bg-primary/20 text-primary'
-                              : 'bg-white'
+                              : 'bg-background'
                           }`}
                         >
                           {[0, 1, 2, 5, 6, 7, 10, 11, 12].includes(i) && 
@@ -211,19 +204,19 @@ export const CrosswordSection = () => {
 
         {/* CTA Section */}
         <div className="text-center">
-          <div className="p-8 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl border border-primary/30 backdrop-blur-sm max-w-2xl mx-auto shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+          <div className="p-8 bg-primary border-4 border-border max-w-2xl mx-auto shadow-[4px_4px_0px_0px_hsl(var(--border))]">
             <Button 
               onClick={handleStartCrossword}
               size="lg"
-              className="px-12 py-6 text-xl font-bold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl border-0"
+              className="neo-button px-12 py-6 text-xl font-bold bg-background text-foreground hover:bg-muted border-4 border-border"
             >
               <Grid3X3 className="w-7 h-7 mr-3" />
               START CROSSWORD PUZZLES
             </Button>
-            <p className="text-sm text-primary/80 mt-4">
+            <p className="text-sm text-primary-foreground mt-4 font-medium">
               Join the community of crossword enthusiasts
             </p>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-primary-foreground/80 mt-2">
               Sign in to save your progress and compete with others
             </p>
           </div>
