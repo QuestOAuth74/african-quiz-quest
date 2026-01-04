@@ -15,48 +15,48 @@
 */
 
 :root {
-  /* Core Neobrutalism Colors - Royal Purple with Blue Accent */
-  --background: 270 20% 96%; /* Soft lavender white */
-  --foreground: 270 60% 8%; /* Deep purple-black for max contrast */
-  --card: 280 25% 98%; /* Pale violet */
-  --card-foreground: 270 60% 8%;
-  --popover: 280 25% 98%;
-  --popover-foreground: 270 60% 8%;
-  --primary: 280 70% 40%; /* Deep royal purple */
-  --primary-foreground: 0 0% 100%; /* Pure white for max visibility */
-  --secondary: 320 60% 50%; /* Rich magenta */
+  /* Core Neobrutalism Colors - Earth Theme (Teal, Green, Orange) */
+  --background: 40 25% 95%; /* Warm cream */
+  --foreground: 160 50% 8%; /* Deep teal-black */
+  --card: 45 30% 98%; /* Off-white cream */
+  --card-foreground: 160 50% 8%;
+  --popover: 45 30% 98%;
+  --popover-foreground: 160 50% 8%;
+  --primary: 170 65% 35%; /* Deep teal */
+  --primary-foreground: 0 0% 100%; /* Pure white */
+  --secondary: 145 55% 40%; /* Forest green */
   --secondary-foreground: 0 0% 100%; /* Pure white */
-  --muted: 270 15% 88%;
-  --muted-foreground: 270 40% 30%; /* Darker for better readability */
-  --accent: 210 90% 50%; /* Vibrant blue accent */
+  --muted: 45 20% 88%;
+  --muted-foreground: 160 30% 30%; /* Dark teal for readability */
+  --accent: 25 90% 50%; /* Vibrant orange */
   --accent-foreground: 0 0% 100%; /* Pure white */
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
-  --border: 270 60% 12%; /* Deep purple-black for hard borders */
-  --input: 270 20% 94%;
-  --ring: 210 90% 50%;
+  --border: 160 50% 10%; /* Deep teal-black for hard borders */
+  --input: 45 25% 92%;
+  --ring: 170 65% 35%;
   --radius: 0px;
 
-  /* Theme accent colors - Purple & Blue */
-  --theme-brown: 280 70% 40%;
-  --theme-brown-light: 280 50% 55%;
-  --theme-brown-dark: 280 80% 25%;
-  --theme-yellow: 210 90% 50%;
-  --theme-yellow-light: 210 85% 65%;
-  --theme-yellow-dark: 210 95% 40%;
-  --theme-gold: 210 90% 50%;
-  --theme-gold-light: 210 85% 65%;
-  --theme-gold-dark: 210 95% 40%;
+  /* Theme accent colors - Earth Tones */
+  --theme-brown: 170 65% 35%;
+  --theme-brown-light: 170 50% 50%;
+  --theme-brown-dark: 170 70% 25%;
+  --theme-yellow: 25 90% 50%;
+  --theme-yellow-light: 30 85% 60%;
+  --theme-yellow-dark: 20 95% 40%;
+  --theme-gold: 25 90% 50%;
+  --theme-gold-light: 30 85% 60%;
+  --theme-gold-dark: 20 95% 40%;
 
   /* Neobrutalism Shadows - Hard offset, zero blur */
-  --shadow-card: 4px 4px 0px hsl(270 60% 12%);
-  --shadow-yellow: 4px 4px 0px hsl(270 60% 12%);
+  --shadow-card: 4px 4px 0px hsl(160 50% 10%);
+  --shadow-yellow: 4px 4px 0px hsl(160 50% 10%);
   --shadow-inset: none;
-  --shadow-soft: 2px 2px 0px hsl(270 60% 12%);
-  --shadow-medium: 4px 4px 0px hsl(270 60% 12%);
-  --shadow-large: 6px 6px 0px hsl(270 60% 12%);
-  --shadow-glow: 4px 4px 0px hsl(270 60% 12%);
-  --shadow-elegant: 5px 5px 0px hsl(270 60% 12%);
+  --shadow-soft: 2px 2px 0px hsl(160 50% 10%);
+  --shadow-medium: 4px 4px 0px hsl(160 50% 10%);
+  --shadow-large: 6px 6px 0px hsl(160 50% 10%);
+  --shadow-glow: 4px 4px 0px hsl(160 50% 10%);
+  --shadow-elegant: 5px 5px 0px hsl(160 50% 10%);
 
   /* Fast transitions for snappy feel */
   --transition-fast: all 0.1s ease;
@@ -65,14 +65,14 @@
   --transition-bounce: all 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
   /* Sidebar */
-  --sidebar-background: 280 25% 98%;
-  --sidebar-foreground: 270 60% 8%;
-  --sidebar-primary: 280 70% 40%;
+  --sidebar-background: 45 30% 98%;
+  --sidebar-foreground: 160 50% 8%;
+  --sidebar-primary: 170 65% 35%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 210 90% 50%;
+  --sidebar-accent: 25 90% 50%;
   --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 270 60% 12%;
-  --sidebar-ring: 210 90% 50%;
+  --sidebar-border: 160 50% 10%;
+  --sidebar-ring: 170 65% 35%;
 }
 
 @layer base {
@@ -161,34 +161,34 @@
   }
 
   .dark {
-    --background: 270 30% 8%;
-    --foreground: 270 10% 95%;
-    --card: 270 25% 12%;
-    --card-foreground: 270 10% 95%;
-    --popover: 270 25% 10%;
-    --popover-foreground: 270 10% 95%;
-    --primary: 280 65% 55%;
+    --background: 160 30% 8%;
+    --foreground: 45 20% 95%;
+    --card: 160 25% 12%;
+    --card-foreground: 45 20% 95%;
+    --popover: 160 25% 10%;
+    --popover-foreground: 45 20% 95%;
+    --primary: 170 60% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 320 55% 55%;
+    --secondary: 145 50% 45%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 270 20% 18%;
-    --muted-foreground: 270 10% 70%;
-    --accent: 210 85% 55%;
+    --muted: 160 20% 18%;
+    --muted-foreground: 45 15% 70%;
+    --accent: 25 85% 55%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 210 75% 70%;
-    --input: 270 20% 15%;
-    --ring: 210 85% 55%;
+    --border: 25 80% 60%;
+    --input: 160 20% 15%;
+    --ring: 170 60% 45%;
 
-    --sidebar-background: 270 25% 10%;
-    --sidebar-foreground: 270 10% 95%;
-    --sidebar-primary: 280 65% 55%;
+    --sidebar-background: 160 25% 10%;
+    --sidebar-foreground: 45 20% 95%;
+    --sidebar-primary: 170 60% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 85% 55%;
+    --sidebar-accent: 25 85% 55%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 210 75% 70%;
-    --sidebar-ring: 210 85% 55%;
+    --sidebar-border: 25 80% 60%;
+    --sidebar-ring: 170 60% 45%;
   }
 }
 
