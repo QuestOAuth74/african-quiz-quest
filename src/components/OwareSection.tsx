@@ -7,27 +7,20 @@ export const OwareSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="w-full py-16 bg-gradient-to-br from-background via-background/95 to-secondary/20 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
+    <section className="w-full py-16 bg-background relative overflow-hidden border-y-4 border-border">
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="text-4xl animate-pulse text-amber-600">⚫</div>
-            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-amber-600 to-orange-500 bg-clip-text text-transparent">
+            <div className="text-4xl text-primary">⚫</div>
+            <h2 className="text-5xl md:text-6xl font-bold text-primary">
               OWARE
             </h2>
-            <div className="text-4xl animate-pulse text-amber-600">⚫</div>
+            <div className="text-4xl text-primary">⚫</div>
           </div>
-          <div className="text-xl md:text-2xl text-amber-600 mb-4 font-light tracking-wide">
+          <div className="text-xl md:text-2xl text-primary mb-4 font-light tracking-wide">
             AFRICAN CHESS
           </div>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-4 font-medium">
+          <p className="text-lg md:text-xl text-foreground max-w-3xl mx-auto mb-4 font-medium">
             Master the ancient Akan strategy game of sowing and capturing
           </p>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto">
@@ -37,12 +30,12 @@ export const OwareSection = () => {
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
           {/* Single Player vs AI */}
-          <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-amber-500/20">
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-amber-600 to-amber-500 rounded-xl w-fit shadow-lg">
-                <Bot className="h-8 w-8 text-white" />
+              <div className="mx-auto mb-4 p-4 bg-primary border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <Bot className="h-8 w-8 text-primary-foreground" />
               </div>
-              <CardTitle className="text-2xl font-bold text-amber-600">
+              <CardTitle className="text-2xl font-bold text-primary">
                 PRACTICE MODE
               </CardTitle>
             </CardHeader>
@@ -52,25 +45,25 @@ export const OwareSection = () => {
               </p>
               <Button 
                 onClick={() => navigate('/oware')}
-                className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white"
+                className="neo-button w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
               >
                 <Gamepad2 className="h-4 w-4 mr-2" />
                 Play vs AI
               </Button>
-              <div className="flex items-center justify-center gap-2 text-amber-600/70 mt-3">
+              <div className="flex items-center justify-center gap-2 text-primary mt-3">
                 <Star className="w-4 h-4" />
-                <span className="text-sm">Master Strategy</span>
+                <span className="text-sm font-semibold">Master Strategy</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Local Multiplayer */}
-          <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-orange-500/20" style={{ animationDelay: '0.1s' }}>
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-orange-600 to-orange-500 rounded-xl w-fit shadow-lg">
-                <Crown className="h-8 w-8 text-white" />
+              <div className="mx-auto mb-4 p-4 bg-secondary border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <Crown className="h-8 w-8 text-secondary-foreground" />
               </div>
-              <CardTitle className="text-2xl font-bold text-amber-600">
+              <CardTitle className="text-2xl font-bold text-primary">
                 LOCAL PLAY
               </CardTitle>
             </CardHeader>
@@ -80,25 +73,25 @@ export const OwareSection = () => {
               </p>
               <Button 
                 onClick={() => navigate('/oware')}
-                className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                className="neo-button w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Local Match
               </Button>
-              <div className="flex items-center justify-center gap-2 text-amber-600/70 mt-3">
+              <div className="flex items-center justify-center gap-2 text-primary mt-3">
                 <Crown className="w-4 h-4" />
-                <span className="text-sm">Pass & Play</span>
+                <span className="text-sm font-semibold">Pass & Play</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Online Multiplayer */}
-          <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-yellow-500/20 md:col-span-3 lg:col-span-1" style={{ animationDelay: '0.2s' }}>
+          <Card className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 cursor-pointer md:col-span-3 lg:col-span-1">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-yellow-600 to-yellow-500 rounded-xl w-fit shadow-lg">
-                <Users className="h-8 w-8 text-white" />
+              <div className="mx-auto mb-4 p-4 bg-accent border-4 border-border w-fit shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+                <Users className="h-8 w-8 text-accent-foreground" />
               </div>
-              <CardTitle className="text-2xl font-bold text-amber-600">
+              <CardTitle className="text-2xl font-bold text-primary">
                 ONLINE ARENA
               </CardTitle>
             </CardHeader>
@@ -108,14 +101,14 @@ export const OwareSection = () => {
               </p>
               <Button 
                 onClick={() => navigate('/oware')}
-                className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 hover:to-yellow-600 text-white"
+                className="neo-button w-full bg-accent text-accent-foreground hover:bg-accent/90 font-bold"
               >
                 <Crown className="h-4 w-4 mr-2" />
                 Join Arena
               </Button>
-              <div className="flex items-center justify-center gap-2 text-amber-600/70 mt-3">
+              <div className="flex items-center justify-center gap-2 text-primary mt-3">
                 <Users className="w-4 h-4" />
-                <span className="text-sm">Global Competition</span>
+                <span className="text-sm font-semibold">Global Competition</span>
               </div>
             </CardContent>
           </Card>
@@ -123,8 +116,8 @@ export const OwareSection = () => {
 
         {/* CTA Section */}
         <div className="text-center">
-          <div className="p-8 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 rounded-2xl border border-amber-500/30 backdrop-blur-sm max-w-2xl mx-auto shadow-[0_0_30px_rgba(245,158,11,0.3)] jeopardy-card">
-            <p className="text-amber-600 text-lg font-medium mb-2">
+          <div className="p-8 bg-card border-4 border-border max-w-2xl mx-auto shadow-[4px_4px_0px_0px_hsl(var(--border))]">
+            <p className="text-primary text-lg font-bold mb-2">
               Experience the strategic depth of traditional African gaming
             </p>
             <p className="text-sm text-muted-foreground">
