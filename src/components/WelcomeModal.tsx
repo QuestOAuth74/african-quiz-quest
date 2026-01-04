@@ -87,19 +87,19 @@ const WelcomeModal = ({ isOpen, onClose }: WelcomeModalProps) => {
         >
           {/* Image Container */}
           <div className="relative mb-8">
-            {/* Glowing Ring Animation */}
-            <div className="absolute inset-0 animate-pulse">
-              <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-r from-primary/20 via-accent/30 to-secondary/20 blur-xl" />
+            {/* Solid background ring - no gradient */}
+            <div className="absolute inset-0">
+              <div className="w-80 h-80 mx-auto bg-primary/20 border-4 border-border" />
             </div>
             
-            {/* Rotating Border */}
+            {/* Solid Border Frame */}
             <div className="relative w-80 h-80 mx-auto">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary via-accent to-secondary animate-spin" style={{ animationDuration: '8s' }}>
-                <div className="absolute inset-2 rounded-full bg-background" />
+              <div className="absolute inset-0 bg-primary border-4 border-border">
+                <div className="absolute inset-4 bg-background" />
               </div>
               
               {/* Image */}
-              <div className="absolute inset-4 rounded-full overflow-hidden shadow-2xl">
+              <div className="absolute inset-6 overflow-hidden border-4 border-border shadow-[4px_4px_0px_hsl(var(--border))]">
                 <img 
                   src="https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/heru.png"
                   alt="Ancient African Elder"
@@ -119,20 +119,20 @@ const WelcomeModal = ({ isOpen, onClose }: WelcomeModalProps) => {
             }`}
           >
             {/* Main Welcome Text */}
-            <h1 className="text-4xl lg:text-6xl font-black text-transparent bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text animate-fade-in">
+            <h1 className="text-4xl lg:text-6xl font-black text-primary animate-fade-in">
               Welcome Child of Africa
             </h1>
             
             {/* Subtitle */}
-            <p className="text-2xl lg:text-3xl font-semibold text-foreground/90 animate-fade-in" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
+            <p className="text-2xl lg:text-3xl font-bold text-foreground animate-fade-in" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
               Learn from the Elders
             </p>
             
-            {/* Decorative Line */}
+            {/* Decorative Line - solid, no gradient */}
             <div className="flex items-center justify-center space-x-4 animate-fade-in" style={{ animationDelay: '1s', animationFillMode: 'both' }}>
-              <div className="h-px bg-gradient-to-r from-transparent via-primary to-transparent w-32" />
-              <Sparkles className="w-6 h-6 text-primary animate-pulse" />
-              <div className="h-px bg-gradient-to-r from-transparent via-primary to-transparent w-32" />
+              <div className="h-1 bg-primary w-32" />
+              <Sparkles className="w-6 h-6 text-primary" />
+              <div className="h-1 bg-primary w-32" />
             </div>
             
             {/* Description */}
@@ -152,7 +152,7 @@ const WelcomeModal = ({ isOpen, onClose }: WelcomeModalProps) => {
           >
             <Button
               onClick={onClose}
-              className="px-12 py-4 text-lg font-semibold rounded-2xl bg-gradient-to-r from-primary via-accent to-secondary text-white hover:shadow-2xl hover:shadow-primary/25 transform hover:scale-105 transition-all duration-300 animate-pulse"
+              className="px-12 py-4 text-lg font-black neo-button bg-primary text-primary-foreground"
               style={{ animationDuration: '2s' }}
             >
               Begin Your Journey

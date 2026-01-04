@@ -58,18 +58,18 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
         alt="African History Jeopardy Game Banner"
       />
 
-      {/* Content Section Below Banner */}
-      <div className="bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown p-4 sm:p-6 md:p-8">
+      {/* Content Section Below Banner - Solid background, no gradient */}
+      <div className="bg-background p-4 sm:p-6 md:p-8 border-t-4 border-border">
         <div className="max-w-5xl mx-auto">
           
           {/* Sign Up/Login Message for Non-Authenticated Users */}
           {!isAuthenticated && (
-            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-r from-theme-yellow/20 via-theme-yellow/30 to-theme-yellow/20 backdrop-blur-sm rounded-lg border-2 border-theme-yellow/50 max-w-2xl mx-auto shadow-lg shadow-theme-yellow/20">
+            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-accent border-4 border-border shadow-[4px_4px_0px_hsl(var(--border))] max-w-2xl mx-auto">
               <div className="text-center">
-                <h3 className="text-xl sm:text-2xl font-bold text-theme-yellow mb-3">
+                <h3 className="text-xl sm:text-2xl font-black text-foreground mb-3">
                   🎯 Unlock the Full Experience!
                 </h3>
-                <p className="text-sm sm:text-base text-theme-yellow-light mb-4 leading-relaxed">
+                <p className="text-sm sm:text-base text-foreground/80 mb-4 leading-relaxed">
                   Sign up or log in to track your progress, compete on leaderboards, and unlock achievements as you master African history!
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -90,10 +90,10 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
           
           {/* Welcome Message with Badges for Authenticated Users - Below banner */}
           {isAuthenticated && user && (
-            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-background/80 backdrop-blur-sm rounded-lg border border-theme-yellow/20 max-w-xl mx-auto">
+            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-card border-4 border-border shadow-[4px_4px_0px_hsl(var(--border))] max-w-xl mx-auto">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-theme-yellow" />
-                <h3 className="text-lg sm:text-xl font-semibold text-theme-yellow">
+                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <h3 className="text-lg sm:text-xl font-black text-foreground">
                   Welcome back, Champion!
                 </h3>
               </div>
@@ -108,17 +108,17 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
 
           <div className="text-center mb-8 sm:mb-12">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <Sparkles className="text-theme-yellow animate-pulse" size={24} />
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold gradient-text animate-pulse-yellow">
+              <Sparkles className="text-primary" size={24} />
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-primary">
                 JEOPARDY!
               </h1>
-              <Sparkles className="text-theme-yellow animate-pulse" size={24} />
+              <Sparkles className="text-primary" size={24} />
             </div>
-            <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-theme-yellow mb-3 sm:mb-4 font-light tracking-wide">
+            <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-secondary font-black mb-3 sm:mb-4 tracking-wide">
               AFRICAN HISTORY EDITION
             </div>
-            <p className="text-theme-yellow-light text-sm sm:text-base md:text-lg lg:text-xl font-medium mb-3 sm:mb-4 px-2">
-              A free educational game from <span className="text-theme-yellow font-semibold">The Historia Africana</span> YouTube Channel
+            <p className="text-foreground text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-3 sm:mb-4 px-2">
+              A free educational game from <span className="text-primary font-black">The Historia Africana</span> YouTube Channel
             </p>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
               Test your knowledge of African history in this authentic Jeopardy-style experience!
@@ -126,12 +126,12 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
-            <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20">
+            <Card className="neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-150 cursor-pointer group animate-scale-in">
               <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
-                  <Bot size={40} className="text-theme-brown" />
+                <div className="mx-auto mb-4 p-4 bg-primary border-3 border-border shadow-[2px_2px_0px_hsl(var(--border))] w-fit">
+                  <Bot size={40} className="text-primary-foreground" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-theme-yellow">
+                <CardTitle className="text-2xl font-black text-foreground">
                   SINGLE PLAYER
                 </CardTitle>
               </CardHeader>
@@ -149,12 +149,12 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
               </CardContent>
             </Card>
 
-            <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20" style={{ animationDelay: '0.1s' }}>
+            <Card className="neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-150 cursor-pointer group animate-scale-in" style={{ animationDelay: '0.1s' }}>
               <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-theme-yellow to-theme-yellow-dark rounded-xl w-fit shadow-lg">
-                  <Users size={40} className="text-theme-brown" />
+                <div className="mx-auto mb-4 p-4 bg-secondary border-3 border-border shadow-[2px_2px_0px_hsl(var(--border))] w-fit">
+                  <Users size={40} className="text-secondary-foreground" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-theme-yellow">
+                <CardTitle className="text-2xl font-black text-foreground">
                   LOCAL MULTIPLAYER
                 </CardTitle>
               </CardHeader>
@@ -172,15 +172,15 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
               </CardContent>
             </Card>
 
-            <Card className="jeopardy-card hover:scale-105 transition-all duration-300 cursor-pointer group animate-scale-in border-theme-yellow/20" style={{ animationDelay: '0.2s' }}>
+            <Card className="neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-150 cursor-pointer group animate-scale-in" style={{ animationDelay: '0.2s' }}>
               <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-xl w-fit shadow-lg relative">
-                  <Users size={40} className="text-white" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+                <div className="mx-auto mb-4 p-4 bg-accent border-3 border-border shadow-[2px_2px_0px_hsl(var(--border))] w-fit relative">
+                  <Users size={40} className="text-accent-foreground" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent border-2 border-border" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-theme-yellow flex items-center justify-center gap-2">
+                <CardTitle className="text-2xl font-black text-foreground flex items-center justify-center gap-2">
                   ONLINE MULTIPLAYER
-                  <Badge variant="secondary" className="text-xs bg-green-600 text-white">LIVE</Badge>
+                  <Badge variant="secondary" className="text-xs bg-accent text-accent-foreground border-2 border-border font-bold">LIVE</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center px-6 pb-6">
@@ -189,7 +189,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
                 </p>
                 <Button 
                   onClick={() => handleModeSelect('online-multiplayer')} 
-                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold text-base py-4 hover:scale-105 transition-all duration-300"
+                  className="w-full neo-button bg-accent text-accent-foreground font-black text-base py-4"
                   size="lg"
                 >
                   JOIN LIVE GAME
@@ -201,11 +201,11 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
           </div>
           
           <div className="text-center mt-6 sm:mt-8 px-4">
-            <p className="text-sm text-muted-foreground mb-2">
+            <p className="text-sm text-foreground font-bold mb-2">
               Think you know African history? Think again!
             </p>
             <p className="text-xs text-muted-foreground">
-              Educational content crafted by <span className="text-theme-yellow font-medium">The Historia Africana Youtube Channel</span> • Bringing African history to life
+              Educational content crafted by <span className="text-primary font-bold">The Historia Africana Youtube Channel</span> • Bringing African history to life
             </p>
           </div>
         </div>
