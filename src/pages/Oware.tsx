@@ -94,7 +94,7 @@ export default function Oware() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-gradient-to-br from-amber-900/20 via-stone-900/30 to-neutral-900/40 dark:from-amber-950 dark:via-stone-950 dark:to-neutral-950">
+      <div className="min-h-screen bg-background">
         <TopNavigation />
         
         {/* Audio Controls - positioned in top-right */}

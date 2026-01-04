@@ -77,9 +77,9 @@ export const WheelOfDestiny = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+    <div className="min-h-screen bg-background">
       {/* Top Navigation */}
-      <header className="bg-background/80 backdrop-blur-md border-b sticky top-0 z-50">
+      <header className="bg-card border-b-4 border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -136,7 +136,7 @@ export const WheelOfDestiny = () => {
                 alt="Wheel of African Destiny" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70" />
+              <div className="absolute inset-0 bg-black/60" />
               
               {/* Wheel Pattern Overlay */}
               <div className="absolute inset-0 opacity-10">

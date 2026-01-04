@@ -16,7 +16,7 @@ export default function Senet() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950 dark:to-orange-950">
+    <div className="min-h-screen bg-background">
       <TopNavigation />
       
       <div className="absolute top-4 right-4 z-10">

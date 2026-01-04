@@ -387,15 +387,15 @@ const Quiz = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <TopNavigation />
         <QuizAdminOverlay 
           currentQuestionId={currentQuestion?.id}
           onQuestionUpdate={handleRealtimeUpdate}
         />
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-yellow mx-auto mb-4"></div>
-          <p className="text-theme-yellow font-orbitron">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary mx-auto mb-4"></div>
+          <p className="text-primary font-bold">Loading...</p>
         </div>
       </div>
     );
@@ -403,15 +403,15 @@ const Quiz = () => {
 
   if (isLoadingQuestions) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <TopNavigation />
         <QuizAdminOverlay 
           currentQuestionId={currentQuestion?.id}
           onQuestionUpdate={handleRealtimeUpdate}
         />
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-yellow mx-auto mb-4"></div>
-          <p className="text-theme-yellow font-orbitron">Loading quiz questions...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary mx-auto mb-4"></div>
+          <p className="text-primary font-bold">Loading quiz questions...</p>
         </div>
       </div>
     );
@@ -423,7 +423,7 @@ const Quiz = () => {
 
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen bg-theme-brown-dark">
+      <div className="min-h-screen bg-background">
         <TopNavigation />
         <div className="pt-20 container mx-auto px-4 py-8">
           <Button
@@ -455,7 +455,7 @@ const Quiz = () => {
   const category = getCurrentCategory();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light">
+    <div className="min-h-screen bg-background">
       <TopNavigation />
       
       <QuizAdminOverlay 
