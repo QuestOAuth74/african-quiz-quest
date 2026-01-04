@@ -15,48 +15,48 @@
 */
 
 :root {
-  /* Core Neobrutalism Colors - Bold & Flat */
-  --background: 45 30% 94%; /* Warm off-white */
-  --foreground: 0 0% 5%; /* Near black */
-  --card: 45 40% 97%; /* Cream white */
-  --card-foreground: 0 0% 5%;
-  --popover: 45 40% 97%;
-  --popover-foreground: 0 0% 5%;
-  --primary: 25 70% 45%; /* Bold terracotta */
-  --primary-foreground: 45 40% 97%;
-  --secondary: 35 60% 55%; /* Warm ochre */
-  --secondary-foreground: 0 0% 5%;
-  --muted: 40 20% 88%;
-  --muted-foreground: 25 20% 35%;
-  --accent: 40 80% 50%; /* Bright amber */
-  --accent-foreground: 0 0% 5%;
+  /* Core Neobrutalism Colors - Royal Purple Theme */
+  --background: 270 20% 96%; /* Soft lavender white */
+  --foreground: 270 50% 10%; /* Deep purple-black */
+  --card: 280 25% 98%; /* Pale violet */
+  --card-foreground: 270 50% 10%;
+  --popover: 280 25% 98%;
+  --popover-foreground: 270 50% 10%;
+  --primary: 280 70% 40%; /* Deep royal purple */
+  --primary-foreground: 45 80% 95%;
+  --secondary: 320 60% 50%; /* Rich magenta */
+  --secondary-foreground: 45 80% 95%;
+  --muted: 270 15% 90%;
+  --muted-foreground: 270 30% 40%;
+  --accent: 45 90% 50%; /* Bright gold */
+  --accent-foreground: 270 50% 10%;
   --destructive: 0 70% 50%;
-  --destructive-foreground: 45 40% 97%;
-  --border: 0 0% 10%; /* Near black for hard borders */
-  --input: 45 25% 92%;
-  --ring: 25 70% 45%;
+  --destructive-foreground: 45 80% 95%;
+  --border: 270 50% 15%; /* Deep purple-black for hard borders */
+  --input: 270 20% 94%;
+  --ring: 280 70% 40%;
   --radius: 0px;
 
-  /* Theme accent colors */
-  --theme-brown: 25 70% 45%;
-  --theme-brown-light: 30 55% 60%;
-  --theme-brown-dark: 20 75% 30%;
-  --theme-yellow: 40 80% 50%;
-  --theme-yellow-light: 45 70% 65%;
-  --theme-yellow-dark: 35 85% 40%;
-  --theme-gold: 40 80% 50%;
-  --theme-gold-light: 45 70% 65%;
-  --theme-gold-dark: 35 85% 40%;
+  /* Theme accent colors - Purple & Gold */
+  --theme-brown: 280 70% 40%;
+  --theme-brown-light: 280 50% 55%;
+  --theme-brown-dark: 280 80% 25%;
+  --theme-yellow: 45 90% 50%;
+  --theme-yellow-light: 48 85% 65%;
+  --theme-yellow-dark: 42 95% 40%;
+  --theme-gold: 45 90% 50%;
+  --theme-gold-light: 48 85% 65%;
+  --theme-gold-dark: 42 95% 40%;
 
   /* Neobrutalism Shadows - Hard offset, zero blur */
-  --shadow-card: 4px 4px 0px hsl(0 0% 10%);
-  --shadow-yellow: 4px 4px 0px hsl(0 0% 10%);
+  --shadow-card: 4px 4px 0px hsl(270 50% 15%);
+  --shadow-yellow: 4px 4px 0px hsl(270 50% 15%);
   --shadow-inset: none;
-  --shadow-soft: 2px 2px 0px hsl(0 0% 10%);
-  --shadow-medium: 4px 4px 0px hsl(0 0% 10%);
-  --shadow-large: 6px 6px 0px hsl(0 0% 10%);
-  --shadow-glow: 4px 4px 0px hsl(0 0% 10%);
-  --shadow-elegant: 5px 5px 0px hsl(0 0% 10%);
+  --shadow-soft: 2px 2px 0px hsl(270 50% 15%);
+  --shadow-medium: 4px 4px 0px hsl(270 50% 15%);
+  --shadow-large: 6px 6px 0px hsl(270 50% 15%);
+  --shadow-glow: 4px 4px 0px hsl(270 50% 15%);
+  --shadow-elegant: 5px 5px 0px hsl(270 50% 15%);
 
   /* Fast transitions for snappy feel */
   --transition-fast: all 0.1s ease;
@@ -65,14 +65,14 @@
   --transition-bounce: all 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
   /* Sidebar */
-  --sidebar-background: 45 40% 97%;
-  --sidebar-foreground: 0 0% 5%;
-  --sidebar-primary: 25 70% 45%;
-  --sidebar-primary-foreground: 45 40% 97%;
-  --sidebar-accent: 40 80% 50%;
-  --sidebar-accent-foreground: 0 0% 5%;
-  --sidebar-border: 0 0% 10%;
-  --sidebar-ring: 25 70% 45%;
+  --sidebar-background: 280 25% 98%;
+  --sidebar-foreground: 270 50% 10%;
+  --sidebar-primary: 280 70% 40%;
+  --sidebar-primary-foreground: 45 80% 95%;
+  --sidebar-accent: 45 90% 50%;
+  --sidebar-accent-foreground: 270 50% 10%;
+  --sidebar-border: 270 50% 15%;
+  --sidebar-ring: 280 70% 40%;
 }
 
 @layer base {
@@ -161,34 +161,34 @@
   }
 
   .dark {
-    --background: 0 0% 8%;
-    --foreground: 45 30% 92%;
-    --card: 0 0% 12%;
-    --card-foreground: 45 30% 92%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 45 30% 92%;
-    --primary: 30 75% 55%;
-    --primary-foreground: 0 0% 8%;
-    --secondary: 40 65% 50%;
-    --secondary-foreground: 0 0% 8%;
-    --muted: 0 0% 18%;
-    --muted-foreground: 40 15% 60%;
+    --background: 270 30% 8%;
+    --foreground: 270 20% 92%;
+    --card: 270 25% 12%;
+    --card-foreground: 270 20% 92%;
+    --popover: 270 25% 10%;
+    --popover-foreground: 270 20% 92%;
+    --primary: 280 65% 55%;
+    --primary-foreground: 270 30% 8%;
+    --secondary: 320 55% 55%;
+    --secondary-foreground: 270 30% 8%;
+    --muted: 270 20% 18%;
+    --muted-foreground: 270 15% 60%;
     --accent: 45 85% 55%;
-    --accent-foreground: 0 0% 8%;
+    --accent-foreground: 270 30% 8%;
     --destructive: 0 70% 55%;
-    --destructive-foreground: 45 30% 92%;
-    --border: 45 30% 75%;
-    --input: 0 0% 15%;
-    --ring: 30 75% 55%;
+    --destructive-foreground: 270 20% 92%;
+    --border: 45 75% 65%;
+    --input: 270 20% 15%;
+    --ring: 280 65% 55%;
 
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 45 30% 92%;
-    --sidebar-primary: 30 75% 55%;
-    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-background: 270 25% 10%;
+    --sidebar-foreground: 270 20% 92%;
+    --sidebar-primary: 280 65% 55%;
+    --sidebar-primary-foreground: 270 30% 8%;
     --sidebar-accent: 45 85% 55%;
-    --sidebar-accent-foreground: 0 0% 8%;
-    --sidebar-border: 45 30% 75%;
-    --sidebar-ring: 30 75% 55%;
+    --sidebar-accent-foreground: 270 30% 8%;
+    --sidebar-border: 45 75% 65%;
+    --sidebar-ring: 280 65% 55%;
   }
 }
 
