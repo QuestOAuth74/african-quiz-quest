@@ -15,48 +15,48 @@
 */
 
 :root {
-  /* Core Neobrutalism Colors - Royal Purple Theme */
+  /* Core Neobrutalism Colors - Royal Purple with Blue Accent */
   --background: 270 20% 96%; /* Soft lavender white */
-  --foreground: 270 50% 10%; /* Deep purple-black */
+  --foreground: 270 60% 8%; /* Deep purple-black for max contrast */
   --card: 280 25% 98%; /* Pale violet */
-  --card-foreground: 270 50% 10%;
+  --card-foreground: 270 60% 8%;
   --popover: 280 25% 98%;
-  --popover-foreground: 270 50% 10%;
+  --popover-foreground: 270 60% 8%;
   --primary: 280 70% 40%; /* Deep royal purple */
-  --primary-foreground: 45 80% 95%;
+  --primary-foreground: 0 0% 100%; /* Pure white for max visibility */
   --secondary: 320 60% 50%; /* Rich magenta */
-  --secondary-foreground: 45 80% 95%;
-  --muted: 270 15% 90%;
-  --muted-foreground: 270 30% 40%;
-  --accent: 45 90% 50%; /* Bright gold */
-  --accent-foreground: 270 50% 10%;
+  --secondary-foreground: 0 0% 100%; /* Pure white */
+  --muted: 270 15% 88%;
+  --muted-foreground: 270 40% 30%; /* Darker for better readability */
+  --accent: 210 90% 50%; /* Vibrant blue accent */
+  --accent-foreground: 0 0% 100%; /* Pure white */
   --destructive: 0 70% 50%;
-  --destructive-foreground: 45 80% 95%;
-  --border: 270 50% 15%; /* Deep purple-black for hard borders */
+  --destructive-foreground: 0 0% 100%;
+  --border: 270 60% 12%; /* Deep purple-black for hard borders */
   --input: 270 20% 94%;
-  --ring: 280 70% 40%;
+  --ring: 210 90% 50%;
   --radius: 0px;
 
-  /* Theme accent colors - Purple & Gold */
+  /* Theme accent colors - Purple & Blue */
   --theme-brown: 280 70% 40%;
   --theme-brown-light: 280 50% 55%;
   --theme-brown-dark: 280 80% 25%;
-  --theme-yellow: 45 90% 50%;
-  --theme-yellow-light: 48 85% 65%;
-  --theme-yellow-dark: 42 95% 40%;
-  --theme-gold: 45 90% 50%;
-  --theme-gold-light: 48 85% 65%;
-  --theme-gold-dark: 42 95% 40%;
+  --theme-yellow: 210 90% 50%;
+  --theme-yellow-light: 210 85% 65%;
+  --theme-yellow-dark: 210 95% 40%;
+  --theme-gold: 210 90% 50%;
+  --theme-gold-light: 210 85% 65%;
+  --theme-gold-dark: 210 95% 40%;
 
   /* Neobrutalism Shadows - Hard offset, zero blur */
-  --shadow-card: 4px 4px 0px hsl(270 50% 15%);
-  --shadow-yellow: 4px 4px 0px hsl(270 50% 15%);
+  --shadow-card: 4px 4px 0px hsl(270 60% 12%);
+  --shadow-yellow: 4px 4px 0px hsl(270 60% 12%);
   --shadow-inset: none;
-  --shadow-soft: 2px 2px 0px hsl(270 50% 15%);
-  --shadow-medium: 4px 4px 0px hsl(270 50% 15%);
-  --shadow-large: 6px 6px 0px hsl(270 50% 15%);
-  --shadow-glow: 4px 4px 0px hsl(270 50% 15%);
-  --shadow-elegant: 5px 5px 0px hsl(270 50% 15%);
+  --shadow-soft: 2px 2px 0px hsl(270 60% 12%);
+  --shadow-medium: 4px 4px 0px hsl(270 60% 12%);
+  --shadow-large: 6px 6px 0px hsl(270 60% 12%);
+  --shadow-glow: 4px 4px 0px hsl(270 60% 12%);
+  --shadow-elegant: 5px 5px 0px hsl(270 60% 12%);
 
   /* Fast transitions for snappy feel */
   --transition-fast: all 0.1s ease;
@@ -66,13 +66,13 @@
 
   /* Sidebar */
   --sidebar-background: 280 25% 98%;
-  --sidebar-foreground: 270 50% 10%;
+  --sidebar-foreground: 270 60% 8%;
   --sidebar-primary: 280 70% 40%;
-  --sidebar-primary-foreground: 45 80% 95%;
-  --sidebar-accent: 45 90% 50%;
-  --sidebar-accent-foreground: 270 50% 10%;
-  --sidebar-border: 270 50% 15%;
-  --sidebar-ring: 280 70% 40%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 210 90% 50%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 270 60% 12%;
+  --sidebar-ring: 210 90% 50%;
 }
 
 @layer base {
@@ -162,33 +162,33 @@
 
   .dark {
     --background: 270 30% 8%;
-    --foreground: 270 20% 92%;
+    --foreground: 270 10% 95%;
     --card: 270 25% 12%;
-    --card-foreground: 270 20% 92%;
+    --card-foreground: 270 10% 95%;
     --popover: 270 25% 10%;
-    --popover-foreground: 270 20% 92%;
+    --popover-foreground: 270 10% 95%;
     --primary: 280 65% 55%;
-    --primary-foreground: 270 30% 8%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 320 55% 55%;
-    --secondary-foreground: 270 30% 8%;
+    --secondary-foreground: 0 0% 100%;
     --muted: 270 20% 18%;
-    --muted-foreground: 270 15% 60%;
-    --accent: 45 85% 55%;
-    --accent-foreground: 270 30% 8%;
+    --muted-foreground: 270 10% 70%;
+    --accent: 210 85% 55%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 55%;
-    --destructive-foreground: 270 20% 92%;
-    --border: 45 75% 65%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 75% 70%;
     --input: 270 20% 15%;
-    --ring: 280 65% 55%;
+    --ring: 210 85% 55%;
 
     --sidebar-background: 270 25% 10%;
-    --sidebar-foreground: 270 20% 92%;
+    --sidebar-foreground: 270 10% 95%;
     --sidebar-primary: 280 65% 55%;
-    --sidebar-primary-foreground: 270 30% 8%;
-    --sidebar-accent: 45 85% 55%;
-    --sidebar-accent-foreground: 270 30% 8%;
-    --sidebar-border: 45 75% 65%;
-    --sidebar-ring: 280 65% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 85% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 75% 70%;
+    --sidebar-ring: 210 85% 55%;
   }
 }
 
