@@ -79,7 +79,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
                     </Button>
                   </Link>
                   <Link to="/auth">
-                    <Button variant="outline" className="w-full sm:w-auto jeopardy-button border-theme-yellow/50 text-theme-yellow hover:bg-theme-yellow/10 font-semibold px-6 py-2">
+                    <Button variant="outline" className="w-full sm:w-auto jeopardy-button border-accent/50 text-accent hover:bg-accent/10 font-semibold px-6 py-2">
                       Log In
                     </Button>
                   </Link>
@@ -226,7 +226,7 @@ export function GameModeSelector({ onSelectMode }: GameModeSelectorProps) {
                   <ArrowLeft className="w-4 h-4 mr-1" />
                   Back
                 </Button>
-                <CardTitle className="text-2xl font-bold text-theme-yellow">
+                <CardTitle className="text-2xl font-bold text-accent">
                   SELECT PLAYERS
                 </CardTitle>
                 <div className="w-16" /> {/* Spacer for balance */}

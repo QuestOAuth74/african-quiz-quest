@@ -422,7 +422,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             <CardContent className="space-y-4">
               {pdfAttachmentUrl ? (
                 <div className="border rounded-lg p-4 flex items-center gap-3">
-                  <File className="h-5 w-5 text-theme-gold" />
+                  <File className="h-5 w-5 text-accent" />
                   <div className="flex-1">
                     <p className="font-medium">{pdfAttachmentName}</p>
                     <p className="text-sm text-muted-foreground">PDF Document</p>
@@ -490,9 +490,9 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-theme-gold/20">
+          <Card className="border-2 border-accent/20">
             <CardHeader>
-              <CardTitle className="text-xl text-theme-gold">Content Editor</CardTitle>
+              <CardTitle className="text-xl text-accent">Content Editor</CardTitle>
               <p className="text-sm text-muted-foreground">
                 Create your blog post content using blocks. Start writing, add images, videos, quotes, and more.
               </p>

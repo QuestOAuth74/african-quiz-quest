@@ -257,14 +257,14 @@ export function CrosswordGrid({
   };
 
   const getCellClasses = (cell: CrosswordCell, x: number, y: number): string => {
-    const baseClasses = "w-8 h-8 text-center text-sm font-bold border border-theme-brown/30";
+    const baseClasses = "w-8 h-8 text-center text-sm font-bold border border-primary/30";
     
     if (cell.isBlocked) {
-      return `${baseClasses} bg-theme-brown-dark cursor-not-allowed`;
+      return `${baseClasses} bg-primary cursor-not-allowed`;
     }
 
     const isSelected = isCellInSelectedWord(x, y);
-    const isHighlighted = isSelected ? "bg-theme-yellow/20 border-theme-yellow" : "bg-background";
+    const isHighlighted = isSelected ? "bg-accent/20 border-accent" : "bg-background";
     
     // Enhanced validation feedback - show correct/incorrect after typing
     let validationClass = "text-foreground";
@@ -276,13 +276,13 @@ export function CrosswordGrid({
       }
     }
     
-    return `${baseClasses} ${isHighlighted} ${validationClass} cursor-pointer hover:bg-theme-yellow/10 transition-colors`;
+    return `${baseClasses} ${isHighlighted} ${validationClass} cursor-pointer hover:bg-accent/10 transition-colors`;
   };
 
   return (
     <div className={`crossword-grid ${className}`}>
       <div 
-        className="inline-grid gap-px bg-theme-brown/20 p-2 rounded-lg"
+        className="inline-grid gap-px bg-primary/20 p-2 rounded-lg"
         style={{ 
           gridTemplateColumns: `repeat(${puzzle.gridSize}, 1fr)`,
           gridTemplateRows: `repeat(${puzzle.gridSize}, 1fr)`
@@ -297,7 +297,7 @@ export function CrosswordGrid({
             >
               {/* Word number */}
               {cell.wordNumber && (
-                <div className="absolute top-0 left-0 text-xs text-theme-yellow font-bold z-10 leading-none">
+                <div className="absolute top-0 left-0 text-xs text-accent font-bold z-10 leading-none">
                   {cell.wordNumber}
                 </div>
               )}

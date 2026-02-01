@@ -64,9 +64,9 @@ export function AudioControls() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="relative overflow-hidden group text-theme-yellow hover:text-theme-yellow-light bg-theme-yellow/20 border-theme-yellow/40 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-xl"
+            className="relative overflow-hidden group text-accent hover:text-accent/80 bg-accent/20 border-accent/40 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-xl"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-theme-yellow/10 to-theme-yellow/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-accent/10 to-accent/30" />
             <VolumeIcon className="w-5 h-5 relative z-10 transition-all duration-200 group-hover:scale-125" />
           </Button>
         </PopoverTrigger>
@@ -81,7 +81,7 @@ export function AudioControls() {
                 className="h-6 w-6 p-0"
               >
                 {isPlaying ? (
-                  <Volume2 className="w-4 h-4 text-theme-yellow" />
+                  <Volume2 className="w-4 h-4 text-accent" />
                 ) : (
                   <VolumeX className="w-4 h-4 text-muted-foreground" />
                 )}
@@ -187,8 +187,8 @@ export function AudioControls() {
       
       {error && (
         <div className="absolute top-full right-0 mt-2 w-64">
-          <div className="bg-theme-yellow/10 border border-theme-yellow/20 rounded-lg p-3 text-center">
-            <p className="text-theme-yellow text-xs">{error}</p>
+          <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 text-center">
+            <p className="text-accent text-xs">{error}</p>
           </div>
         </div>
       )}

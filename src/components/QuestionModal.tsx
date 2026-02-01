@@ -139,7 +139,7 @@ const QuestionModal = ({
           <ScrollArea className={`${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'} pr-4`}>
             <div className="space-y-6">
               {/* Question Display */}
-              <Card className="jeopardy-card border-theme-yellow/30">
+              <Card className="jeopardy-card border-accent/30">
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-4">
                     <Badge variant="secondary" className="bg-accent text-accent-foreground">
@@ -267,28 +267,28 @@ const QuestionModal = ({
     if (isAIPlayer) {
       return `max-w-4xl ${heightClass} jeopardy-card border-blue-500/50 bg-gradient-to-br from-blue-900/20 to-purple-900/20 ${mobileClass}`;
     }
-    return `max-w-4xl ${heightClass} jeopardy-card border-theme-yellow/30 ${mobileClass}`;
+    return `max-w-4xl ${heightClass} jeopardy-card border-accent/30 ${mobileClass}`;
   };
 
   const getHeaderClasses = () => {
     if (isAIPlayer) {
       return "font-orbitron font-black text-2xl md:text-3xl text-blue-400";
     }
-    return "font-orbitron font-black text-2xl md:text-3xl text-theme-yellow";
+    return "font-orbitron font-black text-2xl md:text-3xl text-accent";
   };
 
   const getPointsClasses = () => {
     if (isAIPlayer) {
       return "font-orbitron font-bold text-xl text-blue-300";
     }
-    return "font-orbitron font-bold text-xl text-theme-yellow-light";
+    return "font-orbitron font-bold text-xl text-accent/80";
   };
 
   const getPlayerClasses = () => {
     if (isAIPlayer) {
       return "text-blue-400 font-medium";
     }
-    return "text-theme-yellow font-medium";
+    return "text-accent font-medium";
   };
 
   return (
@@ -336,7 +336,7 @@ const QuestionModal = ({
           <ScrollArea className={`flex-1 ${isMobile ? 'max-h-[55vh]' : 'max-h-[70vh]'}`}>
             <div className="space-y-6 pr-4">
               {/* Question */}
-              <Card className="jeopardy-card border-theme-brown-light/50 animate-scale-in">
+              <Card className="jeopardy-card border-primary/80/50 animate-scale-in">
                 <CardContent className="p-4">
                   {question.imageUrl && (
                     <div className="mb-6 flex justify-center">
@@ -396,11 +396,11 @@ const QuestionModal = ({
                             variant={selectedOption === option.id ? "default" : "outline"}
                             className={`w-full p-4 h-auto text-left justify-start transition-all duration-300 ${
                               selectedOption === option.id 
-                                ? "jeopardy-gold border-theme-yellow" 
-                                : "jeopardy-button border-theme-yellow/50 hover:border-theme-yellow"
+                                ? "jeopardy-gold border-accent" 
+                                : "jeopardy-button border-accent/50 hover:border-accent"
                             }`}
                           >
-                            <span className="font-orbitron font-bold mr-3 text-theme-yellow-light">
+                            <span className="font-orbitron font-bold mr-3 text-accent/80">
                               {String.fromCharCode(65 + index)}.
                             </span>
                             <span className="flex-1">{option.text}</span>
@@ -497,11 +497,11 @@ const QuestionModal = ({
 
                   {/* Explanation */}
                   {(question.explanation || question.historicalContext) && (
-                    <Card className="jeopardy-card border-theme-brown-light/50">
+                    <Card className="jeopardy-card border-primary/80/50">
                       <CardContent className="p-6">
                         {question.explanation && (
                           <>
-                            <h3 className="text-base font-orbitron font-bold text-theme-yellow mb-3 uppercase tracking-wider">
+                            <h3 className="text-base font-orbitron font-bold text-accent mb-3 uppercase tracking-wider">
                               Explanation
                             </h3>
                             <p className="text-sm font-exo leading-relaxed text-card-foreground mb-3">
@@ -511,8 +511,8 @@ const QuestionModal = ({
                         )}
                         {question.historicalContext && (
                           <>
-                            <div className="pt-3 border-t border-theme-yellow/30">
-                              <h4 className="text-sm font-orbitron font-bold text-theme-yellow-light mb-2 uppercase tracking-wider">
+                            <div className="pt-3 border-t border-accent/30">
+                              <h4 className="text-sm font-orbitron font-bold text-accent/80 mb-2 uppercase tracking-wider">
                                 Historical Context
                               </h4>
                               <p className="text-sm font-exo leading-relaxed text-card-foreground/90">

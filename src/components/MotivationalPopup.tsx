@@ -32,14 +32,14 @@ export const MotivationalPopup = ({ isOpen, onClose }: MotivationalPopupProps) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-gradient-to-br from-theme-brown via-theme-brown-dark to-theme-brown border-2 border-theme-yellow/50 shadow-2xl">
+      <DialogContent className="max-w-md bg-gradient-to-br from-primary via-primary to-primary border-2 border-accent/50 shadow-2xl">
         <div className="relative overflow-hidden rounded-lg">
           {/* Close button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="absolute top-2 right-2 z-10 text-theme-yellow-light hover:text-theme-yellow hover:bg-theme-brown/50"
+            className="absolute top-2 right-2 z-10 text-accent/80 hover:text-accent hover:bg-primary/50"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -58,9 +58,9 @@ export const MotivationalPopup = ({ isOpen, onClose }: MotivationalPopupProps) =
                 }}
               >
                 <Sparkles 
-                  className="text-theme-yellow/60 h-3 w-3"
+                  className="text-accent/60 h-3 w-3"
                   style={{
-                    filter: 'drop-shadow(0 0 4px hsl(var(--theme-yellow)))'
+                    filter: 'drop-shadow(0 0 4px hsl(var(--accent)))'
                   }}
                 />
               </div>
@@ -74,24 +74,24 @@ export const MotivationalPopup = ({ isOpen, onClose }: MotivationalPopupProps) =
               <img
                 src="https://tvfqqzphwwcgrvmkilzr.supabase.co/storage/v1/object/public/question-images/heru.png"
                 alt="Heru - Ancient Egyptian Falcon God"
-                className="w-24 h-24 mx-auto rounded-full border-2 border-theme-yellow/50 animate-scale-in"
+                className="w-24 h-24 mx-auto rounded-full border-2 border-accent/50 animate-scale-in"
                 style={{
-                  filter: 'drop-shadow(0 0 12px hsl(var(--theme-yellow) / 0.4))',
-                  boxShadow: '0 0 20px hsl(var(--theme-yellow) / 0.3)'
+                  filter: 'drop-shadow(0 0 12px hsl(var(--accent) / 0.4))',
+                  boxShadow: '0 0 20px hsl(var(--accent) / 0.3)'
                 }}
               />
               
               {/* Rotating glow ring */}
-              <div className="absolute inset-0 rounded-full border-2 border-theme-yellow/30 animate-spin opacity-60"
+              <div className="absolute inset-0 rounded-full border-2 border-accent/30 animate-spin opacity-60"
                    style={{ animationDuration: '3s' }} />
             </div>
 
             {/* Motivational text */}
             <div className="space-y-3">
-              <h3 className="text-lg font-bold text-theme-yellow font-orbitron">
+              <h3 className="text-lg font-bold text-accent font-orbitron">
                 Ancestral Encouragement
               </h3>
-              <p className="text-theme-yellow-light text-sm leading-relaxed italic">
+              <p className="text-accent/80 text-sm leading-relaxed italic">
                 {quote}
               </p>
             </div>
@@ -99,7 +99,7 @@ export const MotivationalPopup = ({ isOpen, onClose }: MotivationalPopupProps) =
             {/* Continue button */}
             <Button
               onClick={onClose}
-              className="mt-4 bg-gradient-to-r from-theme-yellow to-theme-yellow-light text-theme-brown font-semibold hover:from-theme-yellow-light hover:to-theme-yellow transition-all duration-300 shadow-lg"
+              className="mt-4 bg-gradient-to-r from-accent to-accent/80 text-primary font-semibold hover:from-accent/80 hover:to-accent transition-all duration-300 shadow-lg"
             >
               Continue Your Journey
             </Button>
@@ -110,7 +110,7 @@ export const MotivationalPopup = ({ isOpen, onClose }: MotivationalPopupProps) =
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-1 h-1 bg-theme-yellow rounded-full animate-bounce opacity-70"
+                className="absolute w-1 h-1 bg-accent rounded-full animate-bounce opacity-70"
                 style={{
                   left: `${20 + (i * 15)}%`,
                   animationDelay: `${i * 0.3}s`,

@@ -12,10 +12,10 @@ const Privacy = () => {
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold text-primary flex items-center justify-center gap-3">
-              <Shield className="h-10 w-10 text-theme-yellow" />
+              <Shield className="h-10 w-10 text-accent" />
               Privacy Policy
             </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-theme-yellow to-theme-yellow-light mx-auto rounded-full"></div>
+            <div className="w-24 h-1 bg-gradient-to-r from-accent to-accent/80 mx-auto rounded-full"></div>
           </div>
 
           {/* Main Content */}
@@ -25,7 +25,7 @@ const Privacy = () => {
               <section className="space-y-4">
                 <h2 className="text-2xl font-semibold text-primary">Who we are</h2>
                 <p className="text-lg leading-relaxed">
-                  Our website address is: <a href="http://historiaafricana.org" className="text-theme-yellow hover:text-theme-yellow-light underline">http://historiaafricana.org</a>.
+                  Our website address is: <a href="http://historiaafricana.org" className="text-accent hover:text-accent/80 underline">http://historiaafricana.org</a>.
                 </p>
               </section>
 
@@ -35,7 +35,7 @@ const Privacy = () => {
                   When visitors leave comments on the site we collect the data shown in the comments form, and also the visitor's IP address and browser user agent string to help spam detection.
                 </p>
                 <p className="text-lg leading-relaxed">
-                  An anonymized string created from your email address (also called a hash) may be provided to the Gravatar service to see if you are using it. The Gravatar service privacy policy is available here: <a href="https://automattic.com/privacy/" className="text-theme-yellow hover:text-theme-yellow-light underline" target="_blank" rel="noopener noreferrer">https://automattic.com/privacy/</a>. After approval of your comment, your profile picture is visible to the public in the context of your comment.
+                  An anonymized string created from your email address (also called a hash) may be provided to the Gravatar service to see if you are using it. The Gravatar service privacy policy is available here: <a href="https://automattic.com/privacy/" className="text-accent hover:text-accent/80 underline" target="_blank" rel="noopener noreferrer">https://automattic.com/privacy/</a>. After approval of your comment, your profile picture is visible to the public in the context of your comment.
                 </p>
               </section>
 

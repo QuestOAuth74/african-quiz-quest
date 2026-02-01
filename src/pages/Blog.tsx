@@ -59,23 +59,23 @@ export const Blog: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Modern Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-theme-brown via-theme-brown-light to-theme-brown-dark">
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/80 to-primary">
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
           {/* Floating geometric shapes */}
-          <div className="absolute top-10 left-10 w-20 h-20 bg-theme-yellow/10 rounded-full animate-pulse"></div>
-          <div className="absolute top-32 right-20 w-16 h-16 bg-theme-yellow/20 rounded-lg rotate-45 animate-bounce delay-100"></div>
-          <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-theme-yellow/15 rounded-full animate-pulse delay-300"></div>
-          <div className="absolute bottom-32 right-1/3 w-8 h-8 bg-theme-yellow/25 rounded-full animate-bounce delay-500"></div>
+          <div className="absolute top-10 left-10 w-20 h-20 bg-accent/10 rounded-full animate-pulse"></div>
+          <div className="absolute top-32 right-20 w-16 h-16 bg-accent/20 rounded-lg rotate-45 animate-bounce delay-100"></div>
+          <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-accent/15 rounded-full animate-pulse delay-300"></div>
+          <div className="absolute bottom-32 right-1/3 w-8 h-8 bg-accent/25 rounded-full animate-bounce delay-500"></div>
           
           {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/10"></div>
           
           {/* Mesh gradient effect */}
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute top-0 left-0 w-72 h-72 bg-theme-yellow/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+            <div className="absolute top-0 left-0 w-72 h-72 bg-accent/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
             <div className="absolute top-0 right-0 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
-            <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-theme-yellow/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-500"></div>
+            <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-accent/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-500"></div>
           </div>
         </div>
 
@@ -83,20 +83,20 @@ export const Blog: React.FC = () => {
           <div className="text-center text-white max-w-4xl mx-auto">
             {/* Modern header with icons */}
             <div className="flex items-center justify-center gap-4 mb-8">
-              <div className="p-3 bg-theme-yellow/20 rounded-2xl backdrop-blur-sm border border-theme-yellow/30">
-                <Sparkles className="h-8 w-8 text-theme-yellow" />
+              <div className="p-3 bg-accent/20 rounded-2xl backdrop-blur-sm border border-accent/30">
+                <Sparkles className="h-8 w-8 text-accent" />
               </div>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-white via-theme-yellow-light to-white bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-white via-accent/80 to-white bg-clip-text text-transparent">
                 Historia Africana
               </h1>
-              <div className="p-3 bg-theme-yellow/20 rounded-2xl backdrop-blur-sm border border-theme-yellow/30">
-                <Globe className="h-8 w-8 text-theme-yellow" />
+              <div className="p-3 bg-accent/20 rounded-2xl backdrop-blur-sm border border-accent/30">
+                <Globe className="h-8 w-8 text-accent" />
               </div>
             </div>
             
-            <div className="inline-flex items-center gap-2 bg-theme-yellow/20 backdrop-blur-sm rounded-full px-6 py-2 border border-theme-yellow/30 mb-6">
-              <BookOpen className="h-5 w-5 text-theme-yellow" />
-              <span className="text-theme-yellow font-semibold">Stories & Insights</span>
+            <div className="inline-flex items-center gap-2 bg-accent/20 backdrop-blur-sm rounded-full px-6 py-2 border border-accent/30 mb-6">
+              <BookOpen className="h-5 w-5 text-accent" />
+              <span className="text-accent font-semibold">Stories & Insights</span>
             </div>
             
             <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto leading-relaxed mb-8 text-gray-100">
@@ -107,15 +107,15 @@ export const Blog: React.FC = () => {
             {/* Feature badges */}
             <div className="flex flex-wrap justify-center gap-6 mt-12">
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20">
-                <Users className="h-5 w-5 text-theme-yellow" />
+                <Users className="h-5 w-5 text-accent" />
                 <span className="text-sm font-medium">Expert Writers</span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20">
-                <TrendingUp className="h-5 w-5 text-theme-yellow" />
+                <TrendingUp className="h-5 w-5 text-accent" />
                 <span className="text-sm font-medium">Weekly Updates</span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20">
-                <Star className="h-5 w-5 text-theme-yellow" />
+                <Star className="h-5 w-5 text-accent" />
                 <span className="text-sm font-medium">Authentic Stories</span>
               </div>
             </div>
@@ -143,11 +143,11 @@ export const Blog: React.FC = () => {
                   placeholder="Search stories, insights, and discoveries..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 text-base bg-background border-2 border-border focus:border-theme-yellow"
+                  className="pl-12 h-12 text-base bg-background border-2 border-border focus:border-accent"
                 />
               </div>
               <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-                <SelectTrigger className="w-full md:w-56 h-12 border-2 border-border focus:border-theme-yellow">
+                <SelectTrigger className="w-full md:w-56 h-12 border-2 border-border focus:border-accent">
                   <SelectValue placeholder="Choose category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -167,8 +167,8 @@ export const Blog: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           {loading ? (
             <div className="text-center py-16">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-theme-yellow/10 rounded-full mb-4">
-                <div className="animate-spin h-8 w-8 border-4 border-theme-yellow border-t-transparent rounded-full"></div>
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-full mb-4">
+                <div className="animate-spin h-8 w-8 border-4 border-accent border-t-transparent rounded-full"></div>
               </div>
               <p className="text-lg text-muted-foreground">Loading amazing stories...</p>
             </div>
@@ -177,7 +177,7 @@ export const Blog: React.FC = () => {
               <div className="grid gap-8 md:gap-10">
                 {currentPosts.map((post, index) => (
                 <article key={post.id} className={`group ${index === 0 ? 'md:col-span-2' : ''}`}>
-                  <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-theme-yellow/20 bg-gradient-to-br from-card to-card/50">
+                  <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-accent/20 bg-gradient-to-br from-card to-card/50">
                     <div className={`grid ${post.featured_image_url ? 'md:grid-cols-2' : 'md:grid-cols-1'} gap-0`}>
                       {post.featured_image_url && (
                         <div className="relative overflow-hidden aspect-video md:aspect-square">
@@ -193,12 +193,12 @@ export const Blog: React.FC = () => {
                       <div className="p-8">
                         <div className="space-y-4">
                           {post.category && (
-                            <Badge variant="secondary" className="bg-theme-yellow/20 text-theme-yellow border-theme-yellow/30 hover:bg-theme-yellow/30">
+                            <Badge variant="secondary" className="bg-accent/20 text-accent border-accent/30 hover:bg-accent/30">
                               {post.category.name}
                             </Badge>
                           )}
                           
-                          <CardTitle className="text-2xl md:text-3xl font-bold leading-tight group-hover:text-theme-yellow transition-colors duration-300">
+                          <CardTitle className="text-2xl md:text-3xl font-bold leading-tight group-hover:text-accent transition-colors duration-300">
                             <Link to={`/blog/${post.slug}`} className="block">
                               {post.title}
                             </Link>
@@ -234,7 +234,7 @@ export const Blog: React.FC = () => {
                           <div className="flex items-center justify-between pt-4">
                             <Link
                               to={`/blog/${post.slug}`}
-                              className="inline-flex items-center gap-2 text-theme-yellow hover:text-theme-yellow-light font-semibold group/link"
+                              className="inline-flex items-center gap-2 text-accent hover:text-accent/80 font-semibold group/link"
                             >
                               Continue Reading
                               <svg className="w-4 h-4 transition-transform group-hover/link:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

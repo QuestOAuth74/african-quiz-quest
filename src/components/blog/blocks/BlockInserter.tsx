@@ -93,7 +93,7 @@ export const BlockInserter: React.FC<BlockInserterProps> = ({ onInsert, onClose 
   ];
 
   return (
-    <Card className="border-theme-gold/20 shadow-lg relative z-10">
+    <Card className="border-accent/20 shadow-lg relative z-10">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-medium text-sm">Choose a block type</h3>
@@ -112,10 +112,10 @@ export const BlockInserter: React.FC<BlockInserterProps> = ({ onInsert, onClose 
             <Button
               key={type}
               variant="ghost"
-              className="h-auto p-3 flex flex-col items-center gap-2 hover:bg-theme-gold/10 hover:border-theme-gold/20 border border-transparent"
+              className="h-auto p-3 flex flex-col items-center gap-2 hover:bg-accent/10 hover:border-accent/20 border border-transparent"
               onClick={() => onInsert(type)}
             >
-              <Icon className="h-5 w-5 text-theme-gold" />
+              <Icon className="h-5 w-5 text-accent" />
               <div className="text-center">
                 <div className="text-xs font-medium">{label}</div>
                 <div className="text-xs text-muted-foreground hidden md:block">

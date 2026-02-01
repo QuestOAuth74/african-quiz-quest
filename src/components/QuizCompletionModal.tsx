@@ -122,9 +122,9 @@ export function QuizCompletionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-theme-brown border-theme-yellow/20 text-theme-yellow-light max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl bg-primary border-accent/20 text-accent/80 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-theme-yellow text-center flex items-center justify-center gap-2">
+          <DialogTitle className="text-2xl font-bold text-accent text-center flex items-center justify-center gap-2">
             {getPerformanceIcon()}
             Quiz Complete!
           </DialogTitle>
@@ -133,31 +133,31 @@ export function QuizCompletionModal({
         <div className="space-y-6">
           {/* Performance Summary */}
           <div className="text-center space-y-3">
-            <p className="text-lg font-semibold text-theme-yellow">
+            <p className="text-lg font-semibold text-accent">
               {getPerformanceMessage()}
             </p>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-theme-brown-dark/50 p-4 rounded-lg border border-theme-yellow/20">
-                <div className="text-2xl font-bold text-theme-yellow">{questionsCorrect}/{questionsAnswered}</div>
-                <div className="text-sm text-theme-yellow-light">Questions Correct</div>
-                <div className="text-lg font-semibold text-theme-yellow">{percentage}%</div>
+              <div className="bg-primary/50 p-4 rounded-lg border border-accent/20">
+                <div className="text-2xl font-bold text-accent">{questionsCorrect}/{questionsAnswered}</div>
+                <div className="text-sm text-accent/80">Questions Correct</div>
+                <div className="text-lg font-semibold text-accent">{percentage}%</div>
               </div>
               
-              <div className="bg-theme-brown-dark/50 p-4 rounded-lg border border-theme-yellow/20">
-                <div className="text-2xl font-bold text-theme-yellow">{finalScore}</div>
-                <div className="text-sm text-theme-yellow-light">Total Points</div>
-                <div className="text-lg font-semibold text-theme-yellow">{scorePercentage}%</div>
+              <div className="bg-primary/50 p-4 rounded-lg border border-accent/20">
+                <div className="text-2xl font-bold text-accent">{finalScore}</div>
+                <div className="text-sm text-accent/80">Total Points</div>
+                <div className="text-lg font-semibold text-accent">{scorePercentage}%</div>
               </div>
             </div>
           </div>
 
           {/* Categories Played */}
           <div className="space-y-2">
-            <h4 className="font-semibold text-theme-yellow">Categories Covered:</h4>
+            <h4 className="font-semibold text-accent">Categories Covered:</h4>
             <div className="flex flex-wrap gap-2">
               {getCategoriesPlayed().map((category, index) => (
-                <Badge key={index} variant="secondary" className="bg-theme-yellow/20 text-theme-yellow border-theme-yellow/30">
+                <Badge key={index} variant="secondary" className="bg-accent/20 text-accent border-accent/30">
                   {category}
                 </Badge>
               ))}
@@ -166,17 +166,17 @@ export function QuizCompletionModal({
 
           {/* Question Results Summary */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-theme-yellow">Question Results:</h4>
+            <h4 className="font-semibold text-accent">Question Results:</h4>
             <div className="max-h-48 overflow-y-auto space-y-2">
               {questions.map((question, index) => {
                 const result = answeredQuestions.find(aq => aq.questionId === question.id);
                 const isCorrect = result?.correct || false;
                 
                 return (
-                  <div key={question.id} className="bg-theme-brown-dark/30 p-3 rounded border border-theme-yellow/10">
+                  <div key={question.id} className="bg-primary/30 p-3 rounded border border-accent/10">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <div className="text-sm text-theme-yellow-light mb-1">
+                        <div className="text-sm text-accent/80 mb-1">
                           Question {index + 1}: {question.text.substring(0, 80)}
                           {question.text.length > 80 ? '...' : ''}
                         </div>
@@ -189,7 +189,7 @@ export function QuizCompletionModal({
                           <span className={`text-sm font-medium ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
                             {isCorrect ? 'Correct' : 'Incorrect'}
                           </span>
-                          <Badge variant="outline" className="border-theme-yellow/30 text-theme-yellow-light text-xs">
+                          <Badge variant="outline" className="border-accent/30 text-accent/80 text-xs">
                             {question.points} pts
                           </Badge>
                         </div>
@@ -205,14 +205,14 @@ export function QuizCompletionModal({
           <div className="flex gap-3 pt-4">
             <Button 
               onClick={onNewQuiz}
-              className="flex-1 bg-theme-yellow text-theme-brown hover:bg-theme-yellow/90"
+              className="flex-1 bg-accent text-primary hover:bg-accent/90"
             >
               Take Another Quiz
             </Button>
             <Button 
               onClick={onBackToHome}
               variant="outline"
-              className="flex-1 border-theme-yellow/30 text-theme-yellow hover:bg-theme-yellow/10"
+              className="flex-1 border-accent/30 text-accent hover:bg-accent/10"
             >
               Back to Home
             </Button>

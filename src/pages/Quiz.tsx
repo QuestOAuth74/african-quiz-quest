@@ -429,14 +429,14 @@ const Quiz = () => {
           <Button
             onClick={() => navigate('/')}
             variant="ghost"
-            className="mb-6 text-theme-yellow-light hover:text-theme-yellow"
+            className="mb-6 text-accent/80 hover:text-accent"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
-          <Card className="bg-theme-brown border-theme-yellow/20">
+          <Card className="bg-primary border-accent/20">
             <CardContent className="pt-6">
-              <div className="text-center text-theme-yellow-light">
+              <div className="text-center text-accent/80">
                 <h2 className="text-xl font-semibold mb-2">No Questions Available</h2>
                 <p>Please check back later when questions have been added.</p>
               </div>
@@ -467,7 +467,7 @@ const Quiz = () => {
         <Button
           onClick={() => navigate('/quiz-setup')}
           variant="ghost"
-          className="mb-6 text-theme-yellow-light hover:text-theme-yellow"
+          className="mb-6 text-accent/80 hover:text-accent"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Quiz Setup
@@ -476,25 +476,25 @@ const Quiz = () => {
         {/* Quiz Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-theme-yellow">Traditional Quiz</h1>
+            <h1 className="text-3xl font-bold text-accent">Traditional Quiz</h1>
             <div className="flex items-center gap-4">
-              <div className="text-theme-yellow-light">
+              <div className="text-accent/80">
                 Question {currentQuestionIndex + 1} of {questions.length}
               </div>
               <FullscreenToggle />
             </div>
           </div>
           
-          <Progress value={progress} className="h-2 bg-theme-brown/50" />
+          <Progress value={progress} className="h-2 bg-primary/50" />
           
           <div className="flex items-center justify-between mt-4">
             <div className="flex items-center gap-3">
               {category && (
-                <Badge variant="secondary" className="bg-theme-yellow/20 text-theme-yellow border-theme-yellow/30">
+                <Badge variant="secondary" className="bg-accent/20 text-accent border-accent/30">
                   {category.name}
                 </Badge>
               )}
-              <Badge variant="outline" className="border-theme-yellow/30 text-theme-yellow-light">
+              <Badge variant="outline" className="border-accent/30 text-accent/80">
                 {currentQuestion?.points} points
               </Badge>
               {hasUpdates && (
@@ -503,16 +503,16 @@ const Quiz = () => {
                 </Badge>
               )}
             </div>
-            <div className="text-theme-yellow-light">
-              Current Score: <span className="text-theme-yellow font-semibold">{score}</span>
+            <div className="text-accent/80">
+              Current Score: <span className="text-accent font-semibold">{score}</span>
             </div>
           </div>
         </div>
 
         {/* Question Card */}
-        <Card className="bg-theme-brown border-theme-yellow/20 mb-6">
+        <Card className="bg-primary border-accent/20 mb-6">
           <CardHeader>
-            <CardTitle className="text-theme-yellow text-xl leading-relaxed">
+            <CardTitle className="text-accent text-xl leading-relaxed">
               {currentQuestion.text}
             </CardTitle>
           </CardHeader>
@@ -539,7 +539,7 @@ const Quiz = () => {
                 const showCorrectness = showResult;
                 
                 let buttonVariant: "default" | "outline" | "secondary" = "outline";
-                let className = "w-full text-left p-4 h-auto border-theme-yellow/30 text-theme-yellow-light hover:bg-theme-yellow/10 transition-all duration-200";
+                let className = "w-full text-left p-4 h-auto border-accent/30 text-accent/80 hover:bg-accent/10 transition-all duration-200";
                 
                 if (showCorrectness) {
                   if (isCorrect) {
@@ -548,7 +548,7 @@ const Quiz = () => {
                     className += " bg-red-500/20 border-red-500 text-red-100 hover:bg-red-500/20";
                   }
                 } else if (isSelected) {
-                  className += " bg-theme-yellow/20 border-theme-yellow text-theme-yellow";
+                  className += " bg-accent/20 border-accent text-accent";
                 }
 
                 return (
@@ -561,7 +561,7 @@ const Quiz = () => {
                   >
                     <div className="flex items-center justify-between w-full">
                       <span className="flex items-center gap-3">
-                        <span className="font-semibold text-sm bg-theme-brown/50 px-2 py-1 rounded">
+                        <span className="font-semibold text-sm bg-primary/50 px-2 py-1 rounded">
                           {String.fromCharCode(65 + index)}
                         </span>
                         <span>{option.text}</span>
@@ -584,7 +584,7 @@ const Quiz = () => {
                 {!showResult && selectedAnswer && (
                   <Button 
                     onClick={handleSubmitAnswer}
-                    className="bg-theme-yellow text-theme-brown hover:bg-theme-yellow/90"
+                    className="bg-accent text-primary hover:bg-accent/90"
                   >
                     Submit Answer
                   </Button>
@@ -595,7 +595,7 @@ const Quiz = () => {
                 {showResult && (
                   <Button 
                     onClick={handleNextQuestion}
-                    className="bg-theme-yellow text-theme-brown hover:bg-theme-yellow/90"
+                    className="bg-accent text-primary hover:bg-accent/90"
                   >
                     {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
                   </Button>
@@ -607,9 +607,9 @@ const Quiz = () => {
 
         {/* Explanation Card */}
         {showResult && (currentQuestion.explanation || currentQuestion.historical_context) && (
-          <Card className="bg-theme-brown border-theme-yellow/20">
+          <Card className="bg-primary border-accent/20">
             <CardHeader>
-              <CardTitle className="text-theme-yellow flex items-center gap-2">
+              <CardTitle className="text-accent flex items-center gap-2">
                 <Info className="h-5 w-5" />
                 Learn More
               </CardTitle>
@@ -617,8 +617,8 @@ const Quiz = () => {
             <CardContent className="space-y-4">
               {currentQuestion.explanation && (
                 <div>
-                  <h4 className="font-semibold text-theme-yellow-light mb-2">Explanation:</h4>
-                  <p className="text-theme-yellow-light/80 leading-relaxed">
+                  <h4 className="font-semibold text-accent/80 mb-2">Explanation:</h4>
+                  <p className="text-accent/80/80 leading-relaxed">
                     {currentQuestion.explanation}
                   </p>
                 </div>
@@ -626,8 +626,8 @@ const Quiz = () => {
               
               {currentQuestion.historical_context && (
                 <div>
-                  <h4 className="font-semibold text-theme-yellow-light mb-2">Historical Context:</h4>
-                  <p className="text-theme-yellow-light/80 leading-relaxed">
+                  <h4 className="font-semibold text-accent/80 mb-2">Historical Context:</h4>
+                  <p className="text-accent/80/80 leading-relaxed">
                     {currentQuestion.historical_context}
                   </p>
                 </div>
@@ -639,9 +639,9 @@ const Quiz = () => {
         {/* Question Rating Component */}
         {showResult && (
           <div className="mt-6">
-            <Card className="bg-theme-brown border-theme-yellow/20">
+            <Card className="bg-primary border-accent/20">
               <CardHeader>
-                <CardTitle className="text-theme-yellow text-lg">Rate This Question</CardTitle>
+                <CardTitle className="text-accent text-lg">Rate This Question</CardTitle>
               </CardHeader>
               <CardContent>
                 <QuestionRating 

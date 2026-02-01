@@ -89,7 +89,7 @@ export const FileBlock: React.FC<FileBlockProps> = ({
         {block.data.url ? (
           <div className="border border-border rounded-lg p-4 bg-muted/30">
             <div className="flex items-center gap-4">
-              <FileIcon className="h-8 w-8 text-theme-gold flex-shrink-0" />
+              <FileIcon className="h-8 w-8 text-accent flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium truncate">{block.data.name}</h4>
                 <div className="flex items-center gap-4 mt-1">

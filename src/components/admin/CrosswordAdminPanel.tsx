@@ -361,7 +361,7 @@ export function CrosswordAdminPanel() {
       {/* Public Access Control */}
       <Card className="jeopardy-card">
         <CardHeader>
-          <CardTitle className="text-theme-yellow flex items-center gap-2">
+          <CardTitle className="text-accent flex items-center gap-2">
             <Settings className="h-5 w-5" />
             Access Control
           </CardTitle>
@@ -394,7 +394,7 @@ export function CrosswordAdminPanel() {
           {/* Add New Word */}
           <Card className="jeopardy-card">
             <CardHeader>
-              <CardTitle className="text-theme-yellow flex items-center gap-2">
+              <CardTitle className="text-accent flex items-center gap-2">
                 <Plus className="h-5 w-5" />
                 Add New Word
               </CardTitle>
@@ -455,7 +455,7 @@ export function CrosswordAdminPanel() {
           {/* Words List */}
           <Card className="jeopardy-card">
             <CardHeader>
-              <CardTitle className="text-theme-yellow">Word Database ({words.length} words)</CardTitle>
+              <CardTitle className="text-accent">Word Database ({words.length} words)</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -491,7 +491,7 @@ export function CrosswordAdminPanel() {
         <TabsContent value="generator" className="space-y-4">
           <Card className="jeopardy-card">
             <CardHeader>
-              <CardTitle className="text-theme-yellow flex items-center gap-2">
+              <CardTitle className="text-accent flex items-center gap-2">
                 <Puzzle className="h-5 w-5" />
                 Generate New Puzzle
               </CardTitle>
@@ -615,7 +615,7 @@ export function CrosswordAdminPanel() {
         <TabsContent value="puzzles" className="space-y-4">
           <Card className="jeopardy-card">
             <CardHeader>
-              <CardTitle className="text-theme-yellow">Generated Puzzles ({puzzles.length})</CardTitle>
+              <CardTitle className="text-accent">Generated Puzzles ({puzzles.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">

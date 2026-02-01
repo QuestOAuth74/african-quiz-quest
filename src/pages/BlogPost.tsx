@@ -206,7 +206,7 @@ export const BlogPost: React.FC = () => {
         const getHeadingStyles = (level: number) => {
           switch (level) {
             case 1:
-              return 'text-3xl mt-8 mb-4 p-6 rounded-lg bg-gradient-to-r from-primary/20 via-theme-gold/10 to-primary/20 border-l-4 border-theme-gold relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-theme-gold/5 before:to-transparent before:animate-pulse';
+              return 'text-3xl mt-8 mb-4 p-6 rounded-lg bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 border-l-4 border-accent relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-accent/5 before:to-transparent before:animate-pulse';
             case 2:
               return 'text-2xl mt-6 mb-3 p-4 rounded-lg bg-gradient-to-r from-accent/15 via-muted/30 to-accent/15 border-l-4 border-accent shadow-sm';
             case 3:
@@ -237,14 +237,14 @@ export const BlogPost: React.FC = () => {
       case 'image':
         return (
           <figure key={block.id} className="my-8">
-            <div className="blog-image-frame relative p-2 rounded-xl bg-gradient-to-br from-theme-gold/20 via-theme-gold/10 to-theme-gold/20 border border-theme-gold/30 shadow-lg">
+            <div className="blog-image-frame relative p-2 rounded-xl bg-gradient-to-br from-accent/20 via-accent/10 to-accent/20 border border-accent/30 shadow-lg">
               <img
                 src={block.data.url}
                 alt={block.data.caption || ''}
                 className="w-full rounded-lg shadow-xl relative z-10"
               />
-              <div className="absolute inset-0 rounded-xl border-2 border-theme-gold/50 animate-pulse-gold"></div>
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-theme-gold/10 to-transparent animate-shimmer"></div>
+              <div className="absolute inset-0 rounded-xl border-2 border-accent/50 animate-pulse-gold"></div>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-accent/10 to-transparent animate-shimmer"></div>
             </div>
             {block.data.caption && (
               <figcaption className="text-sm text-muted-foreground text-center mt-3 italic">
@@ -290,7 +290,7 @@ export const BlogPost: React.FC = () => {
               href={block.data.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-theme-gold hover:text-theme-gold-dark underline font-medium block"
+              className="text-accent hover:text-accent-dark underline font-medium block"
             >
               {block.data.text || block.data.url}
             </a>
@@ -304,7 +304,7 @@ export const BlogPost: React.FC = () => {
         return (
           <div key={block.id} className="my-4">
             <div className="border rounded-lg p-4 flex items-center gap-3">
-              <File className="h-5 w-5 text-theme-gold" />
+              <File className="h-5 w-5 text-accent" />
               <div className="flex-1">
                 <p className="font-medium">{block.data.name}</p>
                 <p className="text-sm text-muted-foreground">{block.data.type}</p>
@@ -313,7 +313,7 @@ export const BlogPost: React.FC = () => {
                 href={block.data.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-theme-gold hover:text-theme-gold-dark font-medium"
+                className="text-accent hover:text-accent-dark font-medium"
               >
                 Download
               </a>
@@ -323,8 +323,8 @@ export const BlogPost: React.FC = () => {
 
       case 'quote':
         return (
-          <blockquote key={block.id} className="border-l-4 border-theme-gold pl-6 py-4 bg-muted/30 rounded-r-lg my-6">
-            <Quote className="h-6 w-6 text-theme-gold mb-2" />
+          <blockquote key={block.id} className="border-l-4 border-accent pl-6 py-4 bg-muted/30 rounded-r-lg my-6">
+            <Quote className="h-6 w-6 text-accent mb-2" />
             <p className="text-lg italic font-medium leading-relaxed">
               "{block.data.text}"
             </p>
@@ -474,7 +474,7 @@ export const BlogPost: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-theme-gold border-t-transparent rounded-full"></div>
+        <div className="animate-spin h-8 w-8 border-4 border-accent border-t-transparent rounded-full"></div>
       </div>
     );
   }

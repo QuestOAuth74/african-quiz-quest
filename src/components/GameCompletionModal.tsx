@@ -74,9 +74,9 @@ export function GameCompletionModal({
 
   const getWinnerIcon = () => {
     if (isPlayerWinner) {
-      return <Crown className="w-12 h-12 text-theme-yellow animate-pulse" />;
+      return <Crown className="w-12 h-12 text-accent animate-pulse" />;
     } else {
-      return <Trophy className="w-12 h-12 text-theme-yellow animate-pulse" />;
+      return <Trophy className="w-12 h-12 text-accent animate-pulse" />;
     }
   };
 
@@ -91,7 +91,7 @@ export function GameCompletionModal({
   const getPositionIcon = (position: number) => {
     switch (position) {
       case 1:
-        return <Crown className="w-6 h-6 text-theme-yellow" />;
+        return <Crown className="w-6 h-6 text-accent" />;
       case 2:
         return <Medal className="w-6 h-6 text-gray-400" />;
       case 3:
@@ -111,18 +111,18 @@ export function GameCompletionModal({
           <DialogTitle className="text-2xl font-orbitron gradient-text mb-2">
             Game Complete!
           </DialogTitle>
-          <div className="text-xl font-exo text-theme-yellow mb-4">
+          <div className="text-xl font-exo text-accent mb-4">
             {getWinnerMessage()}
           </div>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Winner Details */}
-          <div className="text-center p-4 rounded-lg border border-theme-yellow/30 bg-theme-yellow/5">
+          <div className="text-center p-4 rounded-lg border border-accent/30 bg-accent/5">
             <div className="text-lg font-bold text-card-foreground">
               {winner?.name || "Unknown"}
             </div>
-            <div className="text-2xl font-orbitron text-theme-yellow">
+            <div className="text-2xl font-orbitron text-accent">
               ${winner?.score.toLocaleString() || 0}
             </div>
             {margin > 0 && (
@@ -140,8 +140,8 @@ export function GameCompletionModal({
                 key={player.name}
                 className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
                   index === 0
-                    ? 'border-theme-yellow bg-theme-yellow/10'
-                    : 'border-theme-yellow/30 hover:bg-theme-yellow/5'
+                    ? 'border-accent bg-accent/10'
+                    : 'border-accent/30 hover:bg-accent/5'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -150,7 +150,7 @@ export function GameCompletionModal({
                     {player.name}
                   </span>
                 </div>
-                <span className="font-bold text-theme-yellow">
+                <span className="font-bold text-accent">
                   ${player.score.toLocaleString()}
                 </span>
               </div>

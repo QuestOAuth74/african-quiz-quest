@@ -22,7 +22,7 @@ export function CrosswordClues({
   const renderCluesList = (clues: CrosswordClue[], title: string) => (
     <Card className="jeopardy-card">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-orbitron text-theme-yellow flex items-center justify-between">
+        <CardTitle className="text-lg font-orbitron text-accent flex items-center justify-between">
           {title}
           <Badge variant="outline" className="text-xs">
             {clues.filter(c => c.isCompleted).length}/{clues.length}
@@ -38,15 +38,15 @@ export function CrosswordClues({
                 onClick={() => onClueClick(clue.wordId)}
                 className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                   selectedWord?.id === clue.wordId
-                    ? 'bg-theme-yellow/20 border-l-4 border-theme-yellow'
+                    ? 'bg-accent/20 border-l-4 border-accent'
                     : clue.isCompleted
                       ? 'bg-green-100/10 border-l-4 border-green-500 opacity-70'
-                      : 'hover:bg-theme-yellow/10 border-l-4 border-transparent'
+                      : 'hover:bg-accent/10 border-l-4 border-transparent'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <span className={`font-bold text-sm min-w-[2rem] ${
-                    clue.isCompleted ? 'text-green-500' : 'text-theme-yellow'
+                    clue.isCompleted ? 'text-green-500' : 'text-accent'
                   }`}>
                     {clue.number}.
                   </span>

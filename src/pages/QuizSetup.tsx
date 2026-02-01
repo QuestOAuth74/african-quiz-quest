@@ -194,17 +194,17 @@ const QuizSetup = () => {
             <Button
               onClick={() => navigate('/')}
               variant="outline"
-              className="jeopardy-button border-theme-yellow/50"
+              className="jeopardy-button border-accent/50"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
             <div>
               <h1 className="font-orbitron font-black text-3xl md:text-4xl gradient-text flex items-center gap-3">
-                <BookOpen className="w-8 h-8 text-theme-yellow" />
+                <BookOpen className="w-8 h-8 text-accent" />
                 Quiz Setup
               </h1>
-              <p className="text-theme-yellow-light font-exo">
+              <p className="text-accent/80 font-exo">
                 Configure your personalized quiz experience
               </p>
             </div>
@@ -242,13 +242,13 @@ const QuizSetup = () => {
                     {categories.map((category) => (
                       <div
                         key={category.id}
-                        className="flex items-center space-x-3 p-3 rounded-lg border border-theme-yellow/30 hover:bg-theme-yellow/5 transition-colors"
+                        className="flex items-center space-x-3 p-3 rounded-lg border border-accent/30 hover:bg-accent/5 transition-colors"
                       >
                         <Checkbox
                           id={category.id}
                           checked={selectedCategories.includes(category.id)}
                           onCheckedChange={() => handleCategoryToggle(category.id)}
-                          className="border-theme-yellow data-[state=checked]:bg-theme-yellow data-[state=checked]:border-theme-yellow"
+                          className="border-accent data-[state=checked]:bg-accent data-[state=checked]:border-accent"
                         />
                         <Label
                           htmlFor={category.id}
@@ -276,7 +276,7 @@ const QuizSetup = () => {
                     <SelectTrigger className="jeopardy-button">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-theme-yellow/30">
+                    <SelectContent className="bg-card border-accent/30">
                       <SelectItem value="5">5 Questions</SelectItem>
                       <SelectItem value="10">10 Questions</SelectItem>
                       <SelectItem value="15">15 Questions</SelectItem>
@@ -301,7 +301,7 @@ const QuizSetup = () => {
                     <SelectTrigger className="jeopardy-button">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-theme-yellow/30">
+                    <SelectContent className="bg-card border-accent/30">
                       <SelectItem value="all">All Questions ({questionCounts.all})</SelectItem>
                       <SelectItem value="fresh">Fresh Questions Only ({questionCounts.fresh})</SelectItem>
                       <SelectItem value="correct">Previously Correct ({questionCounts.correct})</SelectItem>
@@ -331,21 +331,21 @@ const QuizSetup = () => {
                   
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Categories</Label>
-                    <p className="text-sm text-theme-yellow font-medium">
+                    <p className="text-sm text-accent font-medium">
                       {selectedCategories.length} selected
                     </p>
                   </div>
                   
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Questions</Label>
-                    <p className="text-sm text-theme-yellow font-medium">
+                    <p className="text-sm text-accent font-medium">
                       {questionCount} questions
                     </p>
                   </div>
 
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Question Type</Label>
-                    <p className="text-sm text-theme-yellow font-medium">
+                    <p className="text-sm text-accent font-medium">
                       {questionFilter === 'all' ? 'All Questions' :
                        questionFilter === 'fresh' ? 'Fresh Questions Only' :
                        questionFilter === 'correct' ? 'Previously Correct' :
@@ -355,7 +355,7 @@ const QuizSetup = () => {
                   
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Points per Question</Label>
-                    <p className="text-sm text-theme-yellow font-medium">
+                    <p className="text-sm text-accent font-medium">
                       10 points each
                     </p>
                   </div>

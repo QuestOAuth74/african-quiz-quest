@@ -298,7 +298,7 @@ CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
     <div className="space-y-6">
       <Card className="jeopardy-card">
         <CardHeader>
-          <CardTitle className="text-theme-yellow flex items-center gap-2">
+          <CardTitle className="text-accent flex items-center gap-2">
             <Upload size={20} />
             Bulk Upload Crossword Words via CSV
           </CardTitle>
@@ -403,7 +403,7 @@ CHEIKH,"Scholars",4,"Cheikh Anta Diop, renowned African historian and scholar"`;
 
       <Card className="jeopardy-card">
         <CardHeader>
-          <CardTitle className="text-theme-yellow">CSV Format Requirements</CardTitle>
+          <CardTitle className="text-accent">CSV Format Requirements</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

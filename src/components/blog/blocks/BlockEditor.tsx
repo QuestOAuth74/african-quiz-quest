@@ -210,7 +210,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ blocks, onChange }) =>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 rounded-full border-2 border-dashed border-muted-foreground/30 hover:border-theme-gold"
+                className="h-8 w-8 rounded-full border-2 border-dashed border-muted-foreground/30 hover:border-accent"
                 onClick={() => setShowInserter(showInserter === index ? null : index)}
               >
                 <Plus className="h-4 w-4" />
@@ -236,7 +236,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ blocks, onChange }) =>
       <div className="flex justify-center py-4">
         <Button
           variant="ghost"
-          className="h-12 w-12 rounded-full border-2 border-dashed border-muted-foreground/30 hover:border-theme-gold"
+          className="h-12 w-12 rounded-full border-2 border-dashed border-muted-foreground/30 hover:border-accent"
           onClick={() => setShowInserter(showInserter === blocks.length ? null : blocks.length)}
         >
           <Plus className="h-5 w-5" />

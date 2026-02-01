@@ -176,17 +176,17 @@ const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProp
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-yellow mx-auto mb-4"></div>
-          <p className="text-theme-yellow font-orbitron">Loading categories...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-accent font-orbitron">Loading categories...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-theme-brown-dark via-theme-brown to-theme-brown-light overflow-auto">
+    <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-primary/80 overflow-auto">
       <TopNavigation />
       <div className="container mx-auto px-4 pt-20 pb-8">
         <div className="max-w-4xl mx-auto">
@@ -195,7 +195,7 @@ const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProp
             <Button
               onClick={onBack}
               variant="outline"
-              className="jeopardy-button border-theme-yellow/50"
+              className="jeopardy-button border-accent/50"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
@@ -204,7 +204,7 @@ const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProp
               <h1 className="font-orbitron font-black text-3xl md:text-4xl gradient-text">
                 Game Setup
               </h1>
-              <p className="text-theme-yellow-light font-exo">
+              <p className="text-accent/80 font-exo">
                 Configure your {gameMode === 'single' ? 'single player' : `${playerCount || 2} player`} game
               </p>
             </div>
@@ -242,13 +242,13 @@ const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProp
                     {categories.map((category) => (
                       <div
                         key={category.id}
-                        className="flex items-center space-x-3 p-3 rounded-lg border border-theme-yellow/30 hover:bg-theme-yellow/5 transition-colors"
+                        className="flex items-center space-x-3 p-3 rounded-lg border border-accent/30 hover:bg-accent/5 transition-colors"
                       >
                         <Checkbox
                           id={category.id}
                           checked={selectedCategories.includes(category.id)}
                           onCheckedChange={() => handleCategoryToggle(category.id)}
-                          className="border-theme-yellow data-[state=checked]:bg-theme-yellow data-[state=checked]:border-theme-yellow"
+                          className="border-accent data-[state=checked]:bg-accent data-[state=checked]:border-accent"
                         />
                         <Label
                           htmlFor={category.id}
@@ -276,7 +276,7 @@ const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProp
                     <SelectTrigger className="jeopardy-button">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-theme-yellow/30">
+                    <SelectContent className="bg-card border-accent/30">
                       <SelectItem value="3">3 Questions</SelectItem>
                       <SelectItem value="4">4 Questions</SelectItem>
                       <SelectItem value="5">5 Questions</SelectItem>
@@ -335,7 +335,7 @@ const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProp
                     <SelectTrigger className="jeopardy-button">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-theme-yellow/30">
+                    <SelectContent className="bg-card border-accent/30">
                       <SelectItem value="all">All Questions ({questionCounts.all})</SelectItem>
                       <SelectItem value="fresh">Fresh Questions Only ({questionCounts.fresh})</SelectItem>
                       <SelectItem value="correct">Previously Correct ({questionCounts.correct})</SelectItem>
@@ -368,21 +368,21 @@ const GameSetup = ({ gameMode, playerCount, onBack, onStartGame }: GameSetupProp
                   
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Categories</Label>
-                    <p className="text-sm text-theme-yellow font-medium">
+                    <p className="text-sm text-accent font-medium">
                       {selectedCategories.length} selected
                     </p>
                   </div>
                   
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Total Questions</Label>
-                    <p className="text-sm text-theme-yellow font-medium">
+                    <p className="text-sm text-accent font-medium">
                       {selectedCategories.length * rowCount}
                     </p>
                   </div>
                   
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Max Points</Label>
-                    <p className="text-sm text-theme-yellow font-medium">
+                    <p className="text-sm text-accent font-medium">
                       ${selectedCategories.length * rowCount * 100 * rowCount / 2}
                     </p>
                   </div>

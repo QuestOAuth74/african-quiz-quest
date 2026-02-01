@@ -114,7 +114,7 @@ export const ListBlock: React.FC<ListBlockProps> = ({
             variant="ghost"
             size="sm"
             onClick={addItem}
-            className="w-full border-2 border-dashed border-muted-foreground/30 hover:border-theme-gold/50"
+            className="w-full border-2 border-dashed border-muted-foreground/30 hover:border-accent/50"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add item

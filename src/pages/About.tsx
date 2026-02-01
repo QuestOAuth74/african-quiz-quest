@@ -12,7 +12,7 @@ const About = () => {
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold text-primary">About Us</h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-theme-yellow to-theme-yellow-light mx-auto rounded-full"></div>
+            <div className="w-24 h-1 bg-gradient-to-r from-accent to-accent/80 mx-auto rounded-full"></div>
           </div>
 
           {/* Main Content */}
@@ -61,7 +61,7 @@ const About = () => {
             <h2 className="text-2xl font-semibold text-primary mb-4">Contact Us</h2>
             <a 
               href="mailto:subscribe@historiaafricana.org"
-              className="inline-flex items-center gap-2 text-theme-yellow hover:text-theme-yellow-light transition-colors text-lg"
+              className="inline-flex items-center gap-2 text-accent hover:text-accent/80 transition-colors text-lg"
             >
               <Mail className="h-5 w-5" />
               subscribe@historiaafricana.org

@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'brown-gold' | 'lake';
+type ColorMode = 'light' | 'dark';
 
 interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  colorMode: ColorMode;
+  setColorMode: (mode: ColorMode) => void;
+  toggleColorMode: () => void;
+  // Legacy compatibility
+  theme: string;
+  setTheme: (theme: string) => void;
   toggleTheme: () => void;
 }
 
@@ -13,7 +17,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    console.warn('⚠️ useTheme called outside ThemeProvider - using fallback');
+    console.warn('useTheme called outside ThemeProvider - using fallback');
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
@@ -24,34 +28,48 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('app-theme');
-    return (saved as Theme) || 'brown-gold';
+  const [colorMode, setColorMode] = useState<ColorMode>(() => {
+    const saved = localStorage.getItem('color-mode');
+    if (saved === 'dark' || saved === 'light') return saved;
+    // Check system preference
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
   });
 
   useEffect(() => {
-    localStorage.setItem('app-theme', theme);
-    
-    // Remove all theme classes first
-    document.documentElement.classList.remove('theme-brown-gold', 'theme-lake');
-    
-    // Add the new theme class
-    document.documentElement.classList.add(`theme-${theme}`);
-    
-    // Debug logging to verify theme switching
-    console.log('🎨 Theme switched to:', theme);
-    console.log('📄 Current document classes:', document.documentElement.className);
-    console.log('💾 localStorage theme:', localStorage.getItem('app-theme'));
-  }, [theme]);
+    localStorage.setItem('color-mode', colorMode);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'brown-gold' ? 'lake' : 'brown-gold';
-    console.log('🔄 Toggling theme from', theme, 'to', newTheme);
-    setTheme(newTheme);
+    // Update document class for dark mode
+    if (colorMode === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Clean up old theme classes
+    document.documentElement.classList.remove('theme-brown-gold', 'theme-lake');
+  }, [colorMode]);
+
+  const toggleColorMode = () => {
+    setColorMode(prev => prev === 'light' ? 'dark' : 'light');
   };
 
+  // Legacy compatibility - these are no-ops now
+  const theme = 'clean-minimal';
+  const setTheme = () => {};
+  const toggleTheme = toggleColorMode;
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{
+      colorMode,
+      setColorMode,
+      toggleColorMode,
+      theme,
+      setTheme,
+      toggleTheme
+    }}>
       {children}
     </ThemeContext.Provider>
   );

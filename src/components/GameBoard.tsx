@@ -42,7 +42,7 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
         {categories.map((category, index) => (
           <Card 
             key={category.id} 
-            className="bg-theme-brown-dark border-none animate-fade-in"
+            className="bg-primary border-none animate-fade-in"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <CardHeader className="p-3">
@@ -65,7 +65,7 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
                 key={`${category.id}-${points}`}
                 className={`aspect-square transition-all duration-500 animate-scale-in ${
                   isAnswered 
-                    ? 'bg-theme-brown-dark/50 border-theme-brown opacity-40 cursor-not-allowed' 
+                    ? 'bg-primary/50 border-primary opacity-40 cursor-not-allowed' 
                     : !hasQuestion
                       ? 'bg-muted/30 border-muted opacity-50 cursor-not-allowed'
                       : 'jeopardy-button hover:scale-105 cursor-pointer'
@@ -75,8 +75,8 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
                 <CardContent className="p-0 h-full relative">
                   {/* Answered overlay */}
                   {isAnswered && (
-                    <div className="absolute inset-0 bg-theme-brown-dark/80 flex items-center justify-center z-10 rounded-lg">
-                      <div className="text-4xl text-theme-brown-light/60">✓</div>
+                    <div className="absolute inset-0 bg-primary/80 flex items-center justify-center z-10 rounded-lg">
+                      <div className="text-4xl text-primary/80/60">✓</div>
                     </div>
                   )}
                   
@@ -91,7 +91,7 @@ export function GameBoard({ categories, onQuestionSelect, isGameActive, rowCount
                     variant="ghost"
                     className={`w-full h-full transition-all duration-300 font-orbitron font-black text-lg md:text-xl border-0 bg-transparent relative ${
                       isAnswered 
-                        ? 'text-theme-brown-light/30 cursor-not-allowed pointer-events-none' 
+                        ? 'text-primary/80/30 cursor-not-allowed pointer-events-none' 
                         : !hasQuestion
                           ? 'text-muted-foreground/40 cursor-not-allowed pointer-events-none'
                           : 'text-jeopardy-gold hover:text-jeopardy-gold-light hover:scale-110 jeopardy-text-glow hover:bg-transparent'

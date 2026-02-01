@@ -39,9 +39,9 @@ export const LinkBlock: React.FC<LinkBlockProps> = ({
         {hasValidUrl && (
           <div className="border border-border rounded-lg p-4 bg-muted/30">
             <div className="flex items-start gap-3">
-              <ExternalLink className="h-5 w-5 text-theme-gold mt-1 flex-shrink-0" />
+              <ExternalLink className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-theme-gold hover:text-theme-gold-dark">
+                <h4 className="font-medium text-accent hover:text-accent-dark">
                   <a 
                     href={block.data.url} 
                     target="_blank" 

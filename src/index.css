@@ -2,84 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Neobrutalism Design System
-   All colors MUST be HSL. NO GRADIENTS.
-   
-   Neobrutalism characteristics:
-   - Hard black borders (3-4px)
-   - Bold, flat, high-contrast colors
-   - Solid offset shadows (no blur)
-   - Zero border radius
-   - Raw, bold typography
-   - No gradients whatsoever
+/* Clean Minimal Design System
+   African-inspired accents with modern, clean aesthetics
+   - Warm terracotta primary
+   - Sage green secondary
+   - True gold accent
+   - Subtle soft shadows
 */
 
 :root {
-  /* Core Neobrutalism Colors - Earth Theme (Teal, Green, Orange) */
-  --background: 40 25% 95%; /* Warm cream */
-  --foreground: 160 50% 8%; /* Deep teal-black */
-  --card: 45 30% 98%; /* Off-white cream */
-  --card-foreground: 160 50% 8%;
-  --popover: 45 30% 98%;
-  --popover-foreground: 160 50% 8%;
-  --primary: 170 65% 35%; /* Deep teal */
-  --primary-foreground: 0 0% 100%; /* Pure white */
-  --secondary: 145 55% 40%; /* Forest green */
-  --secondary-foreground: 0 0% 100%; /* Pure white */
-  --muted: 45 20% 88%;
-  --muted-foreground: 160 30% 30%; /* Dark teal for readability */
-  --accent: 25 90% 50%; /* Vibrant orange */
-  --accent-foreground: 0 0% 100%; /* Pure white */
-  --destructive: 0 70% 50%;
+  /* Clean Minimal Colors - Warm African-Inspired Palette */
+  --background: 0 0% 98%; /* Near-white */
+  --foreground: 20 15% 15%; /* Warm dark gray */
+  --card: 0 0% 100%; /* Pure white */
+  --card-foreground: 20 15% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 15% 15%;
+  --primary: 16 65% 45%; /* Warm terracotta */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 140 20% 45%; /* Sage green */
+  --secondary-foreground: 0 0% 100%;
+  --muted: 20 10% 94%;
+  --muted-foreground: 20 10% 40%;
+  --accent: 40 85% 50%; /* True gold */
+  --accent-foreground: 20 15% 15%;
+  --destructive: 0 65% 50%;
   --destructive-foreground: 0 0% 100%;
-  --border: 160 50% 10%; /* Deep teal-black for hard borders */
-  --input: 45 25% 92%;
-  --ring: 170 65% 35%;
-  --radius: 0px;
+  --border: 20 10% 88%;
+  --input: 20 10% 94%;
+  --ring: 16 65% 45%;
+  --radius: 0.5rem;
 
-  /* Theme accent colors - Earth Tones */
-  --theme-brown: 170 65% 35%;
-  --theme-brown-light: 170 50% 50%;
-  --theme-brown-dark: 170 70% 25%;
-  --theme-yellow: 25 90% 50%;
-  --theme-yellow-light: 30 85% 60%;
-  --theme-yellow-dark: 20 95% 40%;
-  --theme-gold: 25 90% 50%;
-  --theme-gold-light: 30 85% 60%;
-  --theme-gold-dark: 20 95% 40%;
-
-  /* Neobrutalism Shadows - Hard offset, zero blur */
-  --shadow-card: 4px 4px 0px hsl(160 50% 10%);
-  --shadow-yellow: 4px 4px 0px hsl(160 50% 10%);
-  --shadow-inset: none;
-  --shadow-soft: 2px 2px 0px hsl(160 50% 10%);
-  --shadow-medium: 4px 4px 0px hsl(160 50% 10%);
-  --shadow-large: 6px 6px 0px hsl(160 50% 10%);
-  --shadow-glow: 4px 4px 0px hsl(160 50% 10%);
-  --shadow-elegant: 5px 5px 0px hsl(160 50% 10%);
-
-  /* Fast transitions for snappy feel */
-  --transition-fast: all 0.1s ease;
-  --transition-smooth: all 0.15s ease;
-  --transition-elegant: all 0.2s ease;
-  --transition-bounce: all 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  /* Smooth transitions */
+  --transition-fast: all 0.15s ease;
+  --transition-smooth: all 0.2s ease;
+  --transition-elegant: all 0.3s ease;
 
   /* Sidebar */
-  --sidebar-background: 45 30% 98%;
-  --sidebar-foreground: 160 50% 8%;
-  --sidebar-primary: 170 65% 35%;
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 20 15% 15%;
+  --sidebar-primary: 16 65% 45%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 25 90% 50%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 160 50% 10%;
-  --sidebar-ring: 170 65% 35%;
+  --sidebar-accent: 40 85% 50%;
+  --sidebar-accent-foreground: 20 15% 15%;
+  --sidebar-border: 20 10% 88%;
+  --sidebar-ring: 16 65% 45%;
 }
 
 @layer base {
+  .dark {
+    --background: 20 15% 10%;
+    --foreground: 20 10% 95%;
+    --card: 20 15% 13%;
+    --card-foreground: 20 10% 95%;
+    --popover: 20 15% 12%;
+    --popover-foreground: 20 10% 95%;
+    --primary: 16 60% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 140 20% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 20 10% 18%;
+    --muted-foreground: 20 10% 65%;
+    --accent: 40 80% 55%;
+    --accent-foreground: 20 15% 10%;
+    --destructive: 0 60% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 20 10% 22%;
+    --input: 20 10% 18%;
+    --ring: 16 60% 55%;
 
-  /* Professional Animations and Utilities */
+    --sidebar-background: 20 15% 12%;
+    --sidebar-foreground: 20 10% 95%;
+    --sidebar-primary: 16 60% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 80% 55%;
+    --sidebar-accent-foreground: 20 15% 10%;
+    --sidebar-border: 20 10% 22%;
+    --sidebar-ring: 16 60% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-foreground font-body;
+    background: hsl(var(--background));
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold;
+  }
+
+  /* Animation utilities */
   .animate-fade-in {
-    animation: fade-in 0.6s ease-out forwards;
+    animation: fade-in 0.4s ease-out forwards;
   }
 
   .animate-fade-in-up {
@@ -87,17 +107,37 @@
   }
 
   .animate-scale-in {
-    animation: scale-in 0.4s ease-out forwards;
+    animation: scale-in 0.3s ease-out forwards;
   }
 
   .animate-slide-in-right {
     animation: slide-in-right 0.3s ease-out forwards;
   }
 
-  .animate-stagger-fade-in {
-    animation: stagger-fade-in 0.6s ease-out forwards;
+  /* Subtle shadow utilities */
+  .shadow-subtle {
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 
+  .shadow-soft {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+
+  .shadow-elevated {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  /* Hover lift utility */
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  /* Story link underline animation */
   .story-link {
     position: relative;
     display: inline-block;
@@ -122,15 +162,16 @@
     transform-origin: bottom left;
   }
 
+  /* Hover scale utility */
   .hover-scale {
     transition: transform 0.2s ease-out;
   }
 
   .hover-scale:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
   }
 
-  /* Hide scrollbar for Instagram-like stories */
+  /* Hide scrollbar utility */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -154,167 +195,38 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
   }
-
-  /* Neobrutalism shadow */
-  .shadow-3xl {
-    box-shadow: 6px 6px 0px hsl(25 40% 15%);
-  }
-
-  .dark {
-    --background: 160 30% 8%;
-    --foreground: 45 20% 95%;
-    --card: 160 25% 12%;
-    --card-foreground: 45 20% 95%;
-    --popover: 160 25% 10%;
-    --popover-foreground: 45 20% 95%;
-    --primary: 170 60% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 145 50% 45%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 160 20% 18%;
-    --muted-foreground: 45 15% 70%;
-    --accent: 25 85% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 25 80% 60%;
-    --input: 160 20% 15%;
-    --ring: 170 60% 45%;
-
-    --sidebar-background: 160 25% 10%;
-    --sidebar-foreground: 45 20% 95%;
-    --sidebar-primary: 170 60% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 25 85% 55%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 25 80% 60%;
-    --sidebar-ring: 170 60% 45%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply text-foreground font-display;
-    background: hsl(var(--background));
-    min-height: 100vh;
-  }
-
-  /* Neobrutalism utility classes */
-  .jeopardy-card {
-    background: hsl(var(--card));
-    box-shadow: var(--shadow-card);
-    border: 3px solid hsl(var(--border));
-  }
-
-  .jeopardy-gold {
-    background: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
-    box-shadow: var(--shadow-yellow);
-    border: 3px solid hsl(var(--border));
-  }
-
-  .jeopardy-button {
-    background: hsl(var(--card));
-    border: 3px solid hsl(var(--border));
-    transition: var(--transition-fast);
-    box-shadow: var(--shadow-card);
-    color: hsl(var(--foreground));
-  }
-
-  .jeopardy-button:hover {
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px hsl(var(--border));
-  }
-
-  .jeopardy-text-glow {
-    /* Neobrutalism - no text glow, use bold text instead */
-    font-weight: 700;
-  }
 }
 
 @layer utilities {
-  .animate-pulse-yellow {
-    animation: pulse-yellow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  @keyframes pulse-yellow {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.02);
-    }
-  }
-
   .gradient-text {
     color: hsl(var(--primary));
     font-weight: 700;
   }
 
-  /* Neobrutalism Image Frame */
+  /* Clean Image Frame */
   .quiz-image-frame {
     position: relative;
     display: inline-block;
-    padding: 6px;
-    background: hsl(var(--accent));
-    border: 3px solid hsl(var(--border));
-    box-shadow: 4px 4px 0px hsl(var(--border));
-  }
-
-  .quiz-image-frame::before,
-  .quiz-image-frame::after {
-    display: none;
+    padding: 4px;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    transition: var(--transition-smooth);
   }
 
   .quiz-image-frame:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px hsl(var(--border));
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   }
 
   .quiz-image-content {
     display: block;
     overflow: hidden;
     background: hsl(var(--card));
+    border-radius: calc(var(--radius) - 2px);
   }
 
-  /* Neobrutalism Button Style */
-  .neo-button {
-    background: hsl(var(--card));
-    border: 3px solid hsl(var(--border));
-    box-shadow: 4px 4px 0px hsl(var(--border));
-    transition: var(--transition-fast);
-    font-weight: 600;
-  }
-
-  .neo-button:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px hsl(var(--border));
-  }
-
-  .neo-button:active {
-    transform: translate(2px, 2px);
-    box-shadow: 0px 0px 0px hsl(var(--border));
-  }
-
-  /* Neobrutalism Card */
-  .neo-card {
-    background: hsl(var(--card));
-    border: 3px solid hsl(var(--border));
-    box-shadow: 4px 4px 0px hsl(var(--border));
-  }
-
-  .neo-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px hsl(var(--border));
-  }
-
-  /* African Pattern Accent - Solid stripes, no gradient */
+  /* African pattern accent - subtle top border */
   .african-accent {
     position: relative;
   }
@@ -325,81 +237,44 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 6px;
-    background: hsl(var(--primary));
-    border-bottom: 2px solid hsl(var(--border));
+    height: 3px;
+    background: linear-gradient(90deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--accent)) 50%,
+      hsl(var(--secondary)) 100%
+    );
+    border-radius: var(--radius) var(--radius) 0 0;
   }
 }
 
-/* Welcome Modal Animations */
-@keyframes float {
-  0%, 100% { 
-    transform: translateY(0px) rotate(0deg); 
-    opacity: 0.3;
-  }
-  50% { 
-    transform: translateY(-20px) rotate(180deg); 
-    opacity: 0.8;
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Neobrutalism Blog image frame styles */
+/* Blog image frame */
 .blog-image-frame {
   position: relative;
   overflow: hidden;
-  border: 3px solid hsl(var(--border));
-  box-shadow: 4px 4px 0px hsl(var(--border));
-}
-
-.blog-image-frame::before {
-  display: none;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  transition: var(--transition-smooth);
 }
 
 .blog-image-frame:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px hsl(var(--border));
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-@keyframes pulse-gold {
-  0%, 100% { 
-    transform: scale(1);
-  }
-  50% { 
-    transform: scale(1.02);
-  }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.animate-pulse-gold {
-  animation: pulse-gold 3s ease-in-out infinite;
-}
-
-.animate-shimmer {
-  animation: shimmer 2s linear infinite;
-}
-
-/* Neobrutalism Forum image frame */
+/* Forum image frame */
 .forum-image-frame {
   position: relative;
   overflow: hidden;
-  background: hsl(var(--accent));
-  padding: 4px;
-  border: 3px solid hsl(var(--border));
-  box-shadow: 4px 4px 0px hsl(var(--border));
-  transition: all 0.15s ease;
+  background: hsl(var(--card));
+  padding: 3px;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  transition: var(--transition-smooth);
 }
 
 .forum-image-frame:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px hsl(var(--border));
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 .forum-image-content {
@@ -407,87 +282,59 @@
   background: hsl(var(--background));
   display: block;
   width: 100%;
+  border-radius: calc(var(--radius) - 2px);
 }
 
-/* Neobrutalism theme-adaptive component styles */
+/* Theme-adaptive components - clean styling */
 .theme-adaptive-card {
   background: hsl(var(--card));
-  border: 3px solid hsl(var(--border));
-  box-shadow: 4px 4px 0px hsl(var(--border));
-  transition: all 0.15s ease;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  transition: var(--transition-smooth);
 }
 
 .theme-adaptive-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px hsl(var(--border));
-}
-
-.theme-brown-gold .theme-adaptive-card:hover {
-  box-shadow: 6px 6px 0px hsl(var(--border));
-}
-
-.theme-lake .theme-adaptive-card:hover {
-  box-shadow: 6px 6px 0px hsl(var(--border));
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 .theme-adaptive-button {
   background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
-  border: 3px solid hsl(var(--border));
-  box-shadow: 4px 4px 0px hsl(var(--border));
-  transition: all 0.15s ease;
-  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: var(--transition-fast);
+  font-weight: 600;
 }
 
 .theme-adaptive-button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px hsl(var(--border));
+  background: hsl(var(--primary) / 0.9);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
 .theme-adaptive-button:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px hsl(var(--border));
+  transform: scale(0.98);
 }
 
-  /* Neobrutalism theme effects - minimal animations, bold styling */
-  .theme-lake .water-ripple,
-  .theme-lake .gentle-wave,
-  .theme-lake .bubble-float,
-  .theme-brown-gold .earth-glow {
-    /* Neobrutalism: no fancy animations, use bold static styling */
-  }
-
-  @keyframes ripple {
-    0% { left: -100%; }
-    100% { left: 100%; }
-  }
-
-  @keyframes wave {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-3px); }
-  }
-
-  @keyframes bubble {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-  }
-
-/* Neobrutalism Crossword-specific styles */
+/* Crossword styles */
 .crossword-grid {
-  font-family: 'Space Mono', monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .crossword-grid input {
-  font-family: 'Space Mono', monospace;
-  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
   text-transform: uppercase;
   outline: none;
-  border: 2px solid hsl(var(--border));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) - 2px);
+  transition: var(--transition-fast);
 }
 
 .crossword-grid input:focus {
-  border: 3px solid hsl(var(--primary));
-  box-shadow: 2px 2px 0px hsl(var(--border));
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
 }
 
 .crossword-clues {
@@ -498,14 +345,13 @@
   height: 100%;
 }
 
-/* Crossword animations */
 @keyframes crossword-reveal {
-  from { 
-    opacity: 0; 
+  from {
+    opacity: 0;
     transform: scale(0.95);
   }
-  to { 
-    opacity: 1; 
+  to {
+    opacity: 1;
     transform: scale(1);
   }
 }
@@ -514,71 +360,117 @@
   animation: crossword-reveal 0.2s ease-out;
 }
 
-/* Neobrutalism Crossword cell highlighting */
 .crossword-cell-selected {
-  background: hsl(var(--accent)) !important;
-  border: 3px solid hsl(var(--border)) !important;
-  box-shadow: 2px 2px 0px hsl(var(--border));
+  background: hsl(var(--accent) / 0.3) !important;
+  border-color: hsl(var(--accent)) !important;
 }
 
 .crossword-cell-correct {
-  background: hsl(142 50% 50%) !important;
-  color: hsl(0 0% 100%) !important;
-  border: 3px solid hsl(var(--border)) !important;
+  background: hsl(142 50% 90%) !important;
+  color: hsl(142 50% 30%) !important;
+  border-color: hsl(142 50% 50%) !important;
 }
 
 .crossword-cell-word-complete {
-  background: hsl(142 50% 45%) !important;
-  border: 3px solid hsl(var(--border)) !important;
+  background: hsl(142 50% 85%) !important;
+  border-color: hsl(142 50% 50%) !important;
 }
 
-/* Neobrutalism Input Styles */
+/* Clean input styles */
 input, textarea, select {
-  border: 2px solid hsl(var(--border)) !important;
-  border-radius: 0 !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: var(--radius) !important;
   background: hsl(var(--input)) !important;
+  transition: var(--transition-fast);
 }
 
 input:focus, textarea:focus, select:focus {
-  border: 3px solid hsl(var(--primary)) !important;
-  box-shadow: 2px 2px 0px hsl(var(--border)) !important;
+  border-color: hsl(var(--primary)) !important;
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2) !important;
   outline: none !important;
 }
 
-/* Neobrutalism Link Styles */
+/* Clean link styles */
 a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  font-weight: 600;
+  color: hsl(var(--primary));
+  text-decoration: none;
+  transition: var(--transition-fast);
 }
 
 a:hover {
-  background: hsl(var(--accent));
-  color: hsl(var(--accent-foreground));
+  color: hsl(var(--primary) / 0.8);
+  text-decoration: underline;
 }
 
-/* Neobrutalism Selection */
+/* Selection */
 ::selection {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
 }
 
-/* Neobrutalism Scrollbar */
+/* Clean scrollbar */
 ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
   background: hsl(var(--muted));
-  border: 2px solid hsl(var(--border));
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary));
-  border: 2px solid hsl(var(--border));
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.8);
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Animation keyframes */
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  0% { opacity: 0; transform: translateX(10px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Float animation for decorative elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.6;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Subtle pulse for attention */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
 }

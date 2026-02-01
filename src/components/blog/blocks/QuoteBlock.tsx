@@ -35,8 +35,8 @@ export const QuoteBlock: React.FC<QuoteBlockProps> = ({
     >
       <div className="space-y-4">
         {block.data.text && (
-          <blockquote className="border-l-4 border-theme-gold pl-6 py-4 bg-muted/30 rounded-r-lg">
-            <QuoteIcon className="h-6 w-6 text-theme-gold mb-2" />
+          <blockquote className="border-l-4 border-accent pl-6 py-4 bg-muted/30 rounded-r-lg">
+            <QuoteIcon className="h-6 w-6 text-accent mb-2" />
             <p className="text-lg italic font-medium leading-relaxed">
               "{block.data.text}"
             </p>

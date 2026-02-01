@@ -76,22 +76,22 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-theme-brown-dark via-background to-theme-brown opacity-90" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--theme-yellow)/0.1),transparent_70%)]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary via-background to-primary opacity-90" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--accent)/0.1),transparent_70%)]" />
       
       {/* Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Back to Game Button */}
-          <Link to="/" className="inline-flex items-center gap-2 text-theme-yellow hover:text-theme-yellow-light transition-colors mb-8 group">
+          <Link to="/" className="inline-flex items-center gap-2 text-accent hover:text-accent/80 transition-colors mb-8 group">
             <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-2px] transition-transform" />
             Back to Game
           </Link>
 
-          <Card className="jeopardy-card border-theme-yellow/20 backdrop-blur-sm">
+          <Card className="jeopardy-card border-accent/20 backdrop-blur-sm">
             <CardHeader className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-theme-yellow to-theme-yellow-dark flex items-center justify-center">
-                <Crown className="w-8 h-8 text-theme-brown" />
+              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center">
+                <Crown className="w-8 h-8 text-primary" />
               </div>
               <div>
                 <CardTitle className="text-3xl font-bold gradient-text">Admin Portal</CardTitle>
@@ -109,7 +109,7 @@ const AdminLogin = () => {
                     placeholder="Administrator Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 bg-background/50 border-border/50 focus:border-theme-yellow transition-colors"
+                    className="pl-10 h-12 bg-background/50 border-border/50 focus:border-accent transition-colors"
                     required
                   />
                 </div>
@@ -120,7 +120,7 @@ const AdminLogin = () => {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-12 bg-background/50 border-border/50 focus:border-theme-yellow transition-colors"
+                    className="pl-10 h-12 bg-background/50 border-border/50 focus:border-accent transition-colors"
                     required
                   />
                 </div>
@@ -131,7 +131,7 @@ const AdminLogin = () => {
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-theme-brown border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                       Authenticating...
                     </div>
                   ) : (

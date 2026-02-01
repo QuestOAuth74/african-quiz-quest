@@ -87,7 +87,7 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
 
   return (
     <div
-      className={`group relative border-2 border-transparent hover:border-theme-gold/20 rounded-lg transition-all ${className}`}
+      className={`group relative border-2 border-transparent hover:border-accent/20 rounded-lg transition-all ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
